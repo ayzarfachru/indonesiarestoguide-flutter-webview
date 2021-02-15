@@ -1,7 +1,15 @@
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:indonesiarestoguide/ui/auth/login_activity.dart';
+import 'package:indonesiarestoguide/ui/bookmark/bookmark_activity.dart';
+import 'package:indonesiarestoguide/ui/cart/cart_activity.dart';
+import 'package:indonesiarestoguide/ui/detail/detail_resto.dart';
+import 'package:indonesiarestoguide/ui/history/history_activity.dart';
 import 'package:indonesiarestoguide/ui/home/home_activity.dart';
+import 'package:indonesiarestoguide/ui/profile/edit_profile.dart';
+import 'package:indonesiarestoguide/ui/profile/profile_activity.dart';
+import 'package:indonesiarestoguide/ui/promo/promo_activity.dart';
+import 'package:indonesiarestoguide/ui/search/search_activity.dart';
 import 'package:indonesiarestoguide/ui/splash_screen.dart';
 import 'package:indonesiarestoguide/ui/welcome_screen.dart';
 import 'package:indonesiarestoguide/utils/utils.dart';
@@ -35,7 +43,7 @@ class _MyAppState extends State<MyApp> {
             elevation: 0
         ),
       ),
-      home: new HomeActivity(),
+      home: new CartActivity(),
     );
   }
 }

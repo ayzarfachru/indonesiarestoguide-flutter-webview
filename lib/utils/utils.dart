@@ -47,9 +47,51 @@ class CustomText{
       text,
       style: GoogleFonts.poppins(
           textStyle: TextStyle(
+              fontSize: 32,
+              fontWeight:
+              FontWeight.w600, color: color??Colors.black)),
+      minFontSize: minSize??0,
+      maxLines: maxLines??1,
+    );
+  }
+
+  static Widget textHeading3({String text, Color color,
+    double minSize, int maxLines,}){
+    return AutoSizeText(
+      text,
+      style: GoogleFonts.poppins(
+          textStyle: TextStyle(
               fontSize: 24,
               fontWeight:
               FontWeight.w500, color: color??Colors.black)),
+      minFontSize: minSize??0,
+      maxLines: maxLines??1,
+    );
+  }
+
+  static Widget textHeading4({String text, Color color,
+    double minSize, int maxLines,}){
+    return AutoSizeText(
+      text,
+      style: GoogleFonts.poppins(
+          textStyle: TextStyle(
+              fontSize: 18,
+              fontWeight:
+              FontWeight.w600, color: color??Colors.black)),
+      minFontSize: minSize??0,
+      maxLines: maxLines??1,
+    );
+  }
+
+  static Widget textHeading5({String text, Color color,
+    double minSize, int maxLines,}){
+    return AutoSizeText(
+      text,
+      style: GoogleFonts.poppins(
+          textStyle: TextStyle(
+              fontSize: 24,
+              fontWeight:
+              FontWeight.w600, color: color??Colors.black)),
       minFontSize: minSize??0,
       maxLines: maxLines??1,
     );

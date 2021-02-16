@@ -1,10 +1,14 @@
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:indonesiarestoguide/model/Resto.dart';
 import 'package:page_transition/page_transition.dart';
 
+import 'package:http/http.dart' as http;
+import 'dart:convert' as convert;
+
 class Links{
-  static String mainUrl = "http://192.168.1.10:8000";
+  static String mainUrl = "http://192.168.100.3:8000";
 }
 
 class CustomText{
@@ -371,5 +375,12 @@ class CustomSize{
   }
   static sizeWidth(BuildContext context){
     return MediaQuery.of(context).size.width;
+  }
+}
+
+class Api{
+  static Future<Resto> getResto() async {
+    var request = await http.get(Links.mainUrl+"/api/user/bookmark?tab=0", headers: {"Accept": "Application/json"});
+    print(convert.jsonDecode(request.body));
   }
 }

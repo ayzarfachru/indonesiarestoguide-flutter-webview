@@ -14,6 +14,7 @@ import 'package:indonesiarestoguide/ui/splash_screen.dart';
 import 'package:indonesiarestoguide/ui/welcome_screen.dart';
 import 'package:indonesiarestoguide/utils/utils.dart';
 
+
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
   GestureBinding.instance?.resamplingEnabled = true;

@@ -13,7 +13,7 @@ import 'package:http/http.dart' as http;
 import 'dart:convert' as convert;
 
 class Links{
-  static String mainUrl = "http://192.168.100.6:8000";
+  static String mainUrl = "http://192.168.100.10:8000/api/v2";
 }
 
 class CustomText{

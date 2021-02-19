@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:indonesiarestoguide/ui/auth/login_activity.dart';
 import 'package:indonesiarestoguide/utils/utils.dart';
+import 'package:page_transition/page_transition.dart';
 
 class WelcomeScreen extends StatefulWidget {
   @override
@@ -40,18 +42,27 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
               SizedBox(
                 height: CustomSize.sizeHeight(context) / 18,
               ),
-              Container(
-                height: CustomSize.sizeHeight(context) / 12,
-                width: CustomSize.sizeWidth(context) / 1.4,
-                decoration: BoxDecoration(
-                  color: CustomColor.primary,
-                  borderRadius: BorderRadius.circular(20)
-                ),
-                child: Center(
-                  child: CustomText.bodyMedium16(
-                      text: "Get Started",
-                      color: Colors.white,
-                      maxLines: 1
+              GestureDetector(
+                onTap: (){
+                  Navigator.pushReplacement(
+                      context,
+                      PageTransition(
+                          type: PageTransitionType.rightToLeft,
+                          child: LoginActivity()));
+                },
+                child: Container(
+                  height: CustomSize.sizeHeight(context) / 12,
+                  width: CustomSize.sizeWidth(context) / 1.4,
+                  decoration: BoxDecoration(
+                    color: CustomColor.primary,
+                    borderRadius: BorderRadius.circular(20)
+                  ),
+                  child: Center(
+                    child: CustomText.bodyMedium16(
+                        text: "Get Started",
+                        color: Colors.white,
+                        maxLines: 1
+                    ),
                   ),
                 ),
               )

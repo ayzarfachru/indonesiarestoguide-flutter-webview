@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:indonesiarestoguide/ui/home/home_activity.dart';
 import 'package:indonesiarestoguide/utils/utils.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class SplashScreen extends StatefulWidget {
   @override
@@ -7,6 +9,28 @@ class SplashScreen extends StatefulWidget {
 }
 
 class _SplashScreenState extends State<SplashScreen> {
+  Future<String> getSwitch() async {
+    SharedPreferences pref = await SharedPreferences.getInstance();
+    return pref.getString("akses") ?? "";
+  }
+
+  Future<bool> _checkForSession() async {
+    await Future.delayed(Duration(milliseconds: 3000), () {});
+
+    return true;
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    _checkForSession().then((status) {
+      if (status) {
+        Navigator.of(context).pushReplacement(MaterialPageRoute(
+            builder: (BuildContext context) => HomeActivity()));
+      }
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(

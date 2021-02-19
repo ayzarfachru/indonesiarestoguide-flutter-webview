@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_icons/flutter_icons.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:indonesiarestoguide/ui/home/home_activity.dart';
@@ -27,6 +28,50 @@ class _LoginActivityState extends State<LoginActivity> {
       _obscureText = !_obscureText;
     });
   }
+
+  bool isLoading = false;
+
+  Future _login(String email, String password) async {
+    if(email != "" && password != ""){
+      setState(() {
+        isLoading = true;
+      });
+      var apiResult = await http.post(Links.mainUrl + '/auth/login', body: {'email': email, 'password': password});
+      print(apiResult.body);
+      var data = json.decode(apiResult.body);
+      if (data['status_code'].toString() == "200") {
+
+        SharedPreferences pref = await SharedPreferences.getInstance();
+        pref.setInt("id", data['user']['id']);
+        pref.setString("name", data['user']['name']);
+        pref.setString("email", data['user']['email']);
+        pref.setString("img", data['user']['img']);
+        pref.setString("gender", data['user']['gender']);
+        pref.setString("tgl", data['user']['ttl']);
+        pref.setString("notelp", data['user']['notelp'].toString());
+        pref.setString("token", data['access_token']);
+
+        setState(() {
+          isLoading = false;
+        });
+        Navigator.pushReplacement(
+            context,
+            PageTransition(
+                type: PageTransitionType.rightToLeft,
+                child: HomeActivity()));
+      } else {
+        Fluttertoast.showToast(
+          msg: data['message'],);
+        setState(() {
+          isLoading = false;
+        });
+      }
+    }else{
+      Fluttertoast.showToast(
+        msg: "Datamu kurang lengkap nih",);
+    }
+  }
+
 
   GoogleSignIn _googleSignIn = GoogleSignIn(
     clientId: "795151845860-o778hf0d6lf62tvnkpd0dc6ttrjt7hnm.apps.googleusercontent.com",
@@ -57,11 +102,11 @@ class _LoginActivityState extends State<LoginActivity> {
       // pref.setString("akses", data['user']['akses']);
       // pref.setString("token", data['access_token']);
 
-    //   Navigator.pushReplacement(
-    //       context,
-    //       PageTransition(
-    //           type: PageTransitionType.rightToLeft,
-    //           child: HomeActivity()));
+      // Navigator.pushReplacement(
+      //     context,
+      //     PageTransition(
+      //         type: PageTransitionType.rightToLeft,
+      //         child: HomeActivity()));
     });
   }
 
@@ -223,7 +268,26 @@ class _LoginActivityState extends State<LoginActivity> {
                 SizedBox(
                   height: CustomSize.sizeHeight(context) / 18,
                 ),
-                Container(
+                (isLoading != true)?GestureDetector(
+                  onTap: (){
+                    _login(_loginTextEmail.text, _loginTextPassword.text);
+                  },
+                  child: Container(
+                    height: CustomSize.sizeHeight(context) / 12,
+                    width: CustomSize.sizeWidth(context) ,
+                    decoration: BoxDecoration(
+                        color: CustomColor.primary,
+                        borderRadius: BorderRadius.circular(20)
+                    ),
+                    child: Center(
+                      child: CustomText.bodyMedium16(
+                          text: "Sign in",
+                          color: Colors.white,
+                          maxLines: 1
+                      ),
+                    ),
+                  ),
+                ):Container(
                   height: CustomSize.sizeHeight(context) / 12,
                   width: CustomSize.sizeWidth(context) ,
                   decoration: BoxDecoration(
@@ -231,10 +295,8 @@ class _LoginActivityState extends State<LoginActivity> {
                       borderRadius: BorderRadius.circular(20)
                   ),
                   child: Center(
-                    child: CustomText.bodyMedium16(
-                        text: "Sign in",
-                        color: Colors.white,
-                        maxLines: 1
+                    child: CircularProgressIndicator(
+                      backgroundColor: Colors.white,
                     ),
                   ),
                 ),

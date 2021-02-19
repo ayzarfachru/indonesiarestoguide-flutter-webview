@@ -1,7 +1,14 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_icons/flutter_icons.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:google_sign_in/google_sign_in.dart';
+import 'package:indonesiarestoguide/ui/home/home_activity.dart';
 import 'package:indonesiarestoguide/utils/utils.dart';
+import 'package:page_transition/page_transition.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:http/http.dart' as http;
 
 class LoginActivity extends StatefulWidget {
   @override
@@ -20,6 +27,44 @@ class _LoginActivityState extends State<LoginActivity> {
       _obscureText = !_obscureText;
     });
   }
+
+  GoogleSignIn _googleSignIn = GoogleSignIn(
+    clientId: "795151845860-o778hf0d6lf62tvnkpd0dc6ttrjt7hnm.apps.googleusercontent.com",
+    scopes: [
+      'email',
+      'https://www.googleapis.com/auth/userinfo.profile',
+    ],
+  );
+
+  Future<void> _handleSignIn() async {
+    await _googleSignIn.signOut();
+    await _googleSignIn.signIn().then((value) async{
+      print(value);
+      // var apiResult = await http
+      //     .post(Links.mainUrl + '/regis', body: {'email': value.email.toString(), 'password': value.id.toString(), 'address': "",
+      //   'name': value.displayName.toString(), 'photoUrl': value.photoUrl.toString()});
+      // print(apiResult.body);
+      // var data = json.decode(apiResult.body);
+      //
+      // SharedPreferences pref = await SharedPreferences.getInstance();
+      // pref.setInt("id", data['user']['id']);
+      // pref.setString("username", data['user']['username']);
+      // pref.setString("name", data['user']['name']);
+      // pref.setString("email", data['user']['email']);
+      // pref.setString("img", data['user']['img']);
+      // pref.setString("address", data['user']['address'].toString());
+      // pref.setString("notelp", data['user']['notelp'].toString());
+      // pref.setString("akses", data['user']['akses']);
+      // pref.setString("token", data['access_token']);
+
+    //   Navigator.pushReplacement(
+    //       context,
+    //       PageTransition(
+    //           type: PageTransitionType.rightToLeft,
+    //           child: HomeActivity()));
+    });
+  }
+
 
   @override
   Widget build(BuildContext context) {
@@ -200,26 +245,29 @@ class _LoginActivityState extends State<LoginActivity> {
                 SizedBox(
                   height: CustomSize.sizeHeight(context) * 0.005,
                 ),
-                Container(
-                  height: CustomSize.sizeHeight(context) / 12,
-                  width: CustomSize.sizeWidth(context) ,
-                  decoration: BoxDecoration(
-                      color: CustomColor.secondary,
-                      borderRadius: BorderRadius.circular(20)
-                  ),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Image.asset(
-                          "assets/icon_google.png",
-                        width: CustomSize.sizeWidth(context) / 14,
-                        height: CustomSize.sizeWidth(context) / 14,
-                      ),
-                      CustomText.bodyMedium16(
-                          text: "Lanjutkan dengan Google",
-                          maxLines: 1
-                      ),
-                    ],
+                GestureDetector(
+                  onTap: _handleSignIn,
+                  child: Container(
+                    height: CustomSize.sizeHeight(context) / 12,
+                    width: CustomSize.sizeWidth(context) ,
+                    decoration: BoxDecoration(
+                        color: CustomColor.secondary,
+                        borderRadius: BorderRadius.circular(20)
+                    ),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Image.asset(
+                            "assets/icon_google.png",
+                          width: CustomSize.sizeWidth(context) / 14,
+                          height: CustomSize.sizeWidth(context) / 14,
+                        ),
+                        CustomText.bodyMedium16(
+                            text: "Lanjutkan dengan Google",
+                            maxLines: 1
+                        ),
+                      ],
+                    ),
                   ),
                 ),
               ],

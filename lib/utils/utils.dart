@@ -1,6 +1,11 @@
+import 'dart:convert';
+
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:indonesiarestoguide/model/Menu.dart';
+import 'package:indonesiarestoguide/model/Price.dart';
+import 'package:indonesiarestoguide/model/Promo.dart';
 import 'package:indonesiarestoguide/model/Resto.dart';
 import 'package:page_transition/page_transition.dart';
 
@@ -8,7 +13,7 @@ import 'package:http/http.dart' as http;
 import 'dart:convert' as convert;
 
 class Links{
-  static String mainUrl = "http://192.168.100.3:8000";
+  static String mainUrl = "http://192.168.100.6:8000";
 }
 
 class CustomText{
@@ -379,8 +384,46 @@ class CustomSize{
 }
 
 class Api{
-  static Future<Resto> getResto() async {
-    var request = await http.get(Links.mainUrl+"/api/user/bookmark?tab=0", headers: {"Accept": "Application/json"});
-    print(convert.jsonDecode(request.body));
+  static Future<Resto> getResto(id) async {
+    var request = await http.get(Links.mainUrl+"/api/v2/resto/detail/$id", headers: {"Accept": "Application/json"});
+    var response = json.decode(request.body)['data'];
+    var recom = <Menu>[];
+    var menus = <Menu>[];
+    var images = <String>[];
+    var promos = <Promo>[];
+    for(var rMenu in response['recom']){
+      var price = Price(rMenu['price'], rMenu.containsKey('discounted') ? rMenu['dicounted'] : 0, rMenu['delivery_price']);
+      var menu = Menu(rMenu['id'], rMenu['name'], rMenu['desc'], price, rMenu['img']);
+      recom.add(menu);
+    }
+    for(var rMenu in response['menu']){
+      for(var dMenu in rMenu['menu']){
+        var price = Price(dMenu['price'], dMenu.containsKey('discounted') ? dMenu['dicounted'] : 0, dMenu['delivery_price']);
+        var menu = Menu(dMenu['id'], dMenu['name'], dMenu['desc'], price, dMenu['img']);
+        menus.add(menu);
+      }
+    }
+    for(var url in response['img']){
+      images.add(url);
+    }
+    for(var p in response['promo']){
+      var price = Price(p['menu_price'], p['menu_discounted'], p['menu_price']);
+      var menu = Menu(p['menu_id'], p['menu_name'], p['menu_desc'], price, p['menu_img']);
+      var promo = Promo(p['menu_id'], p['word'], price.discounted, menu);
+      promos.add(promo);
+    }
+    return Resto.all(
+        id,
+        response['name'],
+        response['address'],
+        response['desc'],
+        response['range'],
+        false,
+        0,
+        images,
+        recom,
+        menus,
+        promos
+    );
   }
 }

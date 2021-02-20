@@ -1,6 +1,17 @@
+import 'dart:convert';
+import 'dart:io';
+
 import 'package:flutter/material.dart';
+import 'package:flutter_datetime_picker/flutter_datetime_picker.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:indonesiarestoguide/utils/utils.dart';
+import 'package:indonesiarestoguide/ui/home/home_activity.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:fluttertoast/fluttertoast.dart';
+import 'package:page_transition/page_transition.dart';
+
+import 'package:http/http.dart' as http;
 
 class EditProfile extends StatefulWidget {
   @override
@@ -12,13 +23,162 @@ class _EditProfileState extends State<EditProfile> {
   TextEditingController _loginEmailName = TextEditingController(text: "");
   TextEditingController _loginNotelpName = TextEditingController(text: "");
 
-  String name = "Deni";
-  String initialName = "";
+  String name = "";
+  String initial = "";
+  String email = "";
+  String img = "";
+  String gender = "wanite";
+  String tgl = "";
+  String notelp = "";
+
+  bool isLoading = true;
+
+  getName() async {
+    SharedPreferences pref = await SharedPreferences.getInstance();
+    setState(() {
+      name = (pref.getString('name'));
+      print(name);
+    });
+  }
+
+  getTname() async {
+    setState(() {
+      _loginTextName = TextEditingController(text: name);
+    });
+  }
+
+  getEmail() async {
+    SharedPreferences pref = await SharedPreferences.getInstance();
+    setState(() {
+      email = (pref.getString('email'));
+      print(email);
+    });
+  }
+
+  getTemail() async {
+    setState(() {
+      _loginEmailName = TextEditingController(text: email);
+    });
+  }
+
+  getImg() async {
+    SharedPreferences pref = await SharedPreferences.getInstance();
+    setState(() {
+      img = (pref.getString('img'));
+      print(img);
+    });
+  }
+
+  getNotelp() async {
+    SharedPreferences pref = await SharedPreferences.getInstance();
+    setState(() {
+      notelp = (pref.getString('notelp'));
+      print(notelp);
+    });
+  }
+
+  getTnotelp() async {
+    setState(() {
+      _loginNotelpName = TextEditingController(text: (notelp != "null")?notelp:"+62");
+    });
+  }
+
+  getGender() async {
+    SharedPreferences pref = await SharedPreferences.getInstance();
+    setState(() {
+      gender = (pref.getString('gender'));
+      print(gender);
+    });
+  }
+
+  pria() async {
+    setState(() {
+      gender = "pria";
+      print(gender);
+    });
+  }
+
+  wanita() async {
+    setState(() {
+      gender = "wanita";
+      print(gender);
+    });
+  }
+
+  getTgl() async {
+    SharedPreferences pref = await SharedPreferences.getInstance();
+    setState(() {
+      tgl = (pref.getString('tgl'));
+      print(tgl);
+    });
+  }
+
+  //------------------------------= IMAGE PICKER =----------------------------------
+  File image;
+  String extension;
+  final picker = ImagePicker();
+
+  Future getImage() async {
+    final pickedFile = await picker.getImage(source: ImageSource.gallery);
+
+    setState(() {
+      image = File(pickedFile.path);
+      extension = pickedFile.path.split('.').last;
+    });
+  }
+
+  Future<String> editProfile(String newName, String newEmail, String newTgl, String newGender, String newNotelp, File newImage, String newImg) async{
+    SharedPreferences pref = await SharedPreferences.getInstance();
+    var token = pref.getString("token") ?? "";
+    var id = pref.getInt("id") ?? "";
+
+    String apiUrl = Links.mainUrl+"/auth/edit/user";
+    var postUri = Uri.parse(apiUrl);
+
+    final response = await http.post(
+        postUri,
+        body: {
+          'name': newName,
+          'email' : newEmail,
+          'ttl': newTgl,
+          'gender': newGender,
+          'phone': newNotelp,
+          'photo': image != null ? 'data:image/$extension;base64,' +
+              base64Encode(newImage.readAsBytesSync()) : '',
+        },
+        headers: {
+          "Accept" : "Application/json",
+          "Authorization": "Bearer $token"
+        }
+    );
+    final responseJson = jsonDecode(response.body);
+    print(newName+'tsnl');
+    print(newEmail+'tsnl');
+    print(newTgl+'tsnl');
+    print(newGender+'tsnl');
+    print(newNotelp+'tsnl');
+    print(image != null ? 'data:image/$extension;base64,' +
+        base64Encode(newImage.readAsBytesSync()) +'tsnl': img+'tsnl');
+    print(responseJson);
+    return responseJson["message"];
+  }
 
   @override
   void initState() {
-    initialName = name.substring(0, 1).toUpperCase();
     super.initState();
+    getName();
+    getEmail();
+    getImg();
+    getNotelp();
+    getGender();
+    getTgl();
+    Future.delayed(Duration.zero, () async {
+      setState(() {
+        getTname();
+        getTemail();
+        getTnotelp();
+      });
+    });
   }
   @override
   Widget build(BuildContext context) {
@@ -52,20 +212,38 @@ class _EditProfileState extends State<EditProfile> {
                     SizedBox(height: CustomSize.sizeHeight(context) / 48,),
                     Row(
                       children: [
-                        Container(
-                          width: CustomSize.sizeWidth(context) / 6,
-                          height: CustomSize.sizeWidth(context) / 6,
-                          decoration: BoxDecoration(
-                              color: CustomColor.primary,
-                              shape: BoxShape.circle
-                          ),
-                          child: Center(
-                            child: CustomText.text(
-                                size: 38,
-                                weight: FontWeight.w800,
-                                text: initialName,
-                                color: Colors.white
+                        GestureDetector(
+                          onTap: () async{
+                            getImage();
+                          },
+                          child: Container(
+                            width: CustomSize.sizeWidth(context) / 6,
+                            height: CustomSize.sizeWidth(context) / 6,
+                            decoration: (image==null)?(img == "/".substring(0, 1))?BoxDecoration(
+                                color: CustomColor.primary,
+                                shape: BoxShape.circle
+                            ):BoxDecoration(
+                              shape: BoxShape.circle,
+                              image: new DecorationImage(
+                                image: NetworkImage(Links.subUrl +
+                                    "$img"),
+                                fit: BoxFit.cover
+                              ),
+                            ): BoxDecoration(
+                              shape: BoxShape.circle,
+                              image: new DecorationImage(
+                                image: new FileImage(image),
+                                  fit: BoxFit.cover
+                              ),
                             ),
+                            child: (img == "/".substring(0, 1))?Center(
+                              child: CustomText.text(
+                                  size: 38,
+                                  weight: FontWeight.w800,
+                                  text: initial,
+                                  color: Colors.white
+                              ),
+                            ):Container(),
                           ),
                         ),
                         SizedBox(width: CustomSize.sizeWidth(context) / 32,),
@@ -120,12 +298,8 @@ class _EditProfileState extends State<EditProfile> {
                             TextStyle(fontSize: 14, color: Colors.grey)),
                         helperStyle: GoogleFonts.poppins(
                             textStyle: TextStyle(fontSize: 14)),
-                        enabledBorder: UnderlineInputBorder(
-
-                        ),
-                        focusedBorder: UnderlineInputBorder(
-
-                        ),
+                        enabledBorder: UnderlineInputBorder(),
+                        focusedBorder: UnderlineInputBorder(),
                       ),
                     ),
                     SizedBox(height: CustomSize.sizeHeight(context) / 48,),
@@ -157,10 +331,73 @@ class _EditProfileState extends State<EditProfile> {
                     SizedBox(
                       height: CustomSize.sizeHeight(context) * 0.005,
                     ),
-                    CustomText.textHeading4(
-                        text: "Laki - laki",
-                        minSize: 18,
-                        maxLines: 1
+                    GestureDetector(
+                        onTap: (){
+                          showModalBottomSheet(
+                              isScrollControlled: true,
+                              shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.only(topLeft: Radius.circular(20), topRight: Radius.circular(20))
+                              ),
+                              context: context,
+                              builder: (_){
+                                return Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    SizedBox(height: CustomSize.sizeHeight(context) / 86,),
+                                    Padding(
+                                      padding: EdgeInsets.symmetric(horizontal: CustomSize.sizeWidth(context) / 2.4),
+                                      child: Divider(thickness: 4,),
+                                    ),
+                                    SizedBox(height: CustomSize.sizeHeight(context) / 106,),
+                                    Padding(
+                                      padding: EdgeInsets.symmetric(horizontal: CustomSize.sizeHeight(context) / 20),
+                                      child: Row(
+                                        crossAxisAlignment: CrossAxisAlignment.center,
+                                        mainAxisAlignment: MainAxisAlignment.spaceAround,
+                                        children: [
+                                          GestureDetector(
+                                            onTap: (){
+                                              pria();
+                                              Navigator.pop(context);
+                                            },
+                                            child: Padding(
+                                              padding: const EdgeInsets.symmetric(vertical: 8.0),
+                                              child: CustomText.textHeading5(
+                                                  text: "Pria",
+                                                  minSize: 17,
+                                                  maxLines: 1
+                                              ),
+                                            ),
+                                          ),
+                                          GestureDetector(
+                                            onTap: (){
+                                              wanita();
+                                              Navigator.pop(context);
+                                            },
+                                            child: Padding(
+                                              padding: const EdgeInsets.symmetric(vertical: 8.0),
+                                              child: CustomText.textHeading5(
+                                                  text: "Wanita",
+                                                  minSize: 17,
+                                                  maxLines: 1
+                                              ),
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                    SizedBox(height: CustomSize.sizeHeight(context) / 72,),
+                                  ],
+                                );
+                              }
+                            );
+                          },
+                        child: CustomText.textHeading4(
+                            text: gender.substring(0, 1).toUpperCase()+gender.substring(1),
+                            minSize: 18,
+                            maxLines: 1
+                        )
                     ),
                     Divider(
                       color: Colors.black,
@@ -171,24 +408,79 @@ class _EditProfileState extends State<EditProfile> {
                     SizedBox(
                       height: CustomSize.sizeHeight(context) * 0.005,
                     ),
-                    CustomText.textHeading4(
-                        text: "15 Februari 2001",
-                        minSize: 18,
-                        maxLines: 1
+                    GestureDetector(
+                      onTap: (){
+                        DatePicker.showDatePicker(context, showTitleActions: true,
+                            onConfirm: (date) {
+                              setState(() {
+                                tgl = date.toString().split(' ')[0];
+                              });
+                              print(date.toString().split(' ')[0]);
+                            },
+                            currentTime: DateTime(DateTime.now().year, DateTime.now().month,
+                                DateTime.now().day),
+                            locale: LocaleType.id,
+                            maxTime: DateTime(DateTime.now().year, 12, 31)
+                        );
+                      },
+                      child: CustomText.textHeading4(
+                          text: tgl,
+                          minSize: 18,
+                          maxLines: 1
+                      ),
                     ),
                     Divider(
                       color: Colors.black,
                       thickness: 1,
                     ),
                     SizedBox(height: CustomSize.sizeHeight(context) / 48,),
-                    Container(
-                      width: CustomSize.sizeWidth(context),
-                      height: CustomSize.sizeHeight(context) / 14,
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(30),
-                        color: CustomColor.accent
+                    GestureDetector(
+                      onTap: () async{
+                        setState(() {
+                          isLoading = false;
+                        });
+                        SharedPreferences pref = await SharedPreferences.getInstance();
+                        pref.setString("name", _loginTextName.text.toString());
+                        pref.setString("email", _loginEmailName.text.toString());
+                        pref.setString("img", (image == null)?img:base64Encode(image.readAsBytesSync()).toString());
+                        pref.setString("gender", gender);
+                        pref.setString("tgl", tgl);
+                        pref.setString("notelp", _loginNotelpName.text.toString());
+
+                        editProfile(_loginTextName.text.toString(), _loginEmailName.text.toString(), tgl.toString(), gender.toString(), _loginNotelpName.text.toString(), image, img.toString()).then((onValue) {
+                          if(onValue == "Success"){
+                            Fluttertoast.showToast(
+                                msg: "Success",
+                                backgroundColor: Colors.grey,
+                                textColor: Colors.black,
+                                fontSize: 16.0
+                            );
+                            setState(() {
+                              isLoading = true;
+                            });
+                            Navigator.pushReplacement(context, PageTransition(type: PageTransitionType.fade, child: new HomeActivity()));
+                          } else {
+                            setState(() {
+                              isLoading = true;
+                            });
+                            Fluttertoast.showToast(
+                                msg: "The field is required",
+                                backgroundColor: Colors.grey,
+                                textColor: Colors.black,
+                                fontSize: 16.0
+                            );
+                          }
+                        });
+                      },
+                      child: Container(
+                        width: CustomSize.sizeWidth(context),
+                        height: CustomSize.sizeHeight(context) / 14,
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(30),
+                          color: CustomColor.accent
+                        ),
+                        child: Center(child: CustomText.bodyRegular16(text: "Simpan", color: Colors.white,)),
                       ),
-                      child: Center(child: CustomText.bodyRegular16(text: "Simpan", color: Colors.white,)),
                     )
                   ],
                 ),

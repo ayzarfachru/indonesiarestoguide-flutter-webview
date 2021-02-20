@@ -3,6 +3,10 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_icons/flutter_icons.dart';
 import 'package:indonesiarestoguide/utils/utils.dart';
+import 'package:page_transition/page_transition.dart';
+import 'package:indonesiarestoguide/ui/profile/profile_activity.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+
 
 class HomeActivity extends StatefulWidget {
   @override
@@ -421,8 +425,20 @@ class _HomeActivityState extends State<HomeActivity> {
               Icon(MaterialCommunityIcons.percent, size: 32, color: Colors.white,),
               Icon(MaterialCommunityIcons.bookmark, size: 32, color: Colors.white,),
               Icon(MaterialCommunityIcons.shopping, size: 32, color: Colors.white,),
-              Icon(FontAwesome.search, size: 32, color: Colors.white,),
-              Icon(Ionicons.md_person, size: 32, color: Colors.white,),
+              GestureDetector(
+                  onTap: () async{
+                    SharedPreferences pref = await SharedPreferences.getInstance();
+                    pref.clear();
+                  },
+                  child: Icon(FontAwesome.search, size: 32, color: Colors.white,)),
+              GestureDetector(
+                onTap: (){
+                  setState(() {
+                    Navigator.push(context, PageTransition(type: PageTransitionType.fade, child: new ProfileActivity()));
+                  });
+                },
+                child: Icon(Ionicons.md_person, size: 32, color: Colors.white,),
+              ),
             ],
           ),
         ),

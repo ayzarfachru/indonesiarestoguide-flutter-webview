@@ -14,6 +14,7 @@ import 'dart:convert' as convert;
 
 class Links{
   static String mainUrl = "http://192.168.100.10:8000/api/v2";
+  static String subUrl = "http://192.168.100.10:8000";
 }
 
 class CustomText{

@@ -1,5 +1,11 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
+import 'package:indonesiarestoguide/model/History.dart';
 import 'package:indonesiarestoguide/utils/utils.dart';
+import 'package:intl/intl.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:http/http.dart' as http;
 
 class HistoryActivity extends StatefulWidget {
   @override
@@ -8,6 +14,41 @@ class HistoryActivity extends StatefulWidget {
 
 class _HistoryActivityState extends State<HistoryActivity> {
   ScrollController _scrollController = ScrollController();
+
+  List<History> history = [];
+  Future _getHistory()async{
+    List<History> _history = [];
+    SharedPreferences pref = await SharedPreferences.getInstance();
+    String token = pref.getString("token") ?? "";
+    var apiResult = await http.get(Links.mainUrl + '/page/history', headers: {
+      "Accept": "Application/json",
+      "Authorization": "Bearer $token"
+    });
+    print(apiResult.body);
+    var data = json.decode(apiResult.body);
+
+    for(var v in data['trans']){
+      History h = History(
+          id: v['id'],
+          name: v['resto_name'],
+          time: v['time'],
+          price: v['price'],
+          img: v['resto_img'],
+          type: v['type']
+      );
+      _history.add(h);
+    }
+
+    setState(() {
+      history = _history;
+    });
+  }
+
+  @override
+  void initState() {
+    _getHistory();
+    super.initState();
+  }
 
   @override
   void dispose() {
@@ -46,7 +87,7 @@ class _HistoryActivityState extends State<HistoryActivity> {
                   shrinkWrap: true,
                   controller: _scrollController,
                   physics: NeverScrollableScrollPhysics(),
-                  itemCount: 2,
+                  itemCount: history.length,
                   itemBuilder: (_, index){
                     return Padding(
                       padding: EdgeInsets.only(bottom: CustomSize.sizeHeight(context) / 86),
@@ -63,8 +104,11 @@ class _HistoryActivityState extends State<HistoryActivity> {
                                 width: CustomSize.sizeWidth(context) / 2.8,
                                 height: CustomSize.sizeWidth(context) / 2.8,
                                 decoration: BoxDecoration(
-                                  color: Colors.amber,
-                                  borderRadius: BorderRadius.circular(20)
+                                    image: DecorationImage(
+                                        image: NetworkImage(Links.subUrl + history[index].img),
+                                        fit: BoxFit.cover
+                                    ),
+                                    borderRadius: BorderRadius.circular(20)
                                 ),
                               ),
                               SizedBox(width: CustomSize.sizeWidth(context) / 24,),
@@ -74,18 +118,18 @@ class _HistoryActivityState extends State<HistoryActivity> {
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   mainAxisAlignment: MainAxisAlignment.center,
                                   children: [
-                                    CustomText.textHeading4(
-                                        text: "Rumah Makan Sederhana",
-                                        minSize: 18,
+                                    CustomText.bodyMedium16(
+                                        text: history[index].name,
+                                        minSize: 16,
                                         maxLines: 1
                                     ),
                                     CustomText.bodyLight12(
-                                        text: "01 Jan 2021, 10:00",
+                                        text: history[index].time,
                                         maxLines: 1,
                                         minSize: 12
                                     ),
                                     CustomText.bodyMedium12(
-                                        text: "Pesan antar",
+                                        text: history[index].type,
                                         maxLines: 1,
                                         minSize: 12
                                     ),
@@ -93,13 +137,13 @@ class _HistoryActivityState extends State<HistoryActivity> {
                                         text: "Selesai",
                                         maxLines: 1,
                                         minSize: 12,
-                                      color: CustomColor.accent
+                                        color: CustomColor.accent
                                     ),
                                     Row(
                                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                       children: [
                                         CustomText.textHeading4(
-                                            text: "35.000",
+                                            text: NumberFormat.currency(locale: 'id', symbol: '', decimalDigits: 0).format(history[index].price),
                                             minSize: 18,
                                             maxLines: 1
                                         ),
@@ -108,7 +152,7 @@ class _HistoryActivityState extends State<HistoryActivity> {
                                           height: CustomSize.sizeHeight(context) / 24,
                                           decoration: BoxDecoration(
                                               borderRadius: BorderRadius.circular(20),
-                                            border: Border.all(color: CustomColor.accent)
+                                              border: Border.all(color: CustomColor.accent)
                                           ),
                                           child: Center(child: CustomText.bodyRegular16(text: "Pesan Lagi", color: CustomColor.accent)),
                                         ),

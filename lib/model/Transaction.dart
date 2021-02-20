@@ -10,7 +10,13 @@ class Transaction{
   String datetime;
   String method;
 
-  Transaction(this.id, this.status, this.resto, this.menus, this.datetime, this.method);
+  Transaction(
+      {this.id,
+      this.status,
+      this.resto,
+      this.menus,
+      this.datetime,
+      this.method});
 
   Transaction.withoutMenu(this.id, this.status, this.resto, this.datetime, this.method);
 

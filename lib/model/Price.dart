@@ -3,7 +3,7 @@ class Price{
   int discounted;
   int delivery;
 
-  Price(this.original, this.discounted, this.delivery);
+  Price({this.original, this.discounted, this.delivery});
 
   Price.original(this.original);
 

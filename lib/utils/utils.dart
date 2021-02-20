@@ -20,11 +20,11 @@ class Links{
 class CustomText{
   static Widget text(
       {String text,
-      double size,
-      double minSize,
-      int maxLines,
-      FontWeight weight,
-      Color color}){
+        double size,
+        double minSize,
+        int maxLines,
+        FontWeight weight,
+        Color color}){
     return AutoSizeText(
       text,
       style: GoogleFonts.poppins(
@@ -171,7 +171,7 @@ class CustomText{
           textStyle: TextStyle(
               fontSize: 14,
               fontWeight:
-              FontWeight.w300, color: color??Colors.black)),
+              FontWeight.w700, color: color??Colors.black)),
       minFontSize: minSize??0,
       maxLines: maxLines??1,
     );
@@ -384,47 +384,47 @@ class CustomSize{
   }
 }
 
-class Api{
-  static Future<Resto> getResto(id) async {
-    var request = await http.get(Links.mainUrl+"/api/v2/resto/detail/$id", headers: {"Accept": "Application/json"});
-    var response = json.decode(request.body)['data'];
-    var recom = <Menu>[];
-    var menus = <Menu>[];
-    var images = <String>[];
-    var promos = <Promo>[];
-    for(var rMenu in response['recom']){
-      var price = Price(rMenu['price'], rMenu.containsKey('discounted') ? rMenu['dicounted'] : 0, rMenu['delivery_price']);
-      var menu = Menu(rMenu['id'], rMenu['name'], rMenu['desc'], price, rMenu['img']);
-      recom.add(menu);
-    }
-    for(var rMenu in response['menu']){
-      for(var dMenu in rMenu['menu']){
-        var price = Price(dMenu['price'], dMenu.containsKey('discounted') ? dMenu['dicounted'] : 0, dMenu['delivery_price']);
-        var menu = Menu(dMenu['id'], dMenu['name'], dMenu['desc'], price, dMenu['img']);
-        menus.add(menu);
-      }
-    }
-    for(var url in response['img']){
-      images.add(url);
-    }
-    for(var p in response['promo']){
-      var price = Price(p['menu_price'], p['menu_discounted'], p['menu_price']);
-      var menu = Menu(p['menu_id'], p['menu_name'], p['menu_desc'], price, p['menu_img']);
-      var promo = Promo(p['menu_id'], p['word'], price.discounted, menu);
-      promos.add(promo);
-    }
-    return Resto.all(
-        id,
-        response['name'],
-        response['address'],
-        response['desc'],
-        response['range'],
-        false,
-        0,
-        images,
-        recom,
-        menus,
-        promos
-    );
-  }
-}
+// class Api{
+//   static Future<Resto> getResto(id) async {
+//     var request = await http.get(Links.mainUrl+"/api/v2/resto/detail/$id", headers: {"Accept": "Application/json"});
+//     var response = json.decode(request.body)['data'];
+//     var recom = <Menu>[];
+//     var menus = <Menu>[];
+//     var images = <String>[];
+//     var promos = <Promo>[];
+//     for(var rMenu in response['recom']){
+//       var price = Price(rMenu['price'], rMenu.containsKey('discounted') ? rMenu['dicounted'] : 0, rMenu['delivery_price']);
+//       var menu = Menu(rMenu['id'], rMenu['name'], rMenu['desc'], price, rMenu['img']);
+//       recom.add(menu);
+//     }
+//     for(var rMenu in response['menu']){
+//       for(var dMenu in rMenu['menu']){
+//         var price = Price(dMenu['price'], dMenu.containsKey('discounted') ? dMenu['dicounted'] : 0, dMenu['delivery_price']);
+//         var menu = Menu(dMenu['id'], dMenu['name'], dMenu['desc'], price, dMenu['img']);
+//         menus.add(menu);
+//       }
+//     }
+//     for(var url in response['img']){
+//       images.add(url);
+//     }
+//     for(var p in response['promo']){
+//       var price = Price(p['menu_price'], p['menu_discounted'], p['menu_price']);
+//       var menu = Menu(p['menu_id'], p['menu_name'], p['menu_desc'], price, p['menu_img']);
+//       var promo = Promo(p['menu_id'], p['word'], price.discounted, menu);
+//       promos.add(promo);
+//     }
+//     return Resto.all(
+//         id,
+//         response['name'],
+//         response['address'],
+//         response['desc'],
+//         response['range'],
+//         false,
+//         0,
+//         images,
+//         recom,
+//         menus,
+//         promos
+//     );
+//   }
+// }

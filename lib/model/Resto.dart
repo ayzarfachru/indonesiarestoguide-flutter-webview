@@ -9,6 +9,7 @@ class Resto{
   String priceRange;
   bool isFavourite;
   double distance;
+  String img;
   List<String> images;
   List<Menu> menus;
   List<Menu> all;
@@ -17,16 +18,16 @@ class Resto{
   Resto(this.id, this.name, this.isFavourite, this.distance);
 
   Resto.all(
-      this.id,
-      this.name,
-      this.address,
-      this.desc,
-      this.priceRange,
-      this.isFavourite,
-      this.distance,
-      this.images,
-      this.menus,
-      this.all,
-      this.promos
-      );
+      {this.id,
+        this.name,
+        this.address,
+        this.desc,
+        this.priceRange,
+        this.isFavourite,
+        this.distance,
+        this.img,
+        this.images,
+        this.menus,
+        this.all,
+        this.promos});
 }

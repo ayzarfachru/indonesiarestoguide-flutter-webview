@@ -74,10 +74,13 @@ class _LoginActivityState extends State<LoginActivity> {
 
 
   GoogleSignIn _googleSignIn = GoogleSignIn(
-    clientId: "795151845860-o778hf0d6lf62tvnkpd0dc6ttrjt7hnm.apps.googleusercontent.com",
+    clientId: "887058389150-nesf8jr9jdk5n2dtt1t30to2el1v3bbi.apps.googleusercontent.com",
     scopes: [
       'email',
       'https://www.googleapis.com/auth/userinfo.profile',
+      // 'https://www.googleapis.com/auth/user.birthday.read',
+      // 'https://www.googleapis.com/auth/user.gender.read',
+      // 'https://www.googleapis.com/auth/user.phonenumbers.read'
     ],
   );
 
@@ -85,31 +88,33 @@ class _LoginActivityState extends State<LoginActivity> {
     await _googleSignIn.signOut();
     await _googleSignIn.signIn().then((value) async{
       print(value);
-      // var apiResult = await http
-      //     .post(Links.mainUrl + '/regis', body: {'email': value.email.toString(), 'password': value.id.toString(), 'address': "",
-      //   'name': value.displayName.toString(), 'photoUrl': value.photoUrl.toString()});
-      // print(apiResult.body);
-      // var data = json.decode(apiResult.body);
-      //
-      // SharedPreferences pref = await SharedPreferences.getInstance();
-      // pref.setInt("id", data['user']['id']);
-      // pref.setString("username", data['user']['username']);
-      // pref.setString("name", data['user']['name']);
-      // pref.setString("email", data['user']['email']);
-      // pref.setString("img", data['user']['img']);
-      // pref.setString("address", data['user']['address'].toString());
-      // pref.setString("notelp", data['user']['notelp'].toString());
-      // pref.setString("akses", data['user']['akses']);
-      // pref.setString("token", data['access_token']);
+      var apiResult = await http.post(Links.mainUrl + '/auth/login/google',
+          body: {'email': value.email, 'name': value.displayName, 'photoUrl': value.photoUrl});
+      print(apiResult.body);
+      var data = json.decode(apiResult.body);
+      if (data['status_code'].toString() == "200") {
 
-      // Navigator.pushReplacement(
-      //     context,
-      //     PageTransition(
-      //         type: PageTransitionType.rightToLeft,
-      //         child: HomeActivity()));
+        SharedPreferences pref = await SharedPreferences.getInstance();
+        pref.setInt("id", data['user']['id']);
+        pref.setString("name", data['user']['name']);
+        pref.setString("email", data['user']['email']);
+        pref.setString("img", data['user']['img']);
+        pref.setString("gender", data['user']['gender']);
+        pref.setString("tgl", data['user']['ttl']);
+        pref.setString("notelp", data['user']['notelp'].toString());
+        pref.setString("token", data['access_token']);
+
+        Navigator.pushReplacement(
+            context,
+            PageTransition(
+                type: PageTransitionType.rightToLeft,
+                child: HomeActivity()));
+      }else{
+        Fluttertoast.showToast(
+          msg: data['message'],);
+      }
     });
   }
-
 
   @override
   Widget build(BuildContext context) {
@@ -320,7 +325,7 @@ class _LoginActivityState extends State<LoginActivity> {
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         Image.asset(
-                            "assets/icon_google.png",
+                          "assets/icon_google.png",
                           width: CustomSize.sizeWidth(context) / 14,
                           height: CustomSize.sizeWidth(context) / 14,
                         ),

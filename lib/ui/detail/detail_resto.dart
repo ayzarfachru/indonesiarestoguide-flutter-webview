@@ -4,11 +4,16 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_icons/flutter_icons.dart';
 import 'package:indonesiarestoguide/model/Menu.dart';
+import 'package:indonesiarestoguide/model/MenuJson.dart';
+import 'package:indonesiarestoguide/model/PrefCart.dart';
 import 'package:indonesiarestoguide/model/Price.dart';
 import 'package:indonesiarestoguide/model/Promo.dart';
+import 'package:indonesiarestoguide/ui/cart/cart_activity.dart';
+import 'package:indonesiarestoguide/ui/home/home_activity.dart';
 import 'package:indonesiarestoguide/utils/utils.dart';
 import 'package:http/http.dart' as http;
 import 'package:intl/intl.dart';
+import 'package:page_transition/page_transition.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:url_launcher/url_launcher.dart';
 
@@ -28,6 +33,8 @@ class _DetailRestoState extends State<DetailResto> {
 
   ScrollController _scrollController = ScrollController();
 
+  List<String> restoId = [];
+  List<String> qty = [];
   String name = "";
   String address = "";
   String desc = "";
@@ -36,10 +43,12 @@ class _DetailRestoState extends State<DetailResto> {
   List<String> images = [];
   List<Promo> promo = [];
   List<Menu> menu = [];
+  List<MenuJson> menuJson = [];
   Future _getDetail(String id)async{
     List<String> _images = [];
     List<Promo> _promo = [];
     List<Menu> _menu = [];
+    List<MenuJson> _menuJson = [];
 
     SharedPreferences pref = await SharedPreferences.getInstance();
     String token = pref.getString("token") ?? "";
@@ -65,6 +74,18 @@ class _DetailRestoState extends State<DetailResto> {
       _menu.add(m);
     }
 
+    for(var v in data['data']['recom']){
+      MenuJson m = MenuJson(
+          id: v['id'],
+          name: v['name'],
+          desc: v['desc'],
+          price: v['price'].toString(),
+          discount: v['discounted_price'].toString(),
+          urlImg: v['img']
+      );
+      _menuJson.add(m);
+    }
+
     for(var v in data['data']['promo']){
       Promo p = Promo(
         word: v['word'],
@@ -78,6 +99,11 @@ class _DetailRestoState extends State<DetailResto> {
       );
       _promo.add(p);
     }
+
+    SharedPreferences pref2 = await SharedPreferences.getInstance();
+    pref2.setString('latResto', data['data']['lat'].toString());
+    pref2.setString('longResto', data['data']['long'].toString());
+
 
     setState(() {
       name = data['data']['name'];
@@ -100,9 +126,22 @@ class _DetailRestoState extends State<DetailResto> {
     }
   }
 
+  Future _getData()async{
+    SharedPreferences pref2 = await SharedPreferences.getInstance();
+    if(pref2.getString('inCart') == '1'){
+      name = (pref2.getString('menuJson'));
+      print("Ini pref2 " +name+" SP");
+      restoId.addAll(pref2.getStringList('restoId')??[]);
+      print(restoId);
+      qty.addAll(pref2.getStringList('qty')??[]);
+      print(qty);
+    }
+  }
+
   @override
   void initState() {
     _getDetail(id);
+    _getData();
     super.initState();
   }
 
@@ -390,7 +429,12 @@ class _DetailRestoState extends State<DetailResto> {
                                                     color: CustomColor.primary,
                                                     borderRadius: BorderRadius.circular(20)
                                                 ),
-                                                child: Center(child: CustomText.bodyRegular16(text: "Add to cart", color: Colors.white)),
+                                                child: GestureDetector(
+                                                    onTap: (){
+                                                      Navigator.pop(context);
+                                                    },
+                                                    child: Center(child: CustomText.bodyRegular16(text: "Add to cart", color: Colors.white))
+                                                ),
                                               ),
                                             ),
                                             SizedBox(height: CustomSize.sizeHeight(context) / 86,),
@@ -459,14 +503,90 @@ class _DetailRestoState extends State<DetailResto> {
                                                       borderRadius: BorderRadius.circular(20)
                                                   ),
                                                 ),
-                                                Container(
-                                                  width: CustomSize.sizeWidth(context) / 4.6,
-                                                  height: CustomSize.sizeHeight(context) / 18,
-                                                  decoration: BoxDecoration(
-                                                      color: CustomColor.accentLight,
-                                                      borderRadius: BorderRadius.circular(20)
+                                                (restoId.contains(menu[index].id.toString()) != true)?GestureDetector(
+                                                  onTap: () async{
+                                                    MenuJson m = MenuJson(
+                                                      id: menu[index].id,
+                                                      name: menu[index].name,
+                                                      desc: menu[index].desc,
+                                                      price: menu[index].price.original.toString(),
+                                                      discount: menu[index].price.discounted.toString(),
+                                                      urlImg: menu[index].urlImg,
+                                                    );
+                                                    menuJson.add(m);
+                                                    // List<String> _restoId = [];
+                                                    // List<String> _qty = [];
+                                                    restoId.add(menu[index].id.toString());
+                                                    qty.add("1");
+
+                                                    String json1 = jsonEncode(menuJson.map((m) => m.toJson()).toList());
+                                                    SharedPreferences pref = await SharedPreferences.getInstance();
+                                                    pref.setString('inCart', '1');
+                                                    pref.setString("menuJson", json1);
+                                                    pref.setStringList("restoId", restoId);
+                                                    pref.setStringList("qty", qty);
+
+                                                    setState(() {});
+                                                  },
+                                                  child: Container(
+                                                    width: CustomSize.sizeWidth(context) / 4.6,
+                                                    height: CustomSize.sizeHeight(context) / 18,
+                                                    decoration: BoxDecoration(
+                                                        color: CustomColor.accentLight,
+                                                        borderRadius: BorderRadius.circular(20)
+                                                    ),
+                                                    child: Center(child: CustomText.bodyRegular16(text: "Add", color: CustomColor.accent)),
                                                   ),
-                                                  child: Center(child: CustomText.bodyRegular16(text: "Add", color: CustomColor.accent)),
+                                                ):Row(
+                                                  children: [
+                                                    GestureDetector(
+                                                      onTap: ()async{
+                                                        if(int.parse(qty[restoId.indexOf(menu[index].id.toString())]) > 1){
+                                                          String s = qty[restoId.indexOf(menu[index].id.toString())];
+                                                          print(s);
+                                                          int i = int.parse(s) - 1;
+                                                          print(i);
+                                                          qty[restoId.indexOf(menu[index].id.toString())] = i.toString();
+                                                          SharedPreferences pref = await SharedPreferences.getInstance();
+                                                          pref.setStringList("qty", qty);
+                                                          setState(() {});
+                                                        }
+                                                      },
+                                                      child: Container(
+                                                        width: CustomSize.sizeWidth(context) / 12,
+                                                        height: CustomSize.sizeWidth(context) / 12,
+                                                        decoration: BoxDecoration(
+                                                            color: CustomColor.accentLight,
+                                                            shape: BoxShape.circle
+                                                        ),
+                                                        child: Center(child: CustomText.textHeading1(text: "-", color: CustomColor.accent)),
+                                                      ),
+                                                    ),
+                                                    SizedBox(width: CustomSize.sizeWidth(context) / 24,),
+                                                    CustomText.bodyRegular16(text: qty[restoId.indexOf(menu[index].id.toString())]),
+                                                    SizedBox(width: CustomSize.sizeWidth(context) / 24,),
+                                                    GestureDetector(
+                                                      onTap: ()async{
+                                                        String s = qty[restoId.indexOf(menu[index].id.toString())];
+                                                        print(s);
+                                                        int i = int.parse(s) + 1;
+                                                        print(i);
+                                                        qty[restoId.indexOf(menu[index].id.toString())] = i.toString();
+                                                        SharedPreferences pref = await SharedPreferences.getInstance();
+                                                        pref.setStringList("qty", qty);
+                                                        setState(() {});
+                                                      },
+                                                      child: Container(
+                                                        width: CustomSize.sizeWidth(context) / 12,
+                                                        height: CustomSize.sizeWidth(context) / 12,
+                                                        decoration: BoxDecoration(
+                                                            color: CustomColor.accentLight,
+                                                            shape: BoxShape.circle
+                                                        ),
+                                                        child: Center(child: CustomText.textHeading1(text: "+", color: CustomColor.accent)),
+                                                      ),
+                                                    ),
+                                                  ],
                                                 ),
                                               ],
                                             ),
@@ -587,14 +707,23 @@ class _DetailRestoState extends State<DetailResto> {
                           padding: EdgeInsets.symmetric(horizontal: CustomSize.sizeWidth(context) / 32),
                           child: Align(
                             alignment: Alignment.bottomRight,
-                            child: Container(
-                              width: CustomSize.sizeWidth(context) / 8,
-                              height: CustomSize.sizeWidth(context) / 8,
-                              decoration: BoxDecoration(
-                                  color: CustomColor.primary,
-                                  shape: BoxShape.circle
+                            child: GestureDetector(
+                              onTap: (){
+                                Navigator.push(
+                                    context,
+                                    PageTransition(
+                                        type: PageTransitionType.rightToLeft,
+                                        child: CartActivity()));
+                              },
+                              child: Container(
+                                width: CustomSize.sizeWidth(context) / 8,
+                                height: CustomSize.sizeWidth(context) / 8,
+                                decoration: BoxDecoration(
+                                    color: CustomColor.primary,
+                                    shape: BoxShape.circle
+                                ),
+                                child: Center(child: Icon(CupertinoIcons.cart_fill, color: Colors.white,)),
                               ),
-                              child: Center(child: Icon(CupertinoIcons.cart_fill, color: Colors.white,)),
                             ),
                           ),
                         ),

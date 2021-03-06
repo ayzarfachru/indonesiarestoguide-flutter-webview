@@ -27,7 +27,10 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
               SizedBox(
                 height: CustomSize.sizeHeight(context) / 24,
               ),
-              CustomText.textHeading2(text: "Indonesia Resto Guide"),
+              Container(
+                width: CustomSize.sizeWidth(context) / 1.1,
+                child: CustomText.textHeading2(text: "Indonesia Resto Guide"),
+              ),
               SizedBox(
                 height: CustomSize.sizeHeight(context) / 48,
               ),

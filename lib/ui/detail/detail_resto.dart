@@ -40,6 +40,7 @@ class _DetailRestoState extends State<DetailResto> {
   String desc = "";
   String img = "";
   String range = "";
+  String inCart = "";
   List<String> images = [];
   List<Promo> promo = [];
   List<Menu> menu = [];
@@ -128,14 +129,16 @@ class _DetailRestoState extends State<DetailResto> {
 
   Future _getData()async{
     SharedPreferences pref2 = await SharedPreferences.getInstance();
+    inCart = pref2.getString('inCart')??"";
     if(pref2.getString('inCart') == '1'){
-      name = (pref2.getString('menuJson'));
+      name = pref2.getString('menuJson')??"";
       print("Ini pref2 " +name+" SP");
       restoId.addAll(pref2.getStringList('restoId')??[]);
       print(restoId);
       qty.addAll(pref2.getStringList('qty')??[]);
       print(qty);
     }
+    setState(() {});
   }
 
   @override
@@ -518,6 +521,7 @@ class _DetailRestoState extends State<DetailResto> {
                                                     // List<String> _qty = [];
                                                     restoId.add(menu[index].id.toString());
                                                     qty.add("1");
+                                                    inCart = '1';
 
                                                     String json1 = jsonEncode(menuJson.map((m) => m.toJson()).toList());
                                                     SharedPreferences pref = await SharedPreferences.getInstance();
@@ -703,43 +707,7 @@ class _DetailRestoState extends State<DetailResto> {
                             );
                           },
                         ),
-                        Padding(
-                          padding: EdgeInsets.symmetric(horizontal: CustomSize.sizeWidth(context) / 32),
-                          child: Align(
-                            alignment: Alignment.bottomRight,
-                            child: GestureDetector(
-                              onTap: (){
-                                Navigator.push(
-                                    context,
-                                    PageTransition(
-                                        type: PageTransitionType.rightToLeft,
-                                        child: CartActivity()));
-                              },
-                              child: Container(
-                                width: CustomSize.sizeWidth(context) / 8,
-                                height: CustomSize.sizeWidth(context) / 8,
-                                decoration: BoxDecoration(
-                                    color: CustomColor.primary,
-                                    shape: BoxShape.circle
-                                ),
-                                child: Center(child: Icon(CupertinoIcons.cart_fill, color: Colors.white,)),
-                              ),
-                            ),
-                          ),
-                        ),
-                        SizedBox(height: CustomSize.sizeHeight(context) / 86,),
-                        Center(
-                          child: Container(
-                            width: CustomSize.sizeWidth(context) / 1.1,
-                            height: CustomSize.sizeHeight(context) / 14,
-                            decoration: BoxDecoration(
-                                color: CustomColor.primary,
-                                borderRadius: BorderRadius.circular(20)
-                            ),
-                            child: Center(child: CustomText.bodyRegular16(text: "Reservasi Sekarang", color: Colors.white)),
-                          ),
-                        ),
-                        SizedBox(height: CustomSize.sizeHeight(context) / 32,),
+                        SizedBox(height: CustomSize.sizeHeight(context) / 8,),
                       ],
                     ),
                   ),
@@ -776,6 +744,32 @@ class _DetailRestoState extends State<DetailResto> {
             ],
           ),
         ),
+      ),
+      floatingActionButton: (inCart == '1')?GestureDetector(
+        onTap: (){
+          Navigator.push(
+              context,
+              PageTransition(
+                  type: PageTransitionType.rightToLeft,
+                  child: CartActivity()));
+        },
+        child: Container(
+          width: CustomSize.sizeWidth(context) / 8,
+          height: CustomSize.sizeWidth(context) / 8,
+          decoration: BoxDecoration(
+              color: CustomColor.primary,
+              shape: BoxShape.circle
+          ),
+          child: Center(child: Icon(CupertinoIcons.cart_fill, color: Colors.white,)),
+        ),
+      ):Container(
+        width: CustomSize.sizeWidth(context) / 1.1,
+        height: CustomSize.sizeHeight(context) / 14,
+        decoration: BoxDecoration(
+            color: CustomColor.primary,
+            borderRadius: BorderRadius.circular(20)
+        ),
+        child: Center(child: CustomText.bodyRegular16(text: "Reservasi Sekarang", color: Colors.white)),
       ),
     );
   }

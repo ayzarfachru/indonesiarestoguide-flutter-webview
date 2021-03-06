@@ -13,8 +13,8 @@ import 'package:http/http.dart' as http;
 import 'dart:convert' as convert;
 
 class Links{
-  static String mainUrl = "http://192.168.100.8:8000/api/v2";
-  static String subUrl = "http://192.168.100.8:8000";
+  static String mainUrl = "http://192.168.100.11:8000/api/v2";
+  static String subUrl = "http://192.168.100.11:8000";
 }
 
 class CustomText{
@@ -100,6 +100,20 @@ class CustomText{
       style: GoogleFonts.poppins(
           textStyle: TextStyle(
               fontSize: 24,
+              fontWeight:
+              FontWeight.w600, color: color??Colors.black)),
+      minFontSize: minSize??0,
+      maxLines: maxLines??1,
+    );
+  }
+
+  static Widget textHeading6({String text, Color color,
+    double minSize, int maxLines,}){
+    return AutoSizeText(
+      text,
+      style: GoogleFonts.poppins(
+          textStyle: TextStyle(
+              fontSize: 14,
               fontWeight:
               FontWeight.w600, color: color??Colors.black)),
       minFontSize: minSize??0,

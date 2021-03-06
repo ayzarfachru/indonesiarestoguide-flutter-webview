@@ -88,8 +88,14 @@ class _CartActivityState extends State<CartActivity> {
   int harga = 0;
   List<String> restoId = [];
   List<String> qty = [];
+  String _restId = '';
+  String _qty = '';
   bool srchAddress = false;
   bool srchAddress2 = false;
+  //delivery = 1
+  //takeaway = 2
+  //dinein = 3
+  int _transCode = 1;
 
   double latitude;
   double longitude;
@@ -103,13 +109,11 @@ class _CartActivityState extends State<CartActivity> {
   Future _getData()async{
     List<MenuJson> _menuJson = [];
     List<String> _menuId = [];
+    List<String> _q = [];
     SharedPreferences pref2 = await SharedPreferences.getInstance();
     name = (pref2.getString('menuJson'));
-    print("Ini pref2 " +name+" SP");
     restoId.addAll(pref2.getStringList('restoId')??[]);
-    print(restoId);
     qty.addAll(pref2.getStringList('qty')??[]);
-    print(qty);
     var data = json.decode(name);
     print(data);
 
@@ -153,6 +157,25 @@ class _CartActivityState extends State<CartActivity> {
     });
   }
 
+  Future<String> makeTransaction()async{
+    SharedPreferences pref = await SharedPreferences.getInstance();
+    var token = pref.getString("token") ?? "";
+
+    var apiResult = await http.post(Links.mainUrl + '/trans',
+        body: {
+          'address': (_transCode == 1)?_srchAddress.text.toString():'',
+          'type': (_transCode == 1)?'delivery':(_transCode == 2)?'takeaway':'dinein',
+          'ongkir': int.parse(totalOngkir),
+          'discount': 0,
+        },
+        headers: {
+      "Accept": "Application/json",
+      "Authorization": "Bearer $token"
+    });
+    print(apiResult.body);
+    var data = json.decode(apiResult.body);
+  }
+
   @override
   void initState() {
     Location.instance.getLocation().then((value) {
@@ -179,7 +202,7 @@ class _CartActivityState extends State<CartActivity> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Padding(
+              (_transCode == 1)?Padding(
                 padding: EdgeInsets.symmetric(horizontal: CustomSize.sizeWidth(context) / 24),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -305,9 +328,9 @@ class _CartActivityState extends State<CartActivity> {
                     ),
                   ],
                 ),
-              ),
-              SizedBox(height: CustomSize.sizeHeight(context) / 48,),
-              Divider(thickness: 6, color: CustomColor.secondary,),
+              ):SizedBox(),
+              (_transCode == 1)?SizedBox(height: CustomSize.sizeHeight(context) / 48,):SizedBox(),
+              (_transCode == 1)?Divider(thickness: 6, color: CustomColor.secondary,):SizedBox(),
               SizedBox(height: CustomSize.sizeHeight(context) / 48,),
               Padding(
                 padding: EdgeInsets.symmetric(horizontal: CustomSize.sizeWidth(context) / 24),
@@ -324,27 +347,133 @@ class _CartActivityState extends State<CartActivity> {
                             shape: BoxShape.circle
                           ),
                           child: Center(
-                            child: Icon(FontAwesome.motorcycle, color: Colors.white, size: 20,),
+                            child: Icon((_transCode == 1)?FontAwesome.motorcycle:(_transCode == 2)?MaterialCommunityIcons.shopping:Icons.restaurant, color: Colors.white, size: 20,),
                           ),
                         ),
                         SizedBox(width: CustomSize.sizeWidth(context) / 32,),
-                        CustomText.textHeading4(text: "Pesan Antar",),
+                        CustomText.textHeading6(text: (_transCode == 1)?"Pesan Antar":(_transCode == 2)?"Ambil Langsung":"Makan Ditempat",),
                       ],
                     ),
                     Padding(
                       padding: EdgeInsets.symmetric(horizontal: CustomSize.sizeWidth(context) / 86),
-                      child: Container(
-                        height: CustomSize.sizeHeight(context) / 24,
-                        decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(20),
-                            border: Border.all(color: CustomColor.accent)
-                        ),
-                        child: Padding(
-                          padding: EdgeInsets.symmetric(horizontal: CustomSize.sizeWidth(context) / 32),
-                          child: Center(
-                            child: CustomText.bodyRegular14(
-                                text: "Ganti",
-                                color: CustomColor.accent
+                      child: GestureDetector(
+                        onTap: (){
+                          showModalBottomSheet(
+                              isScrollControlled: true,
+                              shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.only(topLeft: Radius.circular(20), topRight: Radius.circular(20))
+                              ),
+                              context: context,
+                              builder: (_){
+                                return Padding(
+                                  padding: EdgeInsets.symmetric(horizontal: CustomSize.sizeWidth(context) / 32),
+                                  child: Column(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      SizedBox(height: CustomSize.sizeHeight(context) / 86,),
+                                      Padding(
+                                        padding: EdgeInsets.symmetric(horizontal: CustomSize.sizeWidth(context) / 2.4),
+                                        child: Divider(thickness: 4,),
+                                      ),
+                                      SizedBox(height: CustomSize.sizeHeight(context) / 52,),
+                                      GestureDetector(
+                                        onTap: (){
+                                          setState(() {
+                                            _transCode = 1;
+                                          });
+                                          Navigator.pop(context);
+                                        },
+                                        child: Row(
+                                          children: [
+                                            Container(
+                                              width: CustomSize.sizeWidth(context) / 8,
+                                              height: CustomSize.sizeWidth(context) / 8,
+                                              decoration: BoxDecoration(
+                                                  color: CustomColor.primary,
+                                                  shape: BoxShape.circle
+                                              ),
+                                              child: Center(
+                                                child: Icon(FontAwesome.motorcycle, color: Colors.white, size: 20,),
+                                              ),
+                                            ),
+                                            SizedBox(width: CustomSize.sizeWidth(context) / 32,),
+                                            CustomText.textHeading6(text: "Pesan Antar",),
+                                          ],
+                                        ),
+                                      ),
+                                      SizedBox(height: CustomSize.sizeHeight(context) / 86,),
+                                      GestureDetector(
+                                        onTap: (){
+                                          setState(() {
+                                            _transCode = 2;
+                                          });
+                                          Navigator.pop(context);
+                                        },
+                                        child: Row(
+                                          children: [
+                                            Container(
+                                              width: CustomSize.sizeWidth(context) / 8,
+                                              height: CustomSize.sizeWidth(context) / 8,
+                                              decoration: BoxDecoration(
+                                                  color: CustomColor.primary,
+                                                  shape: BoxShape.circle
+                                              ),
+                                              child: Center(
+                                                child: Icon(MaterialCommunityIcons.shopping, color: Colors.white, size: 20,),
+                                              ),
+                                            ),
+                                            SizedBox(width: CustomSize.sizeWidth(context) / 32,),
+                                            CustomText.textHeading6(text: "Ambil Langsung",),
+                                          ],
+                                        ),
+                                      ),
+                                      SizedBox(height: CustomSize.sizeHeight(context) / 86,),
+                                      GestureDetector(
+                                        onTap: (){
+                                          setState(() {
+                                            _transCode = 3;
+                                          });
+                                          Navigator.pop(context);
+                                        },
+                                        child: Row(
+                                          children: [
+                                            Container(
+                                              width: CustomSize.sizeWidth(context) / 8,
+                                              height: CustomSize.sizeWidth(context) / 8,
+                                              decoration: BoxDecoration(
+                                                  color: CustomColor.primary,
+                                                  shape: BoxShape.circle
+                                              ),
+                                              child: Center(
+                                                child: Icon(Icons.restaurant, color: Colors.white, size: 20,),
+                                              ),
+                                            ),
+                                            SizedBox(width: CustomSize.sizeWidth(context) / 32,),
+                                            CustomText.textHeading6(text: "Makan Ditempat",),
+                                          ],
+                                        ),
+                                      ),
+                                      SizedBox(height: CustomSize.sizeHeight(context) / 86,),
+                                    ],
+                                  ),
+                                );
+                              }
+                          );
+                        },
+                        child: Container(
+                          height: CustomSize.sizeHeight(context) / 24,
+                          decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(20),
+                              border: Border.all(color: CustomColor.accent)
+                          ),
+                          child: Padding(
+                            padding: EdgeInsets.symmetric(horizontal: CustomSize.sizeWidth(context) / 32),
+                            child: Center(
+                              child: CustomText.bodyRegular14(
+                                  text: "Ganti",
+                                  color: CustomColor.accent
+                              ),
                             ),
                           ),
                         ),
@@ -503,12 +632,15 @@ class _CartActivityState extends State<CartActivity> {
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        CustomText.textHeading4(text: "Ada lagi pesanannya ?"),
-                        CustomText.bodyRegular16(text: "Masih bisa tambah lagi loo")
-                      ],
+                    Container(
+                      width: CustomSize.sizeWidth(context) / 1.6,
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          CustomText.textHeading4(text: "Ada lagi pesanannya ?"),
+                          CustomText.bodyRegular16(text: "Masih bisa tambah lagi loo")
+                        ],
+                      ),
                     ),
                     Padding(
                       padding: EdgeInsets.symmetric(horizontal: CustomSize.sizeWidth(context) / 86),
@@ -563,13 +695,13 @@ class _CartActivityState extends State<CartActivity> {
                                   CustomText.bodyLight16(text: NumberFormat.currency(locale: 'id', symbol: '', decimalDigits: 0).format(harga)),
                                 ],
                               ),
-                              SizedBox(height: CustomSize.sizeHeight(context) / 100,),
-                              Row(mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              (_transCode == 1)?SizedBox(height: CustomSize.sizeHeight(context) / 100,):SizedBox(),
+                              (_transCode == 1)?Row(mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                 children: [
                                   CustomText.bodyLight16(text: "Ongkir"),
                                   CustomText.bodyLight16(text: totalOngkir),
                                 ],
-                              ),
+                              ):SizedBox(),
                               SizedBox(height: CustomSize.sizeHeight(context) / 64,),
                               Divider(thickness: 1,),
                               SizedBox(height: CustomSize.sizeHeight(context) / 120,),

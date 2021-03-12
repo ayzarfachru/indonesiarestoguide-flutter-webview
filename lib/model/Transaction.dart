@@ -7,7 +7,7 @@ class Transaction{
   int id;
   String status;
   String username;
-  Resto nameResto;
+  String nameResto;
   String address;
   int ongkir;
   int total;

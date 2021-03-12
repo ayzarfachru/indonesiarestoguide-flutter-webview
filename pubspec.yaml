@@ -66,11 +66,11 @@ flutter:
 
   assets:
     - assets/
-#    - res/mipmap-hdpi/
-#    - res/mipmap-mdpi/
-#    - res/mipmap-xhdpi/
-#    - res/mipmap-xxhdpi/
-#    - res/mipmap-xxxhdpi/
+  #    - res/mipmap-hdpi/
+  #    - res/mipmap-mdpi/
+  #    - res/mipmap-xhdpi/
+  #    - res/mipmap-xxhdpi/
+  #    - res/mipmap-xxxhdpi/
 
   # To add assets to your application, add an assets section, like this:
   # assets:

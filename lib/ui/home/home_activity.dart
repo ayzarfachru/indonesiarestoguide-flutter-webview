@@ -1,17 +1,24 @@
 import 'dart:convert';
 
+import 'package:barcode_scan/barcode_scan.dart';
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_icons/flutter_icons.dart';
 import 'package:indonesiarestoguide/model/Menu.dart';
 import 'package:indonesiarestoguide/model/Price.dart';
 import 'package:indonesiarestoguide/model/Promo.dart';
 import 'package:indonesiarestoguide/model/Resto.dart';
+import 'package:indonesiarestoguide/model/Transaction.dart';
 import 'package:indonesiarestoguide/ui/bookmark/bookmark_activity.dart';
+import 'package:indonesiarestoguide/ui/cart/cart_activity.dart';
 import 'package:indonesiarestoguide/ui/detail/detail_resto.dart';
+import 'package:indonesiarestoguide/ui/detail/detail_transaction.dart';
 import 'package:indonesiarestoguide/ui/history/history_activity.dart';
 import 'package:indonesiarestoguide/ui/profile/profile_activity.dart';
+import 'package:indonesiarestoguide/ui/promo/promo_activity.dart';
+import 'package:indonesiarestoguide/ui/search/search_activity.dart';
 import 'package:indonesiarestoguide/utils/utils.dart';
 import 'package:intl/intl.dart';
 import 'package:location/location.dart';
@@ -105,10 +112,12 @@ class _HomeActivityState extends State<HomeActivity> {
   List<Resto> resto = [];
   List<Resto> again = [];
   List<Menu> promo = [];
+  List<Transaction> transaction = [];
   Future _getDataHome(String lat, String long)async{
     List<Resto> _resto = [];
     List<Resto> _again = [];
     List<Menu> _promo = [];
+    List<Transaction> _transaction = [];
 
     SharedPreferences pref = await SharedPreferences.getInstance();
     String token = pref.getString("token") ?? "";
@@ -118,6 +127,19 @@ class _HomeActivityState extends State<HomeActivity> {
     });
     print(apiResult.body);
     var data = json.decode(apiResult.body);
+
+    for(var v in data['trans']){
+      Transaction t = Transaction(
+          id: v['id'],
+          date: v['date'],
+          img: v['img'],
+          nameResto: v['resto_name'],
+          status: v['status_text'],
+          total: v['total'],
+          type: v['type_text']
+      );
+      _transaction.add(t);
+    }
 
     for(var v in data['resto']){
       Resto r = Resto.all(
@@ -152,6 +174,7 @@ class _HomeActivityState extends State<HomeActivity> {
     }
 
     setState(() {
+      transaction = _transaction;
       resto = _resto;
       again = _again;
       promo = _promo;
@@ -284,68 +307,84 @@ class _HomeActivityState extends State<HomeActivity> {
                       height: CustomSize.sizeHeight(context) / 5,
                       child: ListView.builder(
                           scrollDirection: Axis.horizontal,
-                          itemCount: 4,
+                          itemCount: transaction.length,
                           itemBuilder: (_, index){
                             return Padding(
                               padding: EdgeInsets.only(left: CustomSize.sizeWidth(context) / 20,
                                   top: CustomSize.sizeHeight(context) / 86, bottom: CustomSize.sizeHeight(context) / 86),
-                              child: Container(
-                                width: CustomSize.sizeWidth(context) / 1.4,
-                                height: CustomSize.sizeHeight(context) / 5,
-                                decoration: BoxDecoration(
-                                  color: Colors.white,
-                                  borderRadius: BorderRadius.circular(20),
-                                  boxShadow: [
-                                    BoxShadow(
-                                      color: Colors.grey.withOpacity(0.5),
-                                      spreadRadius: 0,
-                                      blurRadius: 4,
-                                      offset: Offset(0, 3), // changes position of shadow
-                                    ),
-                                  ],
-                                ),
-                                child: Padding(
-                                  padding: EdgeInsets.symmetric(horizontal: CustomSize.sizeWidth(context) / 48),
-                                  child: Row(
-                                    crossAxisAlignment: CrossAxisAlignment.center,
-                                    children: [
-                                      Container(
-                                        width: CustomSize.sizeWidth(context) / 4.8,
-                                        height: CustomSize.sizeHeight(context) / 6.8,
-                                        decoration: BoxDecoration(
-                                            color: Colors.amber,
-                                            borderRadius: BorderRadius.circular(20)
-                                        ),
+                              child: GestureDetector(
+                                onTap: (){
+                                  if(transaction[index].type.startsWith('Reservasi') != true){
+                                    Navigator.push(
+                                        context,
+                                        PageTransition(
+                                            type: PageTransitionType.rightToLeft,
+                                            child: new DetailTransaction(transaction[index].id)));
+                                  }
+                                },
+                                child: Container(
+                                  width: CustomSize.sizeWidth(context) / 1.2,
+                                  height: CustomSize.sizeHeight(context) / 5,
+                                  decoration: BoxDecoration(
+                                    color: Colors.white,
+                                    borderRadius: BorderRadius.circular(20),
+                                    boxShadow: [
+                                      BoxShadow(
+                                        color: Colors.grey.withOpacity(0.5),
+                                        spreadRadius: 0,
+                                        blurRadius: 4,
+                                        offset: Offset(0, 3), // changes position of shadow
                                       ),
-                                      SizedBox(width: CustomSize.sizeWidth(context) / 36,),
-                                      Padding(
-                                        padding: EdgeInsets.symmetric(vertical: CustomSize.sizeHeight(context) / 63),
-                                        child: Container(
-                                          width: CustomSize.sizeWidth(context) / 2.4,
-                                          child: Column(
-                                            crossAxisAlignment: CrossAxisAlignment.start,
-                                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                            children: [
-                                              Column(
-                                                crossAxisAlignment: CrossAxisAlignment.start,
-                                                children: [
-                                                  CustomText.bodyMedium14(text: "Rumah Makan Selera Bunda", minSize: 14, maxLines: 2),
-                                                  CustomText.bodyLight12(text: "01 Jan 2021, 10:00", minSize: 12),
-                                                  CustomText.bodyMedium12(text: "Pesan Antar", minSize: 12),
-                                                ],
-                                              ),
-                                              Row(
-                                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                                children: [
-                                                  CustomText.bodyLight12(text: "Diproses", minSize: 12, color: Colors.amberAccent),
-                                                  CustomText.bodyMedium14(text: "35.000", minSize: 14),
-                                                ],
+                                    ],
+                                  ),
+                                  child: Padding(
+                                    padding: EdgeInsets.symmetric(horizontal: CustomSize.sizeWidth(context) / 48),
+                                    child: Row(
+                                      crossAxisAlignment: CrossAxisAlignment.center,
+                                      children: [
+                                        Container(
+                                          width: CustomSize.sizeWidth(context) / 3.4,
+                                          height: CustomSize.sizeHeight(context) / 6.8,
+                                          decoration: BoxDecoration(
+                                              borderRadius: BorderRadius.circular(20),
+                                              image: DecorationImage(
+                                                  image: NetworkImage(Links.subUrl + transaction[index].img),
+                                                  fit: BoxFit.cover
                                               )
-                                            ],
                                           ),
                                         ),
-                                      )
-                                    ],
+                                        SizedBox(width: CustomSize.sizeWidth(context) / 36,),
+                                        Padding(
+                                          padding: EdgeInsets.symmetric(vertical: CustomSize.sizeHeight(context) / 63),
+                                          child: Container(
+                                            width: CustomSize.sizeWidth(context) / 2.2,
+                                            child: Column(
+                                              crossAxisAlignment: CrossAxisAlignment.start,
+                                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                              children: [
+                                                Column(
+                                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                                  children: [
+                                                    CustomText.bodyMedium14(text: transaction[index].nameResto.toString(), minSize: 14, maxLines: 1),
+                                                    CustomText.bodyLight12(text: transaction[index].date, minSize: 12),
+                                                    (transaction[index].type.startsWith('Reservasi'))
+                                                        ?CustomText.bodyMedium10(text: transaction[index].type, minSize: 11)
+                                                        :CustomText.bodyMedium12(text: transaction[index].type, minSize: 12),
+                                                  ],
+                                                ),
+                                                Row(
+                                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                                  children: [
+                                                    CustomText.bodyLight12(text: transaction[index].status, minSize: 12, color: Colors.amberAccent),
+                                                    CustomText.bodyMedium14(text: NumberFormat.currency(locale: 'id', symbol: '', decimalDigits: 0).format(transaction[index].total), minSize: 14),
+                                                  ],
+                                                )
+                                              ],
+                                            ),
+                                          ),
+                                        )
+                                      ],
+                                    ),
                                   ),
                                 ),
                               ),
@@ -592,14 +631,22 @@ class _HomeActivityState extends State<HomeActivity> {
             crossAxisAlignment: CrossAxisAlignment.center,
             mainAxisAlignment: MainAxisAlignment.spaceAround,
             children: [
-              Icon(MaterialCommunityIcons.percent, size: 32, color: Colors.white,),
               GestureDetector(
                   onTap: (){
                     Navigator.push(
                         context,
                         PageTransition(
                             type: PageTransitionType.rightToLeft,
-                            child: BookmarkActivity()));
+                            child: new PromoActivity()));
+                  },
+                  child: Icon(MaterialCommunityIcons.percent, size: 32, color: Colors.white,)),
+              GestureDetector(
+                  onTap: (){
+                    Navigator.push(
+                        context,
+                        PageTransition(
+                            type: PageTransitionType.rightToLeft,
+                            child: new BookmarkActivity()));
                   },
                   child: Icon(MaterialCommunityIcons.bookmark, size: 32, color: Colors.white,)),
               GestureDetector(
@@ -608,14 +655,18 @@ class _HomeActivityState extends State<HomeActivity> {
                         context,
                         PageTransition(
                             type: PageTransitionType.rightToLeft,
-                            child: HistoryActivity()));
+                            child: CartActivity()));
                   },
-                  child: Icon(MaterialCommunityIcons.shopping, size: 32, color: Colors.white,)),
-              Icon(FontAwesome.search, size: 32, color: Colors.white,),
+                  child: Icon(CupertinoIcons.cart_fill, size: 32, color: Colors.white,)),
+              GestureDetector(
+                  onTap: (){
+                    Navigator.push(context, PageTransition(type: PageTransitionType.rightToLeft, child: new SearchActivity()));
+                  },
+                  child: Icon(FontAwesome.search, size: 32, color: Colors.white,)),
               GestureDetector(
                 onTap: (){
                   setState(() {
-                    Navigator.push(context, PageTransition(type: PageTransitionType.fade, child: new ProfileActivity()));
+                    Navigator.push(context, PageTransition(type: PageTransitionType.rightToLeft, child: new ProfileActivity()));
                   });
                 },
                 child: Icon(Ionicons.md_person, size: 32, color: Colors.white,),

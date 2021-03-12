@@ -81,15 +81,15 @@ class _SearchActivityState extends State<SearchActivity> {
                     children: [
                       SizedBox(height: CustomSize.sizeHeight(context) / 48,),
                       CustomText.textHeading4(
-                        text: "Paling banyak Dicari"
+                          text: "Paling banyak Dicari"
                       ),
                       SizedBox(height: CustomSize.sizeHeight(context) / 48,),
                       Container(
                         height: CustomSize.sizeHeight(context) / 18,
                         child: ListView.builder(
-                          scrollDirection: Axis.horizontal,
-                          shrinkWrap: true,
-                          itemCount: 4,
+                            scrollDirection: Axis.horizontal,
+                            shrinkWrap: true,
+                            itemCount: 4,
                             itemBuilder: (_, index){
                               return Padding(
                                 padding: EdgeInsets.symmetric(horizontal: CustomSize.sizeWidth(context) / 86),
@@ -103,8 +103,8 @@ class _SearchActivityState extends State<SearchActivity> {
                                     padding: EdgeInsets.symmetric(horizontal: CustomSize.sizeWidth(context) / 48),
                                     child: Center(
                                       child: CustomText.bodyRegular14(
-                                        text: "Soto Daging",
-                                        color: CustomColor.accent
+                                          text: "Soto Daging",
+                                          color: CustomColor.accent
                                       ),
                                     ),
                                   ),
@@ -134,11 +134,11 @@ class _SearchActivityState extends State<SearchActivity> {
                                       height: CustomSize.sizeWidth(context) / 6,
                                       decoration: BoxDecoration(
                                           shape: BoxShape.circle,
-                                        color: CustomColor.secondary
+                                          color: CustomColor.secondary
                                       ),
                                     ),
                                     SizedBox(height: CustomSize.sizeHeight(context) / 86,),
-                                    CustomText.textHeading4(
+                                    CustomText.bodyMedium16(
                                         text: "Appetizer"
                                     ),
                                   ],

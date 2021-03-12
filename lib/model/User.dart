@@ -15,4 +15,6 @@ class User{
       this.gender,
       this.tgl,
       this.token});
+
+  User.name(this.name);
 }

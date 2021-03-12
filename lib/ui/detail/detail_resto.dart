@@ -10,6 +10,7 @@ import 'package:indonesiarestoguide/model/Price.dart';
 import 'package:indonesiarestoguide/model/Promo.dart';
 import 'package:indonesiarestoguide/ui/cart/cart_activity.dart';
 import 'package:indonesiarestoguide/ui/home/home_activity.dart';
+import 'package:indonesiarestoguide/ui/reservation/reservation_activity.dart';
 import 'package:indonesiarestoguide/utils/utils.dart';
 import 'package:http/http.dart' as http;
 import 'package:intl/intl.dart';
@@ -40,6 +41,9 @@ class _DetailRestoState extends State<DetailResto> {
   String desc = "";
   String img = "";
   String range = "";
+  String openClose = "";
+  String reservationFee = "";
+  bool isFav = false;
   String inCart = "";
   List<String> images = [];
   List<Promo> promo = [];
@@ -112,6 +116,9 @@ class _DetailRestoState extends State<DetailResto> {
       desc = data['data']['desc'];
       img = data['data']['main_img'];
       range = data['data']['range'];
+      isFav = data['data']['is_followed'];
+      openClose = data['data']['openclose'];
+      reservationFee = data['data']['reservation_fee'].toString();
       images = _images;
       promo = _promo;
       menu = _menu;
@@ -195,8 +202,17 @@ class _DetailRestoState extends State<DetailResto> {
                                 ),
                               ),
                               Icon(MaterialCommunityIcons.bookmark,
-                                color: CustomColor.secondary, size: 40,)
+                                color: (isFav)?CustomColor.primary:CustomColor.dividerDark, size: 40,)
                             ],
+                          ),
+                        ),
+                        Padding(
+                          padding: EdgeInsets.symmetric(horizontal: CustomSize.sizeHeight(context) / 24),
+                          child: GestureDetector(
+                            onTap: _launchURL,
+                            child: Container(
+                                width: CustomSize.sizeWidth(context),
+                                child: CustomText.bodyMedium16(text: address, maxLines: 10)),
                           ),
                         ),
                         SizedBox(height: CustomSize.sizeHeight(context) / 24,),
@@ -218,35 +234,30 @@ class _DetailRestoState extends State<DetailResto> {
                                   ),
                                   child: Column(
                                     children: [
-                                      CustomText.bodyMedium16(text: "Kisaran Harga", minSize: 16),
+                                      CustomText.bodyMedium12(text: "Kisaran Harga", minSize: 12),
                                       SizedBox(height: CustomSize.sizeHeight(context) / 86,),
                                       CustomText.bodyRegular16(text: range, minSize: 16, color: CustomColor.primary),
                                     ],
                                   ),
                                 ),
                               ),
-                              GestureDetector(
-                                onTap: (){
-                                  _launchURL();
-                                },
-                                child: Container(
-                                  width: CustomSize.sizeWidth(context) / 2.2,
-                                  decoration: BoxDecoration(
-                                    color: CustomColor.secondary,
-                                    borderRadius: BorderRadius.circular(15),
+                              Container(
+                                width: CustomSize.sizeWidth(context) / 2.2,
+                                decoration: BoxDecoration(
+                                  color: CustomColor.secondary,
+                                  borderRadius: BorderRadius.circular(15),
+                                ),
+                                child: Padding(
+                                  padding: EdgeInsets.symmetric(
+                                      horizontal: CustomSize.sizeWidth(context) / 48,
+                                      vertical: CustomSize.sizeHeight(context) / 48
                                   ),
-                                  child: Padding(
-                                    padding: EdgeInsets.symmetric(
-                                        horizontal: CustomSize.sizeWidth(context) / 48,
-                                        vertical: CustomSize.sizeHeight(context) / 48
-                                    ),
-                                    child: Column(
-                                      children: [
-                                        CustomText.bodyMedium16(text: "Alamat", minSize: 16),
-                                        SizedBox(height: CustomSize.sizeHeight(context) / 86,),
-                                        CustomText.bodyRegular16(text: address, minSize: 16, color: CustomColor.primary),
-                                      ],
-                                    ),
+                                  child: Column(
+                                    children: [
+                                      CustomText.bodyMedium12(text: "Jam Buka & Tutup", minSize: 12),
+                                      SizedBox(height: CustomSize.sizeHeight(context) / 86,),
+                                      CustomText.bodyRegular16(text: openClose, minSize: 16, color: CustomColor.primary),
+                                    ],
                                   ),
                                 ),
                               ),
@@ -448,7 +459,7 @@ class _DetailRestoState extends State<DetailResto> {
                                 },
                                 child: Container(
                                   width: CustomSize.sizeWidth(context),
-                                  height: CustomSize.sizeHeight(context) / 3.8,
+                                  height: CustomSize.sizeHeight(context) / 4.2,
                                   child: Column(
                                     children: [
                                       Expanded(
@@ -469,10 +480,10 @@ class _DetailRestoState extends State<DetailResto> {
                                                           minSize: 18,
                                                           maxLines: 1
                                                       ),
-                                                      CustomText.bodyRegular16(
+                                                      CustomText.bodyRegular12(
                                                           text: menu[index].desc,
                                                           maxLines: 2,
-                                                          minSize: 16
+                                                          minSize: 12
                                                       ),
                                                     ],
                                                   ),
@@ -652,10 +663,10 @@ class _DetailRestoState extends State<DetailResto> {
                                                         minSize: 18,
                                                         maxLines: 1
                                                     ),
-                                                    CustomText.bodyRegular16(
+                                                    CustomText.bodyRegular12(
                                                         text: "Lorem ipsum dolor sit amet, con sectetur adipiscing elit",
                                                         maxLines: 2,
-                                                        minSize: 16
+                                                        minSize: 12
                                                     ),
                                                   ],
                                                 ),
@@ -762,14 +773,23 @@ class _DetailRestoState extends State<DetailResto> {
           ),
           child: Center(child: Icon(CupertinoIcons.cart_fill, color: Colors.white,)),
         ),
-      ):Container(
-        width: CustomSize.sizeWidth(context) / 1.1,
-        height: CustomSize.sizeHeight(context) / 14,
-        decoration: BoxDecoration(
-            color: CustomColor.primary,
-            borderRadius: BorderRadius.circular(20)
+      ):GestureDetector(
+        onTap: (){
+          Navigator.push(
+              context,
+              PageTransition(
+                  type: PageTransitionType.rightToLeft,
+                  child: new ReservationActivity(id, address, reservationFee)));
+        },
+        child: Container(
+          width: CustomSize.sizeWidth(context) / 1.1,
+          height: CustomSize.sizeHeight(context) / 14,
+          decoration: BoxDecoration(
+              color: CustomColor.primary,
+              borderRadius: BorderRadius.circular(20)
+          ),
+          child: Center(child: CustomText.bodyRegular16(text: "Reservasi Sekarang", color: Colors.white)),
         ),
-        child: Center(child: CustomText.bodyRegular16(text: "Reservasi Sekarang", color: Colors.white)),
       ),
     );
   }

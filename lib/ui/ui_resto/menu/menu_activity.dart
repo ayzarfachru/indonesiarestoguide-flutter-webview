@@ -1,35 +1,21 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_icons/flutter_icons.dart';
 import 'package:indonesiarestoguide/utils/utils.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+import 'package:page_transition/page_transition.dart';
 
-class PromoActivity extends StatefulWidget {
+class MenuActivity extends StatefulWidget {
   @override
   _PromoActivityState createState() => _PromoActivityState();
 }
 
-class _PromoActivityState extends State<PromoActivity> {
+class _PromoActivityState extends State<MenuActivity> {
   ScrollController _scrollController = ScrollController();
-  String homepg = "";
-
-  getHomePg() async {
-    SharedPreferences pref = await SharedPreferences.getInstance();
-    setState(() {
-      homepg = (pref.getString('homepg'));
-      print(homepg);
-    });
-  }
 
   @override
   void dispose() {
     _scrollController.dispose();
     super.dispose();
-  }
-
-  @override
-  void initState() {
-    super.initState();
-    getHomePg();
   }
 
   @override
@@ -46,23 +32,12 @@ class _PromoActivityState extends State<PromoActivity> {
                 SizedBox(
                   height: CustomSize.sizeHeight(context) / 32,
                 ),
-                (homepg != "1")?CustomText.textHeading3(
-                  text: "Penawaran Terbaik",
+                CustomText.textHeading3(
+                  text: "Menu di Restoranmu",
                   color: CustomColor.primary,
                   minSize: 18,
                   maxLines: 1
-                ):CustomText.textHeading3(
-                    text: "Promo di Restoranmu",
-                    color: CustomColor.primary,
-                    minSize: 18,
-                    maxLines: 1
                 ),
-                (homepg != "1")?CustomText.textHeading3(
-                    text: "di Sekitarmu",
-                    color: CustomColor.primary,
-                    minSize: 18,
-                    maxLines: 1
-                ):Container(),
                 ListView.builder(
                   shrinkWrap: true,
                   controller: _scrollController,
@@ -113,7 +88,7 @@ class _PromoActivityState extends State<PromoActivity> {
                                           maxLines: 1,
                                             minSize: 12
                                         ),
-                                        (homepg != "1")?Container():Row(
+                                        Row(
                                           children: [
                                             Icon(Icons.edit, color: CustomColor.primary,),
                                             SizedBox(width: CustomSize.sizeWidth(context) / 86,),
@@ -159,7 +134,7 @@ class _PromoActivityState extends State<PromoActivity> {
           ),
         ),
       ),
-        floatingActionButton: (homepg != '1')?Container():GestureDetector(
+        floatingActionButton: GestureDetector(
           onTap: (){
             // Navigator.push(
             //     context,

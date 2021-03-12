@@ -13,8 +13,8 @@ import 'package:http/http.dart' as http;
 import 'dart:convert' as convert;
 
 class Links{
-  static String mainUrl = "http://192.168.100.11:8000/api/v2";
-  static String subUrl = "http://192.168.100.11:8000";
+  static String mainUrl = "http://192.168.100.2:8000/api/v2";
+  static String subUrl = "http://192.168.100.2:8000";
 }
 
 class CustomText{
@@ -121,6 +121,20 @@ class CustomText{
     );
   }
 
+  static Widget textHeading7({String text, Color color,
+    double minSize, int maxLines,}){
+    return AutoSizeText(
+      text,
+      style: GoogleFonts.poppins(
+          textStyle: TextStyle(
+              fontSize: 16,
+              fontWeight:
+              FontWeight.w600, color: color??Colors.black)),
+      minFontSize: minSize??0,
+      maxLines: maxLines??1,
+    );
+  }
+
   static Widget textTitle1({String text, Color color,
     double minSize, int maxLines,}){
     return AutoSizeText(
@@ -205,6 +219,20 @@ class CustomText{
     );
   }
 
+  static Widget textTitle8({String text, Color color,
+    double minSize, int maxLines,}){
+    return AutoSizeText(
+      text,
+      style: GoogleFonts.poppins(
+          textStyle: TextStyle(
+              fontSize: 14,
+              fontWeight:
+              FontWeight.w600, color: color??Colors.black)),
+      minFontSize: minSize??0,
+      maxLines: maxLines??1,
+    );
+  }
+
   static Widget bodyMedium16({String text, Color color,
     double minSize, int maxLines,}){
     return AutoSizeText(
@@ -247,6 +275,34 @@ class CustomText{
     );
   }
 
+  static Widget bodyMedium10({String text, Color color,
+    double minSize, int maxLines,}){
+    return AutoSizeText(
+      text,
+      style: GoogleFonts.poppins(
+          textStyle: TextStyle(
+              fontSize: 10,
+              fontWeight:
+              FontWeight.w500, color: color??Colors.black)),
+      minFontSize: minSize??0,
+      maxLines: maxLines??1,
+    );
+  }
+
+  static Widget bodyRegular15({String text, Color color,
+    double minSize, int maxLines,}){
+    return AutoSizeText(
+      text,
+      style: GoogleFonts.poppins(
+          textStyle: TextStyle(
+              fontSize: 15,
+              fontWeight:
+              FontWeight.w400, color: color??Colors.black)),
+      minFontSize: minSize??0,
+      maxLines: maxLines??1,
+    );
+  }
+
   static Widget bodyRegular16({String text, Color color,
     double minSize, int maxLines,}){
     return AutoSizeText(
@@ -282,6 +338,21 @@ class CustomText{
       style: GoogleFonts.poppins(
           textStyle: TextStyle(
               fontSize: 12,
+              fontWeight:
+              FontWeight.w400, color: color??Colors.black,
+              decoration: decoration??TextDecoration.none)),
+      minFontSize: minSize??0,
+      maxLines: maxLines??1,
+    );
+  }
+
+  static Widget bodyRegular10({String text, Color color,
+    double minSize, int maxLines, TextDecoration decoration}){
+    return AutoSizeText(
+      text,
+      style: GoogleFonts.poppins(
+          textStyle: TextStyle(
+              fontSize: 10,
               fontWeight:
               FontWeight.w400, color: color??Colors.black,
               decoration: decoration??TextDecoration.none)),
@@ -347,6 +418,7 @@ class CustomText{
   }
 }
 
+
 class CustomColor{
   static Color primary = Color(0xffAF1E22);
   static Color primaryLight = Color(0xffAF1E22).withOpacity(.2);
@@ -354,6 +426,8 @@ class CustomColor{
 
   static Color accent = Color(0xff26CD67);
   static Color accentLight = Color(0xff26CD67).withOpacity(0.2);
+
+  static Color redBtn = Color.fromRGBO(251,22,10,1);
 
   static Color background = Color(0xffF2F6FD);
 

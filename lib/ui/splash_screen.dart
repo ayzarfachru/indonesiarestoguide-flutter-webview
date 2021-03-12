@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:indonesiarestoguide/ui/home/home_activity.dart';
+import 'package:indonesiarestoguide/ui/ui_resto/home/home_activity.dart';
 import 'package:indonesiarestoguide/utils/utils.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -9,6 +10,7 @@ class SplashScreen extends StatefulWidget {
 }
 
 class _SplashScreenState extends State<SplashScreen> {
+  String homepg = "";
   Future<String> getSwitch() async {
     SharedPreferences pref = await SharedPreferences.getInstance();
     return pref.getString("akses") ?? "";
@@ -20,13 +22,22 @@ class _SplashScreenState extends State<SplashScreen> {
     return true;
   }
 
+  getHomePg() async {
+    SharedPreferences pref = await SharedPreferences.getInstance();
+    setState(() {
+      homepg = (pref.getString('homepg'));
+      print(homepg);
+    });
+  }
+
   @override
   void initState() {
     super.initState();
+    getHomePg();
     _checkForSession().then((status) {
       if (status) {
         Navigator.of(context).pushReplacement(MaterialPageRoute(
-            builder: (BuildContext context) => HomeActivity()));
+            builder: (BuildContext context) => (homepg != "1")?HomeActivity():HomeActivityResto()));
       }
     });
   }

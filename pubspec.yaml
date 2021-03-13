@@ -48,6 +48,7 @@ dependencies:
   geocoder: ^0.2.1
   barcode_scan: ^2.0.1
   day_night_time_picker: ^0.5.0
+  pull_to_refresh: 1.6.3
 
 dev_dependencies:
   flutter_test:

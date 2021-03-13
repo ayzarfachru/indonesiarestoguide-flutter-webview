@@ -5,6 +5,7 @@ import 'package:indonesiarestoguide/model/History.dart';
 import 'package:indonesiarestoguide/utils/utils.dart';
 import 'package:intl/intl.dart';
 import 'package:page_transition/page_transition.dart';
+import 'package:pull_to_refresh/pull_to_refresh.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:http/http.dart' as http;
 import 'package:indonesiarestoguide/ui/detail/detail_history.dart';
@@ -55,6 +56,25 @@ class _HistoryActivityState extends State<HistoryActivity> {
     });
   }
 
+  RefreshController _refreshController =
+  RefreshController(initialRefresh: false);
+
+  void _onRefresh() async {
+    // monitor network fetch
+    _getHistory();
+    setState(() {});
+    await Future.delayed(Duration(milliseconds: 1000));
+    // if failed,use refreshFailed()
+    _refreshController.refreshCompleted();
+  }
+
+  void _onLoading() async {
+    // monitor network fetch
+    await Future.delayed(Duration(milliseconds: 1000));
+    // if failed,use loadFailed(),if no data return,use LoadNodata()
+    _refreshController.loadComplete();
+  }
+
   @override
   void initState() {
     _getHistory();
@@ -95,95 +115,107 @@ class _HistoryActivityState extends State<HistoryActivity> {
                   ),
                 ),
               ),
-              ListView.builder(
-                  shrinkWrap: true,
-                  controller: _scrollController,
-                  physics: NeverScrollableScrollPhysics(),
-                  itemCount: history.length,
-                  itemBuilder: (_, index){
-                    return Padding(
-                      padding: EdgeInsets.only(bottom: CustomSize.sizeHeight(context) / 86),
-                      child: GestureDetector(
-                        onTap: (){
-                          Navigator.push(context, PageTransition(type: PageTransitionType.rightToLeft, child: new DetailHistory(history[index].id)));
-                        },
-                        child: Container(
-                          width: CustomSize.sizeWidth(context),
-                          height: CustomSize.sizeHeight(context) / 4,
-                          color: Colors.white,
-                          child: Padding(
-                            padding: EdgeInsets.all(CustomSize.sizeWidth(context) / 38),
-                            child: Row(
-                              crossAxisAlignment: CrossAxisAlignment.center,
-                              children: [
-                                Container(
-                                  width: CustomSize.sizeWidth(context) / 2.8,
-                                  height: CustomSize.sizeWidth(context) / 2.8,
-                                  decoration: BoxDecoration(
-                                      image: DecorationImage(
-                                          image: NetworkImage(Links.subUrl + history[index].img),
-                                          fit: BoxFit.cover
-                                      ),
-                                      borderRadius: BorderRadius.circular(20)
+              SmartRefresher(
+                enablePullDown: true,
+                enablePullUp: false,
+                header: WaterDropMaterialHeader(
+                  distance: 30,
+                  backgroundColor: Colors.white,
+                  color: CustomColor.primary,
+                ),
+                controller: _refreshController,
+                onRefresh: _onRefresh,
+                onLoading: _onLoading,
+                child: ListView.builder(
+                    shrinkWrap: true,
+                    controller: _scrollController,
+                    physics: NeverScrollableScrollPhysics(),
+                    itemCount: history.length,
+                    itemBuilder: (_, index){
+                      return Padding(
+                        padding: EdgeInsets.only(bottom: CustomSize.sizeHeight(context) / 86),
+                        child: GestureDetector(
+                          onTap: (){
+                            Navigator.push(context, PageTransition(type: PageTransitionType.rightToLeft, child: new DetailHistory(history[index].id)));
+                          },
+                          child: Container(
+                            width: CustomSize.sizeWidth(context),
+                            height: CustomSize.sizeHeight(context) / 4,
+                            color: Colors.white,
+                            child: Padding(
+                              padding: EdgeInsets.all(CustomSize.sizeWidth(context) / 38),
+                              child: Row(
+                                crossAxisAlignment: CrossAxisAlignment.center,
+                                children: [
+                                  Container(
+                                    width: CustomSize.sizeWidth(context) / 2.8,
+                                    height: CustomSize.sizeWidth(context) / 2.8,
+                                    decoration: BoxDecoration(
+                                        image: DecorationImage(
+                                            image: NetworkImage(Links.subUrl + history[index].img),
+                                            fit: BoxFit.cover
+                                        ),
+                                        borderRadius: BorderRadius.circular(20)
+                                    ),
                                   ),
-                                ),
-                                SizedBox(width: CustomSize.sizeWidth(context) / 24,),
-                                Container(
-                                  width: CustomSize.sizeWidth(context) / 2,
-                                  child: Column(
-                                    crossAxisAlignment: CrossAxisAlignment.start,
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    children: [
-                                      CustomText.bodyMedium16(
-                                          text: history[index].name,
-                                          minSize: 16,
-                                          maxLines: 1
-                                      ),
-                                      CustomText.bodyLight12(
-                                          text: history[index].time,
-                                          maxLines: 1,
-                                          minSize: 12
-                                      ),
-                                      CustomText.bodyMedium12(
-                                          text: history[index].type,
-                                          maxLines: 1,
-                                          minSize: 12
-                                      ),
-                                      CustomText.bodyLight12(
-                                          text: "Selesai",
-                                          maxLines: 1,
-                                          minSize: 12,
-                                          color: CustomColor.accent
-                                      ),
-                                      Row(
-                                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                        children: [
-                                          CustomText.textHeading4(
-                                              text: NumberFormat.currency(locale: 'id', symbol: '', decimalDigits: 0).format(history[index].price),
-                                              minSize: 18,
-                                              maxLines: 1
-                                          ),
-                                          Container(
-                                            width: CustomSize.sizeWidth(context) / 4.2,
-                                            height: CustomSize.sizeHeight(context) / 24,
-                                            decoration: BoxDecoration(
-                                                borderRadius: BorderRadius.circular(20),
-                                                border: Border.all(color: CustomColor.accent)
+                                  SizedBox(width: CustomSize.sizeWidth(context) / 24,),
+                                  Container(
+                                    width: CustomSize.sizeWidth(context) / 2,
+                                    child: Column(
+                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      mainAxisAlignment: MainAxisAlignment.center,
+                                      children: [
+                                        CustomText.bodyMedium16(
+                                            text: history[index].name,
+                                            minSize: 16,
+                                            maxLines: 1
+                                        ),
+                                        CustomText.bodyLight12(
+                                            text: history[index].time,
+                                            maxLines: 1,
+                                            minSize: 12
+                                        ),
+                                        CustomText.bodyMedium12(
+                                            text: history[index].type,
+                                            maxLines: 1,
+                                            minSize: 12
+                                        ),
+                                        CustomText.bodyLight12(
+                                            text: "Selesai",
+                                            maxLines: 1,
+                                            minSize: 12,
+                                            color: CustomColor.accent
+                                        ),
+                                        Row(
+                                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                          children: [
+                                            CustomText.textHeading4(
+                                                text: NumberFormat.currency(locale: 'id', symbol: '', decimalDigits: 0).format(history[index].price),
+                                                minSize: 18,
+                                                maxLines: 1
                                             ),
-                                            child: Center(child: CustomText.bodyRegular14(text: "Pesan Lagi", color: CustomColor.accent)),
-                                          ),
-                                        ],
-                                      )
-                                    ],
+                                            Container(
+                                              width: CustomSize.sizeWidth(context) / 4.2,
+                                              height: CustomSize.sizeHeight(context) / 24,
+                                              decoration: BoxDecoration(
+                                                  borderRadius: BorderRadius.circular(20),
+                                                  border: Border.all(color: CustomColor.accent)
+                                              ),
+                                              child: Center(child: CustomText.bodyRegular14(text: "Pesan Lagi", color: CustomColor.accent)),
+                                            ),
+                                          ],
+                                        )
+                                      ],
+                                    ),
                                   ),
-                                ),
-                              ],
+                                ],
+                              ),
                             ),
                           ),
                         ),
-                      ),
-                    );
-                  }
+                      );
+                    }
+                ),
               ),
               SizedBox(height: CustomSize.sizeHeight(context) / 48,)
             ],

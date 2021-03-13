@@ -6,8 +6,12 @@ import 'package:indonesiarestoguide/model/Resto.dart';
 import 'package:indonesiarestoguide/utils/utils.dart';
 import 'package:location/location.dart';
 import 'package:location_platform_interface/location_platform_interface.dart';
+import 'package:pull_to_refresh/pull_to_refresh.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:http/http.dart' as http;
+
+import '../../utils/utils.dart';
+import '../../utils/utils.dart';
 
 class Location {
   /// Initializes the plugin and starts listening for potential platform events.
@@ -90,9 +94,15 @@ class BookmarkActivity extends StatefulWidget {
 class _BookmarkActivityState extends State<BookmarkActivity> {
   ScrollController _scrollController = ScrollController();
 
+  bool isLoading = false;
+
   List<Resto> resto = [];
   Future _getBookmark(String lat, String long)async{
     List<Resto> _resto = [];
+
+    setState(() {
+      isLoading = true;
+    });
     SharedPreferences pref = await SharedPreferences.getInstance();
     String token = pref.getString("token") ?? "";
     var apiResult = await http.get(Links.mainUrl + '/page/favresto?lat=$lat&long=$long', headers: {
@@ -114,8 +124,34 @@ class _BookmarkActivityState extends State<BookmarkActivity> {
 
     setState(() {
       resto = _resto;
+      isLoading = false;
     });
   }
+
+  RefreshController _refreshController =
+  RefreshController(initialRefresh: false);
+
+  void _onRefresh() async {
+    // monitor network fetch
+    Location.instance.requestPermission().then((value) {
+      print(value);
+    });
+    Location.instance.getLocation().then((value) {
+      _getBookmark(value.latitude.toString(), value.longitude.toString());
+    });
+    setState(() {});
+    await Future.delayed(Duration(milliseconds: 1000));
+    // if failed,use refreshFailed()
+    _refreshController.refreshCompleted();
+  }
+
+  void _onLoading() async {
+    // monitor network fetch
+    await Future.delayed(Duration(milliseconds: 1000));
+    // if failed,use loadFailed(),if no data return,use LoadNodata()
+    _refreshController.loadComplete();
+  }
+
 
   @override
   void initState() {
@@ -138,80 +174,96 @@ class _BookmarkActivityState extends State<BookmarkActivity> {
   Widget build(BuildContext context) {
     return Scaffold(
       body: SafeArea(
-        child: SingleChildScrollView(
+        child: (isLoading)?Container(
+          width: CustomSize.sizeWidth(context),
+            height: CustomSize.sizeHeight(context),
+            child: Center(child: CircularProgressIndicator())):SmartRefresher(
+          enablePullDown: true,
+          enablePullUp: false,
+          header: WaterDropMaterialHeader(
+            distance: 30,
+            backgroundColor: Colors.white,
+            color: CustomColor.primary,
+          ),
+          controller: _refreshController,
+          onRefresh: _onRefresh,
+          onLoading: _onLoading,
+              child: SingleChildScrollView(
           controller: _scrollController,
           child: Column(
-            children: [
-              SizedBox(
-                height: CustomSize.sizeHeight(context) / 32,
-              ),
-              Padding(
-                padding: EdgeInsets.symmetric(horizontal: CustomSize.sizeWidth(context) / 24),
-                child: CustomText.textHeading3(
-                    text: "Restoran Favoritmu Nih !",
-                    minSize: 18,
-                    maxLines: 1
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                SizedBox(
+                  height: CustomSize.sizeHeight(context) / 32,
                 ),
-              ),
-              StaggeredGridView.countBuilder(
-                staggeredTileBuilder: (index) {
-                  return StaggeredTile.count(1, 1.2);
-                },
-                crossAxisCount: 2,
-                controller: _scrollController,
-                physics: NeverScrollableScrollPhysics(),
-                shrinkWrap: true,
-                itemCount: resto.length,
-                itemBuilder: (_, index){
-                  return Padding(
-                    padding: EdgeInsets.all(CustomSize.sizeWidth(context) / 52),
-                    child: Container(
-                      width: CustomSize.sizeWidth(context) / 2.3,
-                      height: CustomSize.sizeHeight(context) / 3,
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.circular(20),
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.grey.withOpacity(0.5),
-                            spreadRadius: 0,
-                            blurRadius: 4,
-                            offset: Offset(0, 3), // changes position of shadow
-                          ),
-                        ],
-                      ),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Container(
-                            width: CustomSize.sizeWidth(context),
-                            height: CustomSize.sizeHeight(context) / 5.8,
-                            decoration: BoxDecoration(
-                              image: DecorationImage(
-                                  image: NetworkImage(Links.subUrl + resto[index].img),
-                                  fit: BoxFit.cover
-                              ),
-                              borderRadius: BorderRadius.circular(20),
+                Padding(
+                  padding: EdgeInsets.symmetric(horizontal: CustomSize.sizeWidth(context) / 24),
+                  child: CustomText.textHeading3(
+                      text: "Restoran Favoritmu Nih !",
+                      minSize: 18,
+                      maxLines: 1
+                  ),
+                ),
+                StaggeredGridView.countBuilder(
+                  staggeredTileBuilder: (index) {
+                    return StaggeredTile.count(1, 1.2);
+                  },
+                  crossAxisCount: 2,
+                  controller: _scrollController,
+                  physics: NeverScrollableScrollPhysics(),
+                  shrinkWrap: true,
+                  itemCount: resto.length,
+                  itemBuilder: (_, index){
+                    return Padding(
+                      padding: EdgeInsets.all(CustomSize.sizeWidth(context) / 52),
+                      child: Container(
+                        width: CustomSize.sizeWidth(context) / 2.3,
+                        height: CustomSize.sizeHeight(context) / 3,
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(20),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.grey.withOpacity(0.5),
+                              spreadRadius: 0,
+                              blurRadius: 4,
+                              offset: Offset(0, 3), // changes position of shadow
                             ),
-                          ),
-                          SizedBox(height: CustomSize.sizeHeight(context) / 86,),
-                          Padding(
-                            padding: EdgeInsets.only(left: CustomSize.sizeWidth(context) / 24),
-                            child: CustomText.bodyRegular14(text: resto[index].distance.toString() + " Km"),
-                          ),
-                          Padding(
-                            padding: EdgeInsets.only(left: CustomSize.sizeWidth(context) / 24),
-                            child: CustomText.bodyMedium16(text: resto[index].name),
-                          ),
-                        ],
+                          ],
+                        ),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Container(
+                              width: CustomSize.sizeWidth(context),
+                              height: CustomSize.sizeHeight(context) / 5.8,
+                              decoration: BoxDecoration(
+                                image: DecorationImage(
+                                    image: NetworkImage(Links.subUrl + resto[index].img),
+                                    fit: BoxFit.cover
+                                ),
+                                borderRadius: BorderRadius.circular(20),
+                              ),
+                            ),
+                            SizedBox(height: CustomSize.sizeHeight(context) / 86,),
+                            Padding(
+                              padding: EdgeInsets.only(left: CustomSize.sizeWidth(context) / 24),
+                              child: CustomText.bodyRegular14(text: resto[index].distance.toString() + " Km"),
+                            ),
+                            Padding(
+                              padding: EdgeInsets.only(left: CustomSize.sizeWidth(context) / 24),
+                              child: CustomText.bodyMedium16(text: resto[index].name),
+                            ),
+                          ],
+                        ),
                       ),
-                    ),
-                  );
-                },
-              )
-            ],
+                    );
+                  },
+                )
+              ],
           ),
         ),
+            ),
       ),
     );
   }

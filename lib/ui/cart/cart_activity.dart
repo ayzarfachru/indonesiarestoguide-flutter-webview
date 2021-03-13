@@ -88,6 +88,8 @@ class CartActivity extends StatefulWidget {
 class _CartActivityState extends State<CartActivity> {
   ScrollController _scrollController = ScrollController();
   TextEditingController _srchAddress = TextEditingController(text: "");
+  bool isLoading = false;
+
   String name = '';
   int harga = 0;
   List<String> restoId = [];
@@ -119,6 +121,10 @@ class _CartActivityState extends State<CartActivity> {
   Future _getData()async{
     List<MenuJson> _menuJson = [];
     List<String> _menuId = [];
+
+    setState(() {
+      isLoading = true;
+    });
     SharedPreferences pref2 = await SharedPreferences.getInstance();
     name = (pref2.getString('menuJson'));
     restoId.addAll(pref2.getStringList('restoId')??[]);
@@ -171,6 +177,7 @@ class _CartActivityState extends State<CartActivity> {
       _tempMenu = _menuJson;
       _restId = _menuId.toString().split('[')[1].split(']')[0].replaceAll(' ', '');
       _qty = qty.toString().split('[')[1].split(']')[0].replaceAll(' ', '');
+      isLoading = false;
     });
   }
 
@@ -766,116 +773,114 @@ class _CartActivityState extends State<CartActivity> {
                     ],
                   ),
                 ),
-                Expanded(
-                  child: Container(
-                    width: CustomSize.sizeWidth(context),
-                    decoration: BoxDecoration(
-                        color: CustomColor.secondary
-                    ),
-                    child: Column(
-                      children: [
-                        SizedBox(height: CustomSize.sizeHeight(context) / 22.5,),
-                        Padding(
-                          padding: EdgeInsets.symmetric(horizontal: CustomSize.sizeWidth(context) / 22),
-                          child: Container(
-                            width: CustomSize.sizeWidth(context),
-                            height: CustomSize.sizeHeight(context) / 3.8,
-                            decoration: BoxDecoration(
-                              color: Colors.white,
-                              borderRadius: BorderRadius.circular(20),
-                            ),
-                            child: Padding(
-                              padding: const EdgeInsets.symmetric(horizontal: 20.0),
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  SizedBox(height: CustomSize.sizeHeight(context) / 36,),
-                                  CustomText.textTitle3(text: "Rincian Pembayaran"),
-                                  SizedBox(height: CustomSize.sizeHeight(context) / 50,),
-                                  Row(
-                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                    children: [
-                                      CustomText.bodyLight16(text: "Harga"),
-                                      CustomText.bodyLight16(text: NumberFormat.currency(locale: 'id', symbol: '', decimalDigits: 0).format(harga)),
-                                    ],
-                                  ),
-                                  (_transCode == 1)?SizedBox(height: CustomSize.sizeHeight(context) / 100,):SizedBox(),
-                                  (_transCode == 1)?Row(mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                    children: [
-                                      CustomText.bodyLight16(text: "Ongkir"),
-                                      CustomText.bodyLight16(text: NumberFormat.currency(locale: 'id', symbol: '', decimalDigits: 0).format(int.parse(totalOngkir))),
-                                    ],
-                                  ):SizedBox(),
-                                  SizedBox(height: CustomSize.sizeHeight(context) / 64,),
-                                  Divider(thickness: 1,),
-                                  SizedBox(height: CustomSize.sizeHeight(context) / 120,),
-                                  Row(mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                    children: [
-                                      CustomText.textTitle3(text: "Total Pembayaran"),
-                                      CustomText.textTitle3(text: NumberFormat.currency(locale: 'id', symbol: '', decimalDigits: 0).format(int.parse(totalHarga))),
-                                    ],
-                                  ),
-                                ],
-                              ),
+                Container(
+                  width: CustomSize.sizeWidth(context),
+                  decoration: BoxDecoration(
+                      color: CustomColor.secondary
+                  ),
+                  child: Column(
+                    children: [
+                      SizedBox(height: CustomSize.sizeHeight(context) / 22.5,),
+                      Padding(
+                        padding: EdgeInsets.symmetric(horizontal: CustomSize.sizeWidth(context) / 22),
+                        child: Container(
+                          width: CustomSize.sizeWidth(context),
+                          height: CustomSize.sizeHeight(context) / 3.8,
+                          decoration: BoxDecoration(
+                            color: Colors.white,
+                            borderRadius: BorderRadius.circular(20),
+                          ),
+                          child: Padding(
+                            padding: const EdgeInsets.symmetric(horizontal: 20.0),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                SizedBox(height: CustomSize.sizeHeight(context) / 36,),
+                                CustomText.textTitle3(text: "Rincian Pembayaran"),
+                                SizedBox(height: CustomSize.sizeHeight(context) / 50,),
+                                Row(
+                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    CustomText.bodyLight16(text: "Harga"),
+                                    CustomText.bodyLight16(text: NumberFormat.currency(locale: 'id', symbol: '', decimalDigits: 0).format(harga)),
+                                  ],
+                                ),
+                                (_transCode == 1)?SizedBox(height: CustomSize.sizeHeight(context) / 100,):SizedBox(),
+                                (_transCode == 1)?Row(mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    CustomText.bodyLight16(text: "Ongkir"),
+                                    CustomText.bodyLight16(text: NumberFormat.currency(locale: 'id', symbol: '', decimalDigits: 0).format(int.parse(totalOngkir))),
+                                  ],
+                                ):SizedBox(),
+                                SizedBox(height: CustomSize.sizeHeight(context) / 64,),
+                                Divider(thickness: 1,),
+                                SizedBox(height: CustomSize.sizeHeight(context) / 120,),
+                                Row(mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    CustomText.textTitle3(text: "Total Pembayaran"),
+                                    CustomText.textTitle3(text: NumberFormat.currency(locale: 'id', symbol: '', decimalDigits: 0).format(int.parse(totalHarga))),
+                                  ],
+                                ),
+                              ],
                             ),
                           ),
                         ),
-                        SizedBox(height: CustomSize.sizeHeight(context) / 40,),
-                        GestureDetector(
-                          onTap: ()async{
-                            String qrcode = '';
-                            if(_transCode == 3){
-                              try {
-                                qrcode = await BarcodeScanner.scan();
-                                setState(() {});
-                                makeTransaction(qrcode);
-                                Navigator.pushReplacement(
-                                    context,
-                                    PageTransition(
-                                        type: PageTransitionType.leftToRight,
-                                        child: HomeActivity()));
-                              } on PlatformException catch (error) {
-                                if (error.code == BarcodeScanner.CameraAccessDenied) {
-                                  print('Izin kamera tidak diizinkan oleh si pengguna');
-                                } else {
-                                  print('Error: $error');
-                                }
-                              }
-                            }else{
+                      ),
+                      SizedBox(height: CustomSize.sizeHeight(context) / 40,),
+                      GestureDetector(
+                        onTap: ()async{
+                          String qrcode = '';
+                          if(_transCode == 3){
+                            try {
+                              qrcode = await BarcodeScanner.scan();
+                              setState(() {});
                               makeTransaction(qrcode);
                               Navigator.pushReplacement(
                                   context,
                                   PageTransition(
                                       type: PageTransitionType.leftToRight,
                                       child: HomeActivity()));
+                            } on PlatformException catch (error) {
+                              if (error.code == BarcodeScanner.CameraAccessDenied) {
+                                print('Izin kamera tidak diizinkan oleh si pengguna');
+                              } else {
+                                print('Error: $error');
+                              }
                             }
-                          },
-                          child: Center(
-                            child: Container(
-                              width: CustomSize.sizeWidth(context) / 1.1,
-                              height: CustomSize.sizeHeight(context) / 14,
-                              decoration: BoxDecoration(
-                                  color: (menuReady.contains(false))?CustomColor.textBody:CustomColor.primary,
-                                  borderRadius: BorderRadius.circular(50)
-                              ),
-                              child: Center(
-                                child: Padding(
-                                  padding: const EdgeInsets.symmetric(horizontal: 20.0),
-                                  child: Row(
-                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                    children: [
-                                      CustomText.textTitle3(text: "Pesan Sekarang", color: Colors.white),
-                                      CustomText.textTitle3(text: NumberFormat.currency(locale: 'id', symbol: '', decimalDigits: 0).format(int.parse(totalHarga)), color: Colors.white),
-                                    ],
-                                  ),
+                          }else{
+                            makeTransaction(qrcode);
+                            Navigator.pushReplacement(
+                                context,
+                                PageTransition(
+                                    type: PageTransitionType.leftToRight,
+                                    child: HomeActivity()));
+                          }
+                        },
+                        child: Center(
+                          child: Container(
+                            width: CustomSize.sizeWidth(context) / 1.1,
+                            height: CustomSize.sizeHeight(context) / 14,
+                            decoration: BoxDecoration(
+                                color: (menuReady.contains(false))?CustomColor.textBody:CustomColor.primary,
+                                borderRadius: BorderRadius.circular(50)
+                            ),
+                            child: Center(
+                              child: Padding(
+                                padding: const EdgeInsets.symmetric(horizontal: 20.0),
+                                child: Row(
+                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    CustomText.textTitle3(text: "Pesan Sekarang", color: Colors.white),
+                                    CustomText.textTitle3(text: NumberFormat.currency(locale: 'id', symbol: '', decimalDigits: 0).format(int.parse(totalHarga)), color: Colors.white),
+                                  ],
                                 ),
                               ),
                             ),
                           ),
                         ),
-                        SizedBox(height: CustomSize.sizeHeight(context) / 54,),
-                      ],
-                    ),
+                      ),
+                      SizedBox(height: CustomSize.sizeHeight(context) / 54,),
+                    ],
                   ),
                 ),
               ],

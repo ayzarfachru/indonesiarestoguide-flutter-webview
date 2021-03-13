@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "839490096186",
+    "project_id": "indonesia-resto-guide-c65f2",
+    "storage_bucket": "indonesia-resto-guide-c65f2.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:839490096186:android:c27a2f5b17de6a3a733903",
+        "android_client_info": {
+          "package_name": "com.devus.indonesiarestoguide"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "839490096186-01a0g8mf6f1ekismopf71vm1cffudrin.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.devus.indonesiarestoguide",
+            "certificate_hash": "9f117a3efb6b7405edbd5bf5fe88f9af2bf007ed"
+          }
+        },
+        {
+          "client_id": "839490096186-4ulavkeso7qrl384n3tmd55qmh4iot2o.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCDRkE5ZtaeuMi4tAonhOZtoAXpJCR-CH4"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "839490096186-4ulavkeso7qrl384n3tmd55qmh4iot2o.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

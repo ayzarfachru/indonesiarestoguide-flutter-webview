@@ -225,9 +225,6 @@ class _LoginActivityState extends State<LoginActivity> {
                             enableInteractiveSelection: false,
                             autocorrect: false,
                             focusNode: fPassword,
-                            onSubmitted: (term) {
-                              fPassword.unfocus();
-                            },
                             obscureText: _obscureText,
                             controller: _loginTextPassword,
                             cursorColor: Colors.black,

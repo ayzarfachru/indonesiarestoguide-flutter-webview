@@ -111,6 +111,8 @@ class HomeActivity extends StatefulWidget {
 class _HomeActivityState extends State<HomeActivity> {
   ScrollController _scrollController = ScrollController();
   List<String> images = ["t", "f"];
+  bool isLoading = false;
+  bool isSearch = false;
 
   List<Resto> resto = [];
   List<Resto> again = [];
@@ -122,6 +124,9 @@ class _HomeActivityState extends State<HomeActivity> {
     List<Menu> _promo = [];
     List<Transaction> _transaction = [];
 
+    setState(() {
+      isLoading = true;
+    });
     SharedPreferences pref = await SharedPreferences.getInstance();
     String token = pref.getString("token") ?? "";
     var apiResult = await http.get(Links.mainUrl + '/page/home?lat=$lat&long=$long', headers: {
@@ -181,9 +186,12 @@ class _HomeActivityState extends State<HomeActivity> {
       resto = _resto;
       again = _again;
       promo = _promo;
+      isLoading = false;
     });
   }
 
+  double latitude = 0;
+  double longitude = 0;
   RefreshController _refreshController =
   RefreshController(initialRefresh: false);
 
@@ -194,6 +202,10 @@ class _HomeActivityState extends State<HomeActivity> {
     });
     Location.instance.getLocation().then((value) {
       _getDataHome(value.latitude.toString(), value.longitude.toString());
+      setState(() {
+        latitude = value.latitude;
+        longitude = value.longitude;
+      });
     });
     setState(() {});
     await Future.delayed(Duration(milliseconds: 1000));
@@ -215,6 +227,10 @@ class _HomeActivityState extends State<HomeActivity> {
     });
     Location.instance.getLocation().then((value) {
       _getDataHome(value.latitude.toString(), value.longitude.toString());
+      setState(() {
+        latitude = value.latitude;
+        longitude = value.longitude;
+      });
     });
     super.initState();
   }
@@ -228,7 +244,10 @@ class _HomeActivityState extends State<HomeActivity> {
   Widget build(BuildContext context) {
     return Scaffold(
       body: SafeArea(
-        child: SmartRefresher(
+        child: (isLoading)?Container(
+            width: CustomSize.sizeWidth(context),
+            height: CustomSize.sizeHeight(context),
+            child: Center(child: CircularProgressIndicator())):SmartRefresher(
           enablePullDown: true,
           enablePullUp: false,
           header: WaterDropMaterialHeader(
@@ -357,7 +376,7 @@ class _HomeActivityState extends State<HomeActivity> {
                                           context,
                                           PageTransition(
                                               type: PageTransitionType.rightToLeft,
-                                              child: new DetailTransaction(transaction[index].id)));
+                                              child: new DetailTransaction(transaction[index].id, transaction[index].status)));
                                     }
                                   },
                                   child: Container(
@@ -601,8 +620,10 @@ class _HomeActivityState extends State<HomeActivity> {
                             itemCount: again.length,
                             itemBuilder: (_, index){
                               return Padding(
-                                padding: EdgeInsets.only(left: CustomSize.sizeWidth(context) / 20,
-                                    top: CustomSize.sizeHeight(context) / 86, bottom: CustomSize.sizeHeight(context) / 86),
+                                padding: EdgeInsets.only(
+                                    left: CustomSize.sizeWidth(context) / 20,
+                                    top: CustomSize.sizeHeight(context) / 86,
+                                    bottom: CustomSize.sizeHeight(context) / 86),
                                 child: Container(
                                   width: CustomSize.sizeWidth(context) / 2.3,
                                   height: CustomSize.sizeHeight(context) / 3.6,
@@ -699,7 +720,7 @@ class _HomeActivityState extends State<HomeActivity> {
                   child: Icon(CupertinoIcons.cart_fill, size: 32, color: Colors.white,)),
               GestureDetector(
                   onTap: (){
-                    Navigator.push(context, PageTransition(type: PageTransitionType.rightToLeft, child: new SearchActivity()));
+                    Navigator.push(context, PageTransition(type: PageTransitionType.rightToLeft, child: new SearchActivity(promo, latitude.toString(), longitude.toString())));
                   },
                   child: Icon(FontAwesome.search, size: 32, color: Colors.white,)),
               GestureDetector(

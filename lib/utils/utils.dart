@@ -9,12 +9,9 @@ import 'package:indonesiarestoguide/model/Promo.dart';
 import 'package:indonesiarestoguide/model/Resto.dart';
 import 'package:page_transition/page_transition.dart';
 
-import 'package:http/http.dart' as http;
-import 'dart:convert' as convert;
-
 class Links{
-  static String mainUrl = "http://192.168.100.13:8000/api/v2";
-  static String subUrl = "http://192.168.100.13:8000";
+  static String mainUrl = "http://192.168.100.7:8000/api/v2";
+  static String subUrl = "http://192.168.100.7:8000";
 }
 
 class CustomText{

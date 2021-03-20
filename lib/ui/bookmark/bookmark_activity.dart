@@ -97,7 +97,7 @@ class _BookmarkActivityState extends State<BookmarkActivity> {
   bool isLoading = false;
 
   List<Resto> resto = [];
-  Future _getBookmark(String lat, String long)async{
+    Future _getBookmark(String lat, String long)async{
     List<Resto> _resto = [];
 
     setState(() {

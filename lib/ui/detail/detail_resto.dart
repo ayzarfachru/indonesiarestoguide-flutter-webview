@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_icons/flutter_icons.dart';
+import 'package:indonesiarestoguide/model/CategoryMenu.dart';
 import 'package:indonesiarestoguide/model/Menu.dart';
 import 'package:indonesiarestoguide/model/MenuJson.dart';
 import 'package:indonesiarestoguide/model/PrefCart.dart';
@@ -34,6 +35,8 @@ class _DetailRestoState extends State<DetailResto> {
 
   ScrollController _scrollController = ScrollController();
 
+  bool isLoading = false;
+
   List<String> restoId = [];
   List<String> qty = [];
   String name = "";
@@ -45,16 +48,23 @@ class _DetailRestoState extends State<DetailResto> {
   String reservationFee = "";
   bool isFav = false;
   String inCart = "";
+  String nameCategory = "";
+
   List<String> images = [];
   List<Promo> promo = [];
   List<Menu> menu = [];
   List<MenuJson> menuJson = [];
+  List<CategoryMenu> categoryMenu = [];
   Future _getDetail(String id)async{
     List<String> _images = [];
     List<Promo> _promo = [];
     List<Menu> _menu = [];
     List<MenuJson> _menuJson = [];
+    List<CategoryMenu> _categoryMenu = [];
 
+    setState(() {
+      isLoading = true;
+    });
     SharedPreferences pref = await SharedPreferences.getInstance();
     String token = pref.getString("token") ?? "";
     var apiResult = await http.get(Links.mainUrl + '/resto/detail/$id', headers: {
@@ -62,11 +72,32 @@ class _DetailRestoState extends State<DetailResto> {
       "Authorization": "Bearer $token"
     });
     var data = json.decode(apiResult.body);
-    print(data);
+    print(data['data']['menu']);
 
     for(var v in data['data']['img']){
       _images.add(v);
     }
+
+    List<Menu> _cateMenu = [];
+    for(var v in data['data']['menu']){
+      for(var a in v['menu']){
+        Menu m = Menu(
+            id: a['id'],
+            name: a['name'],
+            desc: a['desc'],
+            price: Price.delivery(a['price'], a['delivery_price']),
+            urlImg: a['img']
+        );
+        _cateMenu.add(m);
+      }
+      CategoryMenu cm = CategoryMenu(
+        name: v['name'],
+        menu: _cateMenu
+      );
+      _cateMenu = [];
+      _categoryMenu.add(cm);
+    }
+    print(_categoryMenu);
 
     for(var v in data['data']['recom']){
       Menu m = Menu(
@@ -122,6 +153,9 @@ class _DetailRestoState extends State<DetailResto> {
       images = _images;
       promo = _promo;
       menu = _menu;
+      categoryMenu = _categoryMenu;
+      nameCategory = _categoryMenu[0].name;
+      isLoading = false;
     });
   }
 
@@ -159,7 +193,10 @@ class _DetailRestoState extends State<DetailResto> {
   Widget build(BuildContext context) {
     return Scaffold(
       body: SafeArea(
-        child: SingleChildScrollView(
+        child: (isLoading)?Container(
+            width: CustomSize.sizeWidth(context),
+            height: CustomSize.sizeHeight(context),
+            child: Center(child: CircularProgressIndicator())):SingleChildScrollView(
           controller: _scrollController,
           child: Stack(
             children: [
@@ -617,14 +654,44 @@ class _DetailRestoState extends State<DetailResto> {
                           },
                         ),
                         SizedBox(height: CustomSize.sizeHeight(context) / 63,),
-                        Padding(
-                          padding: EdgeInsets.symmetric(horizontal: CustomSize.sizeWidth(context) / 32),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              SizedBox(height: CustomSize.sizeHeight(context) / 63,),
-                              CustomText.textHeading4(text: "Semua Menu", color: CustomColor.primary),
-                            ],
+                        GestureDetector(
+                          onTap: (){
+                            showModalBottomSheet(
+                                isScrollControlled: true,
+                                shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.only(topLeft: Radius.circular(20), topRight: Radius.circular(20))
+                                ),
+                                context: context,
+                                builder: (_){
+                                  return Column(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      SizedBox(height: CustomSize.sizeHeight(context) / 86,),
+                                      Padding(
+                                        padding: EdgeInsets.symmetric(horizontal: CustomSize.sizeWidth(context) / 2.4),
+                                        child: Divider(thickness: 4,),
+                                      ),
+                                      SizedBox(height: CustomSize.sizeHeight(context) / 52,),
+                                      ListView.builder(
+                                          itemBuilder: (ctx, index){
+
+                                          },
+                                      ),
+                                    ],
+                                  );
+                                }
+                            );
+                          },
+                          child: Padding(
+                            padding: EdgeInsets.symmetric(horizontal: CustomSize.sizeWidth(context) / 32),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                SizedBox(height: CustomSize.sizeHeight(context) / 63,),
+                                CustomText.textHeading4(text: nameCategory, color: CustomColor.primary),
+                              ],
+                            ),
                           ),
                         ),
                         SizedBox(height: CustomSize.sizeHeight(context) / 48,),
@@ -632,8 +699,9 @@ class _DetailRestoState extends State<DetailResto> {
                           controller: _scrollController,
                           physics: NeverScrollableScrollPhysics(),
                           shrinkWrap: true,
-                          itemCount: 3,
+                          itemCount: categoryMenu[categoryMenu.indexWhere((v) => v.name == nameCategory)].menu.length,
                           itemBuilder: (_, index){
+                            print(categoryMenu[categoryMenu.indexWhere((v) => v.name == nameCategory)].menu.length);
                             return Padding(
                               padding: EdgeInsets.only(
                                 top: CustomSize.sizeWidth(context) / 32,
@@ -659,12 +727,12 @@ class _DetailRestoState extends State<DetailResto> {
                                                   crossAxisAlignment: CrossAxisAlignment.start,
                                                   children: [
                                                     CustomText.textHeading4(
-                                                        text: "Burger Enak",
+                                                        text: categoryMenu[categoryMenu.indexWhere((v) => v.name == nameCategory)].menu[index].name,
                                                         minSize: 18,
                                                         maxLines: 1
                                                     ),
                                                     CustomText.bodyRegular12(
-                                                        text: "Lorem ipsum dolor sit amet, con sectetur adipiscing elit",
+                                                        text: categoryMenu[categoryMenu.indexWhere((v) => v.name == nameCategory)].menu[index].desc,
                                                         maxLines: 2,
                                                         minSize: 12
                                                     ),
@@ -674,7 +742,7 @@ class _DetailRestoState extends State<DetailResto> {
                                                   crossAxisAlignment: CrossAxisAlignment.start,
                                                   children: [
                                                     CustomText.bodyMedium16(
-                                                        text: "15.000",
+                                                        text: NumberFormat.currency(locale: 'id', symbol: '', decimalDigits: 0).format(categoryMenu[categoryMenu.indexWhere((v) => v.name == nameCategory)].menu[index].price.original),
                                                         maxLines: 1,
                                                         minSize: 16
                                                     ),
@@ -693,7 +761,10 @@ class _DetailRestoState extends State<DetailResto> {
                                                 width: CustomSize.sizeWidth(context) / 3.4,
                                                 height: CustomSize.sizeWidth(context) / 3.4,
                                                 decoration: BoxDecoration(
-                                                    color: Colors.amberAccent,
+                                                  image: DecorationImage(
+                                                    image: NetworkImage(Links.subUrl + categoryMenu[categoryMenu.indexWhere((v) => v.name == nameCategory)].menu[index].urlImg),
+                                                    fit: BoxFit.cover
+                                                  ),
                                                     borderRadius: BorderRadius.circular(20)
                                                 ),
                                               ),
@@ -756,7 +827,7 @@ class _DetailRestoState extends State<DetailResto> {
           ),
         ),
       ),
-      floatingActionButton: (inCart == '1')?GestureDetector(
+      floatingActionButton: (isLoading != true)?(inCart == '1')?GestureDetector(
         onTap: (){
           Navigator.push(
               context,
@@ -790,7 +861,7 @@ class _DetailRestoState extends State<DetailResto> {
           ),
           child: Center(child: CustomText.bodyRegular16(text: "Reservasi Sekarang", color: Colors.white)),
         ),
-      ),
+      ):SizedBox(),
     );
   }
 }

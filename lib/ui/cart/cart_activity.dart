@@ -242,7 +242,10 @@ class _CartActivityState extends State<CartActivity> {
       },
       child: Scaffold(
         body: SafeArea(
-          child: SingleChildScrollView(
+          child: (isLoading)?Container(
+              width: CustomSize.sizeWidth(context),
+              height: CustomSize.sizeHeight(context),
+              child: Center(child: CircularProgressIndicator())):SingleChildScrollView(
             controller: _scrollController,
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,

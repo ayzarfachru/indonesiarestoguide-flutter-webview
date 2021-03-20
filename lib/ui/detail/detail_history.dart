@@ -27,6 +27,8 @@ class _DetailHistoryState extends State<DetailHistory> {
 
   ScrollController _scrollController = ScrollController();
 
+  bool isLoading = false;
+
   String type = '';
   String address = '';
   int ongkir = 0;
@@ -37,6 +39,10 @@ class _DetailHistoryState extends State<DetailHistory> {
   List<Menu> menu = [];
   Future<void> getData()async{
     List<Menu> _menu = [];
+
+    setState(() {
+      isLoading = true;
+    });
     SharedPreferences pref = await SharedPreferences.getInstance();
     var token = pref.getString("token") ?? "";
 
@@ -51,7 +57,7 @@ class _DetailHistoryState extends State<DetailHistory> {
     for(var v in data['menus']){
       Menu m = Menu(
           id: v['menus_id'],
-          qty: v['qty'],
+          qty: v['qty'].toString(),
           price: Price(original: v['price']),
           name: v['name'],
           urlImg: v['img'],
@@ -67,6 +73,7 @@ class _DetailHistoryState extends State<DetailHistory> {
       ongkir = data['ongkir'];
       total = data['total'];
       harga = data['total'] - data['ongkir'];
+      isLoading = false;
     });
   }
 
@@ -85,7 +92,10 @@ class _DetailHistoryState extends State<DetailHistory> {
   Widget build(BuildContext context) {
     return Scaffold(
       body: SafeArea(
-        child: SingleChildScrollView(
+        child: (isLoading)?Container(
+            width: CustomSize.sizeWidth(context),
+            height: CustomSize.sizeHeight(context),
+            child: Center(child: CircularProgressIndicator())):SingleChildScrollView(
           controller: _scrollController,
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,

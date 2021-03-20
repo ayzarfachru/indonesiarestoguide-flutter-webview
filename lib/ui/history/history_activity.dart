@@ -19,9 +19,15 @@ class _HistoryActivityState extends State<HistoryActivity> {
   ScrollController _scrollController = ScrollController();
   String homepg = "";
 
+  bool isLoading = false;
+
   List<History> history = [];
   Future _getHistory()async{
     List<History> _history = [];
+
+    setState(() {
+      isLoading = true;
+    });
     SharedPreferences pref = await SharedPreferences.getInstance();
     String token = pref.getString("token") ?? "";
     var apiResult = await http.get(Links.mainUrl + '/page/history', headers: {
@@ -45,6 +51,7 @@ class _HistoryActivityState extends State<HistoryActivity> {
 
     setState(() {
       history = _history;
+      isLoading = false;
     });
   }
 
@@ -92,41 +99,44 @@ class _HistoryActivityState extends State<HistoryActivity> {
     return Scaffold(
       backgroundColor: CustomColor.secondary,
       body: SafeArea(
-        child: SingleChildScrollView(
-          controller: _scrollController,
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              SizedBox(
-                height: CustomSize.sizeHeight(context) / 32,
-                child: Container(
-                  color: Colors.white,
-                ),
-              ),
-              Container(
-                width: CustomSize.sizeWidth(context),
-                color: Colors.white,
-                child: Padding(
-                  padding: EdgeInsets.symmetric(horizontal: CustomSize.sizeWidth(context) / 24),
-                  child: CustomText.textHeading3(
-                      text: "Riwayat",
-                      minSize: 18,
-                      maxLines: 1
+        child: (isLoading)?Container(
+            width: CustomSize.sizeWidth(context),
+            height: CustomSize.sizeHeight(context),
+            child: Center(child: CircularProgressIndicator())):SmartRefresher(
+          enablePullDown: true,
+          enablePullUp: false,
+          header: WaterDropMaterialHeader(
+            distance: 30,
+            backgroundColor: Colors.white,
+            color: CustomColor.primary,
+          ),
+          controller: _refreshController,
+          onRefresh: _onRefresh,
+          onLoading: _onLoading,
+          child: SingleChildScrollView(
+            controller: _scrollController,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                SizedBox(
+                  height: CustomSize.sizeHeight(context) / 32,
+                  child: Container(
+                    color: Colors.white,
                   ),
                 ),
-              ),
-              SmartRefresher(
-                enablePullDown: true,
-                enablePullUp: false,
-                header: WaterDropMaterialHeader(
-                  distance: 30,
-                  backgroundColor: Colors.white,
-                  color: CustomColor.primary,
+                Container(
+                  width: CustomSize.sizeWidth(context),
+                  color: Colors.white,
+                  child: Padding(
+                    padding: EdgeInsets.symmetric(horizontal: CustomSize.sizeWidth(context) / 24),
+                    child: CustomText.textHeading3(
+                        text: "Riwayat",
+                        minSize: 18,
+                        maxLines: 1
+                    ),
+                  ),
                 ),
-                controller: _refreshController,
-                onRefresh: _onRefresh,
-                onLoading: _onLoading,
-                child: ListView.builder(
+                ListView.builder(
                     shrinkWrap: true,
                     controller: _scrollController,
                     physics: NeverScrollableScrollPhysics(),
@@ -216,9 +226,9 @@ class _HistoryActivityState extends State<HistoryActivity> {
                       );
                     }
                 ),
-              ),
-              SizedBox(height: CustomSize.sizeHeight(context) / 48,)
-            ],
+                SizedBox(height: CustomSize.sizeHeight(context) / 48,)
+              ],
+            ),
           ),
         ),
       ),

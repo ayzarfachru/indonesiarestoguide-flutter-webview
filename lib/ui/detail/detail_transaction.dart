@@ -8,22 +8,28 @@ import 'package:intl/intl.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:flutter_icons/flutter_icons.dart';
 import 'package:http/http.dart' as http;
+import 'package:page_transition/page_transition.dart';
+import 'package:indonesiarestoguide/utils/chat_activity.dart';
 
 class DetailTransaction extends StatefulWidget {
   int id;
+  String status;
 
-  DetailTransaction(this.id);
+  DetailTransaction(this.id, this.status);
 
   @override
-  _DetailTransactionState createState() => _DetailTransactionState(id);
+  _DetailTransactionState createState() => _DetailTransactionState(id, status);
 }
 
 class _DetailTransactionState extends State<DetailTransaction> {
   int id;
+  String status;
 
-  _DetailTransactionState(this.id);
+  _DetailTransactionState(this.id, this.status);
 
   ScrollController _scrollController = ScrollController();
+
+  bool isLoading = false;
 
   String type = '';
   String address = '';
@@ -35,6 +41,10 @@ class _DetailTransactionState extends State<DetailTransaction> {
   List<Menu> menu = [];
   Future<void> getData()async{
     List<Menu> _menu = [];
+
+    setState(() {
+      isLoading = true;
+    });
     SharedPreferences pref = await SharedPreferences.getInstance();
     var token = pref.getString("token") ?? "";
 
@@ -49,7 +59,7 @@ class _DetailTransactionState extends State<DetailTransaction> {
     for(var v in data['menu']){
       Menu m = Menu(
         id: v['menus_id'],
-        qty: v['qty'],
+        qty: v['qty'].toString(),
         price: Price(original: v['price']),
         name: v['name'],
         urlImg: v['image'],
@@ -65,12 +75,22 @@ class _DetailTransactionState extends State<DetailTransaction> {
       total = data['trans']['total'];
       harga = data['trans']['total'] - data['trans']['ongkir'];
       chatroom = data['chatroom'].toString();
+      isLoading = false;
     });
     print(chatroom);
   }
 
+  String userName = '';
+  Future getUser()async{
+    SharedPreferences pref = await SharedPreferences.getInstance();
+    setState(() {
+      userName = (pref.getString('name'));
+    });
+  }
+
   @override
   void initState() {
+    getUser();
     getData();
     super.initState();
   }
@@ -84,7 +104,10 @@ class _DetailTransactionState extends State<DetailTransaction> {
   Widget build(BuildContext context) {
     return Scaffold(
       body: SafeArea(
-        child: SingleChildScrollView(
+        child: (isLoading)?Container(
+            width: CustomSize.sizeWidth(context),
+            height: CustomSize.sizeHeight(context),
+            child: Center(child: CircularProgressIndicator())):SingleChildScrollView(
           controller: _scrollController,
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -151,85 +174,81 @@ class _DetailTransactionState extends State<DetailTransaction> {
                       child: AnimatedContainer(
                         duration: Duration(milliseconds: 500),
                         width: CustomSize.sizeWidth(context),
-                        height: CustomSize.sizeHeight(context) / 5.4,
-                        child: SingleChildScrollView(
-                          child: Column(
-                            children: [
-                              SingleChildScrollView(
-                                child: Container(
-                                  height: CustomSize.sizeHeight(context) / 6,
-                                  child: Row(
-                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                    children: [
-                                      Container(
-                                        width: CustomSize.sizeWidth(context) / 1.65,
-                                        child: Column(
-                                          crossAxisAlignment: CrossAxisAlignment.start,
+                        height: CustomSize.sizeHeight(context) / 5.2,
+                        child: Column(
+                          children: [
+                            Container(
+                              height: CustomSize.sizeHeight(context) / 6,
+                              child: Row(
+                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                children: [
+                                  Container(
+                                    width: CustomSize.sizeWidth(context) / 1.65,
+                                    child: Column(
+                                      crossAxisAlignment: CrossAxisAlignment.start,
 
-                                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                      children: [
+                                        Column(
+                                          crossAxisAlignment: CrossAxisAlignment.start,
                                           children: [
-                                            Column(
-                                              crossAxisAlignment: CrossAxisAlignment.start,
+                                            CustomText.textHeading4(
+                                                text: menu[index].name,
+                                                minSize: 18,
+                                                maxLines: 1
+                                            ),
+                                            CustomText.bodyRegular12(
+                                                text: menu[index].desc,
+                                                maxLines: 2,
+                                                minSize: 12
+                                            ),
+                                            SizedBox(height: CustomSize.sizeHeight(context) / 48,),
+                                            Row(
                                               children: [
-                                                CustomText.textHeading4(
-                                                    text: menu[index].name,
-                                                    minSize: 18,
-                                                    maxLines: 1
+                                                CustomText.bodyMedium14(
+                                                    text: NumberFormat.currency(locale: 'id', symbol: '', decimalDigits: 0).format(menu[index].price.original) ,
+                                                    maxLines: 1,
+                                                    minSize: 16
                                                 ),
-                                                CustomText.bodyRegular12(
-                                                    text: menu[index].desc,
-                                                    maxLines: 2,
-                                                    minSize: 12
+                                                CustomText.bodyLight14(
+                                                    text: "  x  ",
+                                                    maxLines: 1,
+                                                    minSize: 14
                                                 ),
-                                                SizedBox(height: CustomSize.sizeHeight(context) / 48,),
-                                                Row(
-                                                  children: [
-                                                    CustomText.bodyMedium14(
-                                                        text: NumberFormat.currency(locale: 'id', symbol: '', decimalDigits: 0).format(menu[index].price.original) ,
-                                                        maxLines: 1,
-                                                        minSize: 16
-                                                    ),
-                                                    CustomText.bodyLight14(
-                                                        text: "  x  ",
-                                                        maxLines: 1,
-                                                        minSize: 14
-                                                    ),
-                                                    CustomText.bodyMedium14(
-                                                        text: menu[index].qty.toString(),
-                                                        maxLines: 1,
-                                                        minSize: 16
-                                                    ),
-                                                  ],
+                                                CustomText.bodyMedium14(
+                                                    text: menu[index].qty.toString(),
+                                                    maxLines: 1,
+                                                    minSize: 16
                                                 ),
                                               ],
                                             ),
                                           ],
                                         ),
-                                      ),
-                                      Column(
-                                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                        crossAxisAlignment: CrossAxisAlignment.end,
-                                        children: [
-                                          Container(
-                                            width: CustomSize.sizeWidth(context) / 3.4,
-                                            height: CustomSize.sizeWidth(context) / 3.4,
-                                            decoration: BoxDecoration(
-                                                image: DecorationImage(
-                                                    image: NetworkImage(Links.subUrl + menu[index].urlImg),
-                                                    fit: BoxFit.cover
-                                                ),
-                                                borderRadius: BorderRadius.circular(20)
+                                      ],
+                                    ),
+                                  ),
+                                  Column(
+                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                    crossAxisAlignment: CrossAxisAlignment.end,
+                                    children: [
+                                      Container(
+                                        width: CustomSize.sizeWidth(context) / 3.4,
+                                        height: CustomSize.sizeWidth(context) / 3.4,
+                                        decoration: BoxDecoration(
+                                            image: DecorationImage(
+                                                image: NetworkImage(Links.subUrl + menu[index].urlImg),
+                                                fit: BoxFit.cover
                                             ),
-                                          ),
-                                        ],
+                                            borderRadius: BorderRadius.circular(20)
+                                        ),
                                       ),
                                     ],
                                   ),
-                                ),
+                                ],
                               ),
-                              Divider()
-                            ],
-                          ),
+                            ),
+                            Divider()
+                          ],
                         ),
                       ),
                     );
@@ -291,6 +310,11 @@ class _DetailTransactionState extends State<DetailTransaction> {
                     SizedBox(height: CustomSize.sizeHeight(context) / 40,),
                     (chatroom != 'null')?GestureDetector(
                       onTap: (){
+                        Navigator.push(
+                            context,
+                            PageTransition(
+                                type: PageTransitionType.rightToLeft,
+                                child: new ChatActivity(chatroom, userName, status)));
                       },
                       child: Center(
                         child: Container(

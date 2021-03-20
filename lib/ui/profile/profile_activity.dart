@@ -9,6 +9,8 @@ import 'package:indonesiarestoguide/ui/profile/edit_profile.dart';
 import 'package:indonesiarestoguide/ui/about/about_activity.dart';
 import 'package:url_launcher/url_launcher.dart';
 
+import '../history/history_activity.dart';
+
 class ProfileActivity extends StatefulWidget {
   @override
   _ProfileActivityState createState() => _ProfileActivityState();
@@ -185,21 +187,30 @@ class _ProfileActivityState extends State<ProfileActivity> {
                     ),
                   ),
                   Divider(),
-                  Padding(
-                    padding: EdgeInsets.symmetric(
-                        horizontal: CustomSize.sizeWidth(context) / 48,
-                        vertical: CustomSize.sizeHeight(context) / 86
-                    ),
-                    child: Row(
-                      children: [
-                        Icon(FontAwesome.history),
-                        SizedBox(width: CustomSize.sizeWidth(context) / 48,),
-                        CustomText.bodyRegular16(
-                            text: "Riwayat",
-                            minSize: 16,
-                            maxLines: 1
-                        ),
-                      ],
+                  GestureDetector(
+                    onTap: (){
+                      Navigator.push(
+                          context,
+                          PageTransition(
+                              type: PageTransitionType.rightToLeft,
+                              child: new HistoryActivity()));
+                    },
+                    child: Padding(
+                      padding: EdgeInsets.symmetric(
+                          horizontal: CustomSize.sizeWidth(context) / 48,
+                          vertical: CustomSize.sizeHeight(context) / 86
+                      ),
+                      child: Row(
+                        children: [
+                          Icon(FontAwesome.history),
+                          SizedBox(width: CustomSize.sizeWidth(context) / 48,),
+                          CustomText.bodyRegular16(
+                              text: "Riwayat",
+                              minSize: 16,
+                              maxLines: 1
+                          ),
+                        ],
+                      ),
                     ),
                   ),
                   Divider(),

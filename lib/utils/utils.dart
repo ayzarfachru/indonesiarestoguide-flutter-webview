@@ -10,8 +10,11 @@ import 'package:indonesiarestoguide/model/Resto.dart';
 import 'package:page_transition/page_transition.dart';
 
 class Links{
-  static String mainUrl = "http://192.168.100.7:8000/api/v2";
-  static String subUrl = "http://192.168.100.7:8000";
+  // static String mainUrl = "http://192.168.100.7:8000/api/v2";
+  // static String subUrl = "http://192.168.100.7:8000";
+
+  static String mainUrl = "http://irg.devus-sby.com/api/v2";
+  static String subUrl = "http://irg.devus-sby.com";
 }
 
 class CustomText{

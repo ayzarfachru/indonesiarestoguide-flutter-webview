@@ -126,7 +126,7 @@ class _CartActivityState extends State<CartActivity> {
       isLoading = true;
     });
     SharedPreferences pref2 = await SharedPreferences.getInstance();
-    name = (pref2.getString('menuJson'));
+    name = (pref2.getString('menuJson')??"");
     restoId.addAll(pref2.getStringList('restoId')??[]);
     qty.addAll(pref2.getStringList('qty')??[]);
     _tempRestoId.addAll(pref2.getStringList('restoId')??[]);
@@ -735,47 +735,47 @@ class _CartActivityState extends State<CartActivity> {
                       );
                     }
                 ),
-                Padding(
-                  padding: EdgeInsets.symmetric(
-                      horizontal: CustomSize.sizeWidth(context) / 32,
-                      vertical: CustomSize.sizeHeight(context) / 86
-                  ),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    children: [
-                      Container(
-                        width: CustomSize.sizeWidth(context) / 1.6,
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            CustomText.textHeading4(text: "Ada lagi pesanannya ?"),
-                            CustomText.bodyRegular16(text: "Masih bisa tambah lagi loo")
-                          ],
-                        ),
-                      ),
-                      Padding(
-                        padding: EdgeInsets.symmetric(horizontal: CustomSize.sizeWidth(context) / 86),
-                        child: Container(
-                          height: CustomSize.sizeHeight(context) / 24,
-                          decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(20),
-                              border: Border.all(color: CustomColor.accent)
-                          ),
-                          child: Padding(
-                            padding: EdgeInsets.symmetric(horizontal: CustomSize.sizeWidth(context) / 32),
-                            child: Center(
-                              child: CustomText.textTitle8(
-                                  text: "Tambah",
-                                  color: CustomColor.accent
-                              ),
-                            ),
-                          ),
-                        ),
-                      )
-                    ],
-                  ),
-                ),
+                // Padding(
+                //   padding: EdgeInsets.symmetric(
+                //       horizontal: CustomSize.sizeWidth(context) / 32,
+                //       vertical: CustomSize.sizeHeight(context) / 86
+                //   ),
+                //   child: Row(
+                //     mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                //     crossAxisAlignment: CrossAxisAlignment.center,
+                //     children: [
+                //       Container(
+                //         width: CustomSize.sizeWidth(context) / 1.6,
+                //         child: Column(
+                //           crossAxisAlignment: CrossAxisAlignment.start,
+                //           children: [
+                //             CustomText.textHeading4(text: "Ada lagi pesanannya ?"),
+                //             CustomText.bodyRegular16(text: "Masih bisa tambah lagi loo")
+                //           ],
+                //         ),
+                //       ),
+                //       Padding(
+                //         padding: EdgeInsets.symmetric(horizontal: CustomSize.sizeWidth(context) / 86),
+                //         child: Container(
+                //           height: CustomSize.sizeHeight(context) / 24,
+                //           decoration: BoxDecoration(
+                //               borderRadius: BorderRadius.circular(20),
+                //               border: Border.all(color: CustomColor.accent)
+                //           ),
+                //           child: Padding(
+                //             padding: EdgeInsets.symmetric(horizontal: CustomSize.sizeWidth(context) / 32),
+                //             child: Center(
+                //               child: CustomText.textTitle8(
+                //                   text: "Tambah",
+                //                   color: CustomColor.accent
+                //               ),
+                //             ),
+                //           ),
+                //         ),
+                //       )
+                //     ],
+                //   ),
+                // ),
                 Container(
                   width: CustomSize.sizeWidth(context),
                   decoration: BoxDecoration(
@@ -851,12 +851,26 @@ class _CartActivityState extends State<CartActivity> {
                               }
                             }
                           }else{
-                            makeTransaction(qrcode);
-                            Navigator.pushReplacement(
-                                context,
-                                PageTransition(
-                                    type: PageTransitionType.leftToRight,
-                                    child: HomeActivity()));
+                            if(_transCode == 1){
+                              if(_srchAddress.text != ''){
+                                makeTransaction(qrcode);
+                                Navigator.pushReplacement(
+                                    context,
+                                    PageTransition(
+                                        type: PageTransitionType.leftToRight,
+                                        child: HomeActivity()));
+                              }else{
+                                Fluttertoast.showToast(
+                                  msg: "Alamat tujuan Anda dimana?",);
+                              }
+                            }else{
+                              makeTransaction(qrcode);
+                              Navigator.pushReplacement(
+                                  context,
+                                  PageTransition(
+                                      type: PageTransitionType.leftToRight,
+                                      child: HomeActivity()));
+                            }
                           }
                         },
                         child: Center(

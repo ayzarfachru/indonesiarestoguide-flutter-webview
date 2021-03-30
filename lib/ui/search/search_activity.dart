@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_icons/flutter_icons.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:indonesiarestoguide/model/Cuisine.dart';
 import 'package:indonesiarestoguide/model/Menu.dart';
@@ -18,19 +19,21 @@ class SearchActivity extends StatefulWidget {
   List<Menu> promo;
   String lat;
   String long;
+  String cui;
 
-  SearchActivity(this.promo, this.lat, this.long);
+  SearchActivity(this.promo, this.lat, this.long, this.cui);
 
   @override
-  _SearchActivityState createState() => _SearchActivityState(promo, lat, long);
+  _SearchActivityState createState() => _SearchActivityState(promo, lat, long, cui);
 }
 
 class _SearchActivityState extends State<SearchActivity> {
   List<Menu> promo;
   String lat;
   String long;
+  String cui;
 
-  _SearchActivityState(this.promo, this.lat, this.long);
+  _SearchActivityState(this.promo, this.lat, this.long, this.cui);
 
   TextEditingController _loginTextName = TextEditingController(text: "");
   ScrollController _scrollController = ScrollController();
@@ -40,13 +43,13 @@ class _SearchActivityState extends State<SearchActivity> {
 
   List<Menu> menu = [];
   List<Resto> resto = [];
-  Future _search(String q)async{
+  Future _search(String q, String type)async{
     List<Menu> _menu = [];
     List<Resto> _resto = [];
     SharedPreferences pref = await SharedPreferences.getInstance();
     var token = pref.getString("token") ?? "";
 
-    var apiResult = await http.get(Links.mainUrl + '/page/search?q=$q&lat=$lat&long=$long',
+    var apiResult = await http.get(Links.mainUrl + '/page/search?q=$q&type=$type&lat=$lat&long=$long',
         headers: {
           "Accept": "Application/json",
           "Authorization": "Bearer $token"
@@ -108,8 +111,17 @@ class _SearchActivityState extends State<SearchActivity> {
     });
   }
 
+  Future searchHome()async{
+    _search('', cui);
+    setState(() {
+      isSearch = true;
+    });
+  }
   @override
   void initState() {
+    if(cui != ''){
+      searchHome();
+    }
     getUtil();
     super.initState();
   }
@@ -153,7 +165,7 @@ class _SearchActivityState extends State<SearchActivity> {
                             cursorColor: Colors.black,
                             textInputAction: TextInputAction.search,
                             onSubmitted: (v){
-                              _search(_loginTextName.text);
+                              _search(_loginTextName.text, '');
                               setState(() {
                                 isSearch = true;
                               });
@@ -209,7 +221,7 @@ class _SearchActivityState extends State<SearchActivity> {
                                 padding: EdgeInsets.symmetric(horizontal: CustomSize.sizeWidth(context) / 86),
                                 child: GestureDetector(
                                   onTap: (){
-                                    _search(recomMenu[index]);
+                                    _search(recomMenu[index], '');
                                     _loginTextName.text = recomMenu[index];
                                     setState(() {
                                       isSearch = true;
@@ -253,7 +265,10 @@ class _SearchActivityState extends State<SearchActivity> {
                                 padding: EdgeInsets.symmetric(horizontal: CustomSize.sizeWidth(context) / 86),
                                 child: GestureDetector(
                                   onTap: (){
-
+                                    _search('', cuisine[index].name);
+                                    setState(() {
+                                      isSearch = true;
+                                    });
                                   },
                                   child: Column(
                                     children: [
@@ -366,6 +381,25 @@ class _SearchActivityState extends State<SearchActivity> {
                     :Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
+                    SizedBox(height: CustomSize.sizeHeight(context) / 48,),
+                    GestureDetector(
+                      onTap: (){
+                        setState(() {
+                          isSearch = false;
+                        });
+                      },
+                      child: Row(
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: [
+                          Icon(FontAwesomeIcons.chevronLeft, size: 18,),
+                          SizedBox(width: CustomSize.sizeWidth(context) / 48,),
+                          CustomText.textTitle3(
+                              text: "Kembali ke search",
+                              maxLines: 1
+                          )
+                        ],
+                      ),
+                    ),
                     (menu.isNotEmpty)?SizedBox(height: CustomSize.sizeHeight(context) / 48,):SizedBox(),
                     (menu.isNotEmpty)?Padding(
                       padding: EdgeInsets.symmetric(horizontal: CustomSize.sizeWidth(context) / 24),

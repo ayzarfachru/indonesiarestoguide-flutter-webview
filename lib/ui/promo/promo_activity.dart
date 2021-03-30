@@ -128,7 +128,7 @@ class _PromoActivityState extends State<PromoActivity> {
             name: v['name'],
             desc: v['desc'],
             urlImg: v['img'],
-            price: Price.discounted(v['price'], v['discounted_price'])
+            price: Price.discounted(int.parse(v['price']), v['discounted_price'])
         ),
       );
       _promo.add(p);

@@ -6,6 +6,8 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_icons/flutter_icons.dart';
+import 'package:fluttertoast/fluttertoast.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:indonesiarestoguide/model/Menu.dart';
 import 'package:indonesiarestoguide/model/Price.dart';
 import 'package:indonesiarestoguide/model/Promo.dart';
@@ -110,7 +112,7 @@ class HomeActivity extends StatefulWidget {
 
 class _HomeActivityState extends State<HomeActivity> {
   ScrollController _scrollController = ScrollController();
-  List<String> images = ["t", "f"];
+  List<String> images = [];
   bool isLoading = false;
   bool isSearch = false;
 
@@ -123,6 +125,7 @@ class _HomeActivityState extends State<HomeActivity> {
     List<Resto> _again = [];
     List<Menu> _promo = [];
     List<Transaction> _transaction = [];
+    List<String> _images = [];
 
     setState(() {
       isLoading = true;
@@ -135,6 +138,11 @@ class _HomeActivityState extends State<HomeActivity> {
     });
     print(apiResult.body);
     var data = json.decode(apiResult.body);
+    print(data['promo']);
+
+    for(var v in data['banner']){
+      _images.add(v);
+    }
 
     for(var v in data['trans']){
       Transaction t = Transaction(
@@ -175,13 +183,13 @@ class _HomeActivityState extends State<HomeActivity> {
           name: v['name'],
           restoName: v['resto_name'],
           urlImg: v['img'],
-          price: Price.discounted(v['price'], v['discounted_price']),
+          price: Price.discounted(int.parse(v['price'].toString()), int.parse(v['discounted_price'].toString())),
           distance: v['resto_distance']
       );
       _promo.add(m);
     }
-
     setState(() {
+      images = _images;
       transaction = _transaction;
       resto = _resto;
       again = _again;
@@ -244,10 +252,24 @@ class _HomeActivityState extends State<HomeActivity> {
   Widget build(BuildContext context) {
     return Scaffold(
       body: SafeArea(
-        child: (isLoading)?Container(
-            width: CustomSize.sizeWidth(context),
-            height: CustomSize.sizeHeight(context),
-            child: Center(child: CircularProgressIndicator())):SmartRefresher(
+        child: (isLoading)?SmartRefresher(
+          enablePullDown: true,
+          enablePullUp: false,
+          header: WaterDropMaterialHeader(
+            distance: 30,
+            backgroundColor: Colors.white,
+            color: CustomColor.primary,
+          ),
+          controller: _refreshController,
+          onRefresh: _onRefresh,
+          onLoading: _onLoading,
+          child: SingleChildScrollView(
+            child: Container(
+                width: CustomSize.sizeWidth(context),
+                height: CustomSize.sizeHeight(context),
+                child: Center(child: CircularProgressIndicator())),
+          ),
+        ):SmartRefresher(
           enablePullDown: true,
           enablePullUp: false,
           header: WaterDropMaterialHeader(
@@ -281,7 +303,12 @@ class _HomeActivityState extends State<HomeActivity> {
                           ),
                           items: images.map((e) {
                             return Container(
-                              color: (e != "t")?Colors.black:Colors.amber,
+                              decoration: BoxDecoration(
+                                image: DecorationImage(
+                                  image: NetworkImage(Links.subUrl + e),
+                                  fit: BoxFit.cover
+                                )
+                              ),
                             );
                           }).toList(),
                         ),
@@ -306,36 +333,68 @@ class _HomeActivityState extends State<HomeActivity> {
                           child: Row(
                             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                             children: [
-                              Container(
-                                width: CustomSize.sizeWidth(context) / 6.5,
-                                height: CustomSize.sizeWidth(context) / 6.5,
-                                decoration: BoxDecoration(
-                                    color: CustomColor.primary,
-                                    shape: BoxShape.circle
+                              GestureDetector(
+                                onTap: (){
+                                  Navigator.push(context,
+                                      PageTransition(type: PageTransitionType.rightToLeft,
+                                          child: new SearchActivity(promo, latitude.toString(), longitude.toString(), 'Opening Course')));
+                                },
+                                child: Container(
+                                  width: CustomSize.sizeWidth(context) / 6.5,
+                                  height: CustomSize.sizeWidth(context) / 6.5,
+                                  decoration: BoxDecoration(
+                                      color: CustomColor.primary,
+                                      shape: BoxShape.circle
+                                  ),
+                                  child: Icon(FontAwesomeIcons.cookieBite, color: Colors.white,),
                                 ),
                               ),
-                              Container(
-                                width: CustomSize.sizeWidth(context) / 6.5,
-                                height: CustomSize.sizeWidth(context) / 6.5,
-                                decoration: BoxDecoration(
-                                    color: CustomColor.primary,
-                                    shape: BoxShape.circle
+                              GestureDetector(
+                                onTap: (){
+                                  Navigator.push(context,
+                                      PageTransition(type: PageTransitionType.rightToLeft,
+                                          child: new SearchActivity(promo, latitude.toString(), longitude.toString(), 'Main Course')));
+                                },
+                                child: Container(
+                                  width: CustomSize.sizeWidth(context) / 6.5,
+                                  height: CustomSize.sizeWidth(context) / 6.5,
+                                  decoration: BoxDecoration(
+                                      color: CustomColor.primary,
+                                      shape: BoxShape.circle
+                                  ),
+                                  child: Icon(FontAwesomeIcons.hamburger, color: Colors.white,),
                                 ),
                               ),
-                              Container(
-                                width: CustomSize.sizeWidth(context) / 6.5,
-                                height: CustomSize.sizeWidth(context) / 6.5,
-                                decoration: BoxDecoration(
-                                    color: CustomColor.primary,
-                                    shape: BoxShape.circle
+                              GestureDetector(
+                                onTap: (){
+                                  Navigator.push(context,
+                                      PageTransition(type: PageTransitionType.rightToLeft,
+                                          child: new SearchActivity(promo, latitude.toString(), longitude.toString(), 'Drink')));
+                                },
+                                child: Container(
+                                  width: CustomSize.sizeWidth(context) / 6.5,
+                                  height: CustomSize.sizeWidth(context) / 6.5,
+                                  decoration: BoxDecoration(
+                                      color: CustomColor.primary,
+                                      shape: BoxShape.circle
+                                  ),
+                                  child: Icon(FontAwesomeIcons.beer, color: Colors.white,),
                                 ),
                               ),
-                              Container(
-                                width: CustomSize.sizeWidth(context) / 6.5,
-                                height: CustomSize.sizeWidth(context) / 6.5,
-                                decoration: BoxDecoration(
-                                    color: CustomColor.primary,
-                                    shape: BoxShape.circle
+                              GestureDetector(
+                                onTap: (){
+                                  Navigator.push(context,
+                                      PageTransition(type: PageTransitionType.rightToLeft,
+                                          child: new SearchActivity(promo, latitude.toString(), longitude.toString(), 'Dessert')));
+                                },
+                                child: Container(
+                                  width: CustomSize.sizeWidth(context) / 6.5,
+                                  height: CustomSize.sizeWidth(context) / 6.5,
+                                  decoration: BoxDecoration(
+                                      color: CustomColor.primary,
+                                      shape: BoxShape.circle
+                                  ),
+                                  child: Icon(FontAwesomeIcons.iceCream, color: Colors.white,),
                                 ),
                               ),
                             ],
@@ -524,9 +583,28 @@ class _HomeActivityState extends State<HomeActivity> {
                       SizedBox(height: CustomSize.sizeHeight(context) / 48,),
                       Padding(
                         padding: EdgeInsets.symmetric(horizontal: CustomSize.sizeWidth(context) / 24),
-                        child: CustomText.textTitle2(
-                            text: "Lagi Diskon",
-                            maxLines: 1
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            CustomText.textTitle2(
+                                text: "Lagi Diskon",
+                                maxLines: 1
+                            ),
+                            GestureDetector(
+                              onTap: (){
+                                Navigator.push(
+                                    context,
+                                    PageTransition(
+                                        type: PageTransitionType.rightToLeft,
+                                        child: new PromoActivity()));
+                              },
+                              child: CustomText.bodyMedium12(
+                                  text: "Lebih banyak",
+                                  color: CustomColor.primary,
+                                  maxLines: 1
+                              ),
+                            ),
+                          ],
                         ),
                       ),
                       (promo != [])?Container(
@@ -607,9 +685,28 @@ class _HomeActivityState extends State<HomeActivity> {
                       SizedBox(height: CustomSize.sizeHeight(context) / 48,),
                       Padding(
                         padding: EdgeInsets.symmetric(horizontal: CustomSize.sizeWidth(context) / 24),
-                        child: CustomText.textTitle2(
-                            text: "Pesan Lagi",
-                            maxLines: 1
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            CustomText.textTitle2(
+                                text: "Pesan Lagi",
+                                maxLines: 1
+                            ),
+                            GestureDetector(
+                              onTap: (){
+                                Navigator.push(
+                                    context,
+                                    PageTransition(
+                                        type: PageTransitionType.rightToLeft,
+                                        child: new HistoryActivity()));
+                              },
+                              child: CustomText.bodyMedium12(
+                                  text: "Lebih banyak",
+                                  color: CustomColor.primary,
+                                  maxLines: 1
+                              ),
+                            ),
+                          ],
                         ),
                       ),
                       Container(
@@ -710,17 +807,25 @@ class _HomeActivityState extends State<HomeActivity> {
                   },
                   child: Icon(MaterialCommunityIcons.bookmark, size: 32, color: Colors.white,)),
               GestureDetector(
-                  onTap: (){
-                    Navigator.push(
-                        context,
-                        PageTransition(
-                            type: PageTransitionType.rightToLeft,
-                            child: CartActivity()));
+                  onTap: ()async{
+                    SharedPreferences pref = await SharedPreferences.getInstance();
+                    String _cart = pref.getString('inCart')??'';
+                    print(pref.getString('inCart'));
+                    if(_cart != ''){
+                      Navigator.push(
+                          context,
+                          PageTransition(
+                              type: PageTransitionType.rightToLeft,
+                              child: CartActivity()));
+                    }else{
+                      Fluttertoast.showToast(
+                        msg: "Tidak ada pesanan di keranjang anda",);
+                    }
                   },
                   child: Icon(CupertinoIcons.cart_fill, size: 32, color: Colors.white,)),
               GestureDetector(
                   onTap: (){
-                    Navigator.push(context, PageTransition(type: PageTransitionType.rightToLeft, child: new SearchActivity(promo, latitude.toString(), longitude.toString())));
+                    Navigator.push(context, PageTransition(type: PageTransitionType.rightToLeft, child: new SearchActivity(promo, latitude.toString(), longitude.toString(), '')));
                   },
                   child: Icon(FontAwesome.search, size: 32, color: Colors.white,)),
               GestureDetector(

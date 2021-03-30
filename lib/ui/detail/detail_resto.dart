@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_icons/flutter_icons.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:indonesiarestoguide/model/CategoryMenu.dart';
 import 'package:indonesiarestoguide/model/Menu.dart';
 import 'package:indonesiarestoguide/model/MenuJson.dart';
@@ -50,6 +51,10 @@ class _DetailRestoState extends State<DetailResto> {
   String inCart = "";
   String nameCategory = "";
 
+  bool isSeePromo = false;
+  bool isPromo = false;
+  int indexPromo = 0;
+
   List<String> images = [];
   List<Promo> promo = [];
   List<Menu> menu = [];
@@ -72,7 +77,7 @@ class _DetailRestoState extends State<DetailResto> {
       "Authorization": "Bearer $token"
     });
     var data = json.decode(apiResult.body);
-    print(data['data']['menu']);
+    print(data['data']['promo']);
 
     for(var v in data['data']['img']){
       _images.add(v);
@@ -140,7 +145,6 @@ class _DetailRestoState extends State<DetailResto> {
     pref2.setString('latResto', data['data']['lat'].toString());
     pref2.setString('longResto', data['data']['long'].toString());
 
-
     setState(() {
       name = data['data']['name'];
       address = data['data']['address'];
@@ -155,6 +159,12 @@ class _DetailRestoState extends State<DetailResto> {
       menu = _menu;
       categoryMenu = _categoryMenu;
       nameCategory = _categoryMenu[0].name;
+      if(promo.length <= 3){
+        indexPromo = promo.length;
+      }else{
+        indexPromo = 3;
+        isPromo = true;
+      }
       isLoading = false;
     });
   }
@@ -348,46 +358,221 @@ class _DetailRestoState extends State<DetailResto> {
                             controller: _scrollController,
                             physics: NeverScrollableScrollPhysics(),
                             shrinkWrap: true,
-                            itemCount: promo.length,
+                            itemCount: (isSeePromo)?promo.length:indexPromo,
                             itemBuilder: (_, index){
                               return Padding(
                                 padding: EdgeInsets.symmetric(
                                     horizontal: CustomSize.sizeWidth(context) / 16,
                                     vertical: CustomSize.sizeHeight(context) / 86
                                 ),
-                                child: Row(
-                                  crossAxisAlignment: CrossAxisAlignment.center,
-                                  children: [
-                                    Icon(Ionicons.ios_wallet, color: CustomColor.primary,),
-                                    SizedBox(width: CustomSize.sizeWidth(context) / 48,),
-                                    Container(
-                                      width: CustomSize.sizeWidth(context) / 1.5,
-                                      child: CustomText.bodyLight14(
-                                          text: promo[index].word,
-                                          minSize: 14,
-                                          maxLines: 2
+                                child: GestureDetector(
+                                  onTap: (){
+                                      showModalBottomSheet(
+                                          isScrollControlled: true,
+                                          shape: RoundedRectangleBorder(
+                                              borderRadius: BorderRadius.only(topLeft: Radius.circular(20), topRight: Radius.circular(20))
+                                          ),
+                                          context: context,
+                                          builder: (_){
+                                            return StatefulBuilder(
+                                                builder: (_, setStateModal){
+                                                  return Column(
+                                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                                    mainAxisSize: MainAxisSize.min,
+                                                    children: [
+                                                      SizedBox(height: CustomSize.sizeHeight(context) / 86,),
+                                                      Padding(
+                                                        padding: EdgeInsets.symmetric(horizontal: CustomSize.sizeWidth(context) / 2.4),
+                                                        child: Divider(thickness: 4,),
+                                                      ),
+                                                      SizedBox(height: CustomSize.sizeHeight(context) / 52,),
+                                                      Center(
+                                                        child: Container(
+                                                          width: CustomSize.sizeWidth(context) / 1.2,
+                                                          height: CustomSize.sizeWidth(context) / 1.2,
+                                                          decoration: BoxDecoration(
+                                                            image: DecorationImage(
+                                                                image: NetworkImage(Links.subUrl + promo[index].menu.urlImg),
+                                                                fit: BoxFit.cover
+                                                            ),
+                                                            borderRadius: BorderRadius.circular(10),
+                                                          ),
+                                                        ),
+                                                      ),
+                                                      SizedBox(height: CustomSize.sizeHeight(context) / 32,),
+                                                      Padding(
+                                                        padding: EdgeInsets.symmetric(horizontal: CustomSize.sizeHeight(context) / 20),
+                                                        child: Column(
+                                                          crossAxisAlignment: CrossAxisAlignment.start,
+                                                          children: [
+                                                            CustomText.textHeading5(
+                                                                text: promo[index].menu.name,
+                                                                minSize: 18,
+                                                                maxLines: 1
+                                                            ),
+                                                            SizedBox(height: CustomSize.sizeHeight(context) / 32,),
+                                                            CustomText.bodyRegular16(
+                                                                text: promo[index].menu.desc,
+                                                                maxLines: 100,
+                                                                minSize: 16
+                                                            ),
+                                                            SizedBox(height: CustomSize.sizeHeight(context) / 32,),
+                                                            Row(
+                                                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                                              children: [
+                                                                CustomText.bodyMedium16(
+                                                                    text: NumberFormat.currency(locale: 'id', symbol: '', decimalDigits: 0).format(promo[index].menu.price.original),
+                                                                    maxLines: 1,
+                                                                    minSize: 16
+                                                                ),
+                                                                (restoId.contains(promo[index].menu.id.toString()) != true)?SizedBox():Row(
+                                                                  children: [
+                                                                    GestureDetector(
+                                                                      onTap: ()async{
+                                                                        if(int.parse(qty[restoId.indexOf(promo[index].menu.id.toString())]) > 1){
+                                                                          String s = qty[restoId.indexOf(promo[index].menu.id.toString())];
+                                                                          print(s);
+                                                                          int i = int.parse(s) - 1;
+                                                                          print(i);
+                                                                          qty[restoId.indexOf(promo[index].menu.id.toString())] = i.toString();
+                                                                          SharedPreferences pref = await SharedPreferences.getInstance();
+                                                                          pref.setStringList("qty", qty);
+                                                                          setStateModal(() {});
+                                                                          setState(() {});
+                                                                        }
+                                                                      },
+                                                                      child: Container(
+                                                                        width: CustomSize.sizeWidth(context) / 12,
+                                                                        height: CustomSize.sizeWidth(context) / 12,
+                                                                        decoration: BoxDecoration(
+                                                                            color: CustomColor.accentLight,
+                                                                            shape: BoxShape.circle
+                                                                        ),
+                                                                        child: Center(child: CustomText.textHeading1(text: "-", color: CustomColor.accent)),
+                                                                      ),
+                                                                    ),
+                                                                    SizedBox(width: CustomSize.sizeWidth(context) / 24,),
+                                                                    CustomText.bodyRegular16(text: qty[restoId.indexOf(promo[index].menu.id.toString())]),
+                                                                    SizedBox(width: CustomSize.sizeWidth(context) / 24,),
+                                                                    GestureDetector(
+                                                                      onTap: ()async{
+                                                                        String s = qty[restoId.indexOf(promo[index].menu.id.toString())];
+                                                                        print(s);
+                                                                        int i = int.parse(s) + 1;
+                                                                        print(i);
+                                                                        qty[restoId.indexOf(promo[index].menu.id.toString())] = i.toString();
+                                                                        SharedPreferences pref = await SharedPreferences.getInstance();
+                                                                        pref.setStringList("qty", qty);
+                                                                        setStateModal(() {});
+                                                                        setState(() {});
+                                                                      },
+                                                                      child: Container(
+                                                                        width: CustomSize.sizeWidth(context) / 12,
+                                                                        height: CustomSize.sizeWidth(context) / 12,
+                                                                        decoration: BoxDecoration(
+                                                                            color: CustomColor.accentLight,
+                                                                            shape: BoxShape.circle
+                                                                        ),
+                                                                        child: Center(child: CustomText.textHeading1(text: "+", color: CustomColor.accent)),
+                                                                      ),
+                                                                    ),
+                                                                  ],
+                                                                )
+                                                              ],
+                                                            ),
+                                                          ],
+                                                        ),
+                                                      ),
+                                                      SizedBox(height: CustomSize.sizeHeight(context) / 32,),
+                                                      (restoId.contains(promo[index].menu.id.toString()) != true)?Center(
+                                                        child: Container(
+                                                          width: CustomSize.sizeWidth(context) / 1.1,
+                                                          height: CustomSize.sizeHeight(context) / 14,
+                                                          decoration: BoxDecoration(
+                                                              color: CustomColor.primary,
+                                                              borderRadius: BorderRadius.circular(20)
+                                                          ),
+                                                          child: GestureDetector(
+                                                              onTap: ()async{
+                                                                MenuJson m = MenuJson(
+                                                                  id: menu[index].id,
+                                                                  name: menu[index].name,
+                                                                  desc: menu[index].desc,
+                                                                  price: menu[index].price.original.toString(),
+                                                                  discount: menu[index].price.discounted.toString(),
+                                                                  urlImg: menu[index].urlImg,
+                                                                );
+                                                                menuJson.add(m);
+                                                                // List<String> _restoId = [];
+                                                                // List<String> _qty = [];
+                                                                restoId.add(menu[index].id.toString());
+                                                                qty.add("1");
+                                                                inCart = '1';
+
+                                                                String json1 = jsonEncode(menuJson.map((m) => m.toJson()).toList());
+                                                                SharedPreferences pref = await SharedPreferences.getInstance();
+                                                                pref.setString('inCart', '1');
+                                                                pref.setString("menuJson", json1);
+                                                                pref.setStringList("restoId", restoId);
+                                                                pref.setStringList("qty", qty);
+
+                                                                setStateModal(() {});
+                                                                setState(() {});
+                                                              },
+                                                              child: Center(child: CustomText.bodyRegular16(text: "Add to cart", color: Colors.white))
+                                                          ),
+                                                        ),
+                                                      )
+                                                          :SizedBox(),
+                                                      SizedBox(height: CustomSize.sizeHeight(context) / 86,),
+                                                    ],
+                                                  );
+                                                }
+                                                );
+                                          }
+                                      );
+                                  },
+                                  child: Row(
+                                    crossAxisAlignment: CrossAxisAlignment.center,
+                                    children: [
+                                      Icon(Ionicons.ios_wallet, color: CustomColor.primary,),
+                                      SizedBox(width: CustomSize.sizeWidth(context) / 48,),
+                                      Container(
+                                        width: CustomSize.sizeWidth(context) / 1.5,
+                                        child: CustomText.bodyLight14(
+                                            text: promo[index].word,
+                                            minSize: 14,
+                                            maxLines: 2
+                                        ),
                                       ),
-                                    ),
-                                    SizedBox(width: CustomSize.sizeWidth(context) / 48,),
-                                    Icon(Icons.chevron_right_sharp, size: 32,),
-                                  ],
+                                      SizedBox(width: CustomSize.sizeWidth(context) / 48,),
+                                      Icon(Icons.chevron_right_sharp, size: 32,),
+                                    ],
+                                  ),
                                 ),
                               );
                             }
                         ),
-                        SizedBox(height: CustomSize.sizeHeight(context) / 48,),
-                        Padding(
+                        (isPromo)?SizedBox(height: CustomSize.sizeHeight(context) / 48,):SizedBox(),
+                        (isPromo)?Padding(
                           padding: EdgeInsets.symmetric(horizontal: CustomSize.sizeWidth(context) / 8),
-                          child: Container(
-                            width: CustomSize.sizeWidth(context) / 4,
-                            height: CustomSize.sizeHeight(context) / 18,
-                            decoration: BoxDecoration(
-                                color: CustomColor.accentLight,
-                                borderRadius: BorderRadius.circular(20)
+                          child: GestureDetector(
+                            onTap: (){
+                              setState(() {
+                                isSeePromo = true;
+                              });
+                            },
+                            child: Container(
+                              width: CustomSize.sizeWidth(context) / 4,
+                              height: CustomSize.sizeHeight(context) / 18,
+                              decoration: BoxDecoration(
+                                  color: CustomColor.accentLight,
+                                  borderRadius: BorderRadius.circular(20)
+                              ),
+                              child: Center(child: CustomText.bodyRegular14(text: "See more", color: CustomColor.accent)),
                             ),
-                            child: Center(child: CustomText.bodyRegular14(text: "See more", color: CustomColor.accent)),
                           ),
-                        ),
+                        ):SizedBox(),
                         SizedBox(height: CustomSize.sizeHeight(context) / 63,),
                         Padding(
                           padding: EdgeInsets.symmetric(horizontal: CustomSize.sizeWidth(context) / 32),
@@ -422,75 +607,158 @@ class _DetailRestoState extends State<DetailResto> {
                                       ),
                                       context: context,
                                       builder: (_){
-                                        return Column(
-                                          crossAxisAlignment: CrossAxisAlignment.start,
-                                          mainAxisSize: MainAxisSize.min,
-                                          children: [
-                                            SizedBox(height: CustomSize.sizeHeight(context) / 86,),
-                                            Padding(
-                                              padding: EdgeInsets.symmetric(horizontal: CustomSize.sizeWidth(context) / 2.4),
-                                              child: Divider(thickness: 4,),
-                                            ),
-                                            SizedBox(height: CustomSize.sizeHeight(context) / 52,),
-                                            Center(
-                                              child: Container(
-                                                width: CustomSize.sizeWidth(context) / 1.2,
-                                                height: CustomSize.sizeWidth(context) / 1.2,
-                                                decoration: BoxDecoration(
-                                                  image: DecorationImage(
-                                                      image: NetworkImage(Links.subUrl + menu[index].urlImg),
-                                                      fit: BoxFit.cover
+                                        return StatefulBuilder(builder: (_, setStateModal){
+                                          return Column(
+                                            crossAxisAlignment: CrossAxisAlignment.start,
+                                            mainAxisSize: MainAxisSize.min,
+                                            children: [
+                                              SizedBox(height: CustomSize.sizeHeight(context) / 86,),
+                                              Padding(
+                                                padding: EdgeInsets.symmetric(horizontal: CustomSize.sizeWidth(context) / 2.4),
+                                                child: Divider(thickness: 4,),
+                                              ),
+                                              SizedBox(height: CustomSize.sizeHeight(context) / 52,),
+                                              Center(
+                                                child: Container(
+                                                  width: CustomSize.sizeWidth(context) / 1.2,
+                                                  height: CustomSize.sizeWidth(context) / 1.2,
+                                                  decoration: BoxDecoration(
+                                                    image: DecorationImage(
+                                                        image: NetworkImage(Links.subUrl + menu[index].urlImg),
+                                                        fit: BoxFit.cover
+                                                    ),
+                                                    borderRadius: BorderRadius.circular(10),
                                                   ),
-                                                  borderRadius: BorderRadius.circular(10),
                                                 ),
                                               ),
-                                            ),
-                                            SizedBox(height: CustomSize.sizeHeight(context) / 32,),
-                                            Padding(
-                                              padding: EdgeInsets.symmetric(horizontal: CustomSize.sizeHeight(context) / 20),
-                                              child: Column(
-                                                crossAxisAlignment: CrossAxisAlignment.start,
-                                                children: [
-                                                  CustomText.textHeading5(
-                                                      text: menu[index].name,
-                                                      minSize: 18,
-                                                      maxLines: 1
-                                                  ),
-                                                  SizedBox(height: CustomSize.sizeHeight(context) / 32,),
-                                                  CustomText.bodyRegular16(
-                                                      text: menu[index].desc,
-                                                      maxLines: 100,
-                                                      minSize: 16
-                                                  ),
-                                                  SizedBox(height: CustomSize.sizeHeight(context) / 32,),
-                                                  CustomText.bodyMedium16(
-                                                      text: NumberFormat.currency(locale: 'id', symbol: '', decimalDigits: 0).format(menu[index].price.original),
-                                                      maxLines: 1,
-                                                      minSize: 16
-                                                  ),
-                                                ],
-                                              ),
-                                            ),
-                                            SizedBox(height: CustomSize.sizeHeight(context) / 32,),
-                                            Center(
-                                              child: Container(
-                                                width: CustomSize.sizeWidth(context) / 1.1,
-                                                height: CustomSize.sizeHeight(context) / 14,
-                                                decoration: BoxDecoration(
-                                                    color: CustomColor.primary,
-                                                    borderRadius: BorderRadius.circular(20)
+                                              SizedBox(height: CustomSize.sizeHeight(context) / 32,),
+                                              Padding(
+                                                padding: EdgeInsets.symmetric(horizontal: CustomSize.sizeHeight(context) / 20),
+                                                child: Column(
+                                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                                  children: [
+                                                    CustomText.textHeading5(
+                                                        text: menu[index].name,
+                                                        minSize: 18,
+                                                        maxLines: 1
+                                                    ),
+                                                    SizedBox(height: CustomSize.sizeHeight(context) / 32,),
+                                                    CustomText.bodyRegular16(
+                                                        text: menu[index].desc,
+                                                        maxLines: 100,
+                                                        minSize: 16
+                                                    ),
+                                                    SizedBox(height: CustomSize.sizeHeight(context) / 32,),
+                                                    Row(
+                                                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                                      children: [
+                                                        CustomText.bodyMedium16(
+                                                            text: NumberFormat.currency(locale: 'id', symbol: '', decimalDigits: 0).format(menu[index].price.original),
+                                                            maxLines: 1,
+                                                            minSize: 16
+                                                        ),
+                                                        (restoId.contains(menu[index].id.toString()) != true)?SizedBox():Row(
+                                                          children: [
+                                                            GestureDetector(
+                                                              onTap: ()async{
+                                                                if(int.parse(qty[restoId.indexOf(promo[index].menu.id.toString())]) > 1){
+                                                                  String s = qty[restoId.indexOf(promo[index].menu.id.toString())];
+                                                                  print(s);
+                                                                  int i = int.parse(s) - 1;
+                                                                  print(i);
+                                                                  qty[restoId.indexOf(promo[index].menu.id.toString())] = i.toString();
+                                                                  SharedPreferences pref = await SharedPreferences.getInstance();
+                                                                  pref.setStringList("qty", qty);
+                                                                  setStateModal(() {});
+                                                                  setState(() {});
+                                                                }
+                                                              },
+                                                              child: Container(
+                                                                width: CustomSize.sizeWidth(context) / 12,
+                                                                height: CustomSize.sizeWidth(context) / 12,
+                                                                decoration: BoxDecoration(
+                                                                    color: CustomColor.accentLight,
+                                                                    shape: BoxShape.circle
+                                                                ),
+                                                                child: Center(child: CustomText.textHeading1(text: "-", color: CustomColor.accent)),
+                                                              ),
+                                                            ),
+                                                            SizedBox(width: CustomSize.sizeWidth(context) / 24,),
+                                                            CustomText.bodyRegular16(text: qty[restoId.indexOf(promo[index].menu.id.toString())]),
+                                                            SizedBox(width: CustomSize.sizeWidth(context) / 24,),
+                                                            GestureDetector(
+                                                              onTap: ()async{
+                                                                String s = qty[restoId.indexOf(promo[index].menu.id.toString())];
+                                                                print(s);
+                                                                int i = int.parse(s) + 1;
+                                                                print(i);
+                                                                qty[restoId.indexOf(promo[index].menu.id.toString())] = i.toString();
+                                                                SharedPreferences pref = await SharedPreferences.getInstance();
+                                                                pref.setStringList("qty", qty);
+                                                                setStateModal(() {});
+                                                                setState(() {});
+                                                              },
+                                                              child: Container(
+                                                                width: CustomSize.sizeWidth(context) / 12,
+                                                                height: CustomSize.sizeWidth(context) / 12,
+                                                                decoration: BoxDecoration(
+                                                                    color: CustomColor.accentLight,
+                                                                    shape: BoxShape.circle
+                                                                ),
+                                                                child: Center(child: CustomText.textHeading1(text: "+", color: CustomColor.accent)),
+                                                              ),
+                                                            ),
+                                                          ],
+                                                        )
+                                                      ],
+                                                    ),
+                                                  ],
                                                 ),
-                                                child: GestureDetector(
-                                                    onTap: (){
-                                                      Navigator.pop(context);
-                                                    },
-                                                    child: Center(child: CustomText.bodyRegular16(text: "Add to cart", color: Colors.white))
-                                                ),
                                               ),
-                                            ),
-                                            SizedBox(height: CustomSize.sizeHeight(context) / 86,),
-                                          ],
-                                        );
+                                              SizedBox(height: CustomSize.sizeHeight(context) / 32,),
+                                              (restoId.contains(menu[index].id.toString()) != true)?Center(
+                                                child: Container(
+                                                  width: CustomSize.sizeWidth(context) / 1.1,
+                                                  height: CustomSize.sizeHeight(context) / 14,
+                                                  decoration: BoxDecoration(
+                                                      color: CustomColor.primary,
+                                                      borderRadius: BorderRadius.circular(20)
+                                                  ),
+                                                  child: GestureDetector(
+                                                      onTap: ()async{
+                                                        MenuJson m = MenuJson(
+                                                          id: menu[index].id,
+                                                          name: menu[index].name,
+                                                          desc: menu[index].desc,
+                                                          price: menu[index].price.original.toString(),
+                                                          discount: menu[index].price.discounted.toString(),
+                                                          urlImg: menu[index].urlImg,
+                                                        );
+                                                        menuJson.add(m);
+                                                        // List<String> _restoId = [];
+                                                        // List<String> _qty = [];
+                                                        restoId.add(menu[index].id.toString());
+                                                        qty.add("1");
+                                                        inCart = '1';
+
+                                                        String json1 = jsonEncode(menuJson.map((m) => m.toJson()).toList());
+                                                        SharedPreferences pref = await SharedPreferences.getInstance();
+                                                        pref.setString('inCart', '1');
+                                                        pref.setString("menuJson", json1);
+                                                        pref.setStringList("restoId", restoId);
+                                                        pref.setStringList("qty", qty);
+
+                                                        setState(() {});
+                                                        setStateModal(() {});
+                                                      },
+                                                      child: Center(child: CustomText.bodyRegular16(text: "Add to cart", color: Colors.white))
+                                                  ),
+                                                ),
+                                              ):SizedBox(),
+                                              SizedBox(height: CustomSize.sizeHeight(context) / 86,),
+                                            ],
+                                          );
+                                        });
                                       }
                                   );
                                 },
@@ -674,23 +942,49 @@ class _DetailRestoState extends State<DetailResto> {
                                       ),
                                       SizedBox(height: CustomSize.sizeHeight(context) / 52,),
                                       ListView.builder(
+                                        shrinkWrap: true,
+                                        physics: NeverScrollableScrollPhysics(),
+                                        itemCount: categoryMenu.length,
                                           itemBuilder: (ctx, index){
-
+                                            return GestureDetector(
+                                              onTap: (){
+                                                setState(() {
+                                                  nameCategory = categoryMenu[index].name;
+                                                });
+                                                Navigator.pop(context);
+                                              },
+                                              child: Padding(
+                                                padding: EdgeInsets.all(CustomSize.sizeWidth(context) / 32),
+                                                child: Container(
+                                                  width: CustomSize.sizeWidth(context),
+                                                    child: CustomText.textHeading7(text: categoryMenu[index].name,)),
+                                              ),
+                                            );
                                           },
                                       ),
+                                      SizedBox(height: CustomSize.sizeHeight(context) / 52,),
                                     ],
                                   );
                                 }
                             );
                           },
-                          child: Padding(
-                            padding: EdgeInsets.symmetric(horizontal: CustomSize.sizeWidth(context) / 32),
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                SizedBox(height: CustomSize.sizeHeight(context) / 63,),
-                                CustomText.textHeading4(text: nameCategory, color: CustomColor.primary),
-                              ],
+                          child: Container(
+                            color: Colors.white,
+                            child: Padding(
+                              padding: EdgeInsets.symmetric(horizontal: CustomSize.sizeWidth(context) / 32),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  SizedBox(height: CustomSize.sizeHeight(context) / 63,),
+                                  Row(
+                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      CustomText.textHeading4(text: nameCategory, color: CustomColor.primary),
+                                      Icon(FontAwesomeIcons.chevronRight, color: CustomColor.primary,)
+                                    ],
+                                  ),
+                                ],
+                              ),
                             ),
                           ),
                         ),
@@ -708,82 +1002,242 @@ class _DetailRestoState extends State<DetailResto> {
                                 left: CustomSize.sizeWidth(context) / 32,
                                 right: CustomSize.sizeWidth(context) / 32,
                               ),
-                              child: Container(
-                                width: CustomSize.sizeWidth(context),
-                                height: CustomSize.sizeHeight(context) / 3.8,
-                                child: Column(
-                                  children: [
-                                    Expanded(
-                                      child: Row(
-                                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                        children: [
-                                          Container(
-                                            width: CustomSize.sizeWidth(context) / 1.65,
-                                            child: Column(
-                                              crossAxisAlignment: CrossAxisAlignment.start,
-                                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                              children: [
-                                                Column(
-                                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                                  children: [
-                                                    CustomText.textHeading4(
-                                                        text: categoryMenu[categoryMenu.indexWhere((v) => v.name == nameCategory)].menu[index].name,
-                                                        minSize: 18,
-                                                        maxLines: 1
-                                                    ),
-                                                    CustomText.bodyRegular12(
-                                                        text: categoryMenu[categoryMenu.indexWhere((v) => v.name == nameCategory)].menu[index].desc,
-                                                        maxLines: 2,
-                                                        minSize: 12
-                                                    ),
-                                                  ],
-                                                ),
-                                                Column(
-                                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                                  children: [
-                                                    CustomText.bodyMedium16(
-                                                        text: NumberFormat.currency(locale: 'id', symbol: '', decimalDigits: 0).format(categoryMenu[categoryMenu.indexWhere((v) => v.name == nameCategory)].menu[index].price.original),
-                                                        maxLines: 1,
-                                                        minSize: 16
-                                                    ),
-                                                    SizedBox(height: CustomSize.sizeHeight(context) / 63,),
-                                                    Icon(Icons.favorite, color: CustomColor.secondary, size: 36,)
-                                                  ],
-                                                )
-                                              ],
+                              child: GestureDetector(
+                                onTap: (){
+                                  if (restoId.contains(categoryMenu[categoryMenu.indexWhere((v) => v.name == nameCategory)].menu[index].id.toString()) != true)
+                                  showModalBottomSheet(
+                                      isScrollControlled: true,
+                                      shape: RoundedRectangleBorder(
+                                          borderRadius: BorderRadius.only(topLeft: Radius.circular(20), topRight: Radius.circular(20))
+                                      ),
+                                      context: context,
+                                      builder: (_){
+                                        return Column(
+                                          crossAxisAlignment: CrossAxisAlignment.start,
+                                          mainAxisSize: MainAxisSize.min,
+                                          children: [
+                                            SizedBox(height: CustomSize.sizeHeight(context) / 86,),
+                                            Padding(
+                                              padding: EdgeInsets.symmetric(horizontal: CustomSize.sizeWidth(context) / 2.4),
+                                              child: Divider(thickness: 4,),
                                             ),
-                                          ),
-                                          Column(
-                                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                            crossAxisAlignment: CrossAxisAlignment.end,
-                                            children: [
-                                              Container(
-                                                width: CustomSize.sizeWidth(context) / 3.4,
-                                                height: CustomSize.sizeWidth(context) / 3.4,
+                                            SizedBox(height: CustomSize.sizeHeight(context) / 52,),
+                                            Center(
+                                              child: Container(
+                                                width: CustomSize.sizeWidth(context) / 1.2,
+                                                height: CustomSize.sizeWidth(context) / 1.2,
                                                 decoration: BoxDecoration(
                                                   image: DecorationImage(
-                                                    image: NetworkImage(Links.subUrl + categoryMenu[categoryMenu.indexWhere((v) => v.name == nameCategory)].menu[index].urlImg),
-                                                    fit: BoxFit.cover
+                                                      image: NetworkImage(Links.subUrl + categoryMenu[categoryMenu.indexWhere((v) => v.name == nameCategory)].menu[index].urlImg),
+                                                      fit: BoxFit.cover
                                                   ),
-                                                    borderRadius: BorderRadius.circular(20)
+                                                  borderRadius: BorderRadius.circular(10),
                                                 ),
                                               ),
-                                              Container(
-                                                width: CustomSize.sizeWidth(context) / 4.6,
-                                                height: CustomSize.sizeHeight(context) / 18,
+                                            ),
+                                            SizedBox(height: CustomSize.sizeHeight(context) / 32,),
+                                            Padding(
+                                              padding: EdgeInsets.symmetric(horizontal: CustomSize.sizeHeight(context) / 20),
+                                              child: Column(
+                                                crossAxisAlignment: CrossAxisAlignment.start,
+                                                children: [
+                                                  CustomText.textHeading5(
+                                                      text: categoryMenu[categoryMenu.indexWhere((v) => v.name == nameCategory)].menu[index].name,
+                                                      minSize: 18,
+                                                      maxLines: 1
+                                                  ),
+                                                  SizedBox(height: CustomSize.sizeHeight(context) / 32,),
+                                                  CustomText.bodyRegular16(
+                                                      text: categoryMenu[categoryMenu.indexWhere((v) => v.name == nameCategory)].menu[index].desc,
+                                                      maxLines: 100,
+                                                      minSize: 16
+                                                  ),
+                                                  SizedBox(height: CustomSize.sizeHeight(context) / 32,),
+                                                  CustomText.bodyMedium16(
+                                                      text: NumberFormat.currency(locale: 'id', symbol: '', decimalDigits: 0).format(categoryMenu[categoryMenu.indexWhere((v) => v.name == nameCategory)].menu[index].price.original),
+                                                      maxLines: 1,
+                                                      minSize: 16
+                                                  ),
+                                                ],
+                                              ),
+                                            ),
+                                            SizedBox(height: CustomSize.sizeHeight(context) / 32,),
+                                            Center(
+                                              child: Container(
+                                                width: CustomSize.sizeWidth(context) / 1.1,
+                                                height: CustomSize.sizeHeight(context) / 14,
                                                 decoration: BoxDecoration(
-                                                    color: CustomColor.accentLight,
+                                                    color: CustomColor.primary,
                                                     borderRadius: BorderRadius.circular(20)
                                                 ),
-                                                child: Center(child: CustomText.bodyRegular16(text: "Add", color: CustomColor.accent)),
+                                                child: GestureDetector(
+                                                    onTap: (){
+                                                      Navigator.pop(context);
+                                                    },
+                                                    child: Center(child: CustomText.bodyRegular16(text: "Add to cart", color: Colors.white))
+                                                ),
                                               ),
-                                            ],
-                                          ),
-                                        ],
+                                            ),
+                                            SizedBox(height: CustomSize.sizeHeight(context) / 86,),
+                                          ],
+                                        );
+                                      }
+                                  );
+                                },
+                                child: Container(
+                                  width: CustomSize.sizeWidth(context),
+                                  height: CustomSize.sizeHeight(context) / 3.8,
+                                  child: Column(
+                                    children: [
+                                      Expanded(
+                                        child: Row(
+                                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                          children: [
+                                            Container(
+                                              width: CustomSize.sizeWidth(context) / 1.65,
+                                              child: Column(
+                                                crossAxisAlignment: CrossAxisAlignment.start,
+                                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                                children: [
+                                                  Column(
+                                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                                    children: [
+                                                      CustomText.textHeading4(
+                                                          text: categoryMenu[categoryMenu.indexWhere((v) => v.name == nameCategory)].menu[index].name,
+                                                          minSize: 18,
+                                                          maxLines: 1
+                                                      ),
+                                                      CustomText.bodyRegular12(
+                                                          text: categoryMenu[categoryMenu.indexWhere((v) => v.name == nameCategory)].menu[index].desc,
+                                                          maxLines: 2,
+                                                          minSize: 12
+                                                      ),
+                                                    ],
+                                                  ),
+                                                  Column(
+                                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                                    children: [
+                                                      CustomText.bodyMedium16(
+                                                          text: NumberFormat.currency(locale: 'id', symbol: '', decimalDigits: 0).format(categoryMenu[categoryMenu.indexWhere((v) => v.name == nameCategory)].menu[index].price.original),
+                                                          maxLines: 1,
+                                                          minSize: 16
+                                                      ),
+                                                      SizedBox(height: CustomSize.sizeHeight(context) / 63,),
+                                                      Icon(Icons.favorite, color: CustomColor.secondary, size: 36,)
+                                                    ],
+                                                  )
+                                                ],
+                                              ),
+                                            ),
+                                            Column(
+                                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                              crossAxisAlignment: CrossAxisAlignment.end,
+                                              children: [
+                                                Container(
+                                                  width: CustomSize.sizeWidth(context) / 3.4,
+                                                  height: CustomSize.sizeWidth(context) / 3.4,
+                                                  decoration: BoxDecoration(
+                                                    image: DecorationImage(
+                                                      image: NetworkImage(Links.subUrl + categoryMenu[categoryMenu.indexWhere((v) => v.name == nameCategory)].menu[index].urlImg),
+                                                      fit: BoxFit.cover
+                                                    ),
+                                                      borderRadius: BorderRadius.circular(20)
+                                                  ),
+                                                ),
+                                                (restoId.contains(categoryMenu[categoryMenu.indexWhere((v) => v.name == nameCategory)].menu[index].id.toString()) != true)?GestureDetector(
+                                                  onTap: () async{
+                                                    MenuJson m = MenuJson(
+                                                      id: categoryMenu[categoryMenu.indexWhere((v) => v.name == nameCategory)].menu[index].id,
+                                                      name: categoryMenu[categoryMenu.indexWhere((v) => v.name == nameCategory)].menu[index].name,
+                                                      desc: categoryMenu[categoryMenu.indexWhere((v) => v.name == nameCategory)].menu[index].desc,
+                                                      price: categoryMenu[categoryMenu.indexWhere((v) => v.name == nameCategory)].menu[index].price.original.toString(),
+                                                      discount: categoryMenu[categoryMenu.indexWhere((v) => v.name == nameCategory)].menu[index].price.discounted.toString(),
+                                                      urlImg: categoryMenu[categoryMenu.indexWhere((v) => v.name == nameCategory)].menu[index].urlImg,
+                                                    );
+                                                    menuJson.add(m);
+                                                    // List<String> _restoId = [];
+                                                    // List<String> _qty = [];
+                                                    restoId.add(categoryMenu[categoryMenu.indexWhere((v) => v.name == nameCategory)].menu[index].id.toString());
+                                                    qty.add("1");
+                                                    inCart = '1';
+
+                                                    String json1 = jsonEncode(menuJson.map((m) => m.toJson()).toList());
+                                                    SharedPreferences pref = await SharedPreferences.getInstance();
+                                                    pref.setString('inCart', '1');
+                                                    pref.setString("menuJson", json1);
+                                                    pref.setStringList("restoId", restoId);
+                                                    pref.setStringList("qty", qty);
+
+                                                    setState(() {});
+                                                  },
+                                                  child: Container(
+                                                    width: CustomSize.sizeWidth(context) / 4.6,
+                                                    height: CustomSize.sizeHeight(context) / 18,
+                                                    decoration: BoxDecoration(
+                                                        color: CustomColor.accentLight,
+                                                        borderRadius: BorderRadius.circular(20)
+                                                    ),
+                                                    child: Center(child: CustomText.bodyRegular16(text: "Add", color: CustomColor.accent)),
+                                                  ),
+                                                ):Row(
+                                                  children: [
+                                                    GestureDetector(
+                                                      onTap: ()async{
+                                                        if(int.parse(qty[restoId.indexOf(categoryMenu[categoryMenu.indexWhere((v) => v.name == nameCategory)].menu[index].id.toString())]) > 1){
+                                                          String s = qty[restoId.indexOf(categoryMenu[categoryMenu.indexWhere((v) => v.name == nameCategory)].menu[index].id.toString())];
+                                                          print(s);
+                                                          int i = int.parse(s) - 1;
+                                                          print(i);
+                                                          qty[restoId.indexOf(categoryMenu[categoryMenu.indexWhere((v) => v.name == nameCategory)].menu[index].id.toString())] = i.toString();
+                                                          SharedPreferences pref = await SharedPreferences.getInstance();
+                                                          pref.setStringList("qty", qty);
+                                                          setState(() {});
+                                                        }
+                                                      },
+                                                      child: Container(
+                                                        width: CustomSize.sizeWidth(context) / 12,
+                                                        height: CustomSize.sizeWidth(context) / 12,
+                                                        decoration: BoxDecoration(
+                                                            color: CustomColor.accentLight,
+                                                            shape: BoxShape.circle
+                                                        ),
+                                                        child: Center(child: CustomText.textHeading1(text: "-", color: CustomColor.accent)),
+                                                      ),
+                                                    ),
+                                                    SizedBox(width: CustomSize.sizeWidth(context) / 24,),
+                                                    CustomText.bodyRegular16(text: qty[restoId.indexOf(categoryMenu[categoryMenu.indexWhere((v) => v.name == nameCategory)].menu[index].id.toString())]),
+                                                    SizedBox(width: CustomSize.sizeWidth(context) / 24,),
+                                                    GestureDetector(
+                                                      onTap: ()async{
+                                                        String s = qty[restoId.indexOf(categoryMenu[categoryMenu.indexWhere((v) => v.name == nameCategory)].menu[index].id.toString())];
+                                                        print(s);
+                                                        int i = int.parse(s) + 1;
+                                                        print(i);
+                                                        qty[restoId.indexOf(categoryMenu[categoryMenu.indexWhere((v) => v.name == nameCategory)].menu[index].id.toString())] = i.toString();
+                                                        SharedPreferences pref = await SharedPreferences.getInstance();
+                                                        pref.setStringList("qty", qty);
+                                                        setState(() {});
+                                                      },
+                                                      child: Container(
+                                                        width: CustomSize.sizeWidth(context) / 12,
+                                                        height: CustomSize.sizeWidth(context) / 12,
+                                                        decoration: BoxDecoration(
+                                                            color: CustomColor.accentLight,
+                                                            shape: BoxShape.circle
+                                                        ),
+                                                        child: Center(child: CustomText.textHeading1(text: "+", color: CustomColor.accent)),
+                                                      ),
+                                                    ),
+                                                  ],
+                                                ),
+                                              ],
+                                            ),
+                                          ],
+                                        ),
                                       ),
-                                    ),
-                                    Divider()
-                                  ],
+                                      Divider()
+                                    ],
+                                  ),
                                 ),
                               ),
                             );

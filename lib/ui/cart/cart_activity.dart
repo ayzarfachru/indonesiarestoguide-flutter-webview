@@ -9,6 +9,7 @@ import 'package:geolocator/geolocator.dart' as geo;
 import 'package:geolocator/geolocator.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:indonesiarestoguide/model/MenuJson.dart';
+import 'package:indonesiarestoguide/ui/detail/detail_resto.dart';
 import 'package:indonesiarestoguide/ui/home/home_activity.dart';
 import 'package:indonesiarestoguide/utils/search_address_maps.dart';
 import 'package:indonesiarestoguide/utils/utils.dart';
@@ -127,12 +128,13 @@ class _CartActivityState extends State<CartActivity> {
     });
     SharedPreferences pref2 = await SharedPreferences.getInstance();
     name = (pref2.getString('menuJson')??"");
+    print(name);
     restoId.addAll(pref2.getStringList('restoId')??[]);
     qty.addAll(pref2.getStringList('qty')??[]);
     _tempRestoId.addAll(pref2.getStringList('restoId')??[]);
     _tempQty.addAll(pref2.getStringList('qty')??[]);
     var data = json.decode(name);
-    print(data);
+
 
     for(var v in data){
       _menuId.add(v['id'].toString());
@@ -653,6 +655,7 @@ class _CartActivityState extends State<CartActivity> {
 
                                                       if(_tempMenu.length == 0){
                                                         pref.setString("inCart", '');
+                                                        pref.setString('restaurantId', '');
                                                       }
                                                     }
                                                     print(harga);
@@ -735,47 +738,59 @@ class _CartActivityState extends State<CartActivity> {
                       );
                     }
                 ),
-                // Padding(
-                //   padding: EdgeInsets.symmetric(
-                //       horizontal: CustomSize.sizeWidth(context) / 32,
-                //       vertical: CustomSize.sizeHeight(context) / 86
-                //   ),
-                //   child: Row(
-                //     mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                //     crossAxisAlignment: CrossAxisAlignment.center,
-                //     children: [
-                //       Container(
-                //         width: CustomSize.sizeWidth(context) / 1.6,
-                //         child: Column(
-                //           crossAxisAlignment: CrossAxisAlignment.start,
-                //           children: [
-                //             CustomText.textHeading4(text: "Ada lagi pesanannya ?"),
-                //             CustomText.bodyRegular16(text: "Masih bisa tambah lagi loo")
-                //           ],
-                //         ),
-                //       ),
-                //       Padding(
-                //         padding: EdgeInsets.symmetric(horizontal: CustomSize.sizeWidth(context) / 86),
-                //         child: Container(
-                //           height: CustomSize.sizeHeight(context) / 24,
-                //           decoration: BoxDecoration(
-                //               borderRadius: BorderRadius.circular(20),
-                //               border: Border.all(color: CustomColor.accent)
-                //           ),
-                //           child: Padding(
-                //             padding: EdgeInsets.symmetric(horizontal: CustomSize.sizeWidth(context) / 32),
-                //             child: Center(
-                //               child: CustomText.textTitle8(
-                //                   text: "Tambah",
-                //                   color: CustomColor.accent
-                //               ),
-                //             ),
-                //           ),
-                //         ),
-                //       )
-                //     ],
-                //   ),
-                // ),
+                Padding(
+                  padding: EdgeInsets.symmetric(
+                      horizontal: CustomSize.sizeWidth(context) / 32,
+                      vertical: CustomSize.sizeHeight(context) / 86
+                  ),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      Container(
+                        width: CustomSize.sizeWidth(context) / 1.6,
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            CustomText.textHeading4(text: "Ada lagi pesanannya ?"),
+                            CustomText.bodyRegular16(text: "Masih bisa tambah lagi loo")
+                          ],
+                        ),
+                      ),
+                      Padding(
+                        padding: EdgeInsets.symmetric(horizontal: CustomSize.sizeWidth(context) / 86),
+                        child: GestureDetector(
+                          onTap: ()async{
+                            SharedPreferences pref = await SharedPreferences.getInstance();
+                            String checkId = pref.getString('restaurantId')??'';
+
+                            Navigator.push(
+                                context,
+                                PageTransition(
+                                    type: PageTransitionType.rightToLeft,
+                                    child: new DetailResto(checkId)));
+                          },
+                          child: Container(
+                            height: CustomSize.sizeHeight(context) / 24,
+                            decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(20),
+                                border: Border.all(color: CustomColor.accent)
+                            ),
+                            child: Padding(
+                              padding: EdgeInsets.symmetric(horizontal: CustomSize.sizeWidth(context) / 32),
+                              child: Center(
+                                child: CustomText.textTitle8(
+                                    text: "Tambah",
+                                    color: CustomColor.accent
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
+                      )
+                    ],
+                  ),
+                ),
                 Container(
                   width: CustomSize.sizeWidth(context),
                   decoration: BoxDecoration(

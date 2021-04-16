@@ -9,6 +9,7 @@ import 'package:flutter_icons/flutter_icons.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:indonesiarestoguide/model/Menu.dart';
+import 'package:indonesiarestoguide/model/MenuJson.dart';
 import 'package:indonesiarestoguide/model/Price.dart';
 import 'package:indonesiarestoguide/model/Promo.dart';
 import 'package:indonesiarestoguide/model/Resto.dart';
@@ -115,7 +116,12 @@ class _HomeActivityState extends State<HomeActivity> {
   List<String> images = [];
   bool isLoading = false;
   bool isSearch = false;
+  String inCart = "";
+  String name = "";
 
+  List<MenuJson> menuJson = [];
+  List<String> restoId = [];
+  List<String> qty = [];
   List<Resto> resto = [];
   List<Resto> again = [];
   List<Menu> promo = [];
@@ -138,7 +144,7 @@ class _HomeActivityState extends State<HomeActivity> {
     });
     print(apiResult.body);
     var data = json.decode(apiResult.body);
-    print(data['promo']);
+    print(data['resto']);
 
     for(var v in data['banner']){
       _images.add(v);
@@ -161,7 +167,7 @@ class _HomeActivityState extends State<HomeActivity> {
       Resto r = Resto.all(
           id: v['id'],
           name: v['name'],
-          distance: v['distance'],
+          distance: double.parse(v['distance'].toString()),
           img: v['img']
       );
       _resto.add(r);
@@ -171,7 +177,7 @@ class _HomeActivityState extends State<HomeActivity> {
       Resto r = Resto.all(
           id: v['id'],
           name: v['name'],
-          distance: v['distance'],
+          distance: double.parse(v['distance'].toString()),
           img: v['img']
       );
       _again.add(r);
@@ -181,10 +187,12 @@ class _HomeActivityState extends State<HomeActivity> {
       Menu m = Menu(
           id: v['id'],
           name: v['name'],
+          restoId: v['resto_id'].toString(),
           restoName: v['resto_name'],
+          desc: v['desc']??'',
           urlImg: v['img'],
           price: Price.discounted(int.parse(v['price'].toString()), int.parse(v['discounted_price'].toString())),
-          distance: v['resto_distance']
+          distance: double.parse(v['resto_distance'].toString())
       );
       _promo.add(m);
     }
@@ -215,6 +223,7 @@ class _HomeActivityState extends State<HomeActivity> {
         longitude = value.longitude;
       });
     });
+    _getData();
     setState(() {});
     await Future.delayed(Duration(milliseconds: 1000));
     // if failed,use refreshFailed()
@@ -226,6 +235,23 @@ class _HomeActivityState extends State<HomeActivity> {
     await Future.delayed(Duration(milliseconds: 1000));
     // if failed,use loadFailed(),if no data return,use LoadNodata()
     _refreshController.loadComplete();
+  }
+
+  Future _getData()async{
+    menuJson = [];
+    restoId = [];
+    qty = [];
+    SharedPreferences pref2 = await SharedPreferences.getInstance();
+    inCart = pref2.getString('inCart')??"";
+    if(pref2.getString('inCart') == '1'){
+      name = pref2.getString('menuJson')??"";
+      print("Ini pref2 " +name+" SP");
+      restoId.addAll(pref2.getStringList('restoId')??[]);
+      print(restoId);
+      qty.addAll(pref2.getStringList('qty')??[]);
+      print(qty);
+    }
+    setState(() {});
   }
 
   @override
@@ -240,6 +266,7 @@ class _HomeActivityState extends State<HomeActivity> {
         longitude = value.longitude;
       });
     });
+    _getData();
     super.initState();
   }
 
@@ -491,7 +518,8 @@ class _HomeActivityState extends State<HomeActivity> {
                                                   Row(
                                                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                                     children: [
-                                                      CustomText.bodyLight12(text: transaction[index].status, minSize: 12, color: Colors.amberAccent),
+                                                      CustomText.bodyLight12(text: transaction[index].status, minSize: 12,
+                                                          color: (transaction[index].status == 'Menunggu')?Colors.amberAccent:Colors.blue),
                                                       CustomText.bodyMedium14(text: NumberFormat.currency(locale: 'id', symbol: '', decimalDigits: 0).format(transaction[index].total), minSize: 14),
                                                     ],
                                                   )
@@ -591,12 +619,15 @@ class _HomeActivityState extends State<HomeActivity> {
                                 maxLines: 1
                             ),
                             GestureDetector(
-                              onTap: (){
-                                Navigator.push(
+                              onTap: ()async{
+                                var i = await Navigator.push(
                                     context,
                                     PageTransition(
                                         type: PageTransitionType.rightToLeft,
                                         child: new PromoActivity()));
+                                if(i == null){
+                                  _getData();
+                                }
                               },
                               child: CustomText.bodyMedium12(
                                   text: "Lebih banyak",
@@ -617,65 +648,241 @@ class _HomeActivityState extends State<HomeActivity> {
                               return Padding(
                                 padding: EdgeInsets.only(left: CustomSize.sizeWidth(context) / 20,
                                     top: CustomSize.sizeHeight(context) / 86, bottom: CustomSize.sizeHeight(context) / 86),
-                                child: Container(
-                                  width: CustomSize.sizeWidth(context) / 1.3,
-                                  height: CustomSize.sizeHeight(context) / 5,
-                                  decoration: BoxDecoration(
-                                    color: Colors.white,
-                                    borderRadius: BorderRadius.circular(20),
-                                    boxShadow: [
-                                      BoxShadow(
-                                        color: Colors.grey.withOpacity(0.5),
-                                        spreadRadius: 0,
-                                        blurRadius: 4,
-                                        offset: Offset(0, 3), // changes position of shadow
-                                      ),
-                                    ],
-                                  ),
-                                  child: Row(
-                                    children: [
-                                      Container(
-                                        width: CustomSize.sizeWidth(context) / 3,
-                                        height: CustomSize.sizeHeight(context) / 5,
-                                        decoration: BoxDecoration(
-                                          image: DecorationImage(
-                                              image: NetworkImage(Links.subUrl + promo[index].urlImg),
-                                              fit: BoxFit.cover
-                                          ),
-                                          borderRadius: BorderRadius.circular(20),
+                                child: GestureDetector(
+                                  onTap: (){
+                                    showModalBottomSheet(
+                                        isScrollControlled: true,
+                                        shape: RoundedRectangleBorder(
+                                            borderRadius: BorderRadius.only(topLeft: Radius.circular(20), topRight: Radius.circular(20))
                                         ),
-                                      ),
-                                      SizedBox(width: CustomSize.sizeWidth(context) / 32,),
-                                      Padding(
-                                        padding: EdgeInsets.symmetric(vertical: CustomSize.sizeHeight(context) / 86),
-                                        child: Container(
-                                          width: CustomSize.sizeWidth(context) / 2.6,
+                                        context: context,
+                                        builder: (_){
+                                          return StatefulBuilder(
+                                              builder: (_, setStateModal){
+                                                return Column(
+                                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                                  mainAxisSize: MainAxisSize.min,
+                                                  children: [
+                                                    SizedBox(height: CustomSize.sizeHeight(context) / 86,),
+                                                    Padding(
+                                                      padding: EdgeInsets.symmetric(horizontal: CustomSize.sizeWidth(context) / 2.4),
+                                                      child: Divider(thickness: 4,),
+                                                    ),
+                                                    SizedBox(height: CustomSize.sizeHeight(context) / 52,),
+                                                    Center(
+                                                      child: Container(
+                                                        width: CustomSize.sizeWidth(context) / 1.2,
+                                                        height: CustomSize.sizeWidth(context) / 1.2,
+                                                        decoration: BoxDecoration(
+                                                          image: DecorationImage(
+                                                              image: NetworkImage(Links.subUrl + promo[index].urlImg),
+                                                              fit: BoxFit.cover
+                                                          ),
+                                                          borderRadius: BorderRadius.circular(10),
+                                                        ),
+                                                      ),
+                                                    ),
+                                                    SizedBox(height: CustomSize.sizeHeight(context) / 32,),
+                                                    Padding(
+                                                      padding: EdgeInsets.symmetric(horizontal: CustomSize.sizeHeight(context) / 20),
+                                                      child: Column(
+                                                        crossAxisAlignment: CrossAxisAlignment.start,
+                                                        children: [
+                                                          CustomText.textHeading5(
+                                                              text: promo[index].name,
+                                                              minSize: 18,
+                                                              maxLines: 1
+                                                          ),
+                                                          SizedBox(height: CustomSize.sizeHeight(context) / 32,),
+                                                          CustomText.bodyRegular16(
+                                                              text: promo[index].desc,
+                                                              maxLines: 100,
+                                                              minSize: 16
+                                                          ),
+                                                          SizedBox(height: CustomSize.sizeHeight(context) / 32,),
+                                                          Row(
+                                                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                                            children: [
+                                                              CustomText.bodyMedium16(
+                                                                  text: NumberFormat.currency(locale: 'id', symbol: '', decimalDigits: 0).format(promo[index].price.original),
+                                                                  maxLines: 1,
+                                                                  minSize: 16
+                                                              ),
+                                                              (restoId.contains(promo[index].id.toString()) != true)?SizedBox():Row(
+                                                                children: [
+                                                                  GestureDetector(
+                                                                    onTap: ()async{
+                                                                      if(int.parse(qty[restoId.indexOf(promo[index].id.toString())]) > 1){
+                                                                        String s = qty[restoId.indexOf(promo[index].id.toString())];
+                                                                        print(s);
+                                                                        int i = int.parse(s) - 1;
+                                                                        print(i);
+                                                                        qty[restoId.indexOf(promo[index].id.toString())] = i.toString();
+                                                                        SharedPreferences pref = await SharedPreferences.getInstance();
+                                                                        pref.setStringList("qty", qty);
+                                                                        setStateModal(() {});
+                                                                        setState(() {});
+                                                                      }
+                                                                    },
+                                                                    child: Container(
+                                                                      width: CustomSize.sizeWidth(context) / 12,
+                                                                      height: CustomSize.sizeWidth(context) / 12,
+                                                                      decoration: BoxDecoration(
+                                                                          color: CustomColor.accentLight,
+                                                                          shape: BoxShape.circle
+                                                                      ),
+                                                                      child: Center(child: CustomText.textHeading1(text: "-", color: CustomColor.accent)),
+                                                                    ),
+                                                                  ),
+                                                                  SizedBox(width: CustomSize.sizeWidth(context) / 24,),
+                                                                  CustomText.bodyRegular16(text: qty[restoId.indexOf(promo[index].id.toString())]),
+                                                                  SizedBox(width: CustomSize.sizeWidth(context) / 24,),
+                                                                  GestureDetector(
+                                                                    onTap: ()async{
+                                                                      String s = qty[restoId.indexOf(promo[index].id.toString())];
+                                                                      print(s);
+                                                                      int i = int.parse(s) + 1;
+                                                                      print(i);
+                                                                      qty[restoId.indexOf(promo[index].id.toString())] = i.toString();
+                                                                      SharedPreferences pref = await SharedPreferences.getInstance();
+                                                                      pref.setStringList("qty", qty);
+                                                                      setStateModal(() {});
+                                                                      setState(() {});
+                                                                    },
+                                                                    child: Container(
+                                                                      width: CustomSize.sizeWidth(context) / 12,
+                                                                      height: CustomSize.sizeWidth(context) / 12,
+                                                                      decoration: BoxDecoration(
+                                                                          color: CustomColor.accentLight,
+                                                                          shape: BoxShape.circle
+                                                                      ),
+                                                                      child: Center(child: CustomText.textHeading1(text: "+", color: CustomColor.accent)),
+                                                                    ),
+                                                                  ),
+                                                                ],
+                                                              )
+                                                            ],
+                                                          ),
+                                                        ],
+                                                      ),
+                                                    ),
+                                                    SizedBox(height: CustomSize.sizeHeight(context) / 32,),
+                                                    (restoId.contains(promo[index].id.toString()) != true)?Center(
+                                                      child: Container(
+                                                        width: CustomSize.sizeWidth(context) / 1.1,
+                                                        height: CustomSize.sizeHeight(context) / 14,
+                                                        decoration: BoxDecoration(
+                                                            color: CustomColor.primary,
+                                                            borderRadius: BorderRadius.circular(20)
+                                                        ),
+                                                        child: GestureDetector(
+                                                            onTap: ()async{
+                                                              SharedPreferences pref = await SharedPreferences.getInstance();
+                                                              String checkId = pref.getString('restaurantId')??'';
+
+                                                              if(checkId == promo[index].restoId || checkId == ''){
+                                                                MenuJson m = MenuJson(
+                                                                  id: promo[index].id,
+                                                                  name: promo[index].name,
+                                                                  desc: promo[index].desc,
+                                                                  price: promo[index].price.original.toString(),
+                                                                  discount: promo[index].price.discounted.toString(),
+                                                                  urlImg: promo[index].urlImg,
+                                                                );
+                                                                menuJson.add(m);
+                                                                // List<String> _restoId = [];
+                                                                // List<String> _qty = [];
+                                                                restoId.add(promo[index].id.toString());
+                                                                qty.add("1");
+                                                                inCart = '1';
+
+                                                                String json1 = jsonEncode(menuJson.map((m) => m.toJson()).toList());
+                                                                pref.setString('restaurantId', promo[index].restoId);
+                                                                pref.setString('inCart', '1');
+                                                                pref.setString("menuJson", json1);
+                                                                pref.setStringList("restoId", restoId);
+                                                                pref.setStringList("qty", qty);
+
+                                                                setStateModal(() {});
+                                                                setState(() {});
+                                                              }else{
+                                                                Fluttertoast.showToast(
+                                                                  msg: "Ada menu yang belum checkout di keranjangmu",);
+                                                              }
+                                                            },
+                                                            child: Center(child: CustomText.bodyRegular16(text: "Add to cart", color: Colors.white))
+                                                        ),
+                                                      ),
+                                                    )
+                                                        :SizedBox(),
+                                                    SizedBox(height: CustomSize.sizeHeight(context) / 86,),
+                                                  ],
+                                                );
+                                              }
+                                          );
+                                        }
+                                    );
+                                  },
+                                  child: Container(
+                                    width: CustomSize.sizeWidth(context) / 1.3,
+                                    height: CustomSize.sizeHeight(context) / 5,
+                                    decoration: BoxDecoration(
+                                      color: Colors.white,
+                                      borderRadius: BorderRadius.circular(20),
+                                      boxShadow: [
+                                        BoxShadow(
+                                          color: Colors.grey.withOpacity(0.5),
+                                          spreadRadius: 0,
+                                          blurRadius: 4,
+                                          offset: Offset(0, 3), // changes position of shadow
+                                        ),
+                                      ],
+                                    ),
+                                    child: Row(
+                                      children: [
+                                        Container(
+                                          width: CustomSize.sizeWidth(context) / 3,
                                           height: CustomSize.sizeHeight(context) / 5,
-                                          child: Column(
-                                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                            crossAxisAlignment: CrossAxisAlignment.start,
-                                            children: [
-                                              Column(
-                                                crossAxisAlignment: CrossAxisAlignment.start,
-                                                children: [
-                                                  CustomText.bodyRegular12(text: promo[index].distance.toString() + " Km", minSize: 12),
-                                                  CustomText.textTitle6(text: promo[index].name, minSize: 14, maxLines: 2),
-                                                  CustomText.bodyMedium12(text: promo[index].restoName, minSize: 12),
-                                                ],
-                                              ),
-                                              Row(
-                                                children: [
-                                                  CustomText.bodyRegular12(text: NumberFormat.currency(locale: 'id', symbol: '', decimalDigits: 0).format(promo[index].price.original), minSize: 12,
-                                                      decoration: TextDecoration.lineThrough),
-                                                  SizedBox(width: CustomSize.sizeWidth(context) / 48,),
-                                                  CustomText.bodyRegular12(text: NumberFormat.currency(locale: 'id', symbol: '', decimalDigits: 0).format(promo[index].price.discounted), minSize: 12),
-                                                ],
-                                              )
-                                            ],
+                                          decoration: BoxDecoration(
+                                            image: DecorationImage(
+                                                image: NetworkImage(Links.subUrl + promo[index].urlImg),
+                                                fit: BoxFit.cover
+                                            ),
+                                            borderRadius: BorderRadius.circular(20),
                                           ),
                                         ),
-                                      )
-                                    ],
+                                        SizedBox(width: CustomSize.sizeWidth(context) / 32,),
+                                        Padding(
+                                          padding: EdgeInsets.symmetric(vertical: CustomSize.sizeHeight(context) / 86),
+                                          child: Container(
+                                            width: CustomSize.sizeWidth(context) / 2.6,
+                                            height: CustomSize.sizeHeight(context) / 5,
+                                            child: Column(
+                                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                              crossAxisAlignment: CrossAxisAlignment.start,
+                                              children: [
+                                                Column(
+                                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                                  children: [
+                                                    CustomText.bodyRegular12(text: promo[index].distance.toString() + " Km", minSize: 12),
+                                                    CustomText.textTitle6(text: promo[index].name, minSize: 14, maxLines: 2),
+                                                    CustomText.bodyMedium12(text: promo[index].restoName, minSize: 12),
+                                                  ],
+                                                ),
+                                                Row(
+                                                  children: [
+                                                    CustomText.bodyRegular12(text: NumberFormat.currency(locale: 'id', symbol: '', decimalDigits: 0).format(promo[index].price.original), minSize: 12,
+                                                        decoration: TextDecoration.lineThrough),
+                                                    SizedBox(width: CustomSize.sizeWidth(context) / 48,),
+                                                    CustomText.bodyRegular12(text: NumberFormat.currency(locale: 'id', symbol: '', decimalDigits: 0).format(promo[index].price.discounted), minSize: 12),
+                                                  ],
+                                                )
+                                              ],
+                                            ),
+                                          ),
+                                        )
+                                      ],
+                                    ),
                                   ),
                                 ),
                               );
@@ -721,45 +928,54 @@ class _HomeActivityState extends State<HomeActivity> {
                                     left: CustomSize.sizeWidth(context) / 20,
                                     top: CustomSize.sizeHeight(context) / 86,
                                     bottom: CustomSize.sizeHeight(context) / 86),
-                                child: Container(
-                                  width: CustomSize.sizeWidth(context) / 2.3,
-                                  height: CustomSize.sizeHeight(context) / 3.6,
-                                  decoration: BoxDecoration(
-                                    color: Colors.white,
-                                    borderRadius: BorderRadius.circular(20),
-                                    boxShadow: [
-                                      BoxShadow(
-                                        color: Colors.grey.withOpacity(0.5),
-                                        spreadRadius: 0,
-                                        blurRadius: 4,
-                                        offset: Offset(0, 3), // changes position of shadow
-                                      ),
-                                    ],
-                                  ),
-                                  child: Column(
-                                    crossAxisAlignment: CrossAxisAlignment.start,
-                                    children: [
-                                      Container(
-                                        width: CustomSize.sizeWidth(context) / 2.3,
-                                        height: CustomSize.sizeHeight(context) / 5.8,
-                                        decoration: BoxDecoration(
-                                          image: DecorationImage(
-                                              image: NetworkImage(Links.subUrl + again[index].img),
-                                              fit: BoxFit.cover
-                                          ),
-                                          borderRadius: BorderRadius.circular(20),
+                                child: GestureDetector(
+                                  onTap: (){
+                                    Navigator.push(
+                                        context,
+                                        PageTransition(
+                                            type: PageTransitionType.rightToLeft,
+                                            child: new DetailResto(again[index].id.toString())));
+                                  },
+                                  child: Container(
+                                    width: CustomSize.sizeWidth(context) / 2.3,
+                                    height: CustomSize.sizeHeight(context) / 3.6,
+                                    decoration: BoxDecoration(
+                                      color: Colors.white,
+                                      borderRadius: BorderRadius.circular(20),
+                                      boxShadow: [
+                                        BoxShadow(
+                                          color: Colors.grey.withOpacity(0.5),
+                                          spreadRadius: 0,
+                                          blurRadius: 4,
+                                          offset: Offset(0, 3), // changes position of shadow
                                         ),
-                                      ),
-                                      SizedBox(height: CustomSize.sizeHeight(context) / 86,),
-                                      Padding(
-                                        padding: EdgeInsets.only(left: CustomSize.sizeWidth(context) / 24),
-                                        child: CustomText.bodyRegular14(text: again[index].distance.toString() + " Km"),
-                                      ),
-                                      Padding(
-                                        padding: EdgeInsets.only(left: CustomSize.sizeWidth(context) / 24),
-                                        child: CustomText.bodyMedium16(text: again[index].name),
-                                      ),
-                                    ],
+                                      ],
+                                    ),
+                                    child: Column(
+                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      children: [
+                                        Container(
+                                          width: CustomSize.sizeWidth(context) / 2.3,
+                                          height: CustomSize.sizeHeight(context) / 5.8,
+                                          decoration: BoxDecoration(
+                                            image: DecorationImage(
+                                                image: NetworkImage(Links.subUrl + again[index].img),
+                                                fit: BoxFit.cover
+                                            ),
+                                            borderRadius: BorderRadius.circular(20),
+                                          ),
+                                        ),
+                                        SizedBox(height: CustomSize.sizeHeight(context) / 86,),
+                                        Padding(
+                                          padding: EdgeInsets.only(left: CustomSize.sizeWidth(context) / 24),
+                                          child: CustomText.bodyRegular14(text: again[index].distance.toString() + " Km"),
+                                        ),
+                                        Padding(
+                                          padding: EdgeInsets.only(left: CustomSize.sizeWidth(context) / 24),
+                                          child: CustomText.bodyMedium16(text: again[index].name),
+                                        ),
+                                      ],
+                                    ),
                                   ),
                                 ),
                               );
@@ -789,12 +1005,15 @@ class _HomeActivityState extends State<HomeActivity> {
             mainAxisAlignment: MainAxisAlignment.spaceAround,
             children: [
               GestureDetector(
-                  onTap: (){
-                    Navigator.push(
+                  onTap: ()async{
+                    var i = await Navigator.push(
                         context,
                         PageTransition(
                             type: PageTransitionType.rightToLeft,
                             child: new PromoActivity()));
+                    if(i == null){
+                      _getData();
+                    }
                   },
                   child: Icon(MaterialCommunityIcons.percent, size: 32, color: Colors.white,)),
               GestureDetector(
@@ -824,8 +1043,11 @@ class _HomeActivityState extends State<HomeActivity> {
                   },
                   child: Icon(CupertinoIcons.cart_fill, size: 32, color: Colors.white,)),
               GestureDetector(
-                  onTap: (){
-                    Navigator.push(context, PageTransition(type: PageTransitionType.rightToLeft, child: new SearchActivity(promo, latitude.toString(), longitude.toString(), '')));
+                  onTap: ()async{
+                    var i = await Navigator.push(context, PageTransition(type: PageTransitionType.rightToLeft, child: new SearchActivity(promo, latitude.toString(), longitude.toString(), '')));
+                    if(i == null){
+                      _getData();
+                    }
                   },
                   child: Icon(FontAwesome.search, size: 32, color: Colors.white,)),
               GestureDetector(

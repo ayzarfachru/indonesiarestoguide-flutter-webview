@@ -77,6 +77,7 @@ class _MyAppState extends State<MyApp> {
         scaffoldBackgroundColor: Colors.white,
         accentColor: CustomColor.primary,
         accentColorBrightness: Brightness.light,
+        visualDensity: VisualDensity.adaptivePlatformDensity,
         appBarTheme: AppBarTheme(
             color: CustomColor.background,
             centerTitle: true,

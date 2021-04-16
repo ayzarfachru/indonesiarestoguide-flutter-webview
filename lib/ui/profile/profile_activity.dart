@@ -272,21 +272,26 @@ class _ProfileActivityState extends State<ProfileActivity> {
                     ),
                   ),
                   Divider(),
-                  Padding(
-                    padding: EdgeInsets.symmetric(
-                        horizontal: CustomSize.sizeWidth(context) / 48,
-                        vertical: CustomSize.sizeHeight(context) / 86
-                    ),
-                    child: Row(
-                      children: [
-                        Icon(Icons.info_rounded),
-                        SizedBox(width: CustomSize.sizeWidth(context) / 48,),
-                        CustomText.bodyRegular16(
-                            text: "Tentang Kami",
-                            minSize: 16,
-                            maxLines: 1
-                        ),
-                      ],
+                  GestureDetector(
+                    onTap: (){
+                      Navigator.pushReplacement(context, PageTransition(type: PageTransitionType.fade, child: AboutActivity()));
+                    },
+                    child: Padding(
+                      padding: EdgeInsets.symmetric(
+                          horizontal: CustomSize.sizeWidth(context) / 48,
+                          vertical: CustomSize.sizeHeight(context) / 86
+                      ),
+                      child: Row(
+                        children: [
+                          Icon(Icons.info_rounded),
+                          SizedBox(width: CustomSize.sizeWidth(context) / 48,),
+                          CustomText.bodyRegular16(
+                              text: "Tentang Kami",
+                              minSize: 16,
+                              maxLines: 1
+                          ),
+                        ],
+                      ),
                     ),
                   ),
                   Divider(),

@@ -22,6 +22,7 @@ class DetailHistory extends StatefulWidget {
 
 class _DetailHistoryState extends State<DetailHistory> {
   int id;
+  String homepg = "";
 
   _DetailHistoryState(this.id);
 
@@ -35,6 +36,14 @@ class _DetailHistoryState extends State<DetailHistory> {
   int harga = 0;
   int total = 0;
   int restoId;
+
+  getHomePg() async {
+    SharedPreferences pref = await SharedPreferences.getInstance();
+    setState(() {
+      homepg = (pref.getString('homepg'));
+      print(homepg);
+    });
+  }
 
   List<Menu> menu = [];
   Future<void> getData()async{
@@ -80,6 +89,7 @@ class _DetailHistoryState extends State<DetailHistory> {
   @override
   void initState() {
     getData();
+    getHomePg();
     super.initState();
   }
 
@@ -221,8 +231,8 @@ class _DetailHistoryState extends State<DetailHistory> {
                                         crossAxisAlignment: CrossAxisAlignment.end,
                                         children: [
                                           Container(
-                                            width: CustomSize.sizeWidth(context) / 3.4,
-                                            height: CustomSize.sizeWidth(context) / 3.4,
+                                            width: CustomSize.sizeWidth(context) / 3.8,
+                                            height: CustomSize.sizeWidth(context) / 3.8,
                                             decoration: BoxDecoration(
                                                 image: DecorationImage(
                                                     image: NetworkImage(Links.subUrl + menu[index].urlImg),
@@ -237,7 +247,6 @@ class _DetailHistoryState extends State<DetailHistory> {
                                   ),
                                 ),
                               ),
-                              Divider()
                             ],
                           ),
                         ),
@@ -248,17 +257,25 @@ class _DetailHistoryState extends State<DetailHistory> {
               Container(
                 width: CustomSize.sizeWidth(context),
                 decoration: BoxDecoration(
-                    color: CustomColor.secondary
+                    color: Colors.white
                 ),
                 child: Column(
                   children: [
-                    SizedBox(height: CustomSize.sizeHeight(context) / 22.5,),
+                    SizedBox(height: CustomSize.sizeHeight(context) / 85,),
                     Padding(
                       padding: EdgeInsets.symmetric(horizontal: CustomSize.sizeWidth(context) / 22),
                       child: Container(
                         width: CustomSize.sizeWidth(context),
                         height: CustomSize.sizeHeight(context) / 3.8,
                         decoration: BoxDecoration(
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.grey.withOpacity(0.3),
+                              spreadRadius: 2,
+                              blurRadius: 7,
+                              offset: Offset(0, 3), // changes position of shadow
+                            ),
+                          ],
                           color: Colors.white,
                           borderRadius: BorderRadius.circular(20),
                         ),
@@ -299,7 +316,7 @@ class _DetailHistoryState extends State<DetailHistory> {
                       ),
                     ),
                     SizedBox(height: CustomSize.sizeHeight(context) / 40,),
-                    Center(
+                    (homepg != "1")?Center(
                       child: GestureDetector(
                         onTap: (){
                           Navigator.push(
@@ -323,7 +340,7 @@ class _DetailHistoryState extends State<DetailHistory> {
                           ),
                         ),
                       ),
-                    ),
+                    ):Container(),
                     SizedBox(height: CustomSize.sizeHeight(context) / 54,),
                   ],
                 ),

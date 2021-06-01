@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_icons/flutter_icons.dart';
 import 'package:indonesiarestoguide/ui/auth/login_activity.dart';
-import 'package:indonesiarestoguide/ui/ui_resto/home/home_activity.dart';
+import 'package:indonesiarestoguide/ui/ui_resto/add_resto/add_view_resto.dart';
 import 'package:indonesiarestoguide/utils/utils.dart';
 import 'package:page_transition/page_transition.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -240,7 +240,7 @@ class _ProfileActivityState extends State<ProfileActivity> {
                       SharedPreferences pref = await SharedPreferences.getInstance();
                       pref.setString("homepg", "1");
                       setState(() {
-                        Navigator.pushReplacement(context, PageTransition(type: PageTransitionType.fade, child: HomeActivityResto()));
+                        Navigator.pushReplacement(context, PageTransition(type: PageTransitionType.fade, child: AddViewResto()));
                       });
                     },
                     child: Padding(
@@ -272,21 +272,26 @@ class _ProfileActivityState extends State<ProfileActivity> {
                     ),
                   ),
                   Divider(),
-                  Padding(
-                    padding: EdgeInsets.symmetric(
-                        horizontal: CustomSize.sizeWidth(context) / 48,
-                        vertical: CustomSize.sizeHeight(context) / 86
-                    ),
-                    child: Row(
-                      children: [
-                        Icon(Icons.info_rounded),
-                        SizedBox(width: CustomSize.sizeWidth(context) / 48,),
-                        CustomText.bodyRegular16(
-                            text: "Tentang Kami",
-                            minSize: 16,
-                            maxLines: 1
-                        ),
-                      ],
+                  GestureDetector(
+                    onTap: (){
+                      Navigator.pushReplacement(context, PageTransition(type: PageTransitionType.fade, child: AboutActivity()));
+                    },
+                    child: Padding(
+                      padding: EdgeInsets.symmetric(
+                          horizontal: CustomSize.sizeWidth(context) / 48,
+                          vertical: CustomSize.sizeHeight(context) / 86
+                      ),
+                      child: Row(
+                        children: [
+                          Icon(Icons.info_rounded),
+                          SizedBox(width: CustomSize.sizeWidth(context) / 48,),
+                          CustomText.bodyRegular16(
+                              text: "Tentang Kami",
+                              minSize: 16,
+                              maxLines: 1
+                          ),
+                        ],
+                      ),
                     ),
                   ),
                   Divider(),

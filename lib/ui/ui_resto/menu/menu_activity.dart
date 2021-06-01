@@ -1,21 +1,122 @@
+import 'dart:convert';
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_icons/flutter_icons.dart';
+import 'package:indonesiarestoguide/model/CategoryMenu.dart';
+import 'package:indonesiarestoguide/model/Menu.dart';
+import 'package:indonesiarestoguide/model/MenuJson.dart';
+import 'package:indonesiarestoguide/model/Price.dart';
+import 'package:indonesiarestoguide/model/Promo.dart';
+import 'package:indonesiarestoguide/ui/ui_resto/menu/add_menu.dart';
+import 'package:indonesiarestoguide/ui/ui_resto/menu/edit_menu.dart';
 import 'package:indonesiarestoguide/utils/utils.dart';
 import 'package:page_transition/page_transition.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:http/http.dart' as http;
 
 class MenuActivity extends StatefulWidget {
   @override
-  _PromoActivityState createState() => _PromoActivityState();
+  _MenuActivityState createState() => _MenuActivityState();
 }
 
-class _PromoActivityState extends State<MenuActivity> {
+class _MenuActivityState extends State<MenuActivity> {
   ScrollController _scrollController = ScrollController();
+
+  bool isLoading = false;
+
+  List<Menu> menu = [];
+  List<MenuJson> menuJson = [];
+  List<CategoryMenu> categoryMenu = [];
+  Future _getDetail(String id)async {
+    List<String> _images = [];
+    List<Promo> _promo = [];
+    List<Menu> _menu = [];
+    List<MenuJson> _menuJson = [];
+    List<CategoryMenu> _categoryMenu = [];
+
+    setState(() {
+      isLoading = true;
+    });
+    SharedPreferences pref = await SharedPreferences.getInstance();
+    String token = pref.getString("token") ?? "";
+    var apiResult = await http.get(
+        Links.mainUrl + '/resto/detail/$id', headers: {
+      "Accept": "Application/json",
+      "Authorization": "Bearer $token"
+    });
+    // print(apiResult.body);
+    var data = json.decode(apiResult.body);
+    for (var v in data['data']['img']) {
+      _images.add(v);
+    }
+
+    List<Menu> _cateMenu = [];
+    if (data['data']['menu'] != null) {
+      for (var v in data['data']['menu']) {
+        for (var a in v['menu']) {
+          Menu m = Menu(
+              id: a['id'],
+              name: a['name'],
+              desc: a['desc'],
+              price: Price.delivery(a['price'], a['delivery_price']),
+              urlImg: a['img']
+          );
+          _cateMenu.add(m);
+        }
+        CategoryMenu cm = CategoryMenu(
+            name: v['name'],
+            menu: _cateMenu
+        );
+        _cateMenu = [];
+        _categoryMenu.add(cm);
+      }
+    }
+  }
 
   @override
   void dispose() {
     _scrollController.dispose();
     super.dispose();
+  }
+
+  showAlertDialog() {
+    // set up the AlertDialog
+    AlertDialog alert = AlertDialog(
+      title: Text("Hapus Menu"),
+      content: Text("Apakah anda ingin menghapus menu?"),
+      actions: [
+        FlatButton(
+          child: Text("Batal", style: TextStyle(color: CustomColor.primary),),
+          onPressed: () async{
+            setState(() {});
+            Navigator.of(context).pop();
+          },
+          // => Navigator.of(context).pop(),
+        ),
+        FlatButton(
+          child: Text("Oke", style: TextStyle(color: CustomColor.primary),),
+          onPressed: () async{
+            setState(() {});
+            Navigator.of(context).pop();
+            Navigator.pushReplacement(
+                context,
+                PageTransition(
+                    type: PageTransitionType.fade,
+                    child: MenuActivity()));
+          },
+          // => Navigator.of(context).pop(),
+        )
+      ],
+    );
+
+    // show the dialog
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return alert;
+      },
+    );
   }
 
   @override
@@ -84,15 +185,29 @@ class _PromoActivityState extends State<MenuActivity> {
                                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                       children: [
                                         CustomText.bodyLight12(
-                                            text: "0.9 km",
+                                            text: "Western Food",
                                           maxLines: 1,
                                             minSize: 12
                                         ),
                                         Row(
                                           children: [
-                                            Icon(Icons.edit, color: CustomColor.primary,),
+                                            GestureDetector(
+                                                onTap: (){
+                                                  Navigator.push(
+                                                      context,
+                                                      PageTransition(
+                                                          type: PageTransitionType.rightToLeft,
+                                                          child: EditMenu()));
+                                                },
+                                                child: Icon(Icons.edit, color: CustomColor.primary,)
+                                            ),
                                             SizedBox(width: CustomSize.sizeWidth(context) / 86,),
-                                            Icon(Icons.delete, color: CustomColor.primary,),
+                                            GestureDetector(
+                                                onTap: (){
+                                                  showAlertDialog();
+                                                },
+                                                child: Icon(Icons.delete, color: CustomColor.primary,)
+                                            ),
                                             SizedBox(width: CustomSize.sizeWidth(context) / 98,),
                                           ],
                                         )
@@ -106,7 +221,7 @@ class _PromoActivityState extends State<MenuActivity> {
                                     ),
                                     SizedBox(height: CustomSize.sizeHeight(context) / 86,),
                                     CustomText.bodyMedium12(
-                                        text: "Resto Biasa",
+                                        text: "Ini desc",
                                       maxLines: 1,
                                       minSize: 12
                                     ),
@@ -136,11 +251,11 @@ class _PromoActivityState extends State<MenuActivity> {
       ),
         floatingActionButton: GestureDetector(
           onTap: (){
-            // Navigator.push(
-            //     context,
-            //     PageTransition(
-            //         type: PageTransitionType.rightToLeft,
-            //         child: CartActivity()));
+            Navigator.push(
+                context,
+                PageTransition(
+                    type: PageTransitionType.rightToLeft,
+                    child: AddMenu()));
           },
           child: Container(
             width: CustomSize.sizeWidth(context) / 6.6,

@@ -9,10 +9,10 @@ import 'package:page_transition/page_transition.dart';
 
 class OrderActivity extends StatefulWidget {
   @override
-  _PromoActivityState createState() => _PromoActivityState();
+  _OrderActivityState createState() => _OrderActivityState();
 }
 
-class _PromoActivityState extends State<OrderActivity> {
+class _OrderActivityState extends State<OrderActivity> {
   ScrollController _scrollController = ScrollController();
 
   @override

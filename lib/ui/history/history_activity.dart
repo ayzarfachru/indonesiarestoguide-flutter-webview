@@ -18,8 +18,17 @@ class HistoryActivity extends StatefulWidget {
 class _HistoryActivityState extends State<HistoryActivity> {
   ScrollController _scrollController = ScrollController();
   String homepg = "";
+  String img = "";
 
   bool isLoading = false;
+
+  getImg() async {
+    SharedPreferences pref = await SharedPreferences.getInstance();
+    setState(() {
+      img = (pref.getString('img'));
+      print(img);
+    });
+  }
 
   List<History> history = [];
   Future _getHistory()async{
@@ -86,6 +95,7 @@ class _HistoryActivityState extends State<HistoryActivity> {
   void initState() {
     _getHistory();
     getHomePg();
+    getImg();
     super.initState();
   }
 
@@ -129,8 +139,13 @@ class _HistoryActivityState extends State<HistoryActivity> {
                   color: Colors.white,
                   child: Padding(
                     padding: EdgeInsets.symmetric(horizontal: CustomSize.sizeWidth(context) / 24),
-                    child: CustomText.textHeading3(
+                    child: (homepg != "1")?CustomText.textHeading3(
                         text: "Riwayat",
+                        minSize: 18,
+                        maxLines: 1
+                    ):CustomText.textHeading3(
+                        text: "Riwayat Pembelian",
+                        color: CustomColor.primary,
                         minSize: 18,
                         maxLines: 1
                     ),
@@ -162,7 +177,8 @@ class _HistoryActivityState extends State<HistoryActivity> {
                                     height: CustomSize.sizeWidth(context) / 2.8,
                                     decoration: BoxDecoration(
                                         image: DecorationImage(
-                                            image: NetworkImage(Links.subUrl + history[index].img),
+                                            image: (homepg != "1")?NetworkImage(Links.subUrl + history[index].img):NetworkImage(Links.subUrl +
+                                                "$img"),
                                             fit: BoxFit.cover
                                         ),
                                         borderRadius: BorderRadius.circular(20)
@@ -176,22 +192,24 @@ class _HistoryActivityState extends State<HistoryActivity> {
                                       mainAxisAlignment: MainAxisAlignment.center,
                                       children: [
                                         CustomText.bodyMedium16(
-                                            text: history[index].name,
+                                            text: (homepg != "1")?history[index].name:"sidoel"
+                                            // history[index].name
+                                            ,
                                             minSize: 16,
                                             maxLines: 1
                                         ),
                                         CustomText.bodyLight12(
-                                            text: history[index].time,
+                                            text: (homepg != "1")?history[index].time:"6 January 2021",
                                             maxLines: 1,
                                             minSize: 12
                                         ),
                                         CustomText.bodyMedium12(
-                                            text: history[index].type,
+                                            text: (homepg != "1")?history[index].type:"Makan ditempat",
                                             maxLines: 1,
                                             minSize: 12
                                         ),
                                         CustomText.bodyLight12(
-                                            text: "Selesai",
+                                            text: (homepg != "1")?"Selesai":"Proses",
                                             maxLines: 1,
                                             minSize: 12,
                                             color: CustomColor.accent
@@ -204,6 +222,7 @@ class _HistoryActivityState extends State<HistoryActivity> {
                                                 minSize: 18,
                                                 maxLines: 1
                                             ),
+                                            (homepg != "1")?
                                             Container(
                                               width: CustomSize.sizeWidth(context) / 4.2,
                                               height: CustomSize.sizeHeight(context) / 24,
@@ -212,7 +231,7 @@ class _HistoryActivityState extends State<HistoryActivity> {
                                                   border: Border.all(color: CustomColor.accent)
                                               ),
                                               child: Center(child: CustomText.bodyRegular14(text: "Pesan Lagi", color: CustomColor.accent)),
-                                            ),
+                                            ):Container(),
                                           ],
                                         )
                                       ],

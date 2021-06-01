@@ -27,7 +27,7 @@ class _EditProfileState extends State<EditProfile> {
   String initial = "";
   String email = "";
   String img = "";
-  String gender = "wanite";
+  String gender = "pria";
   String tgl = "";
   String notelp = "";
 

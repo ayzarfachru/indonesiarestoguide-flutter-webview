@@ -37,7 +37,7 @@ class _PromoActivityState extends State<OrderPending> {
           id: v['id'],
           status: v['status'],
           username: v['username'],
-          total: v['total'],
+          total: int.parse(v['total']),
           type: v['type']
       );
       _transaction.add(r);
@@ -362,7 +362,7 @@ class _PromoActivityState extends State<OrderPending> {
                                       crossAxisAlignment: CrossAxisAlignment.start,
                                       children: [
                                         CustomText.bodyLight12(
-                                            text: transaction[index].status.toString(),
+                                            text: (transaction[index].type.toString() != "Makan Ditempat")?(transaction[index].type.toString() != "Ambil Sekarang")?"Isi nya Alamat":"Ambil Ditempat":transaction[index].type.toString(),
                                             maxLines: 1,
                                             minSize: 12
                                         ),

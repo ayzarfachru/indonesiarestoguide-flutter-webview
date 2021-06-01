@@ -58,12 +58,12 @@ class _DetailTransactionState extends State<DetailTransaction> {
 
     for(var v in data['menu']){
       Menu m = Menu(
-        id: v['menus_id'],
-        qty: v['qty'].toString(),
-        price: Price(original: v['price']),
-        name: v['name'],
-        urlImg: v['image'],
-        desc: v['desc']
+          id: v['menus_id'],
+          qty: v['qty'].toString(),
+          price: Price(original: v['price']),
+          name: v['name'],
+          urlImg: v['image'],
+          desc: v['desc']
       );
       _menu.add(m);
     }
@@ -112,13 +112,13 @@ class _DetailTransactionState extends State<DetailTransaction> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              (type == 'delivery')?Padding(
+              (type == 'delivery' || type == 'takeaway')?Padding(
                 padding: EdgeInsets.symmetric(horizontal: CustomSize.sizeWidth(context) / 24),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     SizedBox(height: CustomSize.sizeHeight(context) / 32,),
-                    CustomText.bodyLight12(text: "Alamat Pengiriman"),
+                    CustomText.bodyLight12(text: (type == 'delivery')?"Alamat Pengiriman":"Alamat Pengambilan"),
                     SizedBox(height: CustomSize.sizeHeight(context) * 0.005,),
                     CustomText.textHeading4(
                         text: address,

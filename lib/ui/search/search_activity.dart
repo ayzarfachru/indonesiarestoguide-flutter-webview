@@ -2,12 +2,10 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_icons/flutter_icons.dart';
-import 'package:fluttertoast/fluttertoast.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:indonesiarestoguide/model/Cuisine.dart';
 import 'package:indonesiarestoguide/model/Menu.dart';
-import 'package:indonesiarestoguide/model/MenuJson.dart';
 import 'package:indonesiarestoguide/model/Price.dart';
 import 'package:indonesiarestoguide/model/Resto.dart';
 import 'package:indonesiarestoguide/ui/detail/detail_resto.dart';
@@ -42,12 +40,6 @@ class _SearchActivityState extends State<SearchActivity> {
 
   bool isSearch = false;
   List<String> recomMenu = ["Nasi Goreng", "Geprek", "Jus Buah", "Soto", "Es Campur"];
-  String inCart = "";
-  String name = "";
-
-  List<MenuJson> menuJson = [];
-  List<String> restoId = [];
-  List<String> qty = [];
 
   List<Menu> menu = [];
   List<Resto> resto = [];
@@ -67,12 +59,12 @@ class _SearchActivityState extends State<SearchActivity> {
 
     for(var v in data['menu']){
       Menu m = Menu(
-        id: v['id'],
-        name: v['name'],
-        restoName: v['resto_name'],
-        urlImg: v['img'],
-        price: Price.discounted(v['price'], v['discounted_price']),
-        distance: double.parse(v['resto_distance'].toString()),
+          id: v['id'],
+          name: v['name'],
+          restoName: v['resto_name'],
+          urlImg: v['img'],
+          price: Price.discounted(v['price'], v['discounted_price']),
+          distance: double.parse(v['resto_distance'].toString()),
       );
       _menu.add(m);
     }
@@ -109,8 +101,8 @@ class _SearchActivityState extends State<SearchActivity> {
 
     for(var v in data['data']){
       Cuisine c = Cuisine(
-          id: v['id'],
-          name: v['name']
+        id: v['id'],
+        name: v['name']
       );
       _cuisine.add(c);
     }
@@ -125,30 +117,11 @@ class _SearchActivityState extends State<SearchActivity> {
       isSearch = true;
     });
   }
-
-  Future _getData()async{
-    menuJson = [];
-    restoId = [];
-    qty = [];
-    SharedPreferences pref2 = await SharedPreferences.getInstance();
-    inCart = pref2.getString('inCart')??"";
-    if(pref2.getString('inCart') == '1'){
-      name = pref2.getString('menuJson')??"";
-      print("Ini pref2 " +name+" SP");
-      restoId.addAll(pref2.getStringList('restoId')??[]);
-      print(restoId);
-      qty.addAll(pref2.getStringList('qty')??[]);
-      print(qty);
-    }
-    setState(() {});
-  }
-
   @override
   void initState() {
     if(cui != ''){
       searchHome();
     }
-    _getData();
     getUtil();
     super.initState();
   }
@@ -330,249 +303,73 @@ class _SearchActivityState extends State<SearchActivity> {
                         itemBuilder: (_, index){
                           return Padding(
                             padding: EdgeInsets.only(top: CustomSize.sizeHeight(context) / 48),
-                            child: GestureDetector(
-                              onTap: (){
-                                showModalBottomSheet(
-                                    isScrollControlled: true,
-                                    shape: RoundedRectangleBorder(
-                                        borderRadius: BorderRadius.only(topLeft: Radius.circular(20), topRight: Radius.circular(20))
+                            child: Container(
+                              width: CustomSize.sizeWidth(context),
+                              height: CustomSize.sizeWidth(context) / 2.6,
+                              decoration: BoxDecoration(
+                                color: Colors.white,
+                                borderRadius: BorderRadius.circular(20),
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: Colors.grey.withOpacity(0.5),
+                                    spreadRadius: 0,
+                                    blurRadius: 7,
+                                    offset: Offset(0, 7), // changes position of shadow
+                                  ),
+                                ],
+                              ),
+                              child: Row(
+                                children: [
+                                  Container(
+                                    width: CustomSize.sizeWidth(context) / 2.6,
+                                    height: CustomSize.sizeWidth(context) / 2.6,
+                                    decoration: BoxDecoration(
+                                      image: DecorationImage(
+                                        image: NetworkImage(Links.subUrl + promo[index].urlImg),
+                                        fit: BoxFit.cover
+                                      ),
+                                      borderRadius: BorderRadius.circular(20),
                                     ),
-                                    context: context,
-                                    builder: (_){
-                                      return StatefulBuilder(
-                                          builder: (_, setStateModal){
-                                            return Column(
-                                              crossAxisAlignment: CrossAxisAlignment.start,
-                                              mainAxisSize: MainAxisSize.min,
-                                              children: [
-                                                SizedBox(height: CustomSize.sizeHeight(context) / 86,),
-                                                Padding(
-                                                  padding: EdgeInsets.symmetric(horizontal: CustomSize.sizeWidth(context) / 2.4),
-                                                  child: Divider(thickness: 4,),
-                                                ),
-                                                SizedBox(height: CustomSize.sizeHeight(context) / 52,),
-                                                Center(
-                                                  child: Container(
-                                                    width: CustomSize.sizeWidth(context) / 1.2,
-                                                    height: CustomSize.sizeWidth(context) / 1.2,
-                                                    decoration: BoxDecoration(
-                                                      image: DecorationImage(
-                                                          image: NetworkImage(Links.subUrl + promo[index].urlImg),
-                                                          fit: BoxFit.cover
-                                                      ),
-                                                      borderRadius: BorderRadius.circular(10),
-                                                    ),
-                                                  ),
-                                                ),
-                                                SizedBox(height: CustomSize.sizeHeight(context) / 32,),
-                                                Padding(
-                                                  padding: EdgeInsets.symmetric(horizontal: CustomSize.sizeHeight(context) / 20),
-                                                  child: Column(
-                                                    crossAxisAlignment: CrossAxisAlignment.start,
-                                                    children: [
-                                                      CustomText.textHeading5(
-                                                          text: promo[index].name,
-                                                          minSize: 18,
-                                                          maxLines: 1
-                                                      ),
-                                                      SizedBox(height: CustomSize.sizeHeight(context) / 32,),
-                                                      CustomText.bodyRegular16(
-                                                          text: promo[index].desc,
-                                                          maxLines: 100,
-                                                          minSize: 16
-                                                      ),
-                                                      SizedBox(height: CustomSize.sizeHeight(context) / 32,),
-                                                      Row(
-                                                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                                        children: [
-                                                          CustomText.bodyMedium16(
-                                                              text: NumberFormat.currency(locale: 'id', symbol: '', decimalDigits: 0).format(promo[index].price.original),
-                                                              maxLines: 1,
-                                                              minSize: 16
-                                                          ),
-                                                          (restoId.contains(promo[index].id.toString()) != true)?SizedBox():Row(
-                                                            children: [
-                                                              GestureDetector(
-                                                                onTap: ()async{
-                                                                  if(int.parse(qty[restoId.indexOf(promo[index].id.toString())]) > 1){
-                                                                    String s = qty[restoId.indexOf(promo[index].id.toString())];
-                                                                    print(s);
-                                                                    int i = int.parse(s) - 1;
-                                                                    print(i);
-                                                                    qty[restoId.indexOf(promo[index].id.toString())] = i.toString();
-                                                                    SharedPreferences pref = await SharedPreferences.getInstance();
-                                                                    pref.setStringList("qty", qty);
-                                                                    setStateModal(() {});
-                                                                    setState(() {});
-                                                                  }
-                                                                },
-                                                                child: Container(
-                                                                  width: CustomSize.sizeWidth(context) / 12,
-                                                                  height: CustomSize.sizeWidth(context) / 12,
-                                                                  decoration: BoxDecoration(
-                                                                      color: CustomColor.accentLight,
-                                                                      shape: BoxShape.circle
-                                                                  ),
-                                                                  child: Center(child: CustomText.textHeading1(text: "-", color: CustomColor.accent)),
-                                                                ),
-                                                              ),
-                                                              SizedBox(width: CustomSize.sizeWidth(context) / 24,),
-                                                              CustomText.bodyRegular16(text: qty[restoId.indexOf(promo[index].id.toString())]),
-                                                              SizedBox(width: CustomSize.sizeWidth(context) / 24,),
-                                                              GestureDetector(
-                                                                onTap: ()async{
-                                                                  String s = qty[restoId.indexOf(promo[index].id.toString())];
-                                                                  print(s);
-                                                                  int i = int.parse(s) + 1;
-                                                                  print(i);
-                                                                  qty[restoId.indexOf(promo[index].id.toString())] = i.toString();
-                                                                  SharedPreferences pref = await SharedPreferences.getInstance();
-                                                                  pref.setStringList("qty", qty);
-                                                                  setStateModal(() {});
-                                                                  setState(() {});
-                                                                },
-                                                                child: Container(
-                                                                  width: CustomSize.sizeWidth(context) / 12,
-                                                                  height: CustomSize.sizeWidth(context) / 12,
-                                                                  decoration: BoxDecoration(
-                                                                      color: CustomColor.accentLight,
-                                                                      shape: BoxShape.circle
-                                                                  ),
-                                                                  child: Center(child: CustomText.textHeading1(text: "+", color: CustomColor.accent)),
-                                                                ),
-                                                              ),
-                                                            ],
-                                                          )
-                                                        ],
-                                                      ),
-                                                    ],
-                                                  ),
-                                                ),
-                                                SizedBox(height: CustomSize.sizeHeight(context) / 32,),
-                                                (restoId.contains(promo[index].id.toString()) != true)?Center(
-                                                  child: Container(
-                                                    width: CustomSize.sizeWidth(context) / 1.1,
-                                                    height: CustomSize.sizeHeight(context) / 14,
-                                                    decoration: BoxDecoration(
-                                                        color: CustomColor.primary,
-                                                        borderRadius: BorderRadius.circular(20)
-                                                    ),
-                                                    child: GestureDetector(
-                                                        onTap: ()async{
-                                                          SharedPreferences pref = await SharedPreferences.getInstance();
-                                                          String checkId = pref.getString('restaurantId')??'';
-
-                                                          if(checkId == promo[index].restoId || checkId == ''){
-                                                            MenuJson m = MenuJson(
-                                                              id: promo[index].id,
-                                                              name: promo[index].name,
-                                                              desc: promo[index].desc,
-                                                              price: promo[index].price.original.toString(),
-                                                              discount: promo[index].price.discounted.toString(),
-                                                              urlImg: promo[index].urlImg,
-                                                            );
-                                                            menuJson.add(m);
-                                                            // List<String> _restoId = [];
-                                                            // List<String> _qty = [];
-                                                            restoId.add(promo[index].id.toString());
-                                                            qty.add("1");
-                                                            inCart = '1';
-
-                                                            String json1 = jsonEncode(menuJson.map((m) => m.toJson()).toList());
-                                                            pref.setString('restaurantId', promo[index].restoId);
-                                                            pref.setString('inCart', '1');
-                                                            pref.setString("menuJson", json1);
-                                                            pref.setStringList("restoId", restoId);
-                                                            pref.setStringList("qty", qty);
-
-                                                            setStateModal(() {});
-                                                            setState(() {});
-                                                          }else{
-                                                            Fluttertoast.showToast(
-                                                              msg: "Ada menu yang belum checkout di keranjangmu",);
-                                                          }
-                                                        },
-                                                        child: Center(child: CustomText.bodyRegular16(text: "Add to cart", color: Colors.white))
-                                                    ),
-                                                  ),
-                                                )
-                                                    :SizedBox(),
-                                                SizedBox(height: CustomSize.sizeHeight(context) / 86,),
-                                              ],
-                                            );
-                                          }
-                                      );
-                                    }
-                                );
-                              },
-                              child: Container(
-                                width: CustomSize.sizeWidth(context),
-                                height: CustomSize.sizeWidth(context) / 2.6,
-                                decoration: BoxDecoration(
-                                  color: Colors.white,
-                                  borderRadius: BorderRadius.circular(20),
-                                  boxShadow: [
-                                    BoxShadow(
-                                      color: Colors.grey.withOpacity(0.5),
-                                      spreadRadius: 0,
-                                      blurRadius: 7,
-                                      offset: Offset(0, 7), // changes position of shadow
-                                    ),
-                                  ],
-                                ),
-                                child: Row(
-                                  children: [
-                                    Container(
-                                      width: CustomSize.sizeWidth(context) / 2.6,
-                                      height: CustomSize.sizeWidth(context) / 2.6,
-                                      decoration: BoxDecoration(
-                                        image: DecorationImage(
-                                            image: NetworkImage(Links.subUrl + promo[index].urlImg),
-                                            fit: BoxFit.cover
+                                  ),
+                                  SizedBox(
+                                    width: CustomSize.sizeWidth(context) / 32,
+                                  ),
+                                  Container(
+                                    width: CustomSize.sizeWidth(context) / 2.1,
+                                    child: Column(
+                                      mainAxisAlignment: MainAxisAlignment.center,
+                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      children: [
+                                        CustomText.bodyLight12(
+                                            text: promo[index].distance.toString() + " km",
+                                            maxLines: 1,
+                                            minSize: 12
                                         ),
-                                        borderRadius: BorderRadius.circular(20),
-                                      ),
+                                        SizedBox(height: CustomSize.sizeHeight(context) / 86,),
+                                        CustomText.textHeading4(
+                                            text: promo[index].name,
+                                            minSize: 18,
+                                            maxLines: 1
+                                        ),
+                                        SizedBox(height: CustomSize.sizeHeight(context) / 86,),
+                                        CustomText.bodyMedium12(
+                                            text: promo[index].restoName,
+                                            maxLines: 1,
+                                            minSize: 12
+                                        ),
+                                        SizedBox(height: CustomSize.sizeHeight(context) / 48,),
+                                        Row(
+                                          children: [
+                                            CustomText.bodyRegular12(text: NumberFormat.currency(locale: 'id', symbol: '', decimalDigits: 0).format(promo[index].price.original), minSize: 12,
+                                                decoration: TextDecoration.lineThrough),
+                                            SizedBox(width: CustomSize.sizeWidth(context) / 48,),
+                                            CustomText.bodyRegular12(text: NumberFormat.currency(locale: 'id', symbol: '', decimalDigits: 0).format(promo[index].price.discounted), minSize: 12),
+                                          ],
+                                        )
+                                      ],
                                     ),
-                                    SizedBox(
-                                      width: CustomSize.sizeWidth(context) / 32,
-                                    ),
-                                    Container(
-                                      width: CustomSize.sizeWidth(context) / 2.1,
-                                      child: Column(
-                                        mainAxisAlignment: MainAxisAlignment.center,
-                                        crossAxisAlignment: CrossAxisAlignment.start,
-                                        children: [
-                                          CustomText.bodyLight12(
-                                              text: promo[index].distance.toString() + " km",
-                                              maxLines: 1,
-                                              minSize: 12
-                                          ),
-                                          SizedBox(height: CustomSize.sizeHeight(context) / 86,),
-                                          CustomText.textHeading4(
-                                              text: promo[index].name,
-                                              minSize: 18,
-                                              maxLines: 1
-                                          ),
-                                          SizedBox(height: CustomSize.sizeHeight(context) / 86,),
-                                          CustomText.bodyMedium12(
-                                              text: promo[index].restoName,
-                                              maxLines: 1,
-                                              minSize: 12
-                                          ),
-                                          SizedBox(height: CustomSize.sizeHeight(context) / 48,),
-                                          Row(
-                                            children: [
-                                              CustomText.bodyRegular12(text: NumberFormat.currency(locale: 'id', symbol: '', decimalDigits: 0).format(promo[index].price.original), minSize: 12,
-                                                  decoration: TextDecoration.lineThrough),
-                                              SizedBox(width: CustomSize.sizeWidth(context) / 48,),
-                                              CustomText.bodyRegular12(text: NumberFormat.currency(locale: 'id', symbol: '', decimalDigits: 0).format(promo[index].price.discounted), minSize: 12),
-                                            ],
-                                          )
-                                        ],
-                                      ),
-                                    )
-                                  ],
-                                ),
+                                  )
+                                ],
                               ),
                             ),
                           );

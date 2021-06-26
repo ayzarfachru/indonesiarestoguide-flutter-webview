@@ -3,18 +3,22 @@ import 'dart:convert';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_icons/flutter_icons.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:indonesiarestoguide/model/CategoryMenu.dart';
 import 'package:indonesiarestoguide/model/Menu.dart';
 import 'package:indonesiarestoguide/model/MenuJson.dart';
 import 'package:indonesiarestoguide/model/Price.dart';
 import 'package:indonesiarestoguide/model/Promo.dart';
+import 'package:indonesiarestoguide/model/Meja.dart';
 import 'package:indonesiarestoguide/ui/ui_resto/menu/add_menu.dart';
 import 'package:indonesiarestoguide/ui/ui_resto/menu/edit_menu.dart';
 import 'package:indonesiarestoguide/utils/utils.dart';
 import 'package:page_transition/page_transition.dart';
 import 'package:indonesiarestoguide/model/Transaction.dart';
+import 'package:qr_flutter/qr_flutter.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:http/http.dart' as http;
+import 'package:url_launcher/url_launcher.dart';
 
 class MejaActivity extends StatefulWidget {
   @override
@@ -22,66 +26,26 @@ class MejaActivity extends StatefulWidget {
 }
 
 class _MejaActivityState extends State<MejaActivity> {
+  void setState(fn) {
+    if(mounted) {
+      super.setState(fn);
+    }
+  }
+
   ScrollController _scrollController = ScrollController();
 
   bool isLoading = false;
 
-  List<Menu> menu = [];
-  List<MenuJson> menuJson = [];
-  List<CategoryMenu> categoryMenu = [];
-  Future _getDetail(String id)async {
-    List<String> _images = [];
-    List<Promo> _promo = [];
-    List<Menu> _menu = [];
-    List<MenuJson> _menuJson = [];
-    List<CategoryMenu> _categoryMenu = [];
+  List<Meja> meja = [];
+  Future<void> _getQr()async{
+    List<Meja> _meja = [];
 
     setState(() {
       isLoading = true;
     });
     SharedPreferences pref = await SharedPreferences.getInstance();
     String token = pref.getString("token") ?? "";
-    var apiResult = await http.get(
-        Links.mainUrl + '/resto/detail/$id', headers: {
-      "Accept": "Application/json",
-      "Authorization": "Bearer $token"
-    });
-    // print(apiResult.body);
-    var data = json.decode(apiResult.body);
-    for (var v in data['data']['img']) {
-      _images.add(v);
-    }
-
-    List<Menu> _cateMenu = [];
-    if (data['data']['menu'] != null) {
-      for (var v in data['data']['menu']) {
-        for (var a in v['menu']) {
-          Menu m = Menu(
-              id: a['id'],
-              name: a['name'],
-              desc: a['desc'],
-              price: Price.delivery(a['price'], a['delivery_price']),
-              urlImg: a['img']
-          );
-          _cateMenu.add(m);
-        }
-        CategoryMenu cm = CategoryMenu(
-            name: v['name'],
-            menu: _cateMenu
-        );
-        _cateMenu = [];
-        _categoryMenu.add(cm);
-      }
-    }
-  }
-
-  List<Transaction> transaction = [];
-  Future _getTrans()async{
-    List<Transaction> _transaction = [];
-
-    SharedPreferences pref = await SharedPreferences.getInstance();
-    String token = pref.getString("token") ?? "";
-    var apiResult = await http.get(Links.mainUrl + '/resto/trans', headers: {
+    var apiResult = await http.get(Links.mainUrl + '/resto/table', headers: {
       "Accept": "Application/json",
       "Authorization": "Bearer $token"
     });
@@ -89,85 +53,45 @@ class _MejaActivityState extends State<MejaActivity> {
     var data = json.decode(apiResult.body);
     print(data);
 
-    for(var v in data['trx']['pending']){
-      Transaction r = Transaction.resto(
+    for(var v in data['table']){
+      Meja p = Meja(
           id: v['id'],
-          status: v['status'],
-          username: v['username'],
-          total: int.parse(v['total']),
-          type: v['type']
+          name: v['name'],
+          qr: v['barcode'],
+          url: v['img'],
       );
-      _transaction.add(r);
+      _meja.add(p);
     }
 
     setState(() {
-      transaction = _transaction;
+      meja = _meja;
+      isLoading = false;
     });
   }
 
-  String id;
-  List<Transaction> detTransaction = [];
-  Future _getDetailTrans(String Id)async{
-    List<Transaction> _detTransaction = [];
+  showAlertDialog(String id) {
 
-    SharedPreferences pref = await SharedPreferences.getInstance();
-    String token = pref.getString("token") ?? "";
-    var apiResult = await http.get(Links.mainUrl + '/trans/'+'24', headers: {
-      "Accept": "Application/json",
-      "Authorization": "Bearer $token"
-    });
-    // print(apiResult.body);
-    var data = json.decode(apiResult.body);
-    print(data);
+    // set up the buttons
+    Widget cancelButton = FlatButton(
+      child: Text("Batal", style: TextStyle(color: CustomColor.primary)),
+      onPressed:  () {
+        Navigator.pop(context);
+      },
+    );
+    Widget continueButton = FlatButton(
+      child: Text("Hapus", style: TextStyle(color: CustomColor.primary)),
+      onPressed:  () {
+        _delMeja(id);
+      },
+    );
 
-    for(var v in data['trans']){
-      Transaction r = Transaction.restoDetail(
-        type: v['type'],
-        address: v['status'],
-        ongkir: v['ongkir'],
-        total: v['total'],
-      );
-      _detTransaction.add(r);
-    }
-
-    setState(() {
-      detTransaction = _detTransaction;
-    });
-  }
-
-  @override
-  void dispose() {
-    _scrollController.dispose();
-    super.dispose();
-  }
-
-  showAlertDialog() {
     // set up the AlertDialog
     AlertDialog alert = AlertDialog(
-      title: Text("Hapus Menu"),
-      content: Text("Apakah anda ingin menghapus menu?"),
+      title: Text("Hapus Meja"),
+      content: Text("Apakah anda yakin ingin menghapus data ini?"),
       actions: [
-        FlatButton(
-          child: Text("Batal", style: TextStyle(color: CustomColor.primary),),
-          onPressed: () async{
-            setState(() {});
-            Navigator.of(context).pop();
-          },
-          // => Navigator.of(context).pop(),
-        ),
-        FlatButton(
-          child: Text("Oke", style: TextStyle(color: CustomColor.primary),),
-          // onPressed: () async{
-          //   setState(() {});
-          //   Navigator.of(context).pop();
-          //   Navigator.pushReplacement(
-          //       context,
-          //       PageTransition(
-          //           type: PageTransitionType.fade,
-          //           child: MejaActivity()));
-          // },
-          // => Navigator.of(context).pop(),
-        )
+        cancelButton,
+        continueButton,
       ],
     );
 
@@ -178,6 +102,103 @@ class _MejaActivityState extends State<MejaActivity> {
         return alert;
       },
     );
+  }
+
+  Future _delMeja(String id)async{
+    setState(() {
+      isLoading = true;
+    });
+    SharedPreferences pref = await SharedPreferences.getInstance();
+    String token = pref.getString("token") ?? "";
+    var apiResult = await http.get(Links.mainUrl + '/resto/table/delete/$id', headers: {
+      "Accept": "Application/json",
+      "Authorization": "Bearer $token"
+    });
+    print(apiResult.body);
+    var data = json.decode(apiResult.body);
+
+    if (data['msg'].toString() == 'Success') {
+      Navigator.pop(context);
+      // print('SUKSESSSS');
+      Navigator.pushReplacement(context,
+          PageTransition(
+              type: PageTransitionType.fade,
+              child: MejaActivity()));
+    }
+
+    setState(() {
+      isLoading = false;
+    });
+  }
+
+  String downloadAll = '';
+  Future<void> getDownloadAll()async{
+
+    setState(() {
+      isLoading = true;
+    });
+    SharedPreferences pref = await SharedPreferences.getInstance();
+    String token = pref.getString("token") ?? "";
+    var apiResult = await http.get(Links.mainUrl + '/resto/qrcode', headers: {
+      "Accept": "Application/json",
+      "Authorization": "Bearer $token"
+    });
+    print(apiResult.body);
+    var data = json.decode(apiResult.body);
+    var link = data['link'];
+
+    setState(() {
+      downloadAll = data['link'];
+      // print(url + 'aa');
+      // meja = _meja;
+      isLoading = false;
+    });
+  }
+
+  Future<void> AddMeja()async{
+
+    setState(() {
+      isLoading = true;
+    });
+    SharedPreferences pref = await SharedPreferences.getInstance();
+    String token = pref.getString("token") ?? "";
+    var apiResult = await http.post(Links.mainUrl + '/table', headers: {
+      "Accept": "Application/json",
+      "Authorization": "Bearer $token"
+    });
+    print(apiResult.body);
+    var data = json.decode(apiResult.body);
+    // var link = data['link'];
+
+    if (data['msg'].toString() == 'Success') {
+      Navigator.pushReplacement(context, PageTransition(type: PageTransitionType.fade, child: new MejaActivity()));
+    }
+
+    setState(() {
+      // downloadAll = data['link'];
+      // print(url + 'aa');
+      // meja = _meja;
+      isLoading = false;
+    });
+  }
+
+  List<String> items;
+  getNumber() async {
+
+  }
+
+  @override
+  void initState() {
+    _getQr();
+    getDownloadAll();
+    items= List<String>.generate(9999, (i) => (i + 1).toString());
+    super.initState();
+  }
+
+  @override
+  void dispose() {
+    _scrollController.dispose();
+    super.dispose();
   }
 
   @override
@@ -195,7 +216,7 @@ class _MejaActivityState extends State<MejaActivity> {
                     height: CustomSize.sizeHeight(context) / 32,
                   ),
                   CustomText.textHeading3(
-                      text: "Barcode",
+                      text: "Qr Code",
                       color: CustomColor.primary,
                       minSize: 18,
                       maxLines: 1
@@ -204,59 +225,170 @@ class _MejaActivityState extends State<MejaActivity> {
                       shrinkWrap: true,
                       controller: _scrollController,
                       physics: NeverScrollableScrollPhysics(),
-                      itemCount: 6,
+                      itemCount: meja.length,
                       itemBuilder: (_, index){
+                        // print(meja.length);
                         return Padding(
                           padding: EdgeInsets.only(top: CustomSize.sizeHeight(context) / 48),
-                          child: Container(
-                            width: CustomSize.sizeWidth(context),
-                            height: CustomSize.sizeWidth(context) / 5.4,
-                            decoration: BoxDecoration(
-                              color: Colors.white,
-                              borderRadius: BorderRadius.circular(20),
-                              boxShadow: [
-                                BoxShadow(
-                                  color: Colors.grey.withOpacity(0.5),
-                                  spreadRadius: 0,
-                                  blurRadius: 7,
-                                  offset: Offset(0, 0), // changes position of shadow
-                                ),
-                              ],
-                            ),
-                            child: Row(
-                              children: [
-                                SizedBox(
-                                  width: CustomSize.sizeWidth(context) / 32,
-                                ),
-                                Container(
-                                  width: CustomSize.sizeWidth(context) / 1.2,
-                                  child: Column(
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    crossAxisAlignment: CrossAxisAlignment.start,
-                                    children: [
-                                      Row(
-                                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                        children: [
-                                          CustomText.textHeading4(
-                                              text: "Meja "+"01",
-                                              minSize: 18,
-                                              maxLines: 1
-                                          ),
-                                          GestureDetector(
-                                            onTap: (){
-
-                                            },
-                                              child: Icon(FontAwesome.download, color: CustomColor.primary, size: 20,)
-                                          ),
-                                        ],
-                                      ),
-                                      SizedBox(
-                                        width: CustomSize.sizeWidth(context) / 32,
-                                      ),
-                                    ],
+                          child: GestureDetector(
+                            onTap: () async{
+                              showModalBottomSheet(
+                                  isScrollControlled: true,
+                                  shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.only(topLeft: Radius.circular(20), topRight: Radius.circular(20))
                                   ),
-                                )
-                              ],
+                                  context: context,
+                                  builder: (_){
+                                    return Column(
+                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      mainAxisSize: MainAxisSize.min,
+                                      children: [
+                                        SizedBox(height: CustomSize.sizeHeight(context) / 86,),
+                                        Padding(
+                                          padding: EdgeInsets.symmetric(horizontal: CustomSize.sizeWidth(context) / 2.4),
+                                          child: Divider(thickness: 4,),
+                                        ),
+                                        SizedBox(height: CustomSize.sizeHeight(context) / 52,),
+                                        Center(
+                                          child: Container(
+                                            width: CustomSize.sizeWidth(context) / 1.2,
+                                            height: CustomSize.sizeWidth(context) / 1.2,
+                                            child: QrImage(
+                                              data: meja[index].qr.toString(),
+                                              version: QrVersions.auto,
+                                              // size: 200.0,
+                                            ),
+                                            // decoration: BoxDecoration(
+                                            //   image: DecorationImage(
+                                            //       image: NetworkImage(Links.subUrl + categoryMenu[categoryMenu.indexWhere((v) => v.name == nameCategory)].menu[index].urlImg),
+                                            //       fit: BoxFit.cover
+                                            //   ),
+                                            //   borderRadius: BorderRadius.circular(10),
+                                            // ),
+                                          ),
+                                        ),
+                                        // SizedBox(height: CustomSize.sizeHeight(context) / 32,),
+                                        // Padding(
+                                        //   padding: EdgeInsets.symmetric(horizontal: CustomSize.sizeHeight(context) / 20),
+                                        //   child: Column(
+                                        //     crossAxisAlignment: CrossAxisAlignment.start,
+                                        //     children: [
+                                        //       CustomText.textHeading5(
+                                        //           text: "Meja "+meja[index].name,
+                                        //           minSize: 18,
+                                        //           maxLines: 1
+                                        //       ),
+                                        //     ],
+                                        //   ),
+                                        // ),
+                                        SizedBox(height: CustomSize.sizeHeight(context) / 52,),
+                                        Center(
+                                          child: Container(
+                                            width: CustomSize.sizeWidth(context) / 1.1,
+                                            height: CustomSize.sizeHeight(context) / 14,
+                                            child: Row(
+                                              mainAxisAlignment: MainAxisAlignment.spaceAround,
+                                              children: [
+                                                GestureDetector(
+                                                  onTap: (){
+                                                    _delMeja(meja[index].id.toString());
+                                                    // Navigator.pop(context);
+                                                    // Navigator.pushReplacement(context, PageTransition(type: PageTransitionType.fade, child: new MejaActivity()));
+                                                  },
+                                                  child: Center(
+                                                    child: Container(
+                                                      width: CustomSize.sizeWidth(context) / 1.1,
+                                                      height: CustomSize.sizeHeight(context) / 14,
+                                                      decoration: BoxDecoration(
+                                                          color: CustomColor.redBtn,
+                                                          borderRadius: BorderRadius.circular(50)
+                                                      ),
+                                                      child: Center(
+                                                        child: Padding(
+                                                          padding: const EdgeInsets.symmetric(horizontal: 20.0),
+                                                          child: Column(
+                                                            mainAxisAlignment: MainAxisAlignment.center,
+                                                            crossAxisAlignment: CrossAxisAlignment.center,
+                                                            children: [
+                                                              CustomText.textHeading7(text: "Hapus Meja", color: Colors.white),
+                                                              // CustomText.textHeading7(text: "Meja", color: Colors.white),
+                                                            ],
+                                                          ),
+                                                        ),
+                                                      ),
+                                                    ),
+                                                  ),
+                                                ),
+                                              ],
+                                            ),
+                                          ),
+                                        ),
+                                        SizedBox(height: CustomSize.sizeHeight(context) / 86,),
+                                      ],
+                                    );
+                                  }
+                              );
+                            },
+                            child: Container(
+                              width: CustomSize.sizeWidth(context),
+                              height: CustomSize.sizeWidth(context) / 5.4,
+                              decoration: BoxDecoration(
+                                color: Colors.white,
+                                borderRadius: BorderRadius.circular(20),
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: Colors.grey.withOpacity(0.5),
+                                    spreadRadius: 0,
+                                    blurRadius: 7,
+                                    offset: Offset(0, 0), // changes position of shadow
+                                  ),
+                                ],
+                              ),
+                              child: Row(
+                                children: [
+                                  SizedBox(
+                                    width: CustomSize.sizeWidth(context) / 32,
+                                  ),
+                                  Container(
+                                    width: CustomSize.sizeWidth(context) / 1.2,
+                                    child: Column(
+                                      mainAxisAlignment: MainAxisAlignment.center,
+                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      children: [
+                                        Row(
+                                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                          children: [
+                                            CustomText.textHeading4(
+                                                text: "Meja "+items[index],
+                                                minSize: 18,
+                                                maxLines: 1
+                                            ),
+                                            // Row(
+                                            //   children: [
+                                            //     GestureDetector(
+                                            //       onTap: () async{
+                                            //         showAlertDialog(meja[index].id.toString());
+                                            //         },
+                                            //         child: Icon(Icons.delete, color: CustomColor.redBtn, size: 20,)
+                                            //     ),
+                                            //     // GestureDetector(
+                                            //     //   onTap: () async{
+                                            //     //     await launch(meja[index].url);
+                                            //     //     },
+                                            //     //     child: Icon(FontAwesome.download, color: CustomColor.primary, size: 20,)
+                                            //     // ),
+                                            //   ],
+                                            // ),
+                                          ],
+                                        ),
+                                        SizedBox(
+                                          width: CustomSize.sizeWidth(context) / 32,
+                                        ),
+                                      ],
+                                    ),
+                                  )
+                                ],
+                              ),
                             ),
                           ),
                         );
@@ -268,24 +400,59 @@ class _MejaActivityState extends State<MejaActivity> {
             ),
           ),
         ),
-        // floatingActionButton: GestureDetector(
-        //   onTap: (){
-        //     Navigator.push(
-        //         context,
-        //         PageTransition(
-        //             type: PageTransitionType.rightToLeft,
-        //             child: AddMenu()));
-        //   },
-        //   child: Container(
-        //     width: CustomSize.sizeWidth(context) / 6.6,
-        //     height: CustomSize.sizeWidth(context) / 6.6,
-        //     decoration: BoxDecoration(
-        //         color: CustomColor.primary,
-        //         shape: BoxShape.circle
-        //     ),
-        //     child: Center(child: Icon(FontAwesome.plus, color: Colors.white, size: 29,)),
-        //   ),
-        // )
+        floatingActionButton: Column(
+          crossAxisAlignment: CrossAxisAlignment.end,
+          mainAxisAlignment: MainAxisAlignment.end,
+          children: [
+            GestureDetector(
+              onTap: () async{
+                if (await canLaunch(downloadAll)) {
+                await launch(downloadAll);
+                } else {
+                throw 'Error';
+                }
+              },
+              child: Container(
+                width: CustomSize.sizeWidth(context) / 6.6,
+                height: CustomSize.sizeWidth(context) / 6.6,
+                decoration: BoxDecoration(
+                    color: CustomColor.accent,
+                    shape: BoxShape.circle
+                ),
+                child: Center(child: Icon(FontAwesome.download, color: Colors.white, size: 29,)),
+              ),
+            ),
+            SizedBox(height: CustomSize.sizeHeight(context) / 72,),
+            GestureDetector(
+              onTap: (){
+                // Navigator.push(
+                //     context,
+                //     PageTransition(
+                //         type: PageTransitionType.rightToLeft,
+                //         child: AddMenu()));
+                if (meja.length == 100) {
+                  Fluttertoast.showToast(
+                      msg: "Meja terlalu banyak",
+                      backgroundColor: Colors.grey,
+                      textColor: Colors.black,
+                      fontSize: 16.0
+                  );
+                } else {
+                  AddMeja();
+                }
+              },
+              child: Container(
+                width: CustomSize.sizeWidth(context) / 6.6,
+                height: CustomSize.sizeWidth(context) / 6.6,
+                decoration: BoxDecoration(
+                    color: CustomColor.primary,
+                    shape: BoxShape.circle
+                ),
+                child: Center(child: Icon(FontAwesome.plus, color: Colors.white, size: 29,)),
+              ),
+            ),
+          ],
+        ),
     );
   }
 }

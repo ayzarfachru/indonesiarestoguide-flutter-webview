@@ -5,6 +5,7 @@ import 'package:flutter_icons/flutter_icons.dart';
 import 'package:indonesiarestoguide/model/Menu.dart';
 import 'package:indonesiarestoguide/model/Price.dart';
 import 'package:indonesiarestoguide/ui/detail/detail_resto.dart';
+import 'package:indonesiarestoguide/ui/history/history_activity.dart';
 import 'package:indonesiarestoguide/utils/utils.dart';
 import 'package:intl/intl.dart';
 import 'package:page_transition/page_transition.dart';
@@ -86,6 +87,37 @@ class _DetailHistoryState extends State<DetailHistory> {
     });
   }
 
+  String operation ='';
+  Future _deleteHistory(String operation, String id)async{
+    // List<Transaction> _transaction = [];
+
+    SharedPreferences pref = await SharedPreferences.getInstance();
+    String token = pref.getString("token") ?? "";
+    var apiResult = await http.get(Links.mainUrl + '/trans/op/$operation/$id', headers: {
+      "Accept": "Application/json",
+      "Authorization": "Bearer $token"
+    });
+    print(apiResult.body);
+    var data = json.decode(apiResult.body);
+    print(data);
+
+    // for(var v in data['trx']['process']){
+    //   Transaction r = Transaction.resto(
+    //       id: v['id'],
+    //       status: v['status'],
+    //       username: v['username'],
+    //       total: int.parse(v['total']),
+    //       type: v['type']
+    //   );
+    //   _transaction.add(r);
+    // }
+
+    setState(() {
+      // transaction = _transaction;
+      print(operation+'   '+id);
+    });
+  }
+
   @override
   void initState() {
     getData();
@@ -110,7 +142,7 @@ class _DetailHistoryState extends State<DetailHistory> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              (type == 'delivery')?Padding(
+              (type == 'delivery' || type == 'Pesan antar')?Padding(
                 padding: EdgeInsets.symmetric(horizontal: CustomSize.sizeWidth(context) / 24),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -125,9 +157,9 @@ class _DetailHistoryState extends State<DetailHistory> {
                     ),
                   ],
                 ),
-              ):SizedBox(),
-              SizedBox(height: (type == 'delivery')?CustomSize.sizeHeight(context) / 48:0,),
-              (type == 'delivery')?Divider(thickness: 6, color: CustomColor.secondary,):SizedBox(),
+              ):Container(),
+              SizedBox(height: (type == 'delivery' || type == 'Pesan antar')?CustomSize.sizeHeight(context) / 48:0,),
+              (type == 'delivery' || type == 'Pesan antar')?Divider(thickness: 6, color: CustomColor.secondary,):SizedBox(),
               SizedBox(height: CustomSize.sizeHeight(context) / 48,),
               Padding(
                 padding: EdgeInsets.symmetric(horizontal: CustomSize.sizeWidth(context) / 24),
@@ -144,11 +176,11 @@ class _DetailHistoryState extends State<DetailHistory> {
                               shape: BoxShape.circle
                           ),
                           child: Center(
-                            child: Icon((type == 'delivery')?FontAwesome.motorcycle:(type == 'takeaway')?MaterialCommunityIcons.shopping:Icons.restaurant, color: Colors.white, size: 20,),
+                            child: Icon((type == 'delivery' || type == 'Pesan antar')?FontAwesome.motorcycle:(type == 'takeaway' || type == 'Ambil Langsung')?MaterialCommunityIcons.shopping:Icons.restaurant, color: Colors.white, size: 20,),
                           ),
                         ),
                         SizedBox(width: CustomSize.sizeWidth(context) / 32,),
-                        CustomText.textHeading6(text: (type == 'delivery')?"Pesan Antar":(type == 'takeaway')?"Ambil Langsung":"Makan Ditempat",),
+                        CustomText.textHeading6(text: (type == 'delivery' || type == 'Pesan antar')?"Pesan Antar":(type == 'takeaway' || type == 'Ambil Langsung')?"Ambil Langsung":"Makan Ditempat",),
                       ],
                     ),
                   ],
@@ -347,6 +379,25 @@ class _DetailHistoryState extends State<DetailHistory> {
               ),
             ],
           ),
+        ),
+      ),
+      floatingActionButton: (homepg != "1")?Container():GestureDetector(
+        onTap: () async{
+          setState(() {
+            isLoading = false;
+          });
+          _deleteHistory(operation = "delete", id.toString());
+          Navigator.pop(context);
+          Navigator.pushReplacement(context, PageTransition(type: PageTransitionType.fade, child: new HistoryActivity()));
+        },
+        child: Container(
+          width: CustomSize.sizeWidth(context) / 1.1,
+          height: CustomSize.sizeHeight(context) / 14,
+          decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(30),
+              color: CustomColor.redBtn
+          ),
+          child: Center(child: CustomText.bodyRegular16(text: "Hapus history", color: Colors.white,)),
         ),
       ),
     );

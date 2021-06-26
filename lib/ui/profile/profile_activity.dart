@@ -1,13 +1,17 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_icons/flutter_icons.dart';
 import 'package:indonesiarestoguide/ui/auth/login_activity.dart';
 import 'package:indonesiarestoguide/ui/ui_resto/add_resto/add_view_resto.dart';
+import 'package:indonesiarestoguide/ui/ui_resto/home/home_activity.dart';
 import 'package:indonesiarestoguide/utils/utils.dart';
 import 'package:page_transition/page_transition.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:indonesiarestoguide/ui/profile/edit_profile.dart';
 import 'package:indonesiarestoguide/ui/about/about_activity.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:http/http.dart' as http;
 
 import '../history/history_activity.dart';
 
@@ -18,7 +22,9 @@ class ProfileActivity extends StatefulWidget {
 
 class _ProfileActivityState extends State<ProfileActivity> {
   // String name = "Deni";
+  String id = "";
   String name = "";
+  String restoName = "";
   String initial = "";
   String email = "";
   String img = "";
@@ -88,9 +94,46 @@ class _ProfileActivityState extends State<ProfileActivity> {
     }
   }
 
+  bool isLoading = false;
+  Future _getUserResto()async{
+    // List<History> _history = [];
+
+    setState(() {
+      isLoading = true;
+    });
+    SharedPreferences pref = await SharedPreferences.getInstance();
+    String token = pref.getString("token") ?? "";
+    var apiResult = await http.get(Links.mainUrl + '/resto', headers: {
+      "Accept": "Application/json",
+      "Authorization": "Bearer $token"
+    });
+    print(apiResult.body);
+    var data = json.decode(apiResult.body);
+
+    // for(var v in data['trans']){
+    //   History h = History(
+    //       id: v['id'],
+    //       name: v['resto_name'],
+    //       time: v['time'],
+    //       price: v['price'],
+    //       img: v['resto_img'],
+    //       type: v['type']
+    //   );
+    //   _history.add(h);
+    // }
+
+    setState(() {
+      id = data['resto']['id'].toString();
+      restoName = data['resto']['name'];
+      // history = _history;
+      isLoading = false;
+    });
+  }
+
   @override
   void initState() {
     super.initState();
+    _getUserResto();
     getName();
     getInitial();
     getEmail();
@@ -235,12 +278,38 @@ class _ProfileActivityState extends State<ProfileActivity> {
                     ),
                   ),
                   (homepg != "1")?Divider():Container(),
-                  (homepg != "1")?GestureDetector(
+                  (homepg != "1")?(id == '')?GestureDetector(
+                    onTap: () async{
+                      // SharedPreferences pref = await SharedPreferences.getInstance();
+                      // pref.setString("homepg", "1");
+                      setState(() {
+                        Navigator.pushReplacement(context, PageTransition(type: PageTransitionType.fade, child: AddViewResto()));
+                      });
+                    },
+                    child: Padding(
+                      padding: EdgeInsets.symmetric(
+                          horizontal: CustomSize.sizeWidth(context) / 48,
+                          vertical: CustomSize.sizeHeight(context) / 86
+                      ),
+                      child: Row(
+                        children: [
+                          Icon(MaterialIcons.restaurant),
+                          SizedBox(width: CustomSize.sizeWidth(context) / 48,),
+                          CustomText.bodyRegular16(
+                              text: "Kelola Restaurant",
+                              minSize: 16,
+                              maxLines: 1
+                          ),
+                        ],
+                      ),
+                    ),
+                  ):GestureDetector(
                     onTap: () async{
                       SharedPreferences pref = await SharedPreferences.getInstance();
                       pref.setString("homepg", "1");
+                      // pref.setString("homerestoname", restoName);
                       setState(() {
-                        Navigator.pushReplacement(context, PageTransition(type: PageTransitionType.fade, child: AddViewResto()));
+                        Navigator.pushReplacement(context, PageTransition(type: PageTransitionType.fade, child: HomeActivityResto()));
                       });
                     },
                     child: Padding(

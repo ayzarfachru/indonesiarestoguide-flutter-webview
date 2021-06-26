@@ -8,6 +8,7 @@ import 'package:flutter_datetime_picker/flutter_datetime_picker.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:indonesiarestoguide/model/Cuisine.dart';
+import 'package:indonesiarestoguide/ui/detail/detail_resto.dart';
 import 'package:indonesiarestoguide/ui/ui_resto/add_resto/add_view_resto.dart';
 import 'package:indonesiarestoguide/ui/ui_resto/home/home_activity.dart';
 import 'package:indonesiarestoguide/utils/utils.dart';
@@ -19,8 +20,18 @@ import 'package:page_transition/page_transition.dart';
 import 'package:http/http.dart' as http;
 
 class EditDetailResto extends StatefulWidget {
+  String facility = '';
+  String cuisine = '';
+  String can_delivery = '';
+  String can_takeaway = '';
+  String ongkir = '';
+  String reservation_fee = '';
+  String idResto = '';
+
+  EditDetailResto(this.facility, this.cuisine, this.can_delivery, this.can_takeaway, this.ongkir, this.reservation_fee, this.idResto);
+
   @override
-  _EditDetailRestoState createState() => _EditDetailRestoState();
+  _EditDetailRestoState createState() => _EditDetailRestoState(facility, cuisine, can_delivery, can_takeaway, ongkir, reservation_fee, idResto);
 }
 
 class CuisineChip extends StatefulWidget {
@@ -124,6 +135,16 @@ class _FacilityChipState extends State<FacilityChip> {
 
 
 class _EditDetailRestoState extends State<EditDetailResto> {
+  String facility = '';
+  String cuisine = '';
+  String can_delivery = '';
+  String can_takeaway = '';
+  String ongkir = '';
+  String reservation_fee = '';
+  String idResto = '';
+
+  _EditDetailRestoState(this.facility, this.cuisine, this.can_delivery, this.can_takeaway, this.ongkir, this.reservation_fee, this.idResto);
+
   TextEditingController _Tipe = TextEditingController(text: "");
   TextEditingController _Fasilitas = TextEditingController(text: "");
   TextEditingController _JamOperasional = TextEditingController(text: "");
@@ -146,24 +167,21 @@ class _EditDetailRestoState extends State<EditDetailResto> {
   bool reservation = false;
   bool delivery = false;
 
-  List<String> cuisineList = [
-    "Chinese Food",
-    "Indonesian Food",
-    "Western Food",
-    "Cafe",
-    "Asian Food",
-    "Bakery",
-    "Bali Food",
-    "Uncivil",
-    "Catering",
-    "Coffee Shop",
-    "Dessert",
-    "Fine Dining",
-    "Halal",
-  ];
+  getDelivery() async {
+    delivery = (can_delivery != 'true')?false:true;
+  }
+
+  getReservation() async {
+    reservation = (reservation_fee == '0')?false:true;
+  }
+
+  getTakeaway() async {
+    takeaway = (can_takeaway != 'true')?false:true;
+  }
+
+  List<String> cuisineList = [];
 
   List<String> selectedCuisineList = List();
-  String cuisine;
 
   _showCuisineDialog() {
     showDialog(
@@ -205,21 +223,9 @@ class _EditDetailRestoState extends State<EditDetailResto> {
   }
 
 
-  List<String> facilityList = [
-    "Air Conditioner",
-    "Smoking Area",
-    "Live Music",
-    "Wifi Access",
-    "Valet Parking",
-    "Big Screen",
-    "Children Playground",
-    "Debit Cart",
-    "Delivery Order",
-    "Master Card",
-  ];
+  List<String> facilityList = [];
 
   List<String> selectedFacilityList = List();
-  String facility;
 
   _showFacilityDialog() {
     showDialog(
@@ -237,7 +243,7 @@ class _EditDetailRestoState extends State<EditDetailResto> {
                   print(facility);
                   if (facility != "") {
                     selectedList = facility.split(",");
-                  } else {}
+                  } else {  }
                 });
               },
             ),
@@ -260,6 +266,14 @@ class _EditDetailRestoState extends State<EditDetailResto> {
         });
   }
 
+
+  getOngkir() async {
+    _Ongkir = TextEditingController(text: ongkir);
+  }
+
+  getHargaPerMeja() async {
+    _HargaPerMeja = TextEditingController(text: reservation_fee);
+  }
 
   getCuisine() async {
     _Tipe = TextEditingController(text: cuisine);
@@ -289,7 +303,7 @@ class _EditDetailRestoState extends State<EditDetailResto> {
     _JamOperasionalTutup = (jamTutup.hour != null)?TextEditingController(text: jamTutup.hour.toString() + ':' + jamTutup.minute.toString()):TextEditingController(text: "");
   }
 
-  Future<String> addResto()async{
+  Future<String> editResto(String idResto)async{
     SharedPreferences pref = await SharedPreferences.getInstance();
     var token = pref.getString("token") ?? "";
     var name = pref.getString("nameResto") ?? "";
@@ -300,7 +314,7 @@ class _EditDetailRestoState extends State<EditDetailResto> {
     var phone = pref.getString("notelpResto") ?? "";
     var img = pref.getString("imgResto") ?? "";
 
-    var apiResult = await http.post(Links.mainUrl + '/resto',
+    var apiResult = await http.post(Links.mainUrl + '/resto/$idResto',
         body: {
           'name': name,
           'desc': desc,
@@ -308,25 +322,55 @@ class _EditDetailRestoState extends State<EditDetailResto> {
           'longitude': longitude,
           'address': address,
           'phone': phone,
-          'hours': buka + ',' + tutup,
           'ongkir': (_Ongkir.text.toString() != null)?_Ongkir.text.toString():'',
           're_price': (_HargaPerMeja.text.toString() != '')?_HargaPerMeja.text.toString():'',
           'takeaway': (takeaway == true)?'1':'',
           'img': img,
           'type': _Tipe.text.toString(),
           'fasilitas': _Fasilitas.text.toString(),
-          'table': (_JumlahMeja.text.toString() != '')?_JumlahMeja.text.toString():''
+
+          // 'name': name,
+          // 'desc': desc,
+          // 'latitude': latitude,
+          // 'longitude': longitude,
+          // 'address': address,
+          // 'phone': phone,
+          // 'hours': buka + ',' + tutup,
+          // 'ongkir': (_Ongkir.text.toString() != null)?_Ongkir.text.toString():'',
+          // 're_price': (_HargaPerMeja.text.toString() != '')?_HargaPerMeja.text.toString():'',
+          // 'takeaway': (takeaway == true)?'1':'',
+          // 'img': img,
+          // 'type': _Tipe.text.toString(),
+          // 'fasilitas': _Fasilitas.text.toString(),
+          // 'table': (_JumlahMeja.text.toString() != '')?_JumlahMeja.text.toString():''
         },
         headers: {
           "Accept": "Application/json",
           "Authorization": "Bearer $token"
         });
-    print(apiResult.body);
+    print(apiResult);
     var data = json.decode(apiResult.body);
 
     if(data['status_code'] == 200){
       print("success");
       print(data);
+      print(json.encode({
+        'name': name,
+        'desc': desc,
+        'latitude': latitude,
+        'longitude': longitude,
+        'address': address,
+        'phone': phone,
+        'ongkir': (_Ongkir.text.toString() != null)?_Ongkir.text.toString():'',
+        're_price': (_HargaPerMeja.text.toString() != '')?_HargaPerMeja.text.toString():'',
+        'takeaway': (takeaway == true)?'1':'',
+        'img': img,
+        'type': _Tipe.text.toString(),
+        'fasilitas': _Fasilitas.text.toString(),
+      }));
+      Navigator.pop(context);
+      Navigator.pop(context);
+      Navigator.pushReplacement(context, PageTransition(type: PageTransitionType.fade, child: HomeActivityResto()));
       // SharedPreferences preferences = await SharedPreferences.getInstance();
       // await preferences.remove('menuJson');
       // await preferences.remove('restoId');
@@ -335,7 +379,58 @@ class _EditDetailRestoState extends State<EditDetailResto> {
       // await preferences.remove('inCart');
     } else {
       print(data);
+      print(json.encode({
+        'name': name,
+        'desc': desc,
+        'latitude': latitude,
+        'longitude': longitude,
+        'address': address,
+        'phone': phone,
+        'ongkir': (_Ongkir.text.toString() != null)?_Ongkir.text.toString():'',
+        're_price': (_HargaPerMeja.text.toString() != '')?_HargaPerMeja.text.toString():'',
+        'takeaway': (takeaway == true)?'1':'',
+        'img': img,
+        'type': _Tipe.text.toString(),
+        'fasilitas': _Fasilitas.text.toString(),
+      }));
     }
+  }
+
+  List<String> dataCuisine;
+  Future<void> getDataCuisine() async {
+    SharedPreferences pref = await SharedPreferences.getInstance();
+    var token = pref.getString("token") ?? "";
+    var data = await http.get(Links.mainUrl +'/util/data?q=cuisine',
+        headers: {
+          "Accept": "application/json",
+          "Authorization": "Bearer $token"
+        }
+    );
+    var jsonData = jsonDecode(data.body);
+    print(jsonData);
+
+    for(var v in jsonData['data']){
+      cuisineList.add(v['name']);
+    }
+    setState(() {});
+  }
+
+  Future<void> getDataFacility() async {
+    SharedPreferences pref = await SharedPreferences.getInstance();
+    var token = pref.getString("token") ?? "";
+    var data = await http.get(Links.mainUrl +'/util/data?q=facility',
+        headers: {
+          "Accept": "application/json",
+          "Authorization": "Bearer $token"
+        }
+    );
+    var jsonData = jsonDecode(data.body);
+    print(jsonData);
+
+    for(var v in jsonData['data']){
+      facilityList.add(v['name']);
+    }
+    setState(() {});
   }
 
   @override
@@ -343,7 +438,16 @@ class _EditDetailRestoState extends State<EditDetailResto> {
     super.initState();
     getTutup();
     getBuka();
-    // getCuisine();
+    getOngkir();
+    getReservation();
+    getHargaPerMeja();
+    getCuisine();
+    getFacility();
+    getDataCuisine();
+    getDataFacility();
+    getDelivery();
+    getTakeaway();
+    // print(_Tipe.text);
     // Future.delayed(Duration.zero, () async {
     //
     // });
@@ -421,7 +525,7 @@ class _EditDetailRestoState extends State<EditDetailResto> {
                                   padding: const EdgeInsets.all(2.0),
                                   child: Center(
                                     child: CustomText.textTitle8(
-                                        text: (cuisine == null)?"Pilih":"Ganti",
+                                        text: (_Tipe.text == null || _Tipe.text == '')?"Pilih":"Ganti",
                                         color: CustomColor.accent
                                     ),
                                   ),
@@ -476,211 +580,7 @@ class _EditDetailRestoState extends State<EditDetailResto> {
                                   padding: const EdgeInsets.all(2.0),
                                   child: Center(
                                     child: CustomText.textTitle8(
-                                        text: (facility == null)?"Pilih":"Ganti",
-                                        color: CustomColor.accent
-                                    ),
-                                  ),
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ),
-                    ),
-                    SizedBox(height: CustomSize.sizeHeight(context) / 48,),
-                    CustomText.bodyLight12(text: "Rentan Harga Mulai Dari"),
-                    TextField(
-                      controller: _MulaiHarga,
-                      keyboardType: TextInputType.number,
-                      cursorColor: Colors.black,
-                      style: GoogleFonts.poppins(
-                          textStyle:
-                          TextStyle(fontSize: 18, color: Colors.black, fontWeight: FontWeight.w600)),
-                      decoration: InputDecoration(
-                        isDense: true,
-                        contentPadding: EdgeInsets.only(bottom: CustomSize.sizeHeight(context) / 86),
-                        hintStyle: GoogleFonts.poppins(
-                            textStyle:
-                            TextStyle(fontSize: 14, color: Colors.grey)),
-                        helperStyle: GoogleFonts.poppins(
-                            textStyle: TextStyle(fontSize: 14)),
-                        enabledBorder: UnderlineInputBorder(),
-                        focusedBorder: UnderlineInputBorder(),
-                      ),
-                    ),
-                    SizedBox(
-                      height: CustomSize.sizeHeight(context) / 48,
-                    ),
-                    CustomText.bodyLight12(text: "Sampai Harga"),
-                    TextField(
-                      controller: _SampaiHarga,
-                      keyboardType: TextInputType.number,
-                      cursorColor: Colors.black,
-                      style: GoogleFonts.poppins(
-                          textStyle:
-                          TextStyle(fontSize: 18, color: Colors.black, fontWeight: FontWeight.w600)),
-                      decoration: InputDecoration(
-                        isDense: true,
-                        contentPadding: EdgeInsets.only(bottom: CustomSize.sizeHeight(context) / 86),
-                        hintStyle: GoogleFonts.poppins(
-                            textStyle:
-                            TextStyle(fontSize: 14, color: Colors.grey)),
-                        helperStyle: GoogleFonts.poppins(
-                            textStyle: TextStyle(fontSize: 14)),
-                        enabledBorder: UnderlineInputBorder(),
-                        focusedBorder: UnderlineInputBorder(),
-                      ),
-                    ),
-                    SizedBox(height: CustomSize.sizeHeight(context) / 48,),
-                    CustomText.bodyLight12(text: "Jam Buka"),
-                    SizedBox(
-                      height: CustomSize.sizeHeight(context) * 0.005,
-                    ),
-                    TextField(
-                      readOnly: true,
-                      controller: _JamOperasionalBuka,
-                      keyboardType: TextInputType.text,
-                      cursorColor: Colors.black,
-                      style: GoogleFonts.poppins(
-                          textStyle:
-                          TextStyle(fontSize: 18, color: Colors.black, fontWeight: FontWeight.w600)),
-                      decoration: InputDecoration(
-                          isDense: true,
-                          contentPadding: EdgeInsets.only(bottom: CustomSize.sizeHeight(context) / 86),
-                          hintStyle: GoogleFonts.poppins(
-                              textStyle:
-                              TextStyle(fontSize: 14, color: Colors.grey)),
-                          helperStyle: GoogleFonts.poppins(
-                              textStyle: TextStyle(fontSize: 14)),
-                          enabledBorder: UnderlineInputBorder(),
-                          focusedBorder: UnderlineInputBorder(),
-                          suffixIcon: GestureDetector(
-                            onTap: () {
-                              setState(() {
-                                jamBuka = TimeOfDay.now().replacing(minute: 30);
-                                print(_JamOperasionalTutup);
-                                // print(cuisine.split(",")[0]);
-                              });
-                              Navigator.of(context).push(
-                                  showPicker(
-                                    blurredBackground: true,
-                                    accentColor: Colors.blue[400],
-                                    context: context,
-                                    value: (jamBuka != null)?jamBuka:null,
-                                    onChange: onTimeOpenChanged,
-                                    minuteInterval: MinuteInterval.ONE,
-                                    disableHour: false,
-                                    disableMinute: false,
-                                    minMinute: 0,
-                                    maxMinute: 59,
-                                    cancelText: 'batal',
-                                    okText: 'simpan',
-                                    // Optional onChange to receive value as DateTime
-                                    onChangeDateTime: (DateTime dateTime) {
-                                      print(jamBuka.hour.toString() + ':' + jamBuka.minute.toString());
-                                      getBuka();
-                                    },
-                                  ));
-                            },
-                            // onTap: () async{
-                            //   Navigator.pushReplacement(context, PageTransition(type: PageTransitionType.fade, child: new AddViewResto()));
-                            // },
-                            child: Stack(
-                              children: [
-                                Container(
-                                  width: CustomSize.sizeWidth(context) / 4,
-                                  decoration: BoxDecoration(
-                                    borderRadius: BorderRadius.circular(25),
-                                    border: Border.all(color: CustomColor.accent, width: 1),
-                                    // color: CustomColor.accentLight
-                                  ),
-                                  child: Padding(
-                                    padding: const EdgeInsets.all(2.0),
-                                    child: Center(
-                                      child: CustomText.textTitle8(
-                                          text: "Atur",
-                                          color: CustomColor.accent
-                                      ),
-                                    ),
-                                  ),
-                                ),
-                              ],
-                            ),
-                          )
-                      ),
-                    ),
-                    SizedBox(height: CustomSize.sizeHeight(context) / 48,),
-                    CustomText.bodyLight12(text: "Jam Tutup"),
-                    SizedBox(
-                      height: CustomSize.sizeHeight(context) * 0.005,
-                    ),
-                    TextField(
-                      readOnly: true,
-                      controller: _JamOperasionalTutup,
-                      keyboardType: TextInputType.text,
-                      cursorColor: Colors.black,
-                      style: GoogleFonts.poppins(
-                          textStyle:
-                          TextStyle(fontSize: 18, color: Colors.black, fontWeight: FontWeight.w600)),
-                      decoration: InputDecoration(
-                        isDense: true,
-                        contentPadding: EdgeInsets.only(bottom: CustomSize.sizeHeight(context) / 86),
-                        hintStyle: GoogleFonts.poppins(
-                            textStyle:
-                            TextStyle(fontSize: 14, color: Colors.grey)),
-                        helperStyle: GoogleFonts.poppins(
-                            textStyle: TextStyle(fontSize: 14)),
-                        enabledBorder: UnderlineInputBorder(),
-                        focusedBorder: UnderlineInputBorder(),
-                        suffixIcon: GestureDetector(
-                          onTap: () {
-                            setState(() {
-                              buka = jamBuka.hour.toString() + ':' + jamBuka.minute.toString();
-                              jamTutup = TimeOfDay.now().replacing(minute: 30);
-                              print(_JamOperasionalTutup.toString() + 'ini');
-                              // print(cuisine.split(",")[0]);
-                            });
-                            Navigator.of(context).push(
-                                showPicker(
-                                  blurredBackground: true,
-                                  accentColor: Colors.blue[400],
-                                  context: context,
-                                  value: jamTutup,
-                                  onChange: onTimeClosedChanged,
-                                  minuteInterval: MinuteInterval.ONE,
-                                  disableHour: false,
-                                  disableMinute: false,
-                                  minMinute: 0,
-                                  maxMinute: 59,
-                                  cancelText: 'batal',
-                                  okText: 'simpan',
-                                  // Optional onChange to receive value as DateTime
-                                  onChangeDateTime: (DateTime dateTime) {
-                                    print(jamBuka.hour.toString() + ':' + jamBuka.minute.toString());
-                                    print(jamTutup.hour.toString() + ':' + jamTutup.minute.toString()+'ini tutup');
-                                    print(buka + 'ini buka');
-                                    tutup = jamTutup.hour.toString() + ':' + jamTutup.minute.toString();
-                                    getTutup();
-                                  },
-                                ));
-                          },
-                          // onTap: () async{
-                          //   Navigator.pushReplacement(context, PageTransition(type: PageTransitionType.fade, child: new AddViewResto()));
-                          // },
-                          child: Stack(
-                            children: [
-                              Container(
-                                width: CustomSize.sizeWidth(context) / 4,
-                                decoration: BoxDecoration(
-                                  borderRadius: BorderRadius.circular(25),
-                                  border: Border.all(color: CustomColor.accent, width: 1),
-                                  // color: CustomColor.accentLight
-                                ),
-                                child: Padding(
-                                  padding: const EdgeInsets.all(2.0),
-                                  child: Center(
-                                    child: CustomText.textTitle8(
-                                        text: "Atur",
+                                        text: (_Fasilitas.text == null || _Fasilitas.text == "")?"Pilih":"Ganti",
                                         color: CustomColor.accent
                                     ),
                                   ),
@@ -777,27 +677,6 @@ class _EditDetailRestoState extends State<EditDetailResto> {
                       ),
                     ):Container(),
                     (reservation)?SizedBox(height: CustomSize.sizeHeight(context) / 48,):Container(),
-                    //------------------------------------- meja yang disediakan ----------------------------------------
-                    (reservation)?CustomText.bodyLight12(text: "Meja yang disediakan restomu untuk reservasi"):Container(),
-                    (reservation)?TextField(
-                      controller: _JumlahMeja,
-                      keyboardType: TextInputType.number,
-                      cursorColor: Colors.black,
-                      style: GoogleFonts.poppins(
-                          textStyle:
-                          TextStyle(fontSize: 18, color: Colors.black, fontWeight: FontWeight.w600)),
-                      decoration: InputDecoration(
-                        isDense: true,
-                        contentPadding: EdgeInsets.only(bottom: CustomSize.sizeHeight(context) / 86),
-                        hintStyle: GoogleFonts.poppins(
-                            textStyle:
-                            TextStyle(fontSize: 14, color: Colors.grey)),
-                        helperStyle: GoogleFonts.poppins(
-                            textStyle: TextStyle(fontSize: 14)),
-                        enabledBorder: UnderlineInputBorder(),
-                        focusedBorder: UnderlineInputBorder(),
-                      ),
-                    ):Container(),
                     //------------------------------------ checkbox takeaway -------------------------------------
                     Row(
                       mainAxisSize: MainAxisSize.max,
@@ -831,12 +710,12 @@ class _EditDetailRestoState extends State<EditDetailResto> {
           setState(() {
             isLoading = false;
           });
-          addResto();
-          Navigator.pushReplacement(
-              context,
-              PageTransition(
-                  type: PageTransitionType.leftToRight,
-                  child: HomeActivityResto()));
+          editResto(idResto);
+          // Navigator.pushReplacement(
+          //     context,
+          //     PageTransition(
+          //         type: PageTransitionType.leftToRight,
+          //         child: HomeActivityResto()));
           // SharedPreferences pref = await SharedPreferences.getInstance();
           // pref.setString("name", _loginTextName.text.toString());
           // pref.setString("email", _loginEmailName.text.toString());

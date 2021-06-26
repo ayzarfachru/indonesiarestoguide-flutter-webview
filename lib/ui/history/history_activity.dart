@@ -31,6 +31,7 @@ class _HistoryActivityState extends State<HistoryActivity> {
   }
 
   List<History> history = [];
+  // /page/history?resto=$id
   Future _getHistory()async{
     List<History> _history = [];
 
@@ -64,6 +65,42 @@ class _HistoryActivityState extends State<HistoryActivity> {
     });
   }
 
+  String id;
+  List<History> user = [];
+  // /page/history?resto=$id
+  Future _getHistoryResto()async{
+    List<History> _user = [];
+
+    setState(() {
+      isLoading = true;
+    });
+    SharedPreferences pref = await SharedPreferences.getInstance();
+    String token = pref.getString("token") ?? "";
+    var apiResult = await http.get(Links.mainUrl + '/page/history?resto=$id', headers: {
+      "Accept": "Application/json",
+      "Authorization": "Bearer $token"
+    });
+    var data = json.decode(apiResult.body);
+    print(data);
+
+    for(var v in data['trans']){
+      History h = History(
+          id: v['id'],
+          name: v['resto_name'],
+          time: v['time'],
+          price: v['price'],
+          img: v['resto_img'],
+          type: v['type']
+      );
+      _user.add(h);
+    }
+
+    setState(() {
+      user = _user;
+      isLoading = false;
+    });
+  }
+
   getHomePg() async {
     SharedPreferences pref = await SharedPreferences.getInstance();
     setState(() {
@@ -91,10 +128,22 @@ class _HistoryActivityState extends State<HistoryActivity> {
     _refreshController.loadComplete();
   }
 
+  idResto() async {
+    SharedPreferences pref = await SharedPreferences.getInstance();
+    pref.getString(id = "idresto");
+  }
+
   @override
   void initState() {
-    _getHistory();
     getHomePg();
+    idResto();
+    Future.delayed(Duration(seconds: 1)).then((_) {
+      if (homepg != '1') {
+        _getHistory();
+      } else {
+        _getHistoryResto();
+      }
+    });
     getImg();
     super.initState();
   }
@@ -155,13 +204,14 @@ class _HistoryActivityState extends State<HistoryActivity> {
                     shrinkWrap: true,
                     controller: _scrollController,
                     physics: NeverScrollableScrollPhysics(),
-                    itemCount: history.length,
+                    itemCount: (homepg != "1")?history.length:user.length,
                     itemBuilder: (_, index){
                       return Padding(
                         padding: EdgeInsets.only(bottom: CustomSize.sizeHeight(context) / 86),
                         child: GestureDetector(
                           onTap: (){
-                            Navigator.push(context, PageTransition(type: PageTransitionType.rightToLeft, child: new DetailHistory(history[index].id)));
+                            (homepg != "1")?Navigator.push(context, PageTransition(type: PageTransitionType.rightToLeft, child: new DetailHistory(history[index].id))):
+                            Navigator.push(context, PageTransition(type: PageTransitionType.rightToLeft, child: new DetailHistory(user[index].id)));
                           },
                           child: Container(
                             width: CustomSize.sizeWidth(context),
@@ -177,8 +227,7 @@ class _HistoryActivityState extends State<HistoryActivity> {
                                     height: CustomSize.sizeWidth(context) / 2.8,
                                     decoration: BoxDecoration(
                                         image: DecorationImage(
-                                            image: (homepg != "1")?NetworkImage(Links.subUrl + history[index].img):NetworkImage(Links.subUrl +
-                                                "$img"),
+                                            image: (homepg != "1")?NetworkImage(Links.subUrl + history[index].img):NetworkImage(Links.subUrl + user[index].img),
                                             fit: BoxFit.cover
                                         ),
                                         borderRadius: BorderRadius.circular(20)
@@ -192,24 +241,24 @@ class _HistoryActivityState extends State<HistoryActivity> {
                                       mainAxisAlignment: MainAxisAlignment.center,
                                       children: [
                                         CustomText.bodyMedium16(
-                                            text: (homepg != "1")?history[index].name:"sidoel"
+                                            text: (homepg != "1")?history[index].name:user[index].name
                                             // history[index].name
                                             ,
                                             minSize: 16,
                                             maxLines: 1
                                         ),
                                         CustomText.bodyLight12(
-                                            text: (homepg != "1")?history[index].time:"6 January 2021",
+                                            text: (homepg != "1")?history[index].time:user[index].time,
                                             maxLines: 1,
                                             minSize: 12
                                         ),
                                         CustomText.bodyMedium12(
-                                            text: (homepg != "1")?history[index].type:"Makan ditempat",
+                                            text: (homepg != "1")?history[index].type:user[index].type,
                                             maxLines: 1,
                                             minSize: 12
                                         ),
                                         CustomText.bodyLight12(
-                                            text: (homepg != "1")?"Selesai":"Proses",
+                                            text: (homepg != "1")?"Selesai":"",
                                             maxLines: 1,
                                             minSize: 12,
                                             color: CustomColor.accent
@@ -218,7 +267,8 @@ class _HistoryActivityState extends State<HistoryActivity> {
                                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                           children: [
                                             CustomText.textHeading4(
-                                                text: NumberFormat.currency(locale: 'id', symbol: '', decimalDigits: 0).format(history[index].price),
+                                                text: (homepg != "1")?NumberFormat.currency(locale: 'id', symbol: '', decimalDigits: 0).format(history[index].price):
+                                                NumberFormat.currency(locale: 'id', symbol: '', decimalDigits: 0).format(user[index].price),
                                                 minSize: 18,
                                                 maxLines: 1
                                             ),

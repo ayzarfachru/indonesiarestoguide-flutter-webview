@@ -6,6 +6,8 @@ class Resto{
   String name;
   String address;
   String desc;
+  String day;
+  String hours;
   String priceRange;
   bool isFavourite;
   double distance;
@@ -22,6 +24,8 @@ class Resto{
         this.name,
         this.address,
         this.desc,
+        this.day,
+        this.hours,
         this.priceRange,
         this.isFavourite,
         this.distance,

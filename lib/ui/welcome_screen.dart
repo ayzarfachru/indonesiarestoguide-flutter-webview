@@ -28,6 +28,7 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
                 height: CustomSize.sizeHeight(context) / 24,
               ),
               Container(
+                alignment: Alignment.center,
                 width: CustomSize.sizeWidth(context) / 1.1,
                 child: CustomText.textHeading2(text: "Indonesia Resto Guide"),
               ),

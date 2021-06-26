@@ -17,18 +17,51 @@ import 'package:indonesiarestoguide/ui/ui_resto/edit_resto/edit_detail_resto.dar
 import 'package:http/http.dart' as http;
 
 class EditViewResto extends StatefulWidget {
+  String name = '';
+  String img = '';
+  String address = '';
+  String phone = '';
+  String desc = '';
+  String lat = '';
+  String long = '';
+  String facility = '';
+  String cuisine = '';
+  String can_delivery = '';
+  String can_takeaway = '';
+  String ongkir = '';
+  String reservation_fee = '';
+  String idResto = '';
+
+  EditViewResto(this.idResto, this.name, this.img, this.address, this.phone, this.desc, this.lat, this.long, this.facility, this.cuisine, this.can_delivery, this.can_takeaway, this.ongkir, this.reservation_fee, );
+
   @override
-  _EditViewRestoState createState() => _EditViewRestoState();
+  _EditViewRestoState createState() => _EditViewRestoState(idResto, name, img, address, phone, desc, lat, long, facility, cuisine, can_delivery, can_takeaway, ongkir, reservation_fee);
 }
 
 class _EditViewRestoState extends State<EditViewResto> {
+  String name = '';
+  String img = '';
+  String address = '';
+  String phone = '';
+  String desc = '';
+  String lat = '';
+  String long = '';
+  String facility = '';
+  String cuisine = '';
+  String can_delivery = '';
+  String can_takeaway = '';
+  String ongkir = '';
+  String reservation_fee = '';
+  String idResto = '';
+
+  _EditViewRestoState(this.idResto, this.name, this.img, this.address, this.phone, this.desc, this.lat, this.long, this.facility, this.cuisine, this.can_delivery, this.can_takeaway, this.ongkir, this.reservation_fee,);
+
   TextEditingController _Name = TextEditingController(text: "");
   TextEditingController _Address = TextEditingController(text: "");
   TextEditingController _NoTelp = TextEditingController(text: "");
   TextEditingController _Desc = TextEditingController(text: "");
 
   String initial = "";
-  String img = "";
 
   bool isLoading = true;
   bool btnAddress = false;
@@ -42,6 +75,13 @@ class _EditViewRestoState extends State<EditViewResto> {
       initial = (pref.getString('name').substring(0, 1).toUpperCase());
       print(initial);
     });
+  }
+
+  getEditView() async {
+    _Name = TextEditingController(text: name);
+    _Address = TextEditingController(text: address);
+    _NoTelp = TextEditingController(text: (phone.split('')[0] == '+')?'0'+phone.split('+62')[1]:phone);
+    _Desc = TextEditingController(text: desc);
   }
 
 
@@ -63,6 +103,8 @@ class _EditViewRestoState extends State<EditViewResto> {
   void initState() {
     super.initState();
     getInitial();
+    getEditView();
+    print(facility);
     Location.instance.getLocation().then((value) {
       setState(() {
         latitude = value.latitude;
@@ -117,8 +159,12 @@ class _EditViewRestoState extends State<EditViewResto> {
                                 color: CustomColor.primary,
                                 shape: BoxShape.circle
                             ):BoxDecoration(
-                                color: CustomColor.primary,
-                                shape: BoxShape.circle
+                              shape: BoxShape.circle,
+                              image: new DecorationImage(
+                                  image: NetworkImage(Links.subUrl +
+                                      "$img"),
+                                  fit: BoxFit.cover
+                              ),
                             ): BoxDecoration(
                               shape: BoxShape.circle,
                               image: new DecorationImage(
@@ -133,21 +179,11 @@ class _EditViewRestoState extends State<EditViewResto> {
                                   text: initial,
                                   color: Colors.white
                               ),
-                            ):Padding(
-                              padding: const EdgeInsets.only(left: 1.5),
-                              child: Center(
-                                child: (image == null)?CustomText.text(
-                                    size: 38,
-                                    weight: FontWeight.w800,
-                                    text: initial,
-                                    color: Colors.white
-                                ):Container(),
-                              ),
-                            ),
+                            ):Container(),
                           ),
                         ),
                         SizedBox(width: CustomSize.sizeWidth(context) / 32,),
-                        CustomText.bodyLight12(text: "Upload foto profile resto"),
+                        CustomText.bodyLight12(text: "Edit foto profile resto"),
                       ],
                     ),
                     SizedBox(height: CustomSize.sizeHeight(context) / 48,),
@@ -347,19 +383,22 @@ class _EditViewRestoState extends State<EditViewResto> {
             isLoading = false;
           });
           SharedPreferences pref = await SharedPreferences.getInstance();
-          pref.setString("imgResto", base64Encode(image.readAsBytesSync()).toString());
+          pref.setString("imgResto", (image != null)?'data:image/$extension;base64,'+base64Encode(image.readAsBytesSync()).toString():'');
           pref.setString("nameResto", _Name.text.toString());
           pref.setString("notelpResto", _NoTelp.text.toString());
           pref.setString("descResto", _Desc.text.toString());
           pref.setString("addressResto", _Address.text.toString());
+          pref.setString("latitudeResto", lat);
+          pref.setString("longitudeResto", long);
           print(pref.getString("imgResto"));
           print(pref.getString("nameResto"));
+          print(pref.getString("notelpResto"));
           print(pref.getString("latitudeResto"));
           print(pref.getString("longitudeResto"));
           print(pref.getString("notelpResto"));
           print(pref.getString("descResto"));
 
-          Navigator.push(context, PageTransition(type: PageTransitionType.fade, child: new EditDetailResto()));
+          Navigator.push(context, PageTransition(type: PageTransitionType.fade, child: new EditDetailResto(facility, cuisine, can_delivery, can_takeaway, ongkir, reservation_fee, idResto)));
         },
         child: Container(
           width: CustomSize.sizeWidth(context) / 1.1,

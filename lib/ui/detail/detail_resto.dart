@@ -3,8 +3,10 @@ import 'dart:convert';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_icons/flutter_icons.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:indonesiarestoguide/model/CategoryMenu.dart';
+import 'package:indonesiarestoguide/model/Cuisine.dart';
 import 'package:indonesiarestoguide/model/Menu.dart';
 import 'package:indonesiarestoguide/model/MenuJson.dart';
 import 'package:indonesiarestoguide/model/PrefCart.dart';
@@ -13,12 +15,14 @@ import 'package:indonesiarestoguide/model/Promo.dart';
 import 'package:indonesiarestoguide/ui/cart/cart_activity.dart';
 import 'package:indonesiarestoguide/ui/home/home_activity.dart';
 import 'package:indonesiarestoguide/ui/reservation/reservation_activity.dart';
+import 'package:indonesiarestoguide/ui/ui_resto/add_resto/add_slider.dart';
 import 'package:indonesiarestoguide/utils/utils.dart';
 import 'package:http/http.dart' as http;
 import 'package:intl/intl.dart';
 import 'package:page_transition/page_transition.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:indonesiarestoguide/ui/ui_resto/edit_resto/edit_view_resto.dart';
 
 class DetailResto extends StatefulWidget {
   String id;
@@ -41,15 +45,21 @@ class _DetailRestoState extends State<DetailResto> {
   List<String> restoId = [];
   List<String> qty = [];
   String name = "";
+  String phone = "";
   String address = "";
   String desc = "";
   String img = "";
   String range = "";
   String openClose = "";
   String reservationFee = "";
+  String can_delivery = "";
+  String can_takeaway = "";
+  String lat = "";
+  String long = "";
   bool isFav = false;
   String inCart = "";
   String nameCategory = "";
+  String homepg = "";
 
   bool isSeePromo = false;
   bool isPromo = false;
@@ -60,12 +70,19 @@ class _DetailRestoState extends State<DetailResto> {
   List<Menu> menu = [];
   List<MenuJson> menuJson = [];
   List<CategoryMenu> categoryMenu = [];
+  String facility = '';
+  String cuisine = '';
+  String idResto = '';
+  String reservation_fee = '';
+  String ongkir = '';
   Future _getDetail(String id)async{
     List<String> _images = [];
     List<Promo> _promo = [];
     List<Menu> _menu = [];
     List<MenuJson> _menuJson = [];
     List<CategoryMenu> _categoryMenu = [];
+    List<String> _facility = [];
+    List<String> _cuisine = [];
 
     setState(() {
       isLoading = true;
@@ -76,8 +93,20 @@ class _DetailRestoState extends State<DetailResto> {
       "Accept": "Application/json",
       "Authorization": "Bearer $token"
     });
+    print(apiResult.body);
     var data = json.decode(apiResult.body);
-    print(data['data']['promo']);
+    // print(data['data']['can_delivery']);
+    // print(data['data']['can_take_away']);
+    // print(data['data']['fasilitas']);
+    // print(data['data']['type']);
+
+    for(var v in data['data']['type']){
+          _cuisine.add(v['name']);
+    }
+
+    for(var v in data['data']['fasilitas']){
+          _facility.add(v['name']);
+    }
 
     for(var v in data['data']['img']){
       _images.add(v);
@@ -102,7 +131,7 @@ class _DetailRestoState extends State<DetailResto> {
       _cateMenu = [];
       _categoryMenu.add(cm);
     }
-    print(_categoryMenu);
+    // print(_categoryMenu);
 
     for(var v in data['data']['recom']){
       Menu m = Menu(
@@ -127,18 +156,20 @@ class _DetailRestoState extends State<DetailResto> {
       _menuJson.add(m);
     }
 
-    for(var v in data['data']['promo']){
-      Promo p = Promo(
-        word: v['word'],
-        menu: Menu(
-            id: v['menu_id'],
-            name: v['menu_name'],
-            desc: v['menu_desc'],
-            urlImg: v['menu_img'],
-            price: Price.discounted(v['menu_price'], v['menu_discounted'])
-        ),
-      );
-      _promo.add(p);
+    if (homepg != "1") {
+      for(var v in data['data']['promo']){
+        Promo p = Promo(
+          word: v['word'],
+          menu: Menu(
+              id: v['menu_id'],
+              name: v['menu_name'],
+              desc: v['menu_desc'],
+              urlImg: v['menu_img'],
+              price: Price.discounted(v['menu_price'], v['menu_discounted'])
+          ),
+        );
+        _promo.add(p);
+      }
     }
 
     SharedPreferences pref2 = await SharedPreferences.getInstance();
@@ -146,19 +177,31 @@ class _DetailRestoState extends State<DetailResto> {
     pref2.setString('longResto', data['data']['long'].toString());
 
     setState(() {
+      idResto = data['data']['id'].toString();
       name = data['data']['name'];
+      phone = data['data']['phone_number'];
       address = data['data']['address'];
       desc = data['data']['desc'];
       img = data['data']['main_img'];
+      reservation_fee = data['data']['reservation_fee'].toString();
+      ongkir = data['data']['ongkir'].toString();
       range = data['data']['range'];
       isFav = data['data']['is_followed'];
       openClose = data['data']['openclose'];
       reservationFee = data['data']['reservation_fee'].toString();
+      can_delivery = data['data']['can_delivery'].toString();
+      can_takeaway = data['data']['can_take_away'].toString();
+      lat = data['data']['lat'].toString();
+      long = data['data']['long'].toString();
       images = _images;
       promo = _promo;
       menu = _menu;
       categoryMenu = _categoryMenu;
       nameCategory = _categoryMenu[0].name;
+      facility = _facility.toString().split('[')[1].split(']')[0].replaceAll(new RegExp(r",\s+"), ",");
+      print(facility);
+      cuisine = _cuisine.toString().split('[')[1].split(']')[0].replaceAll(new RegExp(r",\s+"), ",");
+      // print(cuisine);
       if(promo.length <= 3){
         indexPromo = promo.length;
       }else{
@@ -166,6 +209,14 @@ class _DetailRestoState extends State<DetailResto> {
         isPromo = true;
       }
       isLoading = false;
+    });
+  }
+
+  getHomePg() async {
+    SharedPreferences pref = await SharedPreferences.getInstance();
+    setState(() {
+      homepg = (pref.getString('homepg'));
+      print(homepg);
     });
   }
 
@@ -192,10 +243,116 @@ class _DetailRestoState extends State<DetailResto> {
     setState(() {});
   }
 
+  Future triggerToast() async{
+    Fluttertoast.showToast(
+        msg: "Tekan dan tahan untuk hapus",
+        backgroundColor: Colors.grey,
+        textColor: Colors.black,
+        fontSize: 16.0
+    );
+  }
+
+  Future _delImage(String id)async{
+
+    setState(() {
+      isLoading = true;
+    });
+    SharedPreferences pref = await SharedPreferences.getInstance();
+    String token = pref.getString("token") ?? "";
+    var apiResult = await http.get(Links.mainUrl + '/resto/img/delete/$id', headers: {
+      "Accept": "Application/json",
+      "Authorization": "Bearer $token"
+    });
+    print(apiResult.body);
+    var data = json.decode(apiResult.body);
+
+    if (data['msg'].toString() == 'Success') {
+      Navigator.pop(context);
+      Navigator.pushReplacement(context,
+          PageTransition(
+              type: PageTransitionType.fade,
+              child: DetailResto(id)));
+    }
+
+    setState(() {
+      isLoading = false;
+    });
+  }
+
+  List<Menu> imagesSlider = [];
+  Future _getImage()async{
+    List<Menu> _imagesSlider = [];
+
+    setState(() {
+      isLoading = true;
+    });
+    SharedPreferences pref = await SharedPreferences.getInstance();
+    String token = pref.getString("token") ?? "";
+    var apiResult = await http.get(Links.mainUrl + '/resto/img', headers: {
+      "Accept": "Application/json",
+      "Authorization": "Bearer $token"
+    });
+    // print(apiResult.body);
+    var data = json.decode(apiResult.body);
+
+    for(var p in data['img']){
+      Menu v = Menu(
+          id: p['id'],
+          urlImg: p['img']
+      );
+      _imagesSlider.add(v);
+    }
+
+    setState(() {
+      imagesSlider = _imagesSlider;
+      // print(imagesSlider);
+      isLoading = false;
+    });
+  }
+
+  showAlertDialog(String id) {
+
+    // set up the buttons
+    Widget cancelButton = FlatButton(
+      child: Text("Batal"),
+      onPressed:  () {
+        Navigator.pop(context);
+      },
+    );
+    Widget continueButton = FlatButton(
+      child: Text("Hapus"),
+      onPressed:  () {
+        _delImage(id);
+      },
+    );
+
+    // set up the AlertDialog
+    AlertDialog alert = AlertDialog(
+      title: Text("Hapus Foto"),
+      content: Text("Apakah anda yakin ingin menghapus foto ini?"),
+      actions: [
+        cancelButton,
+        continueButton,
+      ],
+    );
+
+    // show the dialog
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return alert;
+      },
+    );
+  }
+
   @override
   void initState() {
     _getDetail(id);
+    print(id);
     _getData();
+    _getImage();
+    getHomePg();
+    print(homepg + ' hoi kafir');
     super.initState();
   }
 
@@ -241,15 +398,39 @@ class _DetailRestoState extends State<DetailResto> {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Container(
-                                width: CustomSize.sizeWidth(context) / 1.5,
+                                width: CustomSize.sizeWidth(context) / 2,
                                 child: CustomText.textHeading5(
                                     text: name,
                                     maxLines: 2,
                                     minSize: 24
                                 ),
                               ),
-                              Icon(MaterialCommunityIcons.bookmark,
-                                color: (isFav)?CustomColor.primary:CustomColor.dividerDark, size: 40,)
+                              (homepg != "1")?Icon(MaterialCommunityIcons.bookmark,
+                                color: (isFav)?CustomColor.primary:CustomColor.dividerDark, size: 40,):
+                              GestureDetector(
+                                onTap: (){
+                                  setState(() {
+                                    Navigator.push(context, PageTransition(type: PageTransitionType.fade, child: new EditViewResto(idResto, name, img, address, phone, desc, lat, long, facility, cuisine, can_delivery, can_takeaway, ongkir, reservation_fee)));
+                                  });
+                                },
+                                child: Container(
+                                  width: CustomSize.sizeWidth(context) / 3.6,
+                                  decoration: BoxDecoration(
+                                    borderRadius: BorderRadius.circular(25),
+                                    border: Border.all(color: CustomColor.accent, width: 1),
+                                    // color: CustomColor.accentLight
+                                  ),
+                                  child: Padding(
+                                    padding: const EdgeInsets.all(2.0),
+                                    child: Center(
+                                      child: CustomText.textTitle8(
+                                          text: "Edit Restomu",
+                                          color: CustomColor.accent
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              )
                             ],
                           ),
                         ),
@@ -311,7 +492,18 @@ class _DetailRestoState extends State<DetailResto> {
                             ],
                           ),
                         ),
-                        SizedBox(height: CustomSize.sizeHeight(context) / 24,),
+                        (homepg != "1")?Container():Padding(
+                          padding: EdgeInsets.symmetric(horizontal: CustomSize.sizeWidth(context) / 32),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Divider(),
+                              SizedBox(height: CustomSize.sizeHeight(context) / 63,),
+                              CustomText.textHeading4(text: "Deskripsi Resto", color: CustomColor.primary),
+                            ],
+                          ),
+                        ),
+                        (homepg != "1")?SizedBox(height: CustomSize.sizeHeight(context) / 24,):SizedBox(height: CustomSize.sizeHeight(context) / 54,),
                         Padding(
                           padding: EdgeInsets.symmetric(horizontal: CustomSize.sizeWidth(context) / 14),
                           child: CustomText.bodyRegular14(
@@ -320,8 +512,39 @@ class _DetailRestoState extends State<DetailResto> {
                               maxLines: 100
                           ),
                         ),
-                        SizedBox(height: CustomSize.sizeHeight(context) / 24,),
-                        Container(
+                        (homepg != '1')?SizedBox(height: CustomSize.sizeHeight(context) / 24,):SizedBox(height: CustomSize.sizeHeight(context) / 124,),
+                        (homepg != '1')?Container():Padding(
+                          padding: EdgeInsets.symmetric(horizontal: CustomSize.sizeHeight(context) / 24, vertical: CustomSize.sizeHeight(context) / 84),
+                          child: Container(
+                            alignment: Alignment.centerRight,
+                            child: GestureDetector(
+                              onTap: (){
+                                setState(() {
+                                  Navigator.push(context, PageTransition(type: PageTransitionType.fade, child: new AddSlider(idResto)));
+                                  print(idResto);
+                                });
+                              },
+                              child: Container(
+                                width: CustomSize.sizeWidth(context) / 3.6,
+                                decoration: BoxDecoration(
+                                  borderRadius: BorderRadius.circular(25),
+                                  border: Border.all(color: CustomColor.accent, width: 1),
+                                  // color: CustomColor.accentLight
+                                ),
+                                child: Padding(
+                                  padding: const EdgeInsets.all(2.0),
+                                  child: Center(
+                                    child: CustomText.textTitle8(
+                                        text: "Tambah Foto",
+                                        color: CustomColor.accent
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
+                        (homepg != '1')?Container(
                           height: CustomSize.sizeWidth(context) / 2.4,
                           child: ListView.builder(
                               scrollDirection: Axis.horizontal,
@@ -343,18 +566,48 @@ class _DetailRestoState extends State<DetailResto> {
                                 );
                               }
                           ),
+                        ):Container(
+                          height: CustomSize.sizeWidth(context) / 2.4,
+                          child: ListView.builder(
+                              scrollDirection: Axis.horizontal,
+                              itemCount: imagesSlider.length,
+                              itemBuilder: (_, index){
+                                return Padding(
+                                  padding: EdgeInsets.only(left: CustomSize.sizeWidth(context) * 0.03),
+                                  child: GestureDetector(
+                                    onTap: () {
+                                      triggerToast();
+                                    },
+                                    onLongPress: () {
+                                      showAlertDialog(imagesSlider[index].id.toString());
+                                    },
+                                    child: Container(
+                                      width: CustomSize.sizeWidth(context) / 2.4,
+                                      height: CustomSize.sizeWidth(context) / 2.4,
+                                      decoration: BoxDecoration(
+                                          image: DecorationImage(
+                                              image: NetworkImage(Links.subUrl + imagesSlider[index].urlImg),
+                                              fit: BoxFit.cover
+                                          ),
+                                          borderRadius: BorderRadius.circular(10)
+                                      ),
+                                    ),
+                                  ),
+                                );
+                              }
+                          ),
                         ),
                         SizedBox(height: CustomSize.sizeHeight(context) / 38,),
-                        Padding(
+                        (homepg != "1")?Padding(
                           padding: EdgeInsets.symmetric(horizontal: CustomSize.sizeWidth(context) / 8),
                           child: CustomText.bodyMedium16(
                               text: "Penawaran yang Tersedia",
                               color: CustomColor.primary,
                               maxLines: 1
                           ),
-                        ),
-                        SizedBox(height: CustomSize.sizeHeight(context) / 86,),
-                        ListView.builder(
+                        ):Container(),
+                        (homepg != "1")?SizedBox(height: CustomSize.sizeHeight(context) / 86,):Container(),
+                        (homepg != "1")?ListView.builder(
                             controller: _scrollController,
                             physics: NeverScrollableScrollPhysics(),
                             shrinkWrap: true,
@@ -552,9 +805,9 @@ class _DetailRestoState extends State<DetailResto> {
                                 ),
                               );
                             }
-                        ),
-                        (isPromo)?SizedBox(height: CustomSize.sizeHeight(context) / 48,):SizedBox(),
-                        (isPromo)?Padding(
+                        ):Container(),
+                        (homepg != "1")?(isPromo)?SizedBox(height: CustomSize.sizeHeight(context) / 48,):SizedBox():Container(),
+                        (homepg != "1")?(isPromo)?Padding(
                           padding: EdgeInsets.symmetric(horizontal: CustomSize.sizeWidth(context) / 8),
                           child: GestureDetector(
                             onTap: (){
@@ -572,9 +825,9 @@ class _DetailRestoState extends State<DetailResto> {
                               child: Center(child: CustomText.bodyRegular14(text: "See more", color: CustomColor.accent)),
                             ),
                           ),
-                        ):SizedBox(),
-                        SizedBox(height: CustomSize.sizeHeight(context) / 63,),
-                        Padding(
+                        ):SizedBox():Container(),
+                        (homepg != "1")?SizedBox(height: CustomSize.sizeHeight(context) / 63,):Container(),
+                        (homepg != "1")?Padding(
                           padding: EdgeInsets.symmetric(horizontal: CustomSize.sizeWidth(context) / 32),
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
@@ -584,9 +837,9 @@ class _DetailRestoState extends State<DetailResto> {
                               CustomText.textHeading4(text: "Rekomendasi Menu", color: CustomColor.primary),
                             ],
                           ),
-                        ),
-                        SizedBox(height: CustomSize.sizeHeight(context) / 48,),
-                        ListView.builder(
+                        ):Container(),
+                        (homepg != "1")?SizedBox(height: CustomSize.sizeHeight(context) / 48,):Container(),
+                        (homepg != "1")?ListView.builder(
                           controller: _scrollController,
                           physics: NeverScrollableScrollPhysics(),
                           shrinkWrap: true,
@@ -920,9 +1173,9 @@ class _DetailRestoState extends State<DetailResto> {
                               ),
                             );
                           },
-                        ),
-                        SizedBox(height: CustomSize.sizeHeight(context) / 63,),
-                        GestureDetector(
+                        ):Container(),
+                        (homepg != "1")?SizedBox(height: CustomSize.sizeHeight(context) / 63,):Container(),
+                        (homepg != "1")?GestureDetector(
                           onTap: (){
                             showModalBottomSheet(
                                 isScrollControlled: true,
@@ -987,9 +1240,9 @@ class _DetailRestoState extends State<DetailResto> {
                               ),
                             ),
                           ),
-                        ),
-                        SizedBox(height: CustomSize.sizeHeight(context) / 48,),
-                        ListView.builder(
+                        ):Container(),
+                        (homepg != "1")?SizedBox(height: CustomSize.sizeHeight(context) / 48,):Container(),
+                        (homepg != "1")?ListView.builder(
                           controller: _scrollController,
                           physics: NeverScrollableScrollPhysics(),
                           shrinkWrap: true,
@@ -1242,8 +1495,8 @@ class _DetailRestoState extends State<DetailResto> {
                               ),
                             );
                           },
-                        ),
-                        SizedBox(height: CustomSize.sizeHeight(context) / 8,),
+                        ):Container(),
+                        (homepg != "1")?SizedBox(height: CustomSize.sizeHeight(context) / 8,):Container(),
                       ],
                     ),
                   ),
@@ -1281,7 +1534,7 @@ class _DetailRestoState extends State<DetailResto> {
           ),
         ),
       ),
-      floatingActionButton: (isLoading != true)?(inCart == '1')?GestureDetector(
+      floatingActionButton: (homepg != "1")?(isLoading != true)?(inCart == '1')?GestureDetector(
         onTap: (){
           Navigator.push(
               context,
@@ -1315,7 +1568,7 @@ class _DetailRestoState extends State<DetailResto> {
           ),
           child: Center(child: CustomText.bodyRegular16(text: "Reservasi Sekarang", color: Colors.white)),
         ),
-      ):SizedBox(),
+      ):SizedBox():Container(),
     );
   }
 }

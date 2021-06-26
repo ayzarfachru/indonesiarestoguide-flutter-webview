@@ -86,7 +86,7 @@ class _EditProfileState extends State<EditProfile> {
   getGender() async {
     SharedPreferences pref = await SharedPreferences.getInstance();
     setState(() {
-      gender = (pref.getString('gender'));
+      gender = 'pria';
       print(gender);
     });
   }

@@ -5,6 +5,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_datetime_picker/flutter_datetime_picker.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:indonesiarestoguide/ui/ui_resto/employees/employees_activity.dart';
+import 'package:indonesiarestoguide/ui/ui_resto/home/home_activity.dart';
 import 'package:indonesiarestoguide/utils/utils.dart';
 import 'package:indonesiarestoguide/ui/home/home_activity.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -53,12 +55,6 @@ class _AddEmployeesActivityState extends State<AddEmployeesActivity> {
     setState(() {
       email = (pref.getString('email'));
       print(email);
-    });
-  }
-
-  getTemail() async {
-    setState(() {
-      _loginEmailName = TextEditingController(text: email);
     });
   }
 
@@ -135,52 +131,40 @@ class _AddEmployeesActivityState extends State<AddEmployeesActivity> {
     });
   }
 
-  Future<String> editProfile(String newName, String newEmail, String newTgl, String newGender, String newNotelp, File newImage, String newImg) async{
+  Future<String> addEployees() async{
     SharedPreferences pref = await SharedPreferences.getInstance();
     var token = pref.getString("token") ?? "";
     var id = pref.getInt("id") ?? "";
 
-    String apiUrl = Links.mainUrl+"/auth/edit/user";
-    var postUri = Uri.parse(apiUrl);
-
-    final response = await http.post(
-        postUri,
+    var apiResult = await http.post(Links.mainUrl + '/karyawan',
         body: {
-          'name': newName,
-          'email' : newEmail,
-          'ttl': newTgl,
-          'gender': newGender,
-          'phone': newNotelp,
-          'photo': image != null ? 'data:image/$extension;base64,' +
-              base64Encode(newImage.readAsBytesSync()) : '',
+          'email': _loginEmailName.text,
         },
         headers: {
-          "Accept" : "Application/json",
+          "Accept": "Application/json",
           "Authorization": "Bearer $token"
-        }
-    );
-    final responseJson = jsonDecode(response.body);
-    print(newName+'tsnl');
-    print(newEmail+'tsnl');
-    print(newTgl+'tsnl');
-    print(newGender+'tsnl');
-    print(newNotelp+'tsnl');
-    print(image != null ? 'data:image/$extension;base64,' +
-        base64Encode(newImage.readAsBytesSync()) +'tsnl': img+'tsnl');
-    print(responseJson);
-    return responseJson["message"];
+        });
+    var data = json.decode(apiResult.body);
+    print(apiResult.body);
+    // print(newName+'tsnl');
+    // print(newEmail+'tsnl');
+    // print(newTgl+'tsnl');
+    // print(newGender+'tsnl');
+    // print(newNotelp+'tsnl');
+    // print(image != null ? 'data:image/$extension;base64,' +
+    //     base64Encode(newImage.readAsBytesSync()) +'tsnl': img+'tsnl');
   }
 
   @override
   void initState() {
     super.initState();
-    getName();
-    getEmail();
-    getImg();
-    getNotelp();
-    getGender();
-    getGenderField();
-    getTgl();
+    // getName();
+    // getEmail();
+    // getImg();
+    // getNotelp();
+    // getGender();
+    // getGenderField();
+    // getTgl();
     Future.delayed(Duration.zero, () async {
       setState(() {
         // getTname();
@@ -201,7 +185,7 @@ class _AddEmployeesActivityState extends State<AddEmployeesActivity> {
               Padding(
                 padding: EdgeInsets.symmetric(horizontal: CustomSize.sizeWidth(context) / 32),
                 child: CustomText.textHeading4(
-                    text: "Isi data pegawai",
+                    text: "Tambah pegawai",
                     minSize: 18,
                     maxLines: 1
                 ),
@@ -260,59 +244,6 @@ class _AddEmployeesActivityState extends State<AddEmployeesActivity> {
                     //   ],
                     // ),
                     // SizedBox(height: CustomSize.sizeHeight(context) / 48,),
-                    CustomText.bodyLight12(text: "Nama Lengkap"),
-                    SizedBox(
-                      height: CustomSize.sizeHeight(context) * 0.005,
-                    ),
-                    TextField(
-                      controller: _loginTextName,
-                      keyboardType: TextInputType.name,
-                      cursorColor: Colors.black,
-                      style: GoogleFonts.poppins(
-                          textStyle:
-                          TextStyle(fontSize: 18, color: Colors.black, fontWeight: FontWeight.w600)),
-                      decoration: InputDecoration(
-                        isDense: true,
-                        contentPadding: EdgeInsets.only(bottom: CustomSize.sizeHeight(context) / 86),
-                        hintStyle: GoogleFonts.poppins(
-                            textStyle:
-                            TextStyle(fontSize: 14, color: Colors.grey)),
-                        helperStyle: GoogleFonts.poppins(
-                            textStyle: TextStyle(fontSize: 14)),
-                        enabledBorder: UnderlineInputBorder(
-
-                        ),
-                        focusedBorder: UnderlineInputBorder(
-
-                        ),
-                      ),
-                    ),
-                    SizedBox(height: CustomSize.sizeHeight(context) / 48,),
-                    CustomText.bodyLight12(text: "No Telepon"),
-                    SizedBox(
-                      height: CustomSize.sizeHeight(context) * 0.005,
-                    ),
-                    TextField(
-                      controller: _loginNotelpName,
-                      keyboardType: TextInputType.numberWithOptions(),
-                      cursorColor: Colors.black,
-                      style: GoogleFonts.poppins(
-                          textStyle:
-                          TextStyle(fontSize: 18, color: Colors.black, fontWeight: FontWeight.w600)),
-                      decoration: InputDecoration(
-                        prefixText: "+62 ",
-                        isDense: true,
-                        contentPadding: EdgeInsets.only(bottom: CustomSize.sizeHeight(context) / 86),
-                        hintStyle: GoogleFonts.poppins(
-                            textStyle:
-                            TextStyle(fontSize: 18, color: Colors.grey, fontWeight: FontWeight.w600)),
-                        helperStyle: GoogleFonts.poppins(
-                            textStyle: TextStyle(fontSize: 14)),
-                        enabledBorder: UnderlineInputBorder(),
-                        focusedBorder: UnderlineInputBorder(),
-                      ),
-                    ),
-                    SizedBox(height: CustomSize.sizeHeight(context) / 48,),
                     CustomText.bodyLight12(text: "Email"),
                     SizedBox(
                       height: CustomSize.sizeHeight(context) * 0.005,
@@ -337,150 +268,6 @@ class _AddEmployeesActivityState extends State<AddEmployeesActivity> {
                       ),
                     ),
                     SizedBox(height: CustomSize.sizeHeight(context) / 48,),
-                    CustomText.bodyLight12(text: "Jenis Kelamin"),
-                    SizedBox(
-                      height: CustomSize.sizeHeight(context) * 0.005,
-                    ),
-                    TextField(
-                      readOnly: true,
-                      controller: _gender,
-                      keyboardType: TextInputType.text,
-                      cursorColor: Colors.black,
-                      style: GoogleFonts.poppins(
-                          textStyle:
-                          TextStyle(fontSize: 18, color: Colors.black, fontWeight: FontWeight.w600)),
-                      decoration: InputDecoration(
-                        isDense: true,
-                        contentPadding: EdgeInsets.only(bottom: CustomSize.sizeHeight(context) / 86),
-                        hintStyle: GoogleFonts.poppins(
-                            textStyle:
-                            TextStyle(fontSize: 14, color: Colors.grey)),
-                        helperStyle: GoogleFonts.poppins(
-                            textStyle: TextStyle(fontSize: 14)),
-                        enabledBorder: UnderlineInputBorder(),
-                        focusedBorder: UnderlineInputBorder(),
-                        suffixIcon: Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 8.0),
-                          child: GestureDetector(
-                            onTap: () async{
-                              showModalBottomSheet(
-                                  isScrollControlled: true,
-                                  shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.only(topLeft: Radius.circular(20), topRight: Radius.circular(20))
-                                  ),
-                                  context: context,
-                                  builder: (_){
-                                    return Column(
-                                      crossAxisAlignment: CrossAxisAlignment.start,
-                                      mainAxisSize: MainAxisSize.min,
-                                      children: [
-                                        SizedBox(height: CustomSize.sizeHeight(context) / 86,),
-                                        Padding(
-                                          padding: EdgeInsets.symmetric(horizontal: CustomSize.sizeWidth(context) / 2.4),
-                                          child: Divider(thickness: 4,),
-                                        ),
-                                        SizedBox(height: CustomSize.sizeHeight(context) / 106,),
-                                        Padding(
-                                          padding: EdgeInsets.symmetric(horizontal: CustomSize.sizeHeight(context) / 20),
-                                          child: Row(
-                                            crossAxisAlignment: CrossAxisAlignment.center,
-                                            mainAxisAlignment: MainAxisAlignment.spaceAround,
-                                            children: [
-                                              GestureDetector(
-                                                onTap: (){
-                                                  pria();
-                                                  getGenderField();
-                                                  Navigator.pop(context);
-                                                },
-                                                child: Padding(
-                                                  padding: const EdgeInsets.symmetric(vertical: 8.0),
-                                                  child: CustomText.textHeading5(
-                                                      text: "Pria",
-                                                      minSize: 17,
-                                                      maxLines: 1
-                                                  ),
-                                                ),
-                                              ),
-                                              GestureDetector(
-                                                onTap: (){
-                                                  wanita();
-                                                  getGenderField();
-                                                  Navigator.pop(context);
-                                                },
-                                                child: Padding(
-                                                  padding: const EdgeInsets.symmetric(vertical: 8.0),
-                                                  child: CustomText.textHeading5(
-                                                      text: "Wanita",
-                                                      minSize: 17,
-                                                      maxLines: 1
-                                                  ),
-                                                ),
-                                              ),
-                                            ],
-                                          ),
-                                        ),
-                                        SizedBox(height: CustomSize.sizeHeight(context) / 72,),
-                                      ],
-                                    );
-                                  }
-                              );
-                            },
-                            child: Stack(
-                              children: [
-                                Container(
-                                  width: CustomSize.sizeWidth(context) / 6,
-                                  decoration: BoxDecoration(
-                                    borderRadius: BorderRadius.circular(25),
-                                    border: Border.all(color: CustomColor.accent, width: 1),
-                                    // color: CustomColor.accentLight
-                                  ),
-                                  child: Padding(
-                                    padding: const EdgeInsets.all(2.0),
-                                    child: Center(
-                                      child: CustomText.textTitle8(
-                                          text: "Ganti",
-                                          color: CustomColor.accent
-                                      ),
-                                    ),
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                        ),
-                      ),
-                    ),
-                    SizedBox(height: CustomSize.sizeHeight(context) / 48,),
-                    CustomText.bodyLight12(text: "Tanggal Lahir"),
-                    SizedBox(
-                      height: CustomSize.sizeHeight(context) * 0.005,
-                    ),
-                    GestureDetector(
-                      onTap: (){
-                        DatePicker.showDatePicker(context, showTitleActions: true,
-                            onConfirm: (date) {
-                              setState(() {
-                                tgl = date.toString().split(' ')[0];
-                              });
-                              print(date.toString().split(' ')[0]);
-                            },
-                            currentTime: DateTime(DateTime.now().year, DateTime.now().month,
-                                DateTime.now().day),
-                            locale: LocaleType.id,
-                            maxTime: DateTime(DateTime.now().year, 12, 31)
-                        );
-                      },
-                      child: CustomText.textHeading4(
-                          text: tgl,
-                          minSize: 18,
-                          maxLines: 1
-                      ),
-                    ),
-                    Divider(
-                      color: Colors.black,
-                      thickness: 1,
-                    ),
-                    SizedBox(height: CustomSize.sizeHeight(context) / 48,),
                   ],
                 ),
               )
@@ -501,30 +288,21 @@ class _AddEmployeesActivityState extends State<AddEmployeesActivity> {
           // pref.setString("tgl", tgl);
           // pref.setString("notelp", _loginNotelpName.text.toString());
 
-          editProfile(_loginTextName.text.toString(), _loginEmailName.text.toString(), tgl.toString(), gender.toString(), _loginNotelpName.text.toString(), image, img.toString()).then((onValue) {
-            if(onValue == "Success"){
-              Fluttertoast.showToast(
-                  msg: "Success",
-                  backgroundColor: Colors.grey,
-                  textColor: Colors.black,
-                  fontSize: 16.0
-              );
-              setState(() {
-                isLoading = true;
-              });
-              Navigator.pushReplacement(context, PageTransition(type: PageTransitionType.fade, child: new HomeActivity()));
-            } else {
-              setState(() {
-                isLoading = true;
-              });
-              Fluttertoast.showToast(
-                  msg: "The field is required",
-                  backgroundColor: Colors.grey,
-                  textColor: Colors.black,
-                  fontSize: 16.0
-              );
-            }
-          });
+          if (_loginEmailName.text != '') {
+            addEployees();
+            Navigator.pop(context);
+            Navigator.pushReplacement(context,
+                PageTransition(
+                    type: PageTransitionType.fade,
+                    child: EmployeesActivity()));
+          } else {
+            Fluttertoast.showToast(
+                msg: "The field is required",
+                backgroundColor: Colors.grey,
+                textColor: Colors.black,
+                fontSize: 16.0
+            );
+          }
         },
         child: Container(
           width: CustomSize.sizeWidth(context) / 1.1,

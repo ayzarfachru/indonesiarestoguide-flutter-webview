@@ -2,11 +2,16 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:date_time_picker/date_time_picker.dart';
+import 'package:day_night_time_picker/lib/constants.dart';
+import 'package:day_night_time_picker/lib/daynight_timepicker.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_datetime_picker/flutter_datetime_picker.dart';
 import 'package:flutter_icons/flutter_icons.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:indonesiarestoguide/model/Promo.dart';
+import 'package:indonesiarestoguide/ui/promo/promo_activity.dart';
 import 'package:indonesiarestoguide/ui/ui_resto/add_resto/add_detail_resto.dart';
 import 'package:indonesiarestoguide/ui/ui_resto/add_resto/add_view_resto.dart';
 import 'package:indonesiarestoguide/ui/ui_resto/home/home_activity.dart';
@@ -20,11 +25,20 @@ import 'package:page_transition/page_transition.dart';
 import 'package:http/http.dart' as http;
 
 class EditPromo extends StatefulWidget {
+  Promo promoResto;
+
+  EditPromo(this.promoResto);
+
   @override
-  _EditPromoState createState() => _EditPromoState();
+  _EditPromoState createState() => _EditPromoState(promoResto);
 }
 
 class _EditPromoState extends State<EditPromo> {
+  void setState(fn) {
+    if(mounted) {
+      super.setState(fn);
+    }
+  }
   TextEditingController descPromo = TextEditingController(text: "");
   TextEditingController percentPromo = TextEditingController(text: "");
   TextEditingController endPromo = TextEditingController(text: "");
@@ -32,8 +46,14 @@ class _EditPromoState extends State<EditPromo> {
   TextEditingController deskMenu = TextEditingController(text: "");
   TextEditingController tOngkir = TextEditingController(text: "");
   TextEditingController tReser4 = TextEditingController(text: "");
+  TextEditingController _Jam = TextEditingController(text: "");
+  TextEditingController typePromo = TextEditingController(text: "");
   TextEditingController tTable = TextEditingController(text: "");
   TextEditingController _dateController = TextEditingController();
+
+  Promo promoResto;
+
+  _EditPromoState(this.promoResto);
 
   String name = "";
   String initial = "";
@@ -49,20 +69,11 @@ class _EditPromoState extends State<EditPromo> {
   bool reservation = false;
   bool delivery = false;
 
-  List<String> menuList = [
-    "Chinese Food",
-    "Indonesian Food",
-    "Western Food",
-    "Cafe",
-    "Asian Food",
-    "Bakery",
-    "Bali Food",
-    "Uncivil",
-    "Catering",
-    "Coffee Shop",
-    "Dessert",
-    "Fine Dining",
-    "Halal",
+  List<String> menuList = [];
+  List<String> type = [
+    'diskon',
+    'potongan',
+    'ongkir',
   ];
 
   List<String> selectedMenuList = List();
@@ -76,7 +87,7 @@ class _EditPromoState extends State<EditPromo> {
           return AlertDialog(
             title: Text("Tipe Menu"),
             content: CuisineChip(
-              menuList,
+              type,
               onSelectionChanged: (selectedList) {
                 setState(() {
                   selectedMenuList = selectedList;
@@ -133,6 +144,17 @@ class _EditPromoState extends State<EditPromo> {
     });
   }
 
+  TimeOfDay jam = TimeOfDay();
+
+  void onTimeOpenChanged(TimeOfDay newTime) {
+    setState(() {
+      jam = newTime;
+    });
+  }
+
+  getBuka() async {
+    _Jam = (jam.hour != null)?TextEditingController(text: jam.hour.toString() + ':' + jam.minute.toString()):TextEditingController(text: "");
+  }
 
   //------------------------------= IMAGE PICKER =----------------------------------
   File image;
@@ -154,37 +176,122 @@ class _EditPromoState extends State<EditPromo> {
 
   Future<Null> _selectDate(BuildContext context) async {
     final DateTime picked = await showDatePicker(
-        context: context,
-        initialDate: selectedDate,
-        initialDatePickerMode: DatePickerMode.day,
-        helpText: "Pilih Tanggal",
-        cancelText: "Batal",
-        confirmText: "Simpan",
-        firstDate: DateTime(2009),
-        lastDate: DateTime(2101),
-        builder: (BuildContext context, Widget child) {
-          return Theme(
-            data: ThemeData.dark().copyWith(
+      context: context,
+      initialDate: selectedDate,
+      initialDatePickerMode: DatePickerMode.day,
+      helpText: "Pilih Tanggal",
+      cancelText: "Batal",
+      confirmText: "Simpan",
+      firstDate: DateTime(2021),
+      lastDate: DateTime(2101),
+      builder: (BuildContext context, Widget child) {
+        return Theme(
+          data: ThemeData.dark().copyWith(
               backgroundColor: Colors.black,
               primaryColor: CustomColor.secondary, //Head background
               accentColor: CustomColor.secondary //s //Background color
-            ),
-            child: child,
-          );
+          ),
+          child: child,
+        );
+      },
+    );
+    if (picked != null)
+      setState(() {
+        selectedDate = picked;
+        print(selectedDate);
+        _dateController.text = DateFormat('d-M-y').format(selectedDate);
+      });
+  }
+
+  String idMenu = '';
+  getMenuId() async {
+    idMenu = promoResto.menus_id.toString();
+  }
+
+  getDescPromo() async {
+    descPromo = TextEditingController(text: promoResto.word);
+  }
+
+  getTypePromo() async {
+    typePromo = TextEditingController(text: (promoResto.discountedPrice != null)?'diskon'
+        :(promoResto.potongan != null)?'potongan':'ongkir');
+  }
+
+  getDiscPromo() async {
+    percentPromo = TextEditingController(text: (promoResto.discountedPrice != null)?promoResto.discountedPrice.toString()
+        :(promoResto.potongan != null)?promoResto.potongan.toString():promoResto.ongkir.toString());
+  }
+
+  getDatePromo() async {
+    _dateController = TextEditingController(text: promoResto.expired_at.split(' ')[0]);
+  }
+
+  getJamPromo() async {
+    _Jam = TextEditingController(text: promoResto.expired_at.split(' ')[1].split(':')[0]+':'+promoResto.expired_at.split(' ')[1].split(':')[1]);
+  }
+
+  Future<void> EditPromo(String id)async{
+    setState(() {
+      isLoading = true;
+    });
+    SharedPreferences pref = await SharedPreferences.getInstance();
+    String token = pref.getString("token") ?? "";
+    var apiResult = await http.post(Links.mainUrl + '/promo/$id',
+        body: {
+          'menu_id': idMenu,
+          'desc': descPromo.text,
+          'expire': _dateController.text+' '+_Jam.text,
+          'type': typePromo.text,
+          'amount': percentPromo.text,
         },
-      );
-      if (picked != null)
-        setState(() {
-          selectedDate = picked;
-          _dateController.text = DateFormat.yMd().format(selectedDate);
+        headers: {
+          "Accept": "Application/json",
+          "Authorization": "Bearer $token"
         });
+    print(apiResult.body);
+    var data = json.decode(apiResult.body);
+
+    if(data['status_code'] == 200){
+      print("success");
+      print(json.encode({
+        'menu': idMenu,
+        'deskripsi': descPromo.text,
+        'expire': _dateController.text+' '+_Jam.text,
+        'type': typePromo.text,
+        'amount': percentPromo.text,
+      }));
+      // Navigator.pushReplacement(context, PageTransition(type: PageTransitionType.fade, child: HomeActivityResto()));
+    } else {
+      // print(data);
+      print(json.encode({
+        'menu_id': idMenu,
+        'desc': descPromo.text,
+        'expire': _dateController.text+' '+_Jam.text,
+        'type': typePromo.text,
+        'amount': percentPromo.text,
+      }));
     }
+    setState(() {
+      isLoading = false;
+    });
+  }
+
+  String id;
 
   @override
   void initState() {
     super.initState();
-    _dateController.text = DateFormat.yMd().format(DateTime.now().add(const Duration(days: 7)));
+    // _dateController.text = DateFormat.yMd().format(DateTime.now().add(const Duration(days: 7)));
     getInitial();
+    getMenuId();
+    getDescPromo();
+    getTypePromo();
+    getDiscPromo();
+    getDatePromo();
+    getJamPromo();
+    setState(() {
+      id = promoResto.id.toString();
+    });
     // Future.delayed(Duration.zero, () async {
     //
     // });
@@ -216,7 +323,6 @@ class _EditPromoState extends State<EditPromo> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    SizedBox(height: CustomSize.sizeHeight(context) / 48,),
                     CustomText.bodyLight12(text: "Deskripsi Promo"),
                     SizedBox(
                       height: CustomSize.sizeHeight(context) * 0.005,
@@ -230,7 +336,7 @@ class _EditPromoState extends State<EditPromo> {
                           TextStyle(fontSize: 18, color: Colors.black, fontWeight: FontWeight.w600)),
                       decoration: InputDecoration(
                         isDense: true,
-                        hintText: "Isi Deskripsi",
+                        hintText: "Isi deskripsi",
                         contentPadding: EdgeInsets.only(bottom: CustomSize.sizeHeight(context) / 86),
                         hintStyle: GoogleFonts.poppins(
                             textStyle:
@@ -242,11 +348,12 @@ class _EditPromoState extends State<EditPromo> {
                       ),
                     ),
                     SizedBox(height: CustomSize.sizeHeight(context) / 48,),
-                    CustomText.bodyLight12(text: "Potongan Harga"),
+                    CustomText.bodyLight12(text: (promoResto.discountedPrice != null)?"Diskon Harga":(promoResto.potongan != null)?"Potongan Harga":"Potongan Ongkir"),
                     SizedBox(
                       height: CustomSize.sizeHeight(context) * 0.005,
                     ),
                     TextField(
+                      inputFormatters: [FilteringTextInputFormatter.digitsOnly],
                       controller: percentPromo,
                       keyboardType: TextInputType.number,
                       cursorColor: Colors.black,
@@ -254,7 +361,7 @@ class _EditPromoState extends State<EditPromo> {
                           textStyle:
                           TextStyle(fontSize: 18, color: Colors.black, fontWeight: FontWeight.w600)),
                       decoration: InputDecoration(
-                        hintText: "Diskon 10 - 100 %",
+                        hintText: (promoResto.discountedPrice != null)?"Diskon 10 - 100 %":(promoResto.potongan != null)?"":"",
                         isDense: true,
                         contentPadding: EdgeInsets.only(bottom: CustomSize.sizeHeight(context) / 86),
                         hintStyle: GoogleFonts.poppins(
@@ -280,6 +387,7 @@ class _EditPromoState extends State<EditPromo> {
                           textStyle:
                           TextStyle(fontSize: 18, color: Colors.black, fontWeight: FontWeight.w600)),
                       decoration: InputDecoration(
+                        hintText: "Atur tanggal berakhir",
                         isDense: true,
                         contentPadding: EdgeInsets.only(bottom: CustomSize.sizeHeight(context) / 86),
                         hintStyle: GoogleFonts.poppins(
@@ -320,6 +428,85 @@ class _EditPromoState extends State<EditPromo> {
                         ),
                       ),
                     ),
+                    SizedBox(height: CustomSize.sizeHeight(context) / 48,),
+                    CustomText.bodyLight12(text: "Jam Berakhir"),
+                    SizedBox(
+                      height: CustomSize.sizeHeight(context) * 0.005,
+                    ),
+                    TextField(
+                      readOnly: true,
+                      controller: _Jam,
+                      keyboardType: TextInputType.text,
+                      cursorColor: Colors.black,
+                      style: GoogleFonts.poppins(
+                          textStyle:
+                          TextStyle(fontSize: 18, color: Colors.black, fontWeight: FontWeight.w600)),
+                      decoration: InputDecoration(
+                          hintText: "Atur jam berakhir",
+                          isDense: true,
+                          contentPadding: EdgeInsets.only(bottom: CustomSize.sizeHeight(context) / 86),
+                          hintStyle: GoogleFonts.poppins(
+                              textStyle:
+                              TextStyle(fontSize: 14, color: Colors.grey)),
+                          helperStyle: GoogleFonts.poppins(
+                              textStyle: TextStyle(fontSize: 14)),
+                          enabledBorder: UnderlineInputBorder(),
+                          focusedBorder: UnderlineInputBorder(),
+                          suffixIcon: GestureDetector(
+                            onTap: () {
+                              setState(() {
+                                jam = TimeOfDay.now().replacing(minute: 30);
+                                print(_Jam);
+                                // print(cuisine.split(",")[0]);
+                              });
+                              Navigator.of(context).push(
+                                  showPicker(
+                                    blurredBackground: true,
+                                    accentColor: Colors.blue[400],
+                                    context: context,
+                                    value: (jam != null)?jam:null,
+                                    onChange: onTimeOpenChanged,
+                                    minuteInterval: MinuteInterval.ONE,
+                                    disableHour: false,
+                                    disableMinute: false,
+                                    minMinute: 0,
+                                    maxMinute: 59,
+                                    cancelText: 'batal',
+                                    okText: 'simpan',
+                                    // Optional onChange to receive value as DateTime
+                                    onChangeDateTime: (DateTime dateTime) {
+                                      print(jam.hour.toString() + '.' + jam.minute.toString());
+                                      getBuka();
+                                    },
+                                  ));
+                            },
+                            // onTap: () async{
+                            //   Navigator.pushReplacement(context, PageTransition(type: PageTransitionType.fade, child: new AddViewResto()));
+                            // },
+                            child: Stack(
+                              children: [
+                                Container(
+                                  width: CustomSize.sizeWidth(context) / 6,
+                                  decoration: BoxDecoration(
+                                    borderRadius: BorderRadius.circular(25),
+                                    border: Border.all(color: CustomColor.accent, width: 1),
+                                    // color: CustomColor.accentLight
+                                  ),
+                                  child: Padding(
+                                    padding: const EdgeInsets.all(2.0),
+                                    child: Center(
+                                      child: CustomText.textTitle8(
+                                          text: "Atur",
+                                          color: CustomColor.accent
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          )
+                      ),
+                    ),
                   ],
                 ),
               ),
@@ -342,13 +529,16 @@ class _EditPromoState extends State<EditPromo> {
           // pref.setString("gender", gender);
           // pref.setString("tgl", tgl);
           // pref.setString("notelp", percentPromo.text.toString());
-          print(descPromo);
-          print(percentPromo);
-          print(endPromo);
-          print(tipeMenu);
-          print(deskMenu);
-          print(base64Encode(image.readAsBytesSync()).toString());
-          print(favorite);
+          // print(descPromo);
+          // print(percentPromo);
+          // print(endPromo);
+          // print(tipeMenu);
+          // print(deskMenu);
+          // print(base64Encode(image.readAsBytesSync()).toString());
+          // print(favorite);
+          EditPromo(id);
+          Navigator.pop(context);
+          Navigator.pushReplacement(context, PageTransition(type: PageTransitionType.fade, child: new PromoActivity()));
         },
         child: Container(
           width: CustomSize.sizeWidth(context) / 1.1,

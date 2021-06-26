@@ -24,7 +24,7 @@ class AddDetailResto extends StatefulWidget {
 }
 
 class CuisineChip extends StatefulWidget {
-  final List<String> cuisineList;
+  final List cuisineList;
   final Function(List<String>) onSelectionChanged;
 
   CuisineChip(this.cuisineList, {this.onSelectionChanged});
@@ -146,21 +146,7 @@ class _AddDetailRestoState extends State<AddDetailResto> {
   bool reservation = false;
   bool delivery = false;
 
-  List<String> cuisineList = [
-    "Chinese Food",
-    "Indonesian Food",
-    "Western Food",
-    "Cafe",
-    "Asian Food",
-    "Bakery",
-    "Bali Food",
-    "Uncivil",
-    "Catering",
-    "Coffee Shop",
-    "Dessert",
-    "Fine Dining",
-    "Halal",
-  ];
+  List cuisineList = [];
 
   List<String> selectedCuisineList = List();
   String cuisine;
@@ -193,7 +179,7 @@ class _AddDetailRestoState extends State<AddDetailResto> {
                   pref.setString("cuisine", cuisine);
                   setState(() {
                     print(cuisine);
-                    getCuisine();
+                    FieldCuisine();
                   });
                   Navigator.of(context).pop();
                 },
@@ -205,18 +191,7 @@ class _AddDetailRestoState extends State<AddDetailResto> {
   }
 
 
-  List<String> facilityList = [
-    "Air Conditioner",
-    "Smoking Area",
-    "Live Music",
-    "Wifi Access",
-    "Valet Parking",
-    "Big Screen",
-    "Children Playground",
-    "Debit Cart",
-    "Delivery Order",
-    "Master Card",
-  ];
+  List<String> facilityList = [];
 
   List<String> selectedFacilityList = List();
   String facility;
@@ -249,7 +224,7 @@ class _AddDetailRestoState extends State<AddDetailResto> {
                   pref.setString("facility", facility);
                   setState(() {
                     print(facility);
-                    getFacility();
+                    FieldFacility();
                   });
                   Navigator.of(context).pop();
                 },
@@ -261,11 +236,48 @@ class _AddDetailRestoState extends State<AddDetailResto> {
   }
 
 
-  getCuisine() async {
+  FieldCuisine() async {
     _Tipe = TextEditingController(text: cuisine);
   }
 
-  getFacility() async {
+  List<String> dataCuisine;
+  Future<void> getCuisine() async {
+    SharedPreferences pref = await SharedPreferences.getInstance();
+    var token = pref.getString("token") ?? "";
+    var data = await http.get(Links.mainUrl +'/util/data?q=cuisine',
+        headers: {
+          "Accept": "application/json",
+          "Authorization": "Bearer $token"
+        }
+    );
+    var jsonData = jsonDecode(data.body);
+    print(jsonData);
+
+    for(var v in jsonData['data']){
+      cuisineList.add(v['name']);
+    }
+    setState(() {});
+  }
+
+  Future<void> getFacility() async {
+    SharedPreferences pref = await SharedPreferences.getInstance();
+    var token = pref.getString("token") ?? "";
+    var data = await http.get(Links.mainUrl +'/util/data?q=facility',
+        headers: {
+          "Accept": "application/json",
+          "Authorization": "Bearer $token"
+        }
+    );
+    var jsonData = jsonDecode(data.body);
+    print(jsonData);
+
+    for(var v in jsonData['data']){
+      facilityList.add(v['name']);
+    }
+    setState(() {});
+  }
+
+  FieldFacility() async {
     _Fasilitas = TextEditingController(text: facility);
   }
 
@@ -308,7 +320,7 @@ class _AddDetailRestoState extends State<AddDetailResto> {
           'longitude': longitude,
           'address': address,
           'phone': phone,
-          'hours': buka + ',' + tutup,
+          'hours': buka + '-' + tutup,
           'ongkir': (_Ongkir.text.toString() != null)?_Ongkir.text.toString():'',
           're_price': (_HargaPerMeja.text.toString() != '')?_HargaPerMeja.text.toString():'',
           'takeaway': (takeaway == true)?'1':'',
@@ -335,6 +347,22 @@ class _AddDetailRestoState extends State<AddDetailResto> {
       // await preferences.remove('inCart');
     } else {
       print(data);
+      print(json.encode({
+        // 'name': name,
+        // 'desc': desc,
+        // 'latitude': latitude,
+        // 'longitude': longitude,
+        // 'address': address,
+        // 'phone': phone,
+        // 'hours': buka + '-' + tutup,
+        // 'ongkir': (_Ongkir.text.toString() != null)?_Ongkir.text.toString():'',
+        // 're_price': (_HargaPerMeja.text.toString() != '')?_HargaPerMeja.text.toString():'',
+        // 'takeaway': (takeaway == true)?'1':'',
+        'img': img,
+        // 'type': _Tipe.text.toString(),
+        // 'fasilitas': _Fasilitas.text.toString(),
+        // 'table': (_JumlahMeja.text.toString() != '')?_JumlahMeja.text.toString():''
+      }));
     }
   }
 
@@ -343,6 +371,8 @@ class _AddDetailRestoState extends State<AddDetailResto> {
     super.initState();
     getTutup();
     getBuka();
+    getCuisine();
+    getFacility();
     // getCuisine();
     // Future.delayed(Duration.zero, () async {
     //
@@ -488,50 +518,50 @@ class _AddDetailRestoState extends State<AddDetailResto> {
                       ),
                     ),
                     SizedBox(height: CustomSize.sizeHeight(context) / 48,),
-                    CustomText.bodyLight12(text: "Rentan Harga Mulai Dari"),
-                    TextField(
-                      controller: _MulaiHarga,
-                      keyboardType: TextInputType.number,
-                      cursorColor: Colors.black,
-                      style: GoogleFonts.poppins(
-                          textStyle:
-                          TextStyle(fontSize: 18, color: Colors.black, fontWeight: FontWeight.w600)),
-                      decoration: InputDecoration(
-                        isDense: true,
-                        contentPadding: EdgeInsets.only(bottom: CustomSize.sizeHeight(context) / 86),
-                        hintStyle: GoogleFonts.poppins(
-                            textStyle:
-                            TextStyle(fontSize: 14, color: Colors.grey)),
-                        helperStyle: GoogleFonts.poppins(
-                            textStyle: TextStyle(fontSize: 14)),
-                        enabledBorder: UnderlineInputBorder(),
-                        focusedBorder: UnderlineInputBorder(),
-                      ),
-                    ),
-                    SizedBox(
-                      height: CustomSize.sizeHeight(context) / 48,
-                    ),
-                    CustomText.bodyLight12(text: "Sampai Harga"),
-                    TextField(
-                      controller: _SampaiHarga,
-                      keyboardType: TextInputType.number,
-                      cursorColor: Colors.black,
-                      style: GoogleFonts.poppins(
-                          textStyle:
-                          TextStyle(fontSize: 18, color: Colors.black, fontWeight: FontWeight.w600)),
-                      decoration: InputDecoration(
-                        isDense: true,
-                        contentPadding: EdgeInsets.only(bottom: CustomSize.sizeHeight(context) / 86),
-                        hintStyle: GoogleFonts.poppins(
-                            textStyle:
-                            TextStyle(fontSize: 14, color: Colors.grey)),
-                        helperStyle: GoogleFonts.poppins(
-                            textStyle: TextStyle(fontSize: 14)),
-                        enabledBorder: UnderlineInputBorder(),
-                        focusedBorder: UnderlineInputBorder(),
-                      ),
-                    ),
-                    SizedBox(height: CustomSize.sizeHeight(context) / 48,),
+                    // CustomText.bodyLight12(text: "Rentan Harga Mulai Dari"),
+                    // TextField(
+                    //   controller: _MulaiHarga,
+                    //   keyboardType: TextInputType.number,
+                    //   cursorColor: Colors.black,
+                    //   style: GoogleFonts.poppins(
+                    //       textStyle:
+                    //       TextStyle(fontSize: 18, color: Colors.black, fontWeight: FontWeight.w600)),
+                    //   decoration: InputDecoration(
+                    //     isDense: true,
+                    //     contentPadding: EdgeInsets.only(bottom: CustomSize.sizeHeight(context) / 86),
+                    //     hintStyle: GoogleFonts.poppins(
+                    //         textStyle:
+                    //         TextStyle(fontSize: 14, color: Colors.grey)),
+                    //     helperStyle: GoogleFonts.poppins(
+                    //         textStyle: TextStyle(fontSize: 14)),
+                    //     enabledBorder: UnderlineInputBorder(),
+                    //     focusedBorder: UnderlineInputBorder(),
+                    //   ),
+                    // ),
+                    // SizedBox(
+                    //   height: CustomSize.sizeHeight(context) / 48,
+                    // ),
+                    // CustomText.bodyLight12(text: "Sampai Harga"),
+                    // TextField(
+                    //   controller: _SampaiHarga,
+                    //   keyboardType: TextInputType.number,
+                    //   cursorColor: Colors.black,
+                    //   style: GoogleFonts.poppins(
+                    //       textStyle:
+                    //       TextStyle(fontSize: 18, color: Colors.black, fontWeight: FontWeight.w600)),
+                    //   decoration: InputDecoration(
+                    //     isDense: true,
+                    //     contentPadding: EdgeInsets.only(bottom: CustomSize.sizeHeight(context) / 86),
+                    //     hintStyle: GoogleFonts.poppins(
+                    //         textStyle:
+                    //         TextStyle(fontSize: 14, color: Colors.grey)),
+                    //     helperStyle: GoogleFonts.poppins(
+                    //         textStyle: TextStyle(fontSize: 14)),
+                    //     enabledBorder: UnderlineInputBorder(),
+                    //     focusedBorder: UnderlineInputBorder(),
+                    //   ),
+                    // ),
+                    // SizedBox(height: CustomSize.sizeHeight(context) / 48,),
                     CustomText.bodyLight12(text: "Jam Buka"),
                     SizedBox(
                       height: CustomSize.sizeHeight(context) * 0.005,
@@ -577,7 +607,7 @@ class _AddDetailRestoState extends State<AddDetailResto> {
                                     okText: 'simpan',
                                     // Optional onChange to receive value as DateTime
                                     onChangeDateTime: (DateTime dateTime) {
-                                      print(jamBuka.hour.toString() + ':' + jamBuka.minute.toString());
+                                      print(jamBuka.hour.toString() + '.' + jamBuka.minute.toString());
                                       getBuka();
                                     },
                                   ));
@@ -817,42 +847,45 @@ class _AddDetailRestoState extends State<AddDetailResto> {
                                 fontWeight: FontWeight.bold, fontSize: 12)),),
                       ],
                     ),
+                    SizedBox(height: CustomSize.sizeHeight(context) / 48,),
+                    GestureDetector(
+                      onTap: () async{
+                        setState(() {
+                          isLoading = false;
+                        });
+                        addResto();
+                        // Navigator.pushReplacement(
+                        //     context,
+                        //     PageTransition(
+                        //         type: PageTransitionType.leftToRight,
+                        //         child: HomeActivityResto()));
+                        // SharedPreferences pref = await SharedPreferences.getInstance();
+                        // pref.setString("name", _loginTextName.text.toString());
+                        // pref.setString("email", _loginEmailName.text.toString());
+                        // pref.setString("img", (image == null)?img:base64Encode(image.readAsBytesSync()).toString());
+                        // pref.setString("gender", gender);
+                        // pref.setString("tgl", tgl);
+                        // pref.setString("notelp", _loginNotelpName.text.toString());
+                      },
+                      child: Center(
+                        child: Container(
+                          alignment: Alignment.center,
+                          width: CustomSize.sizeWidth(context) / 1.1,
+                          height: CustomSize.sizeHeight(context) / 14,
+                          decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(30),
+                              color: CustomColor.accent
+                          ),
+                          child: Center(child: CustomText.bodyRegular16(text: "Simpan", color: Colors.white,)),
+                        ),
+                      ),
+                    ),
                   ],
                 ),
               ),
               SizedBox(height: CustomSize.sizeHeight(context) / 8,),
             ],
           ),
-        ),
-      ),
-      floatingActionButton:
-      GestureDetector(
-        onTap: () async{
-          setState(() {
-            isLoading = false;
-          });
-          addResto();
-          Navigator.pushReplacement(
-              context,
-              PageTransition(
-                  type: PageTransitionType.leftToRight,
-                  child: HomeActivityResto()));
-          // SharedPreferences pref = await SharedPreferences.getInstance();
-          // pref.setString("name", _loginTextName.text.toString());
-          // pref.setString("email", _loginEmailName.text.toString());
-          // pref.setString("img", (image == null)?img:base64Encode(image.readAsBytesSync()).toString());
-          // pref.setString("gender", gender);
-          // pref.setString("tgl", tgl);
-          // pref.setString("notelp", _loginNotelpName.text.toString());
-        },
-        child: Container(
-          width: CustomSize.sizeWidth(context) / 1.1,
-          height: CustomSize.sizeHeight(context) / 14,
-          decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(30),
-              color: CustomColor.accent
-          ),
-          child: Center(child: CustomText.bodyRegular16(text: "Simpan", color: Colors.white,)),
         ),
       ),
     );

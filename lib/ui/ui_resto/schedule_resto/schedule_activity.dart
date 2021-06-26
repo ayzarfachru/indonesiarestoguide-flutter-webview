@@ -3,9 +3,12 @@ import 'dart:convert';
 import 'package:day_night_time_picker/lib/constants.dart';
 import 'package:day_night_time_picker/lib/daynight_timepicker.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_icons/flutter_icons.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:indonesiarestoguide/model/History.dart';
+import 'package:indonesiarestoguide/model/Schedule.dart';
 import 'package:indonesiarestoguide/ui/ui_resto/home/home_activity.dart';
+import 'package:indonesiarestoguide/ui/ui_resto/schedule_resto/edit_schedule.dart';
 import 'package:indonesiarestoguide/utils/utils.dart';
 import 'package:intl/intl.dart';
 import 'package:page_transition/page_transition.dart';
@@ -72,6 +75,12 @@ class CuisineChipState extends State<DayChip> {
 }
 
 class _ScheduleActivityState extends State<ScheduleActivity> {
+  void setState(fn) {
+    if(mounted) {
+      super.setState(fn);
+    }
+  }
+
   ScrollController _scrollController = ScrollController();
   TextEditingController _JamOperasionalBuka = TextEditingController(text: "");
   TextEditingController _JamOperasionalTutup = TextEditingController(text: "");
@@ -186,48 +195,6 @@ class _ScheduleActivityState extends State<ScheduleActivity> {
     _closeDayController = TextEditingController(text: closeDay);
   }
 
-  getImg() async {
-    SharedPreferences pref = await SharedPreferences.getInstance();
-    setState(() {
-      img = (pref.getString('img'));
-      print(img);
-    });
-  }
-
-  List<History> history = [];
-  Future _getHistory()async{
-    List<History> _history = [];
-
-    setState(() {
-      isLoading = true;
-    });
-    SharedPreferences pref = await SharedPreferences.getInstance();
-    String token = pref.getString("token") ?? "";
-    var apiResult = await http.get(Links.mainUrl + '/page/history', headers: {
-      "Accept": "Application/json",
-      "Authorization": "Bearer $token"
-    });
-    print(apiResult.body);
-    var data = json.decode(apiResult.body);
-
-    for(var v in data['trans']){
-      History h = History(
-          id: v['id'],
-          name: v['resto_name'],
-          time: v['time'],
-          price: v['price'],
-          img: v['resto_img'],
-          type: v['type']
-      );
-      _history.add(h);
-    }
-
-    setState(() {
-      history = _history;
-      isLoading = false;
-    });
-  }
-
   getHomePg() async {
     SharedPreferences pref = await SharedPreferences.getInstance();
     setState(() {
@@ -239,10 +206,12 @@ class _ScheduleActivityState extends State<ScheduleActivity> {
   RefreshController _refreshController =
   RefreshController(initialRefresh: false);
 
+  Future<List<Schedule>> future;
   void _onRefresh() async {
     // monitor network fetch
-    _getHistory();
-    setState(() {});
+    setState(() {
+      Navigator.pushReplacement(context, PageTransition(type: PageTransitionType.fade, child: new ScheduleActivity()));
+    });
     await Future.delayed(Duration(milliseconds: 1000));
     // if failed,use refreshFailed()
     _refreshController.refreshCompleted();
@@ -323,13 +292,106 @@ class _ScheduleActivityState extends State<ScheduleActivity> {
     } else {}
   }
 
+
+
+  // String day;
+  // Future<void> _getSchedule()async{
+  //   List<Schedule> _schedule = [];
+  //
+  //   setState(() {
+  //     isLoading = true;
+  //   });
+  //   SharedPreferences pref = await SharedPreferences.getInstance();
+  //   String token = pref.getString("token") ?? "";
+  //   var apiResult = await http.get(Links.mainUrl + '/resto/day', headers: {
+  //     "Accept": "Application/json",
+  //     "Authorization": "Bearer $token"
+  //   });
+  //   print(apiResult.body);
+  //   var data = json.decode(apiResult.body);
+  //
+  //   setState(() {
+  //     day = data['menu']['day'];
+  //     print(day);
+  //     print(data);
+  //     isLoading = false;
+  //   });
+  // }
+
+  getOpenAndClose() async {
+    SharedPreferences pref = await SharedPreferences.getInstance();
+    setState(() {
+      openAndClose = pref.getString('openclose');
+      print(openAndClose);
+    });
+  }
+
+  String openAndClose = "0";
+  List<Schedule> _schedule = [];
+  List<Schedule> schedule = [];
+  Future<void> _getSchedule() async {
+    SharedPreferences pref = await SharedPreferences.getInstance();
+    var token = pref.getString("token") ?? "";
+    var data = await http.get(Links.mainUrl +'/resto/day',
+        headers: {
+          "Accept": "application/json",
+          "Authorization": "Bearer $token"
+        }
+    );
+    var jsonData = jsonDecode(data.body);
+    print(jsonData);
+
+    for(var v in jsonData['menu']){
+      Schedule a = Schedule(
+        id: v['id'],
+        day: v['day'],
+        open_at: v['open_at'],
+        closed_at: v['closed_at'],
+      );
+      _schedule.add(a);
+    }
+    setState(() {
+      schedule = _schedule;
+      isLoading = false;
+    });
+  }
+
+  Future<void> _closeNow()async{
+    List<Schedule> _schedule = [];
+    setState(() {
+      isLoading = true;
+    });
+    SharedPreferences pref = await SharedPreferences.getInstance();
+    String token = pref.getString("token") ?? "";
+    var apiResult = await http.post(Links.mainUrl + '/resto/close',
+        body: {},
+        headers: {
+          "Accept": "Application/json",
+          "Authorization": "Bearer $token"
+        });
+    // print(apiResult.body);
+    var data = json.decode(apiResult.body);
+
+    if(data['status_code'] == 200){
+      print("success");
+      print(data["status"]);
+    } else {
+      print(data);
+    }
+    setState(() {
+      schedule = _schedule;
+      isLoading = false;
+    });
+  }
+
   @override
   void initState() {
-    _getHistory();
+    getOpenAndClose();
+    _getSchedule();
     getHomePg();
-    getImg();
     getTutup();
     getBuka();
+    getHariBuka();
     print(selectedDateList);
     super.initState();
   }
@@ -360,292 +422,110 @@ class _ScheduleActivityState extends State<ScheduleActivity> {
           onLoading: _onLoading,
           child: SingleChildScrollView(
             controller: _scrollController,
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                SizedBox(height: CustomSize.sizeHeight(context) / 38,),
-                Padding(
-                  padding: EdgeInsets.symmetric(horizontal: CustomSize.sizeWidth(context) / 32),
-                  child: CustomText.textHeading3(
+            child: Padding(
+              padding: EdgeInsets.symmetric(horizontal: CustomSize.sizeWidth(context) / 24),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  SizedBox(
+                    height: CustomSize.sizeHeight(context) / 32,
+                  ),
+                  CustomText.textHeading3(
                       text: "Jadwal Operasional",
                       color: CustomColor.primary,
                       minSize: 18,
                       maxLines: 1
                   ),
-                ),
-                SizedBox(height: CustomSize.sizeHeight(context) / 48,),
-                Padding(
-                  padding: EdgeInsets.symmetric(horizontal: CustomSize.sizeWidth(context) / 32),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      SizedBox(height: CustomSize.sizeHeight(context) / 48,),
-                      CustomText.bodyLight12(text: "Jam Buka"),
-                      SizedBox(
-                        height: CustomSize.sizeHeight(context) * 0.005,
-                      ),
-                      TextField(
-                        readOnly: true,
-                        controller: _JamOperasionalBuka,
-                        keyboardType: TextInputType.text,
-                        cursorColor: Colors.black,
-                        style: GoogleFonts.poppins(
-                            textStyle:
-                            TextStyle(fontSize: 18, color: Colors.black, fontWeight: FontWeight.w600)),
-                        decoration: InputDecoration(
-                          isDense: true,
-                          contentPadding: EdgeInsets.only(bottom: CustomSize.sizeHeight(context) / 86),
-                          hintStyle: GoogleFonts.poppins(
-                              textStyle:
-                              TextStyle(fontSize: 14, color: Colors.grey)),
-                          helperStyle: GoogleFonts.poppins(
-                              textStyle: TextStyle(fontSize: 14)),
-                          enabledBorder: UnderlineInputBorder(),
-                          focusedBorder: UnderlineInputBorder(),
-                          suffixIcon: GestureDetector(
-                            onTap: () {
-                              setState(() {
-                                jamBuka = TimeOfDay.now().replacing(minute: 30);
-                                print(_JamOperasionalTutup);
-                                // print(cuisine.split(",")[0]);
-                              });
-                              Navigator.of(context).push(
-                                  showPicker(
-                                    blurredBackground: true,
-                                    accentColor: Colors.blue[400],
-                                    context: context,
-                                    value: (jamBuka != null)?jamBuka:null,
-                                    onChange: onTimeOpenChanged,
-                                    minuteInterval: MinuteInterval.ONE,
-                                    disableHour: false,
-                                    disableMinute: false,
-                                    minMinute: 0,
-                                    maxMinute: 59,
-                                    cancelText: 'batal',
-                                    okText: 'simpan',
-                                    // Optional onChange to receive value as DateTime
-                                    onChangeDateTime: (DateTime dateTime) {
-                                      print(jamBuka.hour.toString() + ':' + jamBuka.minute.toString());
-                                      getBuka();
-                                    },
-                                  ));
-                            },
-                            // onTap: () async{
-                            //   Navigator.pushReplacement(context, PageTransition(type: PageTransitionType.fade, child: new AddViewResto()));
-                            // },
-                            child: Stack(
-                              children: [
-                                Container(
-                                  width: CustomSize.sizeWidth(context) / 4,
-                                  decoration: BoxDecoration(
-                                    borderRadius: BorderRadius.circular(25),
-                                    border: Border.all(color: CustomColor.accent, width: 1),
-                                    // color: CustomColor.accentLight
-                                  ),
-                                  child: Padding(
-                                    padding: const EdgeInsets.all(2.0),
-                                    child: Center(
-                                      child: CustomText.textTitle8(
-                                          text: "Atur",
-                                          color: CustomColor.accent
-                                      ),
-                                    ),
-                                  ),
+                  ListView.builder(
+                      shrinkWrap: true,
+                      controller: _scrollController,
+                      physics: NeverScrollableScrollPhysics(),
+                      itemCount: schedule.length,
+                      itemBuilder: (_, index){
+                        return Padding(
+                          padding: EdgeInsets.only(top: CustomSize.sizeHeight(context) / 48),
+                          child: Container(
+                            width: CustomSize.sizeWidth(context),
+                            height: CustomSize.sizeWidth(context) / 5.4,
+                            decoration: BoxDecoration(
+                              color: Colors.white,
+                              borderRadius: BorderRadius.circular(20),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: Colors.grey.withOpacity(0.5),
+                                  spreadRadius: 0,
+                                  blurRadius: 7,
+                                  offset: Offset(0, 0), // changes position of shadow
                                 ),
                               ],
                             ),
-                          )
-                        ),
-                      ),
-                      SizedBox(height: CustomSize.sizeHeight(context) / 48,),
-                      CustomText.bodyLight12(text: "Jam Tutup"),
-                      SizedBox(
-                        height: CustomSize.sizeHeight(context) * 0.005,
-                      ),
-                      TextField(
-                        readOnly: true,
-                        controller: _JamOperasionalTutup,
-                        keyboardType: TextInputType.text,
-                        cursorColor: Colors.black,
-                        style: GoogleFonts.poppins(
-                            textStyle:
-                            TextStyle(fontSize: 18, color: Colors.black, fontWeight: FontWeight.w600)),
-                        decoration: InputDecoration(
-                          isDense: true,
-                          contentPadding: EdgeInsets.only(bottom: CustomSize.sizeHeight(context) / 86),
-                          hintStyle: GoogleFonts.poppins(
-                              textStyle:
-                              TextStyle(fontSize: 14, color: Colors.grey)),
-                          helperStyle: GoogleFonts.poppins(
-                              textStyle: TextStyle(fontSize: 14)),
-                          enabledBorder: UnderlineInputBorder(),
-                          focusedBorder: UnderlineInputBorder(),
-                          suffixIcon: GestureDetector(
-                            onTap: () {
-                              setState(() {
-                                buka = jamBuka.hour.toString() + ':' + jamBuka.minute.toString();
-                                jamTutup = TimeOfDay.now().replacing(minute: 30);
-                                print(_JamOperasionalTutup.toString() + 'ini');
-                                // print(cuisine.split(",")[0]);
-                              });
-                              Navigator.of(context).push(
-                                  showPicker(
-                                    blurredBackground: true,
-                                    accentColor: Colors.blue[400],
-                                    context: context,
-                                    value: jamTutup,
-                                    onChange: onTimeClosedChanged,
-                                    minuteInterval: MinuteInterval.ONE,
-                                    disableHour: false,
-                                    disableMinute: false,
-                                    minMinute: 0,
-                                    maxMinute: 59,
-                                    cancelText: 'batal',
-                                    okText: 'simpan',
-                                    // Optional onChange to receive value as DateTime
-                                    onChangeDateTime: (DateTime dateTime) {
-                                      print(jamBuka.hour.toString() + ':' + jamBuka.minute.toString());
-                                      print(jamTutup.hour.toString() + ':' + jamTutup.minute.toString()+'ini tutup');
-                                      print(buka + 'ini buka');
-                                      tutup = jamTutup.hour.toString() + ':' + jamTutup.minute.toString();
-                                      getTutup();
-                                    },
-                                  ));
-                            },
-                            // onTap: () async{
-                            //   Navigator.pushReplacement(context, PageTransition(type: PageTransitionType.fade, child: new AddViewResto()));
-                            // },
-                            child: Stack(
+                            child: Row(
                               children: [
-                                Container(
-                                  width: CustomSize.sizeWidth(context) / 4,
-                                  decoration: BoxDecoration(
-                                    borderRadius: BorderRadius.circular(25),
-                                    border: Border.all(color: CustomColor.accent, width: 1),
-                                    // color: CustomColor.accentLight
-                                  ),
-                                  child: Padding(
-                                    padding: const EdgeInsets.all(2.0),
-                                    child: Center(
-                                      child: CustomText.textTitle8(
-                                          text: "Atur",
-                                          color: CustomColor.accent
-                                      ),
-                                    ),
-                                  ),
+                                SizedBox(
+                                  width: CustomSize.sizeWidth(context) / 32,
                                 ),
+                                Container(
+                                  width: CustomSize.sizeWidth(context) / 1.2,
+                                  child: Column(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: [
+                                      Row(
+                                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                        children: [
+                                          Column(
+                                            crossAxisAlignment: CrossAxisAlignment.start,
+                                            children: [
+                                              CustomText.textHeading4(
+                                                  text: schedule[index].day,
+                                                  minSize: 18,
+                                                  maxLines: 1
+                                              ),
+                                              SizedBox(
+                                                width: CustomSize.sizeWidth(context) / 32,
+                                              ),
+                                              (schedule[index].open_at == "00:00:00" && schedule[index].open_at == "00:00:00")?
+                                              CustomText.bodyMedium12(
+                                                  text: "Hari ini tutup",
+                                                  color: CustomColor.redBtn,
+                                                  maxLines: 1,
+                                                  minSize: 12
+                                              )
+                                              :CustomText.bodyMedium12(
+                                                  text: schedule[index].open_at.split(':')[0]+':'+schedule[index].open_at.split(':')[1]
+                                                      +' - '+schedule[index].closed_at.split(':')[0]+':'+schedule[index].closed_at.split(':')[1],
+                                                  maxLines: 1,
+                                                  minSize: 12
+                                              ),
+                                            ],
+                                          ),
+                                          GestureDetector(
+                                              onTap: (){
+                                                Navigator.push(
+                                                    context,
+                                                    PageTransition(
+                                                        type: PageTransitionType.rightToLeft,
+                                                        child: EditSchedule(schedule[index])));
+                                              },
+                                              child: Icon(Icons.edit, color: CustomColor.primary, size: 20,)
+                                          ),
+                                        ],
+                                      ),
+                                      SizedBox(
+                                        width: CustomSize.sizeWidth(context) / 32,
+                                      ),
+                                    ],
+                                  ),
+                                )
                               ],
                             ),
                           ),
-                        ),
-                      ),
-                      SizedBox(height: CustomSize.sizeHeight(context) / 48,),
-                      CustomText.bodyLight12(text: "Hari Buka"),
-                      SizedBox(
-                        height: CustomSize.sizeHeight(context) * 0.005,
-                      ),
-                      TextField(
-                        readOnly: true,
-                        controller: _openDayController,
-                        keyboardType: TextInputType.number,
-                        cursorColor: Colors.black,
-                        style: GoogleFonts.poppins(
-                            textStyle:
-                            TextStyle(fontSize: 18, color: Colors.black, fontWeight: FontWeight.w600)),
-                        decoration: InputDecoration(
-                          isDense: true,
-                          contentPadding: EdgeInsets.only(bottom: CustomSize.sizeHeight(context) / 86),
-                          hintStyle: GoogleFonts.poppins(
-                              textStyle:
-                              TextStyle(fontSize: 14, color: Colors.grey)),
-                          helperStyle: GoogleFonts.poppins(
-                              textStyle: TextStyle(fontSize: 14)),
-                          enabledBorder: UnderlineInputBorder(),
-                          focusedBorder: UnderlineInputBorder(),
-                          suffixIcon: GestureDetector(
-                            onTap: () async{
-                              _showOpenDayDialog();
-                            },
-                            child: Stack(
-                              children: [
-                                Container(
-                                  width: CustomSize.sizeWidth(context) / 4,
-                                  decoration: BoxDecoration(
-                                    borderRadius: BorderRadius.circular(25),
-                                    border: Border.all(color: CustomColor.accent, width: 1),
-                                    // color: CustomColor.accentLight
-                                  ),
-                                  child: Padding(
-                                    padding: const EdgeInsets.all(2.0),
-                                    child: Center(
-                                      child: CustomText.textTitle8(
-                                          text: "Pilih",
-                                          color: CustomColor.accent
-                                      ),
-                                    ),
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                        ),
-                      ),
-                      SizedBox(height: CustomSize.sizeHeight(context) / 48,),
-                      CustomText.bodyLight12(text: "Hari Tutup"),
-                      SizedBox(
-                        height: CustomSize.sizeHeight(context) * 0.005,
-                      ),
-                      TextField(
-                        readOnly: true,
-                        controller: _closeDayController,
-                        keyboardType: TextInputType.number,
-                        cursorColor: Colors.black,
-                        style: GoogleFonts.poppins(
-                            textStyle:
-                            TextStyle(fontSize: 18, color: Colors.black, fontWeight: FontWeight.w600)),
-                        decoration: InputDecoration(
-                          isDense: true,
-                          contentPadding: EdgeInsets.only(bottom: CustomSize.sizeHeight(context) / 86),
-                          hintStyle: GoogleFonts.poppins(
-                              textStyle:
-                              TextStyle(fontSize: 14, color: Colors.grey)),
-                          helperStyle: GoogleFonts.poppins(
-                              textStyle: TextStyle(fontSize: 14)),
-                          enabledBorder: UnderlineInputBorder(),
-                          focusedBorder: UnderlineInputBorder(),
-                          suffixIcon: GestureDetector(
-                            onTap: () async{
-                              _showCloseDayDialog();
-                            },
-                            child: Stack(
-                              children: [
-                                Container(
-                                  width: CustomSize.sizeWidth(context) / 4,
-                                  decoration: BoxDecoration(
-                                    borderRadius: BorderRadius.circular(25),
-                                    border: Border.all(color: CustomColor.accent, width: 1),
-                                    // color: CustomColor.accentLight
-                                  ),
-                                  child: Padding(
-                                    padding: const EdgeInsets.all(2.0),
-                                    child: Center(
-                                      child: CustomText.textTitle8(
-                                          text: "Pilih",
-                                          color: CustomColor.accent
-                                      ),
-                                    ),
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                        ),
-                      ),
-                    ],
+                        );
+                      }
                   ),
-                ),
-                SizedBox(height: CustomSize.sizeHeight(context) / 8,),
-              ],
+                  SizedBox(height: CustomSize.sizeHeight(context) / 9,),
+                ],
+              ),
             ),
           ),
         ),
@@ -655,14 +535,21 @@ class _ScheduleActivityState extends State<ScheduleActivity> {
         children: [
           GestureDetector(
             onTap: () async{
+              if(openAndClose == null){
+                SharedPreferences pref = await SharedPreferences.getInstance();
+                pref.setString("openclose", "1");
+              }else if(openAndClose == '1'){
+                SharedPreferences pref = await SharedPreferences.getInstance();
+                pref.setString("openclose", null);
+              }
               setState(() {
                 isLoading = false;
               });
-              // addResto();
+              _closeNow();
               Navigator.pushReplacement(
                   context,
                   PageTransition(
-                      type: PageTransitionType.leftToRight,
+                      type: PageTransitionType.fade,
                       child: HomeActivityResto()));
               // SharedPreferences pref = await SharedPreferences.getInstance();
               // pref.setString("name", _loginTextName.text.toString());
@@ -677,41 +564,12 @@ class _ScheduleActivityState extends State<ScheduleActivity> {
               height: CustomSize.sizeHeight(context) / 14,
               decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(30),
-                  color: CustomColor.redBtn
+                  color: (openAndClose == null)?CustomColor.redBtn:CustomColor.accent
               ),
-              child: Center(child: CustomText.bodyRegular16(text: "Tutup Sekarang!", color: Colors.white,)),
+              child: Center(child: CustomText.bodyRegular16(text: (openAndClose == null)?"Tutup Sekarang!":"Buka Sekarang!", color: Colors.white,)),
             ),
           ),
-          SizedBox(height: CustomSize.sizeHeight(context) * 0.005,),
-          GestureDetector(
-            onTap: () async{
-              setState(() {
-                isLoading = false;
-              });
-              // addResto();
-              Navigator.pushReplacement(
-                  context,
-                  PageTransition(
-                      type: PageTransitionType.leftToRight,
-                      child: HomeActivityResto()));
-              // SharedPreferences pref = await SharedPreferences.getInstance();
-              // pref.setString("name", _loginTextName.text.toString());
-              // pref.setString("email", _loginEmailName.text.toString());
-              // pref.setString("img", (image == null)?img:base64Encode(image.readAsBytesSync()).toString());
-              // pref.setString("gender", gender);
-              // pref.setString("tgl", tgl);
-              // pref.setString("notelp", _loginNotelpName.text.toString());
-            },
-            child: Container(
-              width: CustomSize.sizeWidth(context) / 1.1,
-              height: CustomSize.sizeHeight(context) / 14,
-              decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(30),
-                  color: CustomColor.accent
-              ),
-              child: Center(child: CustomText.bodyRegular16(text: "Simpan", color: Colors.white,)),
-            ),
-          ),
+          // SizedBox(height: CustomSize.sizeHeight(context) * 0.005,),
         ],
       ),
     );

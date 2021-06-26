@@ -115,7 +115,7 @@ class _ReservationActivityState extends State<ReservationActivity> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     SizedBox(height: CustomSize.sizeHeight(context) / 48,),
-                    CustomText.bodyLight12(text: "Untuk berapa orang ?"),
+                    CustomText.bodyLight12(text: "Pesan berapa meja (1 meja untuk 4 orang)"),
                     SizedBox(
                       height: CustomSize.sizeHeight(context) * 0.005,
                     ),

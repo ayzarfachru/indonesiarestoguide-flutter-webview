@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter_icons/flutter_icons.dart';
 import 'package:indonesiarestoguide/model/History.dart';
+import 'package:indonesiarestoguide/model/User.dart';
 import 'package:indonesiarestoguide/ui/ui_resto/employees/add_employees.dart';
 import 'package:indonesiarestoguide/utils/utils.dart';
 import 'package:intl/intl.dart';
@@ -32,36 +33,35 @@ class _EmployeesActivityState extends State<EmployeesActivity> {
     });
   }
 
-  List<History> history = [];
-  Future _getHistory()async{
-    List<History> _history = [];
+  List<User> user = [];
+  Future _getKaryawan()async{
+    List<User> _user = [];
 
     setState(() {
       isLoading = true;
     });
     SharedPreferences pref = await SharedPreferences.getInstance();
     String token = pref.getString("token") ?? "";
-    var apiResult = await http.get(Links.mainUrl + '/page/history', headers: {
+    var apiResult = await http.get(Links.mainUrl + '/karyawan', headers: {
       "Accept": "Application/json",
       "Authorization": "Bearer $token"
     });
     print(apiResult.body);
     var data = json.decode(apiResult.body);
 
-    for(var v in data['trans']){
-      History h = History(
+    for(var v in data['users']){
+      User p = User.resto(
           id: v['id'],
-          name: v['resto_name'],
-          time: v['time'],
-          price: v['price'],
-          img: v['resto_img'],
-          type: v['type']
+          name: v['name'],
+          email: v['email'],
+          img: v['img'],
       );
-      _history.add(h);
+      _user.add(p);
     }
 
     setState(() {
-      history = _history;
+      user = _user;
+      print(user);
       isLoading = false;
     });
   }
@@ -79,7 +79,7 @@ class _EmployeesActivityState extends State<EmployeesActivity> {
 
   void _onRefresh() async {
     // monitor network fetch
-    _getHistory();
+    _getKaryawan();
     setState(() {});
     await Future.delayed(Duration(milliseconds: 1000));
     // if failed,use refreshFailed()
@@ -93,9 +93,72 @@ class _EmployeesActivityState extends State<EmployeesActivity> {
     _refreshController.loadComplete();
   }
 
+  Future _delKaryawan(String id)async{
+    List<User> _user = [];
+
+    setState(() {
+      isLoading = true;
+    });
+    SharedPreferences pref = await SharedPreferences.getInstance();
+    String token = pref.getString("token") ?? "";
+    var apiResult = await http.get(Links.mainUrl + '/karyawan/delete/$id', headers: {
+      "Accept": "Application/json",
+      "Authorization": "Bearer $token"
+    });
+    print(apiResult.body);
+    var data = json.decode(apiResult.body);
+    
+    if (data['msg'].toString() == 'success') {
+      Navigator.pop(context);
+      Navigator.pushReplacement(context,
+          PageTransition(
+              type: PageTransitionType.fade,
+              child: EmployeesActivity()));
+    }  
+
+    setState(() {
+      isLoading = false;
+    });
+  }
+
+  showAlertDialog(String id) {
+
+    // set up the buttons
+    Widget cancelButton = FlatButton(
+      child: Text("Batal", style: TextStyle(color: CustomColor.primary)),
+      onPressed:  () {
+        Navigator.pop(context);
+      },
+    );
+    Widget continueButton = FlatButton(
+      child: Text("Hapus", style: TextStyle(color: CustomColor.primary)),
+      onPressed:  () {
+        _delKaryawan(id);
+      },
+    );
+
+    // set up the AlertDialog
+    AlertDialog alert = AlertDialog(
+      title: Text("Hapus Pegawai"),
+      content: Text("Apakah anda yakin ingin menghapus data ini?"),
+      actions: [
+        cancelButton,
+        continueButton,
+      ],
+    );
+
+    // show the dialog
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return alert;
+      },
+    );
+  }
+
   @override
   void initState() {
-    _getHistory();
+    _getKaryawan();
     getHomePg();
     getImg();
     super.initState();
@@ -153,70 +216,81 @@ class _EmployeesActivityState extends State<EmployeesActivity> {
                     ),
                   ),
                 ),
+                SizedBox(height: CustomSize.sizeHeight(context) / 54,),
                 ListView.builder(
                     shrinkWrap: true,
                     controller: _scrollController,
                     physics: NeverScrollableScrollPhysics(),
-                    itemCount: history.length,
+                    itemCount: user.length,
                     itemBuilder: (_, index){
                       return Padding(
-                        padding: EdgeInsets.only(bottom: CustomSize.sizeHeight(context) / 86),
+                        padding: EdgeInsets.symmetric(horizontal: CustomSize.sizeWidth(context) / 28),
                         child: GestureDetector(
                           // onTap: (){
                           //   Navigator.push(context, PageTransition(type: PageTransitionType.rightToLeft, child: new DetailHistory(history[index].id)));
                           // },
                           child: Container(
                             width: CustomSize.sizeWidth(context),
-                            height: CustomSize.sizeHeight(context) / 5,
+                            height: CustomSize.sizeHeight(context) / 7.5,
                             color: Colors.white,
                             child: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               crossAxisAlignment: CrossAxisAlignment.center,
-                              mainAxisAlignment: MainAxisAlignment.center,
                               children: [
-                                SizedBox(width: CustomSize.sizeWidth(context) / 24,),
-                                Container(
-                                  width: CustomSize.sizeWidth(context) / 1.1,
-                                  child: Column(
-                                    crossAxisAlignment: CrossAxisAlignment.start,
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    children: [
-                                      Divider(thickness: 1.5, color: CustomColor.secondary,),
-                                      CustomText.bodyMedium16(
-                                          text: (homepg != "1")?history[index].name:"Ahmad"
-                                          // history[index].name
-                                          ,
-                                          minSize: 16,
-                                          maxLines: 1
+                                Row(
+                                  children: [
+                                    Container(
+                                      width: CustomSize.sizeWidth(context) / 6,
+                                      height: CustomSize.sizeWidth(context) / 6,
+                                      decoration: (user[index].img == "/".substring(0, 1))?BoxDecoration(
+                                          color: CustomColor.primary,
+                                          shape: BoxShape.circle
+                                      ):BoxDecoration(
+                                        shape: BoxShape.circle,
+                                        image: new DecorationImage(
+                                            image: (user[index].img != null)?NetworkImage(Links.subUrl +
+                                                user[index].img):AssetImage('assets/default.png'),
+                                            fit: BoxFit.cover
+                                        ),
                                       ),
-                                      CustomText.bodyLight12(
-                                          text: "Jl. Bendul Merisi no.31 Surabaya",
-                                          maxLines: 1,
-                                          minSize: 12
-                                      ),
-                                      Row(
-                                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                      child: (user[index].img == "/".substring(0, 1))?Center(
+                                        child: CustomText.text(
+                                            size: 38,
+                                            weight: FontWeight.w800,
+                                            // text: initial,
+                                            color: Colors.white
+                                        ),
+                                      ):Container(),
+                                    ),
+                                    SizedBox(width: CustomSize.sizeWidth(context) / 32,),
+                                    Container(
+                                      width: CustomSize.sizeWidth(context) / 1.6,
+                                      child: Column(
+                                        crossAxisAlignment: CrossAxisAlignment.start,
+                                        mainAxisAlignment: MainAxisAlignment.center,
                                         children: [
-                                          CustomText.bodyMedium12(
-                                              text: "8 Mar 2021",
+                                          CustomText.textHeading4(
+                                              text: user[index].name,
                                               maxLines: 1,
-                                              minSize: 12
+                                              minSize: 18
                                           ),
-                                          // CustomText.textHeading4(
-                                          //     text: "Rp. "+NumberFormat.currency(locale: 'id', symbol: '', decimalDigits: 0).format(history[index].price),
-                                          //     minSize: 18,
-                                          //     maxLines: 1
-                                          // ),
+                                          CustomText.bodyLight16(text: user[index].email, maxLines: 1, minSize: 12),
                                         ],
                                       ),
-                                      CustomText.bodyMedium12(
-                                          text: "+62 87828192378",
-                                          maxLines: 1,
-                                          minSize: 12
-                                      ),
-                                      Divider(thickness: 1.5, color: CustomColor.secondary,),
-                                    ],
-                                  ),
+                                    ),
+                                  ],
                                 ),
+                                Padding(
+                                  padding: const EdgeInsets.only(right: 8.0),
+                                  child: GestureDetector(
+                                      onTap: () async{
+                                        setState(() {
+                                          showAlertDialog(user[index].id.toString());
+                                        });
+                                      },
+                                      child: Icon(Icons.delete, color: CustomColor.redBtn,)
+                                  ),
+                                )
                               ],
                             ),
                           ),

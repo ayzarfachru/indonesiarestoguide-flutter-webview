@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_icons/flutter_icons.dart';
@@ -12,18 +14,21 @@ import 'package:indonesiarestoguide/ui/ui_resto/menu/menu_activity.dart';
 import 'package:indonesiarestoguide/ui/ui_resto/order/order_activity.dart';
 import 'package:indonesiarestoguide/ui/ui_resto/reservation_resto/reservation_activity.dart';
 import 'package:indonesiarestoguide/ui/ui_resto/reservation_resto/reservation_pending_page.dart';
+import 'package:indonesiarestoguide/model/Meja.dart';
+import 'package:url_launcher/url_launcher.dart';
 import 'package:indonesiarestoguide/ui/ui_resto/schedule_resto/schedule_activity.dart';
 import 'package:indonesiarestoguide/ui/ui_resto/meja/meja_activity.dart';
 import 'package:indonesiarestoguide/utils/utils.dart';
 import 'package:page_transition/page_transition.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:http/http.dart' as http;
 
 class HomeActivityResto extends StatefulWidget {
   @override
-  _HomeActivityState createState() => _HomeActivityState();
+  _HomeActivityRestoState createState() => _HomeActivityRestoState();
 }
 
-class _HomeActivityState extends State<HomeActivityResto> {
+class _HomeActivityRestoState extends State<HomeActivityResto> {
   String img = "";
   String homepg = "";
   int id;
@@ -52,12 +57,98 @@ class _HomeActivityState extends State<HomeActivityResto> {
     });
   }
 
+
+  bool isLoading = false;
+  List<Meja> meja = [];
+  String url;
+  Future<void> _getQr()async{
+    List<Meja> _meja = [];
+
+    setState(() {
+      isLoading = true;
+    });
+    SharedPreferences pref = await SharedPreferences.getInstance();
+    String token = pref.getString("token") ?? "";
+    var apiResult = await http.get(Links.mainUrl + '/resto/qrcode', headers: {
+      "Accept": "Application/json",
+      "Authorization": "Bearer $token"
+    });
+    print(apiResult.body);
+    var data = json.decode(apiResult.body);
+    var link = data['link'];
+
+    // for(var v in data['link']){
+    //   QrCode p = QrCode(
+    //     id: v['id'],
+    //     url: v['link'],
+    //   );
+    //   _meja.add(p);
+    // }
+    setState(() {
+      url = data['link'];
+      print(url + 'aa');
+      meja = _meja;
+      isLoading = false;
+    });
+  }
+
+  _launchURL() async {
+    if (await canLaunch(url)) {
+      await launch(url);
+    } else {
+      throw 'Error';
+    }
+  }
+
+  idResto() async {
+    SharedPreferences pref = await SharedPreferences.getInstance();
+    pref.setString("idresto", id.toString());
+  }
+
+  String restoName = "";
+  Future _getUserResto()async{
+    // List<History> _history = [];
+
+    setState(() {
+      isLoading = true;
+    });
+    SharedPreferences pref = await SharedPreferences.getInstance();
+    String token = pref.getString("token") ?? "";
+    var apiResult = await http.get(Links.mainUrl + '/resto', headers: {
+      "Accept": "Application/json",
+      "Authorization": "Bearer $token"
+    });
+    print(apiResult.body);
+    var data = json.decode(apiResult.body);
+
+    // for(var v in data['trans']){
+    //   History h = History(
+    //       id: v['id'],
+    //       name: v['resto_name'],
+    //       time: v['time'],
+    //       price: v['price'],
+    //       img: v['resto_img'],
+    //       type: v['type']
+    //   );
+    //   _history.add(h);
+    // }
+
+    setState(() {
+      restoName = data['resto']['name'];
+      // history = _history;
+      isLoading = false;
+    });
+  }
+
   @override
   void initState() {
     super.initState();
+    _getUserResto();
     getImg();
     getId();
     getHomePg();
+    idResto();
+    _getQr();
   }
 
   DateTime currentBackPressTime;
@@ -72,6 +163,7 @@ class _HomeActivityState extends State<HomeActivityResto> {
 //    SystemNavigator.pop();
     SharedPreferences pref = await SharedPreferences.getInstance();
     pref.setString("homepg", "");
+    pref.setString("idresto", "");
     Navigator.pushReplacement(context, MaterialPageRoute(builder: (context)=> HomeActivity()));
     return Future.value(true);
   }
@@ -149,7 +241,7 @@ class _HomeActivityState extends State<HomeActivityResto> {
                     Container(
                       padding: EdgeInsets.symmetric(horizontal: CustomSize.sizeWidth(context) / 10),
                       child: CustomText.textHeading5(
-                        text: "di Restoran GSB",
+                        text: "di Restoran "+restoName,
                         color: Colors.white,
                           minSize: 24,
                           maxLines: 1
@@ -307,6 +399,7 @@ class _HomeActivityState extends State<HomeActivityResto> {
                             GestureDetector(
                               onTap: (){
                                 setState(() {
+                                  // _launchURL();
                                   Navigator.push(context, PageTransition(type: PageTransitionType.fade, child: new MejaActivity()));
                                 });
                               },
@@ -337,6 +430,18 @@ class _HomeActivityState extends State<HomeActivityResto> {
                                     ),
                                   ],
                                 ),
+                                // child: Column(
+                                //   mainAxisAlignment: MainAxisAlignment.center,
+                                //   crossAxisAlignment: CrossAxisAlignment.center,
+                                //   children: [
+                                //     Icon(FontAwesome.qrcode, color: CustomColor.primary, size: 32,),
+                                //     CustomText.bodyMedium14(
+                                //         text: "Qr Code",
+                                //         minSize: 14,
+                                //         maxLines: 1
+                                //     ),
+                                //   ],
+                                // ),
                               ),
                             ),
                           ],

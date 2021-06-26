@@ -206,6 +206,42 @@ class _HomeActivityState extends State<HomeActivity> {
     });
   }
 
+  //resto
+
+  // List<History> history = [];
+  Future _getUserResto()async{
+    // List<History> _history = [];
+
+    setState(() {
+      isLoading = true;
+    });
+    SharedPreferences pref = await SharedPreferences.getInstance();
+    String token = pref.getString("token") ?? "";
+    var apiResult = await http.get(Links.mainUrl + '/resto', headers: {
+      "Accept": "Application/json",
+      "Authorization": "Bearer $token"
+    });
+    print(apiResult.body);
+    var data = json.decode(apiResult.body);
+
+    // for(var v in data['trans']){
+    //   History h = History(
+    //       id: v['id'],
+    //       name: v['resto_name'],
+    //       time: v['time'],
+    //       price: v['price'],
+    //       img: v['resto_img'],
+    //       type: v['type']
+    //   );
+    //   _history.add(h);
+    // }
+
+    setState(() {
+      // history = _history;
+      isLoading = false;
+    });
+  }
+
   double latitude = 0;
   double longitude = 0;
   RefreshController _refreshController =
@@ -256,6 +292,7 @@ class _HomeActivityState extends State<HomeActivity> {
 
   @override
   void initState() {
+    _getUserResto();
     Location.instance.requestPermission().then((value) {
       print(value);
     });

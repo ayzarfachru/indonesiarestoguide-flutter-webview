@@ -13,6 +13,7 @@ class Transaction{
   int total;
   List<Menu> menus;
   String type;
+  String table;
   String img;
   String date;
   String datetime;
@@ -37,6 +38,9 @@ class Transaction{
 
   Transaction.resto(
       {this.id, this.status, this.username, this.total, this.type});
+
+  Transaction.reservation(
+      {this.id, this.status, this.username, this.datetime, this.table, this.total, this.img});
 
   Transaction.restoDetail(
       {this.type, this.address, this.ongkir, this.total});

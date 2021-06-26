@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 
@@ -6,6 +7,8 @@ import 'package:flutter_datetime_picker/flutter_datetime_picker.dart';
 import 'package:flutter_icons/flutter_icons.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:indonesiarestoguide/model/Menu.dart';
+import 'package:indonesiarestoguide/model/Price.dart';
 import 'package:indonesiarestoguide/ui/ui_resto/add_resto/add_detail_resto.dart';
 import 'package:indonesiarestoguide/ui/ui_resto/add_resto/add_view_resto.dart';
 import 'package:indonesiarestoguide/ui/ui_resto/home/home_activity.dart';
@@ -24,23 +27,26 @@ class AddMenu extends StatefulWidget {
 }
 
 class MenuChip extends StatefulWidget {
-  final List<String> menuList;
+  final List<String> typeList;
   final Function(List<String>) onSelectionChanged;
+  String tipeMenu;
 
-  MenuChip(this.menuList, {this.onSelectionChanged});
+  MenuChip(this.typeList, {this.onSelectionChanged,this.tipeMenu});
 
   @override
-  CuisineChipState createState() => CuisineChipState();
+  MenuChipState createState() => MenuChipState(tipeMenu);
 }
 
-class CuisineChipState extends State<MenuChip> {
+class MenuChipState extends State<MenuChip> {
   // String selectedChoice = "";
   List<String> selectedChoices = List();
+  String tipeMenu;
+  MenuChipState(this.tipeMenu);
 
   _buildChoiceList() {
     List<Widget> choices = List();
 
-    widget.menuList.forEach((item) {
+    widget.typeList.forEach((item) {
       choices.add(Container(
         padding: const EdgeInsets.all(2.0),
         child: FilterChip(
@@ -76,6 +82,12 @@ class CuisineChipState extends State<MenuChip> {
 }
 
 class _AddMenuState extends State<AddMenu> {
+  void setState(fn) {
+    if(mounted) {
+      super.setState(fn);
+    }
+  }
+
   TextEditingController namaMenu = TextEditingController(text: "");
   TextEditingController hargaMenu = TextEditingController(text: "");
   TextEditingController hargaDeliv = TextEditingController(text: "");
@@ -87,11 +99,7 @@ class _AddMenuState extends State<AddMenu> {
 
   String name = "";
   String initial = "";
-  String email = "";
   String img = "";
-  String gender = "wanita";
-  String tgl = "";
-  String notelp = "";
 
   bool isLoading = true;
 
@@ -99,15 +107,11 @@ class _AddMenuState extends State<AddMenu> {
   bool reservation = false;
   bool delivery = false;
 
-  List<String> menuList = [
-    "Opening Course",
-    "Main Course",
-    "Dessert",
-    "Drink",
-  ];
+  List<String> typeList = [];
 
   List<String> selectedMenuList = List();
   String tipe;
+
 
   _showCuisineDialog() {
     showDialog(
@@ -117,7 +121,7 @@ class _AddMenuState extends State<AddMenu> {
           return AlertDialog(
             title: Text("Tipe Menu"),
             content: MenuChip(
-              menuList,
+              typeList,
               onSelectionChanged: (selectedList) {
                 setState(() {
                   selectedMenuList = selectedList;
@@ -156,21 +160,6 @@ class _AddMenuState extends State<AddMenu> {
     });
   }
 
-  pria() async {
-    setState(() {
-      gender = "pria";
-      print(gender);
-    });
-  }
-
-  wanita() async {
-    setState(() {
-      gender = "wanita";
-      print(gender);
-    });
-  }
-
-
   //------------------------------= IMAGE PICKER =----------------------------------
   File image;
   String extension;
@@ -185,10 +174,101 @@ class _AddMenuState extends State<AddMenu> {
     });
   }
 
+
+  List<Menu> menu = [];
+  Future<void> AddMenu()async{
+    List<Menu> _menu = [];
+
+    setState(() {
+      isLoading = true;
+    });
+    SharedPreferences pref = await SharedPreferences.getInstance();
+    String token = pref.getString("token") ?? "";
+    var apiResult = await http.post(Links.mainUrl + '/resto/menu',
+        body: {
+          'name': namaMenu.text,
+          'desc': deskMenu.text,
+          'price': hargaMenu.text,
+          'delivery_price': hargaDeliv.text,
+          'is_recommended': (favorite == true)?'true':'false',
+          'type': tipeMenu.text,
+          'img': 'data:image/$extension;base64,'+base64Encode(image.readAsBytesSync()).toString(),
+        },
+        headers: {
+        "Accept": "Application/json",
+        "Authorization": "Bearer $token"
+      });
+    // print(apiResult.body);
+    var data = json.decode(apiResult.body);
+
+    if(data['status_code'] == 200){
+      print("success");
+      print(json.encode({
+        'name': namaMenu.text,
+        'desc': deskMenu.text,
+        'price': hargaMenu.text,
+        'delivery_price': hargaDeliv.text,
+        'is_recommended': favorite.toString(),
+        'type': tipeMenu.text,
+        'img': (image != null)?'data:image/$extension;base64,'+base64Encode(image.readAsBytesSync()).toString():'',
+      }));
+      Navigator.pushReplacement(context, PageTransition(type: PageTransitionType.fade, child: HomeActivityResto()));
+    } else {
+      // print(data);
+      print(json.encode({
+        'name': namaMenu.text,
+        'desc': deskMenu.text,
+        'price': hargaMenu.text,
+        'delivery_price': hargaDeliv.text,
+        'is_recommended': (favorite == true)?'1':'0',
+        'type': tipeMenu.text,
+        'img': 'data:image/$extension;base64,'+base64Encode(image.readAsBytesSync()).toString(),
+      }));
+    }
+    setState(() {
+      menu = _menu;
+      isLoading = false;
+    });
+  }
+
+  List<String> dataCuisine;
+  Future<void> getType() async {
+    SharedPreferences pref = await SharedPreferences.getInstance();
+    var token = pref.getString("token") ?? "";
+    var data = await http.get(Links.mainUrl +'/util/data?q=menutype',
+        headers: {
+          "Accept": "application/json",
+          "Authorization": "Bearer $token"
+        }
+    );
+    var jsonData = jsonDecode(data.body);
+    print(jsonData);
+
+    for(var v in jsonData['data']){
+      typeList.add(v['name']);
+    }
+    setState(() {});
+  }
+
+  int load = 0;
+  void animateButton() {
+    setState(() {
+      load = 1;
+    });
+
+    Timer(Duration(milliseconds: 3300), () {
+      setState(() {
+        load = 2;
+      });
+    });
+  }
+
   @override
   void initState() {
     super.initState();
     getInitial();
+    AddMenu();
+    getType();
     // Future.delayed(Duration.zero, () async {
     //
     // });
@@ -334,7 +414,7 @@ class _AddMenuState extends State<AddMenu> {
                                     padding: const EdgeInsets.all(2.0),
                                     child: Center(
                                       child: CustomText.textTitle8(
-                                          text: "Ganti",
+                                          text: (tipeMenu.text == '')?"Pilih":"Ganti",
                                           color: CustomColor.accent
                                       ),
                                     ),
@@ -501,13 +581,15 @@ class _AddMenuState extends State<AddMenu> {
           // pref.setString("gender", gender);
           // pref.setString("tgl", tgl);
           // pref.setString("notelp", hargaMenu.text.toString());
-          print(namaMenu);
-          print(hargaMenu);
-          print(hargaDeliv);
-          print(tipeMenu);
-          print(deskMenu);
-          print(base64Encode(image.readAsBytesSync()).toString());
-          print(favorite);
+          // print(namaMenu);
+          // print(hargaMenu);
+          // print(hargaDeliv);
+          // print(tipeMenu);
+          // print(deskMenu);
+          // print(base64Encode(image.readAsBytesSync()).toString());
+          // print(favorite);
+          AddMenu();
+          animateButton();
         },
         child: Container(
           width: CustomSize.sizeWidth(context) / 1.1,
@@ -516,7 +598,10 @@ class _AddMenuState extends State<AddMenu> {
               borderRadius: BorderRadius.circular(30),
               color: CustomColor.accent
           ),
-          child: Center(child: CustomText.bodyRegular16(text: "Simpan", color: Colors.white,)),
+          child: Center(child: (load == 0)?CustomText.bodyRegular16(text: "Simpan", color: Colors.white,):
+          CircularProgressIndicator(
+            valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+          )),
         ),
       ),
     );

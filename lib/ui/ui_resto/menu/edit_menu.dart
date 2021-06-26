@@ -6,6 +6,8 @@ import 'package:flutter_datetime_picker/flutter_datetime_picker.dart';
 import 'package:flutter_icons/flutter_icons.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:indonesiarestoguide/model/Menu.dart';
+import 'package:indonesiarestoguide/model/Price.dart';
 import 'package:indonesiarestoguide/ui/ui_resto/add_resto/add_detail_resto.dart';
 import 'package:indonesiarestoguide/ui/ui_resto/add_resto/add_view_resto.dart';
 import 'package:indonesiarestoguide/ui/ui_resto/home/home_activity.dart';
@@ -19,15 +21,19 @@ import 'package:page_transition/page_transition.dart';
 import 'package:http/http.dart' as http;
 
 class EditMenu extends StatefulWidget {
+  Menu detailMenu;
+
+  EditMenu(this.detailMenu);
+
   @override
-  _EditMenuState createState() => _EditMenuState();
+  _EditMenuState createState() => _EditMenuState(detailMenu);
 }
 
 class MenuChip extends StatefulWidget {
-  final List<String> menuList;
+  final List<String> typeList;
   final Function(List<String>) onSelectionChanged;
 
-  MenuChip(this.menuList, {this.onSelectionChanged});
+  MenuChip(this.typeList, {this.onSelectionChanged});
 
   @override
   CuisineChipState createState() => CuisineChipState();
@@ -40,7 +46,7 @@ class CuisineChipState extends State<MenuChip> {
   _buildChoiceList() {
     List<Widget> choices = List();
 
-    widget.menuList.forEach((item) {
+    widget.typeList.forEach((item) {
       choices.add(Container(
         padding: const EdgeInsets.all(2.0),
         child: FilterChip(
@@ -76,6 +82,11 @@ class CuisineChipState extends State<MenuChip> {
 }
 
 class _EditMenuState extends State<EditMenu> {
+  Menu detailMenu;
+
+  _EditMenuState(this.detailMenu);
+
+
   TextEditingController namaMenu = TextEditingController(text: "");
   TextEditingController hargaMenu = TextEditingController(text: "");
   TextEditingController hargaDeliv = TextEditingController(text: "");
@@ -87,11 +98,7 @@ class _EditMenuState extends State<EditMenu> {
 
   String name = "";
   String initial = "";
-  String email = "";
   String img = "";
-  String gender = "wanita";
-  String tgl = "";
-  String notelp = "";
 
   bool isLoading = true;
 
@@ -99,12 +106,7 @@ class _EditMenuState extends State<EditMenu> {
   bool reservation = false;
   bool delivery = false;
 
-  List<String> menuList = [
-    "Opening Course",
-    "Main Course",
-    "Dessert",
-    "Drink",
-  ];
+  List<String> menuList = [];
 
   List<String> selectedMenuList = List();
   String tipe;
@@ -117,7 +119,7 @@ class _EditMenuState extends State<EditMenu> {
           return AlertDialog(
             title: Text("Tipe Menu"),
             content: MenuChip(
-              menuList,
+              typeList,
               onSelectionChanged: (selectedList) {
                 setState(() {
                   selectedMenuList = selectedList;
@@ -133,7 +135,7 @@ class _EditMenuState extends State<EditMenu> {
                   pref.setString("tipeMenu", tipe);
                   setState(() {
                     print(tipe);
-                    getTipeMenu();
+                    getNewTipeMenu();
                   });
                   Navigator.of(context).pop();
                 },
@@ -144,8 +146,31 @@ class _EditMenuState extends State<EditMenu> {
         });
   }
 
+  getNameMenu() async {
+    namaMenu = TextEditingController(text: detailMenu.name);
+  }
+
+  getHargaMenu() async {
+    hargaMenu = TextEditingController(text: detailMenu.price.original.toString());
+  }
+
+  getDelivMenu() async {
+    hargaDeliv = TextEditingController(text: detailMenu.delivery_price.delivery.toString());
+  }
+
   getTipeMenu() async {
+    tipeMenu = TextEditingController(text: detailMenu.type);
+  }
+  getNewTipeMenu() async {
     tipeMenu = TextEditingController(text: tipe);
+  }
+
+  getDescMenu() async {
+    deskMenu = TextEditingController(text: detailMenu.desc);
+  }
+
+  getFavMenu() async {
+    favorite = (detailMenu.is_recommended != '1')?false:true;
   }
 
   getInitial() async {
@@ -153,20 +178,6 @@ class _EditMenuState extends State<EditMenu> {
     setState(() {
       initial = (pref.getString('name').substring(0, 1).toUpperCase());
       print(initial);
-    });
-  }
-
-  pria() async {
-    setState(() {
-      gender = "pria";
-      print(gender);
-    });
-  }
-
-  wanita() async {
-    setState(() {
-      gender = "wanita";
-      print(gender);
     });
   }
 
@@ -185,10 +196,98 @@ class _EditMenuState extends State<EditMenu> {
     });
   }
 
+
+  List<String> typeList = [];
+  List<String> dataCuisine;
+  Future<void> getType() async {
+    SharedPreferences pref = await SharedPreferences.getInstance();
+    var token = pref.getString("token") ?? "";
+    var data = await http.get(Links.mainUrl +'/util/data?q=menutype',
+        headers: {
+          "Accept": "application/json",
+          "Authorization": "Bearer $token"
+        }
+    );
+    var jsonData = jsonDecode(data.body);
+    print(jsonData);
+
+    for(var v in jsonData['data']){
+      typeList.add(v['name']);
+    }
+    setState(() {});
+  }
+
+
+  String id;
+  List<Menu> menu = [];
+  Future<void> _editMenu()async{
+    List<Menu> _menu = [];
+
+    setState(() {
+      isLoading = true;
+    });
+    SharedPreferences pref = await SharedPreferences.getInstance();
+    String token = pref.getString("token") ?? "";
+    var apiResult = await http.post(Links.mainUrl + '/resto/menu/$id',
+        body: {
+          'name': namaMenu.text,
+          'desc': deskMenu.text,
+          'price': hargaMenu.text,
+          'delivery_price': hargaDeliv.text,
+          'is_recommended': (favorite == true)?'true':'false',
+          'type': tipeMenu.text,
+          'img': (image != null)?'data:image/$extension;base64,'+base64Encode(image.readAsBytesSync()).toString():'',
+        },
+        headers: {
+          "Accept": "Application/json",
+          "Authorization": "Bearer $token"
+        });
+    // print(apiResult.body);
+    var data = json.decode(apiResult.body);
+
+    if(data['status_code'] == 200){
+      print("success");
+      print(json.encode({
+        'name': namaMenu.text,
+        'desc': deskMenu.text,
+        'price': hargaMenu.text,
+        'delivery_price': hargaDeliv.text,
+        'is_recommended': (favorite == true)?'true':'false',
+        'type': tipeMenu.text,
+        'img': (image != null)?'data:image/$extension;base64,'+base64Encode(image.readAsBytesSync()).toString():'',
+      }));
+    } else {
+      print(data);
+      print(json.encode({
+        'name': namaMenu.text,
+        'desc': deskMenu.text,
+        'price': hargaMenu.text,
+        'delivery_price': hargaDeliv.text,
+        'is_recommended': favorite.toString(),
+        'type': tipeMenu.text,
+        'img': (image != null)?'data:image/$extension;base64,'+base64Encode(image.readAsBytesSync()).toString():'',
+      }));
+    }
+    setState(() {
+      menu = _menu;
+      isLoading = false;
+    });
+  }
+
   @override
   void initState() {
     super.initState();
     getInitial();
+    getType();
+    getNameMenu();
+    getHargaMenu();
+    getDelivMenu();
+    getTipeMenu();
+    getDescMenu();
+    getFavMenu();
+    setState(() {
+      id = detailMenu.id.toString();
+    });
     // Future.delayed(Duration.zero, () async {
     //
     // });
@@ -384,11 +483,10 @@ class _EditMenuState extends State<EditMenu> {
                           (image == null)?Container(
                             height: CustomSize.sizeHeight(context) / 6.5,
                             width: CustomSize.sizeWidth(context) / 3.2,
-                            child: Icon(FontAwesome.plus, color: CustomColor.primary, size: 50,),
                             decoration: BoxDecoration(
-                              border: Border.all(
-                                  color: CustomColor.primary,
-                                  width: 3.0
+                              image: DecorationImage(
+                                  image: NetworkImage(Links.subUrl + detailMenu.urlImg),
+                                  fit: BoxFit.cover
                               ),
                               borderRadius: BorderRadius.all(
                                   Radius.circular(10.0) //         <--- border radius here
@@ -445,7 +543,7 @@ class _EditMenuState extends State<EditMenu> {
                       ),
                     ),
                     SizedBox(
-                      height: CustomSize.sizeHeight(context) * 0.0075,
+                      height: CustomSize.sizeHeight(context) * 0.0150,
                     ),
                     //------------------------------------ checkbox favorite -------------------------------------
                     Row(
@@ -494,6 +592,7 @@ class _EditMenuState extends State<EditMenu> {
           setState(() {
             isLoading = false;
           });
+          _editMenu();
           // Navigator.pushReplacement(context, PageTransition(type: PageTransitionType.fade, child: new HomeActivityResto()));
           // SharedPreferences pref = await SharedPreferences.getInstance();
           // pref.setString("name", namaMenu.text.toString());
@@ -502,12 +601,7 @@ class _EditMenuState extends State<EditMenu> {
           // pref.setString("gender", gender);
           // pref.setString("tgl", tgl);
           // pref.setString("notelp", hargaMenu.text.toString());
-          print(namaMenu);
-          print(hargaMenu);
-          print(hargaDeliv);
-          print(tipeMenu);
-          print(deskMenu);
-          print(base64Encode(image.readAsBytesSync()).toString());
+          Navigator.pushReplacement(context, PageTransition(type: PageTransitionType.fade, child: new MenuActivity()));
           print(favorite);
         },
         child: Container(

@@ -61,6 +61,7 @@ class _SplashScreenState extends State<SplashScreen> {
                 height: CustomSize.sizeHeight(context) / 24,
               ),
               Container(
+                alignment: Alignment.center,
                 width: CustomSize.sizeWidth(context) / 1.1,
                 child: CustomText.textHeading2(text: "Indonesia Resto Guide"),
               ),

@@ -2,9 +2,12 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_icons/flutter_icons.dart';
+import 'package:indonesiarestoguide/ui/promo/add_promo.dart';
+import 'package:indonesiarestoguide/ui/promo/edit_promo.dart';
 import 'package:indonesiarestoguide/utils/utils.dart';
 import 'package:intl/intl.dart';
 import 'package:location/location.dart';
+import 'package:page_transition/page_transition.dart';
 import 'package:pull_to_refresh/pull_to_refresh.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:location_platform_interface/location_platform_interface.dart';
@@ -93,6 +96,11 @@ class PromoActivity extends StatefulWidget {
 }
 
 class _PromoActivityState extends State<PromoActivity> {
+  void setState(fn) {
+    if(mounted) {
+      super.setState(fn);
+    }
+  }
   ScrollController _scrollController = ScrollController();
   String homepg = "";
   bool isLoading = false;
@@ -139,6 +147,50 @@ class _PromoActivityState extends State<PromoActivity> {
     });
   }
 
+  List<Promo> promoResto = [];
+  Future<void> _getPromoResto()async {
+    List<Promo> _promoResto = [];
+
+    setState(() {
+      isLoading = true;
+    });
+    SharedPreferences pref = await SharedPreferences.getInstance();
+    String token = pref.getString("token") ?? "";
+    var apiResult = await http.get(Links.mainUrl + '/promo', headers: {
+      "Accept": "Application/json",
+      "Authorization": "Bearer $token"
+    });
+    print(apiResult.body);
+    var data = json.decode(apiResult.body);
+    // print(data['promo']);
+
+    for (var a in data['promo']) {
+      Promo b = Promo.resto(
+        id: a['id'],
+        menus_id: int.parse(a['menus_id']),
+        word: a['description'],
+        discountedPrice: (a['discount'] != null)?int.parse(a['discount']):a['discount'],
+        potongan: (a['potongan'] != null)?int.parse(a['potongan']):a['potongan'],
+        ongkir: (a['ongkir'] != null)?int.parse(a['ongkir']):a['ongkir'],
+        expired_at: a['expired_at'],
+        menu: Menu(
+            id: a['menus']['id'],
+            name: a['menus']['name'],
+            desc: a['menus']['desc'],
+            urlImg: a['menus']['img'],
+            price: Price.promo(
+                a['menus']['price'].toString(), a['menus']['delivery_price'].toString())
+        ),
+      );
+      _promoResto.add(b);
+    }
+    setState(() {
+      promoResto = _promoResto;
+      // print(promoResto);
+      isLoading = false;
+    });
+  }
+
   RefreshController _refreshController =
   RefreshController(initialRefresh: false);
 
@@ -147,8 +199,15 @@ class _PromoActivityState extends State<PromoActivity> {
     Location.instance.requestPermission().then((value) {
       print(value);
     });
-    Location.instance.getLocation().then((value) {
-      _getPromo(value.latitude.toString(), value.longitude.toString());
+    Future.delayed(Duration(seconds: 1)).then((_) {
+      if (homepg != '1') {
+        Location.instance.getLocation().then((value) {
+          _getPromo(value.latitude.toString(), value.longitude.toString());
+        });
+      } else {
+        _getPromoResto();
+        print('ini resto');
+      }
     });
     setState(() {});
     await Future.delayed(Duration(milliseconds: 1000));
@@ -163,19 +222,92 @@ class _PromoActivityState extends State<PromoActivity> {
     _refreshController.loadComplete();
   }
 
+  showAlertDialog(String id) {
+
+    // set up the buttons
+    Widget cancelButton = FlatButton(
+      child: Text("Batal", style: TextStyle(color: CustomColor.primary)),
+      onPressed:  () {
+        Navigator.pop(context);
+      },
+    );
+    Widget continueButton = FlatButton(
+      child: Text("Hapus", style: TextStyle(color: CustomColor.primary)),
+      onPressed:  () {
+        _delPromo(id);
+      },
+    );
+
+    // set up the AlertDialog
+    AlertDialog alert = AlertDialog(
+      title: Text("Hapus Promo"),
+      content: Text("Apakah anda yakin ingin menghapus data ini?"),
+      actions: [
+        cancelButton,
+        continueButton,
+      ],
+    );
+
+    // show the dialog
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return alert;
+      },
+    );
+  }
+
+  Future _delPromo(String id)async{
+    setState(() {
+      isLoading = true;
+    });
+    SharedPreferences pref = await SharedPreferences.getInstance();
+    String token = pref.getString("token") ?? "";
+    var apiResult = await http.get(Links.mainUrl + '/promo/delete/$id', headers: {
+      "Accept": "Application/json",
+      "Authorization": "Bearer $token"
+    });
+    print(apiResult.body);
+    var data = json.decode(apiResult.body);
+
+    if (data['msg'].toString() == 'success') {
+      Navigator.pop(context);
+      Navigator.pushReplacement(context,
+          PageTransition(
+              type: PageTransitionType.fade,
+              child: PromoActivity()));
+    }
+
+    setState(() {
+      isLoading = false;
+    });
+  }
+
   @override
   void dispose() {
     _scrollController.dispose();
     super.dispose();
   }
 
+  double hargaDiskon = 0;
+  int hargaPotongan = 0;
+  int hargaOngkir = 0;
+
   @override
   void initState() {
     Location.instance.requestPermission().then((value) {
       print(value);
     });
-    Location.instance.getLocation().then((value) {
-      _getPromo(value.latitude.toString(), value.longitude.toString());
+    Future.delayed(Duration(seconds: 1)).then((_) {
+      if (homepg != '1') {
+        Location.instance.getLocation().then((value) {
+          _getPromo(value.latitude.toString(), value.longitude.toString());
+        });
+      } else {
+        _getPromoResto();
+        print('ini resto');
+        // print(promoResto);
+      }
     });
     super.initState();
     getHomePg();
@@ -230,8 +362,20 @@ class _PromoActivityState extends State<PromoActivity> {
                     shrinkWrap: true,
                     controller: _scrollController,
                     physics: NeverScrollableScrollPhysics(),
-                    itemCount: promo.length,
+                    itemCount: (homepg != "1")?promo.length:promoResto.length,
                       itemBuilder: (_, index){
+                      Future.delayed(Duration(seconds: 1)).then((_) {
+                        setState(() {
+                          // int hargaAsli = int.parse(promoResto[index].menu.price.oriString);
+                          // int hargaAsliDeliv = int.parse(promoResto[index].menu.price.deliString);
+                          // hargaDiskon = hargaAsli-(hargaAsli*promoResto[index].discountedPrice/100);
+                          // hargaPotongan = (promoResto[index].potongan != null)?hargaAsli-promoResto[index].potongan:hargaAsli;
+                          // hargaOngkir = (promoResto[index].ongkir != null)?hargaAsliDeliv-promoResto[index].ongkir:hargaAsliDeliv;
+
+                          // print(hargaDiskon.toString().split('.')[0]);
+                          // print(hargaOngkir);
+                        });
+                      });
                         return Padding(
                           padding: EdgeInsets.only(top: CustomSize.sizeHeight(context) / 48),
                           child: Container(
@@ -256,7 +400,7 @@ class _PromoActivityState extends State<PromoActivity> {
                                   height: CustomSize.sizeWidth(context) / 2.6,
                                   decoration: BoxDecoration(
                                     image: DecorationImage(
-                                      image: NetworkImage(Links.subUrl + promo[index].menu.urlImg),
+                                      image: (homepg != "1")?NetworkImage(Links.subUrl + promo[index].menu.urlImg):NetworkImage(Links.subUrl + promoResto[index].menu.urlImg),
                                       fit: BoxFit.cover
                                     ),
                                     borderRadius: BorderRadius.circular(20),
@@ -274,40 +418,113 @@ class _PromoActivityState extends State<PromoActivity> {
                                       Row(
                                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                         children: [
-                                          CustomText.bodyLight12(
+                                          (homepg != '1')?CustomText.bodyLight12(
                                               text: "0.9 km",
-                                            maxLines: 1,
+                                              maxLines: 1,
+                                              minSize: 12
+                                          ):CustomText.bodyLight12(
+                                              text: 'Sampai : '+promoResto[index].expired_at.split(' ')[0],
+                                              maxLines: 1,
                                               minSize: 12
                                           ),
                                           (homepg != "1")?Container():Row(
                                             children: [
-                                              Icon(Icons.edit, color: CustomColor.primary,),
+                                              GestureDetector(
+                                                onTap: (){
+                                                  Navigator.push(
+                                                      context,
+                                                      PageTransition(
+                                                          type: PageTransitionType.rightToLeft,
+                                                          child: EditPromo(promoResto[index])));
+                                                },
+                                                  child: Icon(Icons.edit, color: CustomColor.primary,)
+                                              ),
                                               SizedBox(width: CustomSize.sizeWidth(context) / 86,),
-                                              Icon(Icons.delete, color: CustomColor.primary,),
+                                              GestureDetector(
+                                                  onTap: (){
+                                                    showAlertDialog(promoResto[index].id.toString());
+                                                  },
+                                                  child: Icon(Icons.delete, color: CustomColor.primary,)
+                                              ),
                                               SizedBox(width: CustomSize.sizeWidth(context) / 98,),
                                             ],
                                           )
                                         ],
                                       ),
-                                      SizedBox(height: CustomSize.sizeHeight(context) / 86,),
-                                      CustomText.textHeading4(
+                                      (homepg != '1')?Container():CustomText.bodyLight12(
+                                          text: 'Jam : '+promoResto[index].expired_at.split(' ')[1].split(':')[0]+':'+promoResto[index].expired_at.split(' ')[1].split(':')[1],
+                                          maxLines: 1,
+                                          minSize: 12
+                                      ),
+                                      SizedBox(height: CustomSize.sizeHeight(context) * 0.00626,),
+                                      (homepg != "1")?CustomText.textHeading4(
                                           text: promo[index].menu.name,
                                           minSize: 18,
                                           maxLines: 1
+                                      ):CustomText.textHeading4(
+                                          text: promoResto[index].menu.name,
+                                          minSize: 18,
+                                          maxLines: 1
                                       ),
-                                      SizedBox(height: CustomSize.sizeHeight(context) / 86,),
-                                      CustomText.bodyMedium12(
+                                      SizedBox(height: CustomSize.sizeHeight(context) * 0.00126,),
+                                      (homepg != "1")?CustomText.bodyMedium12(
                                           text: promo[index].menu.desc,
                                         maxLines: 1,
                                         minSize: 12
+                                      ):CustomText.bodyMedium12(
+                                          text: promoResto[index].word,
+                                        maxLines: 1,
+                                        minSize: 12
                                       ),
-                                      SizedBox(height: CustomSize.sizeHeight(context) / 48,),
+                                      (homepg != "1")?SizedBox(height: CustomSize.sizeHeight(context) / 48,):SizedBox(height: CustomSize.sizeHeight(context) / 108,),
                                       Row(
                                         children: [
-                                          CustomText.bodyRegular12(text: NumberFormat.currency(locale: 'id', symbol: '', decimalDigits: 0).format(promo[index].menu.price.original), minSize: 12,
-                                              decoration: TextDecoration.lineThrough),
+                                          (homepg != "1")?CustomText.bodyRegular12(text: NumberFormat.currency(locale: 'id', symbol: '', decimalDigits: 0).format(promo[index].menu.price.original), minSize: 12,
+                                              decoration: TextDecoration.lineThrough)
+                                          :Column(
+                                            crossAxisAlignment: CrossAxisAlignment.end,
+                                            children: [
+                                              Row(
+                                                children: [
+                                                  CustomText.bodyRegular12(text: 'Harga menu : ', minSize: 12),
+                                                  SizedBox(width: CustomSize.sizeWidth(context) / 48,),
+                                                  (promoResto[index].discountedPrice != null || promoResto[index].potongan != null)?CustomText.bodyRegular12(text: NumberFormat.currency(locale: 'id', symbol: '', decimalDigits: 0).format(int.parse(promoResto[index].menu.price.oriString)), minSize: 12, color: CustomColor.redBtn,
+                                                      decoration: TextDecoration.lineThrough)
+                                                      :CustomText.bodyRegular12(text: NumberFormat.currency(locale: 'id', symbol: '', decimalDigits: 0).format(int.parse(promoResto[index].menu.price.oriString)), minSize: 12,),
+                                                ],
+                                              ),
+                                              Row(
+                                                children: [
+                                                  CustomText.bodyRegular12(text: 'Delivery : ', minSize: 12),
+                                                  SizedBox(width: CustomSize.sizeWidth(context) / 48,),
+                                                  (promoResto[index].ongkir != null)?CustomText.bodyRegular12(text: NumberFormat.currency(locale: 'id', symbol: '', decimalDigits: 0).format(int.parse(promoResto[index].menu.price.deliString)), minSize: 12, color: CustomColor.redBtn,
+                                                      decoration: TextDecoration.lineThrough)
+                                                      :CustomText.bodyRegular12(text: NumberFormat.currency(locale: 'id', symbol: '', decimalDigits: 0).format(int.parse(promoResto[index].menu.price.deliString)), minSize: 12,),
+                                                ],
+                                              ),
+                                            ],
+                                          ),
                                           SizedBox(width: CustomSize.sizeWidth(context) / 48,),
-                                          CustomText.bodyRegular12(text: NumberFormat.currency(locale: 'id', symbol: '', decimalDigits: 0).format(promo[index].menu.price.discounted), minSize: 12),
+                                          (homepg == "1")?Column(
+                                            crossAxisAlignment: CrossAxisAlignment.start,
+                                            children: [
+                                              // (homepg != "1")?CustomText.bodyRegular12(text: NumberFormat.currency(locale: 'id', symbol: '', decimalDigits: 0).format(promo[index].menu.price.discounted), minSize: 12)
+                                              //     :
+                                              CustomText.bodyRegular12(text:
+                                              (promoResto[index].discountedPrice != null)?
+                                              NumberFormat.currency(locale: 'id', symbol: '', decimalDigits: 0).format((int.parse(promoResto[index].menu.price.oriString)-(int.parse(promoResto[index].menu.price.oriString)*promoResto[index].discountedPrice/100)))
+                                                  :(promoResto[index].potongan != null)?NumberFormat.currency(locale: 'id', symbol: '', decimalDigits: 0).format(int.parse(promoResto[index].menu.price.oriString)-promoResto[index].potongan)
+                                                  :'', minSize: 12),
+
+                                              // (homepg != "1")?CustomText.bodyRegular12(text: NumberFormat.currency(locale: 'id', symbol: '', decimalDigits: 0).format(promo[index].menu.price.discounted), minSize: 12)
+                                              //     :
+                                              CustomText.bodyRegular12(text:
+                                              (promoResto[index].menu.price.deliString != null)?
+                                              (promoResto[index].ongkir != null)?
+                                                  NumberFormat.currency(locale: 'id', symbol: '', decimalDigits: 0).format((int.parse(promoResto[index].menu.price.deliString)-promoResto[index].ongkir))
+                                                  :'' :'', minSize: 12),
+                                            ],
+                                          ):CustomText.bodyRegular12(text: NumberFormat.currency(locale: 'id', symbol: '', decimalDigits: 0).format(promo[index].menu.price.discounted), minSize: 12),
                                         ],
                                       )
                                     ],
@@ -319,7 +536,7 @@ class _PromoActivityState extends State<PromoActivity> {
                         );
                       }
                   ),
-                  SizedBox(height: CustomSize.sizeHeight(context) / 48,)
+                  SizedBox(height: CustomSize.sizeHeight(context) / 8,)
                 ],
               ),
             ),
@@ -327,12 +544,17 @@ class _PromoActivityState extends State<PromoActivity> {
         ),
       ),
         floatingActionButton: (homepg != '1')?Container():GestureDetector(
-          onTap: (){
-            // Navigator.push(
-            //     context,
-            //     PageTransition(
-            //         type: PageTransitionType.rightToLeft,
-            //         child: CartActivity()));
+          onTap: ()async{
+            SharedPreferences pref = await SharedPreferences.getInstance();
+            // pref.remove("idMenu");
+            // pref.remove("nameMenu");
+            pref.setString("idMenu", '');
+            pref.setString("nameMenu", '');
+            Navigator.push(
+                context,
+                PageTransition(
+                    type: PageTransitionType.rightToLeft,
+                    child: AddPromo()));
           },
           child: Container(
             width: CustomSize.sizeWidth(context) / 6.6,

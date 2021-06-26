@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_datetime_picker/flutter_datetime_picker.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -292,6 +293,7 @@ class _AddViewRestoState extends State<AddViewResto> {
                       controller: _NoTelp,
                       keyboardType: TextInputType.number,
                       cursorColor: Colors.black,
+                      inputFormatters: [FilteringTextInputFormatter.digitsOnly],
                       style: GoogleFonts.poppins(
                           textStyle:
                           TextStyle(fontSize: 18, color: Colors.black, fontWeight: FontWeight.w600)),
@@ -341,13 +343,13 @@ class _AddViewRestoState extends State<AddViewResto> {
         ),
       ),
       floatingActionButton:
-      GestureDetector(
+      (btnAddress == true)?Container():GestureDetector(
         onTap: () async{
           setState(() {
             isLoading = false;
           });
           SharedPreferences pref = await SharedPreferences.getInstance();
-          pref.setString("imgResto", base64Encode(image.readAsBytesSync()).toString());
+          pref.setString("imgResto", 'data:image/$extension;base64,'+base64Encode(image.readAsBytesSync()).toString());
           pref.setString("nameResto", _Name.text.toString());
           pref.setString("notelpResto", _NoTelp.text.toString());
           pref.setString("descResto", _Desc.text.toString());

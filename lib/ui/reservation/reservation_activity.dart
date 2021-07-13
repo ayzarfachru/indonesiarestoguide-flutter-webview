@@ -245,7 +245,7 @@ class _ReservationActivityState extends State<ReservationActivity> {
                                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                 children: [
                                   CustomText.bodyLight16(text: "Harga" + " x " +_textPerson.text),
-                                  CustomText.bodyLight16(text: NumberFormat.currency(locale: 'id', symbol: '', decimalDigits: 0).format(int.parse(reservationFee))),
+                                  CustomText.bodyLight16(text: NumberFormat.currency(locale: 'id', symbol: '', decimalDigits: 0).format(int.parse(reservationFee))+" (1)"),
                                 ],
                               ),
                               // (_transCode == 1)?SizedBox(height: CustomSize.sizeHeight(context) / 100,):SizedBox(),

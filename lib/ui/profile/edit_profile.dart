@@ -5,11 +5,15 @@ import 'package:flutter/material.dart';
 import 'package:flutter_datetime_picker/flutter_datetime_picker.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:flutter/services.dart';
 import 'package:indonesiarestoguide/utils/utils.dart';
+import 'package:flutter_icons/flutter_icons.dart';
 import 'package:indonesiarestoguide/ui/home/home_activity.dart';
+import 'package:indonesiarestoguide/model/User.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:page_transition/page_transition.dart';
+import 'dart:typed_data';
 
 import 'package:http/http.dart' as http;
 
@@ -22,6 +26,8 @@ class _EditProfileState extends State<EditProfile> {
   TextEditingController _loginTextName = TextEditingController(text: "");
   TextEditingController _loginEmailName = TextEditingController(text: "");
   TextEditingController _loginNotelpName = TextEditingController(text: "");
+  TextEditingController newPass = TextEditingController(text: "");
+  TextEditingController _newPass = TextEditingController(text: "");
 
   String name = "";
   String initial = "";
@@ -30,14 +36,25 @@ class _EditProfileState extends State<EditProfile> {
   String gender = "pria";
   String tgl = "";
   String notelp = "";
+  bool Pass = false;
 
-  bool isLoading = true;
+  bool isLoading = false;
 
-  getName() async {
+  getPref() async {
     SharedPreferences pref = await SharedPreferences.getInstance();
     setState(() {
       name = (pref.getString('name'));
       print(name);
+      email = (pref.getString('email'));
+      print(email);
+      img = (pref.getString('img'));
+      print(img);
+      notelp = (pref.getString('notelp'));
+      print(notelp);
+      gender = (pref.getString('gender'));
+      print(gender);
+      tgl = (pref.getString('tgl'));
+      print(tgl);
     });
   }
 
@@ -64,10 +81,20 @@ class _EditProfileState extends State<EditProfile> {
   getImg() async {
     SharedPreferences pref = await SharedPreferences.getInstance();
     setState(() {
-      img = (pref.getString('img'));
+      img = pref.getString('img');
       print(img);
     });
   }
+
+  String img2 = "";
+  getImg2() async {
+    SharedPreferences pref = await SharedPreferences.getInstance();
+    setState(() {
+      img2 = (pref.getString('img')).toString();
+      // print(img2);
+    });
+  }
+
 
   getNotelp() async {
     SharedPreferences pref = await SharedPreferences.getInstance();
@@ -79,14 +106,14 @@ class _EditProfileState extends State<EditProfile> {
 
   getTnotelp() async {
     setState(() {
-      _loginNotelpName = TextEditingController(text: (notelp != "null")?notelp:"+62");
+      _loginNotelpName = TextEditingController(text: (notelp != "null")?notelp:"");
     });
   }
 
   getGender() async {
     SharedPreferences pref = await SharedPreferences.getInstance();
     setState(() {
-      gender = 'pria';
+      gender = (pref.getString('gender'));
       print(gender);
     });
   }
@@ -131,6 +158,9 @@ class _EditProfileState extends State<EditProfile> {
     SharedPreferences pref = await SharedPreferences.getInstance();
     var token = pref.getString("token") ?? "";
     var id = pref.getInt("id") ?? "";
+    setState(() {
+      isLoading = true;
+    });
 
     String apiUrl = Links.mainUrl+"/auth/edit/user";
     var postUri = Uri.parse(apiUrl);
@@ -143,14 +173,34 @@ class _EditProfileState extends State<EditProfile> {
           'ttl': newTgl,
           'gender': newGender,
           'phone': newNotelp,
-          'photo': image != null ? 'data:image/$extension;base64,' +
-              base64Encode(newImage.readAsBytesSync()) : '',
+          'photo': 'data:image/$extension;base64,' +
+              base64Encode(newImage.readAsBytesSync()),
         },
         headers: {
           "Accept" : "Application/json",
           "Authorization": "Bearer $token"
         }
     );
+    if (response.statusCode == 200) {
+      SharedPreferences pref = await SharedPreferences.getInstance();
+      pref.setString("name", _loginTextName.text.toString());
+      pref.setString("email", _loginEmailName.text.toString());
+      pref.setString("img", (image == null)?img:base64Encode(image.readAsBytesSync()).toString());
+      print('ini lohh'+ img.substring(0,1));
+      // debugPrint('ini image baru '+base64Encode(image.readAsBytesSync()).toString(), wrapWidth: 9024);
+      // printWrapped(base64Encode(image.readAsBytesSync()).toString());
+      pref.setString("gender", gender);
+      pref.setString("tgl", tgl);
+      pref.setString("notelp", _loginNotelpName.text.toString());
+      Navigator.pushReplacement(context, PageTransition(type: PageTransitionType.fade, child: new HomeActivity()));
+    } else {
+      Fluttertoast.showToast(
+          msg: "The field is required",
+          backgroundColor: Colors.grey,
+          textColor: Colors.black,
+          fontSize: 16.0
+      );
+    }
     final responseJson = jsonDecode(response.body);
     print(newName+'tsnl');
     print(newEmail+'tsnl');
@@ -160,18 +210,147 @@ class _EditProfileState extends State<EditProfile> {
     print(image != null ? 'data:image/$extension;base64,' +
         base64Encode(newImage.readAsBytesSync()) +'tsnl': img+'tsnl');
     print(responseJson);
+    setState(() {
+      isLoading = false;
+    });
     return responseJson["message"];
+  }
+
+  Future<String> editProfile2(String newName, String newEmail, String newTgl, String newGender, String newNotelp, File newImage, String newImg) async{
+    SharedPreferences pref = await SharedPreferences.getInstance();
+    var token = pref.getString("token") ?? "";
+    var id = pref.getInt("id") ?? "";
+    setState(() {
+      isLoading = true;
+    });
+
+    String apiUrl = Links.mainUrl+"/auth/edit/user";
+    var postUri = Uri.parse(apiUrl);
+
+    final response = await http.post(
+        postUri,
+        body: {
+          'name': newName,
+          'email' : newEmail,
+          'ttl': newTgl,
+          'gender': newGender,
+          'phone': newNotelp,
+        },
+        headers: {
+          "Accept" : "Application/json",
+          "Authorization": "Bearer $token"
+        }
+    );
+    if (response.statusCode == 200) {
+      SharedPreferences pref = await SharedPreferences.getInstance();
+      pref.setString("name", _loginTextName.text.toString());
+      pref.setString("email", _loginEmailName.text.toString());
+      pref.setString("img", (image == null)?img:base64Encode(image.readAsBytesSync()).toString());
+      print('ini lohh'+ img.substring(0,1));
+      // debugPrint('ini image baru '+base64Encode(image.readAsBytesSync()).toString(), wrapWidth: 9024);
+      // printWrapped(base64Encode(image.readAsBytesSync()).toString());
+      pref.setString("gender", gender);
+      pref.setString("tgl", tgl);
+      pref.setString("notelp", _loginNotelpName.text.toString());
+      Navigator.pushReplacement(context, PageTransition(type: PageTransitionType.fade, child: new HomeActivity()));
+    } else {
+      Fluttertoast.showToast(
+          msg: "The field is required",
+          backgroundColor: Colors.grey,
+          textColor: Colors.black,
+          fontSize: 16.0
+      );
+    }
+    final responseJson = jsonDecode(response.body);
+    print(newName+'tsnl');
+    print(newEmail+'tsnl');
+    print(newTgl+'tsnl');
+    print(newGender+'tsnl');
+    print(newNotelp+'tsnl');
+    print(image != null ? 'data:image/$extension;base64,' +
+        base64Encode(newImage.readAsBytesSync()) +'tsnl': img+'tsnl');
+    print(responseJson);
+    setState(() {
+      isLoading = false;
+    });
+    return responseJson["message"];
+  }
+
+
+  String id;
+  List<User> user = [];
+  Future<void> _editPass()async{
+    List<User> _user = [];
+    SharedPreferences pref = await SharedPreferences.getInstance();
+    String token = pref.getString("token") ?? "";
+    var apiResult = await http.post(Links.mainUrl + '/auth/password',
+        body: {
+          'password': _newPass.text,
+        },
+        headers: {
+          "Accept": "Application/json",
+          "Authorization": "Bearer $token"
+        });
+    // print(apiResult.body);
+    var data = json.decode(apiResult.body);
+
+    if(data['status_code'] == 200){
+      print("success");
+      print(json.encode({
+        'password': _newPass.text,
+      }));
+    } else {
+      print(data);
+      print("gagal");
+      print(json.encode({
+        'password': _newPass.text,
+      }));
+    }
+    setState(() {
+      user = _user;
+    });
+  }
+
+
+  bool _obscureText = true;
+
+  void _toggle() {
+    setState(() {
+      _obscureText = !_obscureText;
+    });
+  }
+
+  bool _obscureText2 = true;
+
+  void _toggle2() {
+    setState(() {
+      _obscureText2 = !_obscureText2;
+    });
+  }
+
+
+  void printWrapped(String text) {
+    final pattern = new RegExp('.{1,9800}'); // 800 is the size of each chunk
+    pattern.allMatches(text).forEach((match) => print(match.group(0)));
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
   }
 
   @override
   void initState() {
     super.initState();
-    getName();
-    getEmail();
-    getImg();
-    getNotelp();
-    getGender();
-    getTgl();
+    getPref();
+    // getEmail();
+    // getImg();
+    // (img != '/'.substring(0, 1))?getImg2():print('');
+    // getNotelp();
+    // getGender();
+    // getTgl();
+    print('ini lohh'+ img);
+    final _byteImage = Base64Decoder().convert(img2.toString());
     Future.delayed(Duration.zero, () async {
       setState(() {
         getTname();
@@ -219,15 +398,18 @@ class _EditProfileState extends State<EditProfile> {
                           child: Container(
                             width: CustomSize.sizeWidth(context) / 6,
                             height: CustomSize.sizeWidth(context) / 6,
-                            decoration: (image==null)?(img == "/".substring(0, 1))?BoxDecoration(
+                            decoration: (image==null)?(img == "" || img == null)?BoxDecoration(
                                 color: CustomColor.primary,
                                 shape: BoxShape.circle
                             ):BoxDecoration(
                               shape: BoxShape.circle,
-                              image: new DecorationImage(
+                              image: ("$img".substring(0, 8) == '/storage')?DecorationImage(
                                 image: NetworkImage(Links.subUrl +
                                     "$img"),
                                 fit: BoxFit.cover
+                              ):DecorationImage(
+                                  image: Image.memory(Base64Decoder().convert(img)).image,
+                                  fit: BoxFit.cover
                               ),
                             ): BoxDecoration(
                               shape: BoxShape.circle,
@@ -236,7 +418,7 @@ class _EditProfileState extends State<EditProfile> {
                                   fit: BoxFit.cover
                               ),
                             ),
-                            child: (img == "/".substring(0, 1))?Center(
+                            child: (img == "" || img == null)?Center(
                               child: CustomText.text(
                                   size: 38,
                                   weight: FontWeight.w800,
@@ -284,6 +466,7 @@ class _EditProfileState extends State<EditProfile> {
                       height: CustomSize.sizeHeight(context) * 0.005,
                     ),
                     TextField(
+                      inputFormatters: [FilteringTextInputFormatter.digitsOnly],
                       controller: _loginNotelpName,
                       keyboardType: TextInputType.numberWithOptions(),
                       cursorColor: Colors.black,
@@ -433,44 +616,154 @@ class _EditProfileState extends State<EditProfile> {
                       color: Colors.black,
                       thickness: 1,
                     ),
+                    // SizedBox(height: CustomSize.sizeHeight(context) / 48,),
+                    //------------------------------------ checkbox reservation -------------------------------------
+                    Row(
+                      mainAxisSize: MainAxisSize.max,
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      children: [
+                        Checkbox(
+                          value: Pass,
+                          onChanged: (bool value) {
+                            setState(() {
+                              print(value);
+                              Pass = value;
+                            });
+                          },
+                        ),
+                        // Text('Apakah Restomu melayani reservasi ?', style: TextStyle(fontWeight: FontWeight.bold))
+                        Text('Apakah anda ingin mengganti password ?', style: GoogleFonts.poppins(
+                            textStyle: TextStyle(
+                                fontWeight: FontWeight.bold, fontSize: 12)),),
+                      ],
+                    ),
+                    //------------------------------------- harga pesan ----------------------------------------
+                    (Pass)?CustomText.bodyLight12(text: "Masukkan password baru"):Container(),
+                    (Pass)?TextField(
+                      maxLines: 1,
+                      controller: newPass,
+                      obscureText: _obscureText,
+                      keyboardType: TextInputType.text,
+                      cursorColor: Colors.black,
+                      style: GoogleFonts.poppins(
+                          textStyle:
+                          TextStyle(fontSize: 18, color: Colors.black, fontWeight: FontWeight.w600)),
+                      decoration: InputDecoration(
+                        suffixIcon: IconButton(
+                          highlightColor: Colors.transparent,
+                          onPressed: _toggle,
+                          icon: Icon(
+                              _obscureText
+                                  ? MaterialCommunityIcons.eye
+                                  : MaterialCommunityIcons.eye_off,
+                              color: Colors.black),
+                        ),
+                        isDense: true,
+                        contentPadding: EdgeInsets.symmetric(vertical: 10.0),
+                        hintStyle: GoogleFonts.poppins(
+                            textStyle:
+                            TextStyle(fontSize: 14, color: Colors.grey)),
+                        helperStyle: GoogleFonts.poppins(
+                            textStyle: TextStyle(fontSize: 14)),
+                        enabledBorder: UnderlineInputBorder(),
+                        focusedBorder: UnderlineInputBorder(),
+                      ),
+                    ):Container(),
+                    (Pass)?SizedBox(height: CustomSize.sizeHeight(context) / 48,):Container(),
+                    //------------------------------------- meja yang disediakan ----------------------------------------
+                    (Pass)?CustomText.bodyLight12(text: "Konfirmasi password baru"):Container(),
+                    (Pass)?TextField(
+                      maxLines: 1,
+                      controller: _newPass,
+                      obscureText: _obscureText2,
+                      keyboardType: TextInputType.text,
+                      cursorColor: Colors.black,
+                      style: GoogleFonts.poppins(
+                          textStyle:
+                          TextStyle(fontSize: 18, color: Colors.black, fontWeight: FontWeight.w600)),
+                      decoration: InputDecoration(
+                        suffixIcon: IconButton(
+                          highlightColor: Colors.transparent,
+                          onPressed: _toggle2,
+                          icon: Icon(
+                              _obscureText2
+                                  ? MaterialCommunityIcons.eye
+                                  : MaterialCommunityIcons.eye_off,
+                              color: Colors.black),
+                        ),
+                        isDense: true,
+                        contentPadding: EdgeInsets.symmetric(vertical: 10.0),
+                        hintStyle: GoogleFonts.poppins(
+                            textStyle:
+                            TextStyle(fontSize: 14, color: Colors.grey)),
+                        helperStyle: GoogleFonts.poppins(
+                            textStyle: TextStyle(fontSize: 14)),
+                        enabledBorder: UnderlineInputBorder(),
+                        focusedBorder: UnderlineInputBorder(),
+                      ),
+                    ):Container(),
+                    (Pass)?SizedBox(height: CustomSize.sizeHeight(context) / 68,):Container(),
                     SizedBox(height: CustomSize.sizeHeight(context) / 48,),
-                    GestureDetector(
+                    (isLoading != true)?GestureDetector(
                       onTap: () async{
                         setState(() {
                           isLoading = false;
                         });
-                        SharedPreferences pref = await SharedPreferences.getInstance();
-                        pref.setString("name", _loginTextName.text.toString());
-                        pref.setString("email", _loginEmailName.text.toString());
-                        pref.setString("img", (image == null)?img:base64Encode(image.readAsBytesSync()).toString());
-                        pref.setString("gender", gender);
-                        pref.setString("tgl", tgl);
-                        pref.setString("notelp", _loginNotelpName.text.toString());
 
-                        editProfile(_loginTextName.text.toString(), _loginEmailName.text.toString(), tgl.toString(), gender.toString(), _loginNotelpName.text.toString(), image, img.toString()).then((onValue) {
-                          if(onValue == "Success"){
-                            Fluttertoast.showToast(
-                                msg: "Success",
-                                backgroundColor: Colors.grey,
-                                textColor: Colors.black,
-                                fontSize: 16.0
-                            );
-                            setState(() {
-                              isLoading = true;
-                            });
-                            Navigator.pushReplacement(context, PageTransition(type: PageTransitionType.fade, child: new HomeActivity()));
-                          } else {
-                            setState(() {
-                              isLoading = true;
-                            });
-                            Fluttertoast.showToast(
-                                msg: "The field is required",
-                                backgroundColor: Colors.grey,
-                                textColor: Colors.black,
-                                fontSize: 16.0
-                            );
+                        print(image.toString() + 'Ini Image');
+                        if (_loginEmailName.text == '') {
+                          Fluttertoast.showToast(msg: 'Email wajib diisi!');
+                        } else {
+                          if (Pass == false) {
+                            if (image != null) {
+                              editProfile(_loginTextName.text.toString(), _loginEmailName.text.toString(), tgl.toString(), gender.toString(), _loginNotelpName.text.toString(), image, img.toString());
+                            } else if (image == null) {
+                              editProfile2(_loginTextName.text.toString(), _loginEmailName.text.toString(), tgl.toString(), gender.toString(), _loginNotelpName.text.toString(), image, img.toString());
+                            }
+                          } else if (Pass == true) {
+                            if (newPass.text.toString() == _newPass.text.toString()) {
+                              if (image != null) {
+                                editProfile(_loginTextName.text.toString(), _loginEmailName.text.toString(), tgl.toString(), gender.toString(), _loginNotelpName.text.toString(), image, img.toString());
+                                _editPass();
+                              } else if (image == null) {
+                                editProfile2(_loginTextName.text.toString(), _loginEmailName.text.toString(), tgl.toString(), gender.toString(), _loginNotelpName.text.toString(), image, img.toString());
+                                _editPass();
+                              }
+                            } else {
+                              Future.delayed(Duration(seconds: 1)).then((_) {
+                                Fluttertoast.showToast(msg: 'Konfirmasi password gagal!');
+                                // setState(() {
+                                //   isLoading = true;
+                                // });
+                              });
+                            }
                           }
-                        });
+                        }
+
+
+                        // if (image != null || image.toString() != '' && Pass == false) {
+                        //   editProfile(_loginTextName.text.toString(), _loginEmailName.text.toString(), tgl.toString(), gender.toString(), _loginNotelpName.text.toString(), image, img.toString());
+                        // } else if (image == null || image.toString() == '' && Pass == false){
+                        //   editProfile2(_loginTextName.text.toString(), _loginEmailName.text.toString(), tgl.toString(), gender.toString(), _loginNotelpName.text.toString(), image, img.toString());
+                        // } else if (image != null || image.toString() != '' && Pass == true) {
+                        //   if (newPass.text.toString() == _newPass.text.toString()) {
+                        //     print(newPass.text.toString() == _newPass.text.toString());
+                        //     editProfile(_loginTextName.text.toString(), _loginEmailName.text.toString(), tgl.toString(), gender.toString(), _loginNotelpName.text.toString(), image, img.toString());
+                        //     _editPass();
+                        //   } else if (newPass.text.toString() != _newPass.text.toString()){
+                        //     Fluttertoast.showToast(msg: 'Konfirmasi password gagal!');
+                        //   }
+                        // } else if (image == null || image.toString() == '' && Pass == true) {
+                        //   if (newPass.text.toString() == _newPass.text.toString()) {
+                        //     print(newPass.text.toString() == _newPass.text.toString());
+                        //     editProfile2(_loginTextName.text.toString(), _loginEmailName.text.toString(), tgl.toString(), gender.toString(), _loginNotelpName.text.toString(), image, img.toString());
+                        //     _editPass();
+                        //   } else if (newPass.text.toString() != _newPass.text.toString()){
+                        //     Fluttertoast.showToast(msg: 'Konfirmasi password gagal!');
+                        //   }
+                        // }
+
+
                       },
                       child: Container(
                         width: CustomSize.sizeWidth(context),
@@ -481,7 +774,20 @@ class _EditProfileState extends State<EditProfile> {
                         ),
                         child: Center(child: CustomText.bodyRegular16(text: "Simpan", color: Colors.white,)),
                       ),
-                    )
+                    ):Container(
+                      width: CustomSize.sizeWidth(context),
+                      height: CustomSize.sizeHeight(context) / 14,
+                      decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(30),
+                          color: CustomColor.accent
+                      ),
+                      child: Center(
+                        child: CircularProgressIndicator(
+                          backgroundColor: Colors.white,
+                        ),
+                      ),
+                    ),
+                    SizedBox(height: CustomSize.sizeHeight(context) / 48,)
                   ],
                 ),
               )

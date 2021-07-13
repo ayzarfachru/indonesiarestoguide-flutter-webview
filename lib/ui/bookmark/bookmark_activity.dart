@@ -191,6 +191,7 @@ class _BookmarkActivityState extends State<BookmarkActivity> {
               child: SingleChildScrollView(
           controller: _scrollController,
           child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
               mainAxisSize: MainAxisSize.min,
               children: [
                 SizedBox(
@@ -199,10 +200,14 @@ class _BookmarkActivityState extends State<BookmarkActivity> {
                 Padding(
                   padding: EdgeInsets.symmetric(horizontal: CustomSize.sizeWidth(context) / 24),
                   child: CustomText.textHeading3(
-                      text: "Restoran Favoritmu Nih !",
+                      text: "Restoran Favoritmu nih !",
+                      color: CustomColor.primary,
                       minSize: 18,
                       maxLines: 1
                   ),
+                ),
+                SizedBox(
+                  height: CustomSize.sizeHeight(context) / 62,
                 ),
                 StaggeredGridView.countBuilder(
                   staggeredTileBuilder: (index) {

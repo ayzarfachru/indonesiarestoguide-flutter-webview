@@ -48,7 +48,7 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
               ),
               GestureDetector(
                 onTap: (){
-                  Navigator.pushReplacement(
+                  Navigator.push(
                       context,
                       PageTransition(
                           type: PageTransitionType.rightToLeft,

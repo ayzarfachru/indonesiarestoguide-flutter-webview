@@ -48,7 +48,7 @@ class _LoginActivityState extends State<LoginActivity> {
         pref.setString("img", data['user']['img']);
         pref.setString("gender", data['user']['gender']);
         pref.setString("tgl", data['user']['ttl']);
-        pref.setString("notelp", data['user']['notelp'].toString());
+        pref.setString("notelp", data['user']['phone_number'].toString());
         pref.setString("token", data['access_token']);
 
         setState(() {
@@ -129,22 +129,27 @@ class _LoginActivityState extends State<LoginActivity> {
                 SizedBox(
                   height: CustomSize.sizeHeight(context) / 86,
                 ),
-                Container(
-                  width: CustomSize.sizeWidth(context) / 7,
-                  height: CustomSize.sizeWidth(context) / 7,
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    shape: BoxShape.circle,
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.grey.withOpacity(0.5),
-                        spreadRadius: 0,
-                        blurRadius: 7,
-                        offset: Offset(0, 7), // changes position of shadow
-                      ),
-                    ],
+                GestureDetector(
+                  onTap: (){
+                    Navigator.pop(context);
+                  },
+                  child: Container(
+                    width: CustomSize.sizeWidth(context) / 7,
+                    height: CustomSize.sizeWidth(context) / 7,
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      shape: BoxShape.circle,
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.grey.withOpacity(0.5),
+                          spreadRadius: 0,
+                          blurRadius: 7,
+                          offset: Offset(0, 7), // changes position of shadow
+                        ),
+                      ],
+                    ),
+                    child: Center(child: Icon(Icons.chevron_left, size: 38,)),
                   ),
-                  child: Center(child: Icon(Icons.chevron_left, size: 38,)),
                 ),
                 SizedBox(
                   height: CustomSize.sizeHeight(context) / 24,

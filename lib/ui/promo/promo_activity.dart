@@ -135,6 +135,7 @@ class _PromoActivityState extends State<PromoActivity> {
             id: v['id'],
             name: v['name'],
             desc: v['desc'],
+            distance: double.parse(v['distance'].toString()),
             urlImg: v['img'],
             price: Price.discounted(int.parse(v['price']), v['discounted_price'])
         ),
@@ -311,6 +312,7 @@ class _PromoActivityState extends State<PromoActivity> {
     });
     super.initState();
     getHomePg();
+    print(homepg);
   }
 
   @override
@@ -419,7 +421,8 @@ class _PromoActivityState extends State<PromoActivity> {
                                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                         children: [
                                           (homepg != '1')?CustomText.bodyLight12(
-                                              text: "0.9 km",
+                                              // text: promo[index].menu.distance.toString().split('.')[0]+' , '+promo[index].menu.distance.toString().split('')[0]+promo[index].menu.distance.toString().split('.')[1].split('')[1]+" km",
+                                              text: promo[index].menu.distance.toString().split('.')[0]+" km",
                                               maxLines: 1,
                                               minSize: 12
                                           ):CustomText.bodyLight12(
@@ -476,7 +479,7 @@ class _PromoActivityState extends State<PromoActivity> {
                                         maxLines: 1,
                                         minSize: 12
                                       ),
-                                      (homepg != "1")?SizedBox(height: CustomSize.sizeHeight(context) / 48,):SizedBox(height: CustomSize.sizeHeight(context) / 108,),
+                                      (homepg != "1")?SizedBox(height: CustomSize.sizeHeight(context) / 22,):SizedBox(height: CustomSize.sizeHeight(context) / 108,),
                                       Row(
                                         children: [
                                           (homepg != "1")?CustomText.bodyRegular12(text: NumberFormat.currency(locale: 'id', symbol: '', decimalDigits: 0).format(promo[index].menu.price.original), minSize: 12,

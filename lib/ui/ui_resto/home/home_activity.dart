@@ -9,6 +9,7 @@ import 'package:indonesiarestoguide/ui/history/history_activity.dart';
 import 'package:indonesiarestoguide/ui/home/home_activity.dart';
 import 'package:indonesiarestoguide/ui/profile/profile_activity.dart';
 import 'package:indonesiarestoguide/ui/promo/promo_activity.dart';
+import 'package:indonesiarestoguide/ui/ui_resto/detail/detail_resto.dart';
 import 'package:indonesiarestoguide/ui/ui_resto/employees/employees_activity.dart';
 import 'package:indonesiarestoguide/ui/ui_resto/menu/menu_activity.dart';
 import 'package:indonesiarestoguide/ui/ui_resto/order/order_activity.dart';
@@ -41,13 +42,6 @@ class _HomeActivityRestoState extends State<HomeActivityResto> {
     });
   }
 
-  getId() async {
-    SharedPreferences pref = await SharedPreferences.getInstance();
-    setState(() {
-      id = (pref.getInt('id'));
-      print(id);
-    });
-  }
 
   getHomePg() async {
     SharedPreferences pref = await SharedPreferences.getInstance();
@@ -135,6 +129,7 @@ class _HomeActivityRestoState extends State<HomeActivityResto> {
 
     setState(() {
       restoName = data['resto']['name'];
+      id = data['resto']['id'];
       // history = _history;
       isLoading = false;
     });
@@ -145,7 +140,6 @@ class _HomeActivityRestoState extends State<HomeActivityResto> {
     super.initState();
     _getUserResto();
     getImg();
-    getId();
     getHomePg();
     idResto();
     _getQr();
@@ -251,8 +245,9 @@ class _HomeActivityRestoState extends State<HomeActivityResto> {
                     Center(
                       child: GestureDetector(
                         onTap: (){
+                          // print(id.toString());
                           setState(() {
-                            Navigator.push(context, PageTransition(type: PageTransitionType.fade, child: new DetailResto(id.toString())));
+                            Navigator.push(context, PageTransition(type: PageTransitionType.fade, child: new DetailRestoAdmin(id.toString())));
                           });
                         },
                         child: Container(

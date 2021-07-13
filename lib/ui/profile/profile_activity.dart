@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_icons/flutter_icons.dart';
@@ -130,6 +131,8 @@ class _ProfileActivityState extends State<ProfileActivity> {
     });
   }
 
+  File image;
+
   @override
   void initState() {
     super.initState();
@@ -170,18 +173,27 @@ class _ProfileActivityState extends State<ProfileActivity> {
                           Container(
                             width: CustomSize.sizeWidth(context) / 6,
                             height: CustomSize.sizeWidth(context) / 6,
-                            decoration: (img == "/".substring(0, 1))?BoxDecoration(
+                            decoration: (image==null)?(img == "" || img == null)?BoxDecoration(
                                 color: CustomColor.primary,
                                 shape: BoxShape.circle
                             ):BoxDecoration(
                               shape: BoxShape.circle,
-                              image: new DecorationImage(
+                              image: ("$img".substring(0, 8) == '/storage')?DecorationImage(
                                   image: NetworkImage(Links.subUrl +
                                       "$img"),
-                                fit: BoxFit.cover
+                                  fit: BoxFit.cover
+                              ):DecorationImage(
+                                  image: Image.memory(Base64Decoder().convert(img)).image,
+                                  fit: BoxFit.cover
+                              ),
+                            ): BoxDecoration(
+                              shape: BoxShape.circle,
+                              image: new DecorationImage(
+                                  image: new FileImage(image),
+                                  fit: BoxFit.cover
                               ),
                             ),
-                            child: (img == "/".substring(0, 1))?Center(
+                            child: (img == "" || img == null)?Center(
                               child: CustomText.text(
                                   size: 38,
                                   weight: FontWeight.w800,
@@ -202,7 +214,7 @@ class _ProfileActivityState extends State<ProfileActivity> {
                                     maxLines: 1,
                                     minSize: 18
                                 ),
-                                (notelp != "null")?CustomText.bodyLight16(text: notelp, maxLines: 1, minSize: 12)
+                                (notelp != "null" && notelp != '')?CustomText.bodyLight16(text: notelp, maxLines: 1, minSize: 12)
                                     :CustomText.bodyLight16(text: "Nomor belum diisi.", maxLines: 1, minSize: 12),
                                 CustomText.bodyLight16(text: email, maxLines: 1, minSize: 12),
                               ],

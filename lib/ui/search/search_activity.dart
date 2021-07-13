@@ -49,7 +49,7 @@ class _SearchActivityState extends State<SearchActivity> {
     SharedPreferences pref = await SharedPreferences.getInstance();
     var token = pref.getString("token") ?? "";
 
-    var apiResult = await http.get(Links.mainUrl + '/page/search?q=$q&type=$type&lat=$lat&long=$long',
+    var apiResult = await http.get(Links.mainUrl + '/page/search?q=$q&type=$type&lat=$lat&long=$long&limit=0',
         headers: {
           "Accept": "Application/json",
           "Authorization": "Bearer $token"
@@ -73,7 +73,7 @@ class _SearchActivityState extends State<SearchActivity> {
       Resto r = Resto.all(
           id: v['id'],
           name: v['name'],
-          distance: v['distance'],
+          distance: double.parse(v['distance'].toString()),
           img: v['img']
       );
       _resto.add(r);
@@ -183,7 +183,7 @@ class _SearchActivityState extends State<SearchActivity> {
                                 TextStyle(fontSize: 18, color: Colors.black, fontWeight: FontWeight.w600)),
                             decoration: InputDecoration(
                               isDense: true,
-                              contentPadding: EdgeInsets.only(bottom: CustomSize.sizeHeight(context) / 86),
+                              // contentPadding: EdgeInsets.only(bottom: CustomSize.sizeHeight(context) / 86),
                               hintText: "Apa yang kamu cari hari ini",
                               hintStyle: GoogleFonts.poppins(
                                   textStyle:
@@ -467,9 +467,9 @@ class _SearchActivityState extends State<SearchActivity> {
                                             Row(
                                               children: [
                                                 CustomText.bodyRegular12(text: NumberFormat.currency(locale: 'id', symbol: '', decimalDigits: 0).format(menu[index].price.original), minSize: 12,
-                                                    decoration: (menu[index].price.discounted != null)?TextDecoration.lineThrough:TextDecoration.none),
+                                                    decoration: (menu[index].price.discounted != null && menu[index].price.discounted.toString() != '0')?TextDecoration.lineThrough:TextDecoration.none),
                                                 SizedBox(width: CustomSize.sizeWidth(context) / 48,),
-                                                (menu[index].price.discounted != null)
+                                                (menu[index].price.discounted != null && menu[index].price.discounted.toString() != '0')
                                                     ?CustomText.bodyRegular12(
                                                     text: NumberFormat.currency(locale: 'id', symbol: '', decimalDigits: 0).format(menu[index].price.discounted), minSize: 12):SizedBox(),
                                               ],

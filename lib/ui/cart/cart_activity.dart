@@ -134,7 +134,7 @@ class _CartActivityState extends State<CartActivity> {
     _tempRestoId.addAll(pref2.getStringList('restoId')??[]);
     _tempQty.addAll(pref2.getStringList('qty')??[]);
     var data = json.decode(name);
-
+    print('ini data bos '+data.toString());
 
     for(var v in data){
       _menuId.add(v['id'].toString());
@@ -573,7 +573,7 @@ class _CartActivityState extends State<CartActivity> {
                               children: [
                                 SingleChildScrollView(
                                   child: Container(
-                                    height: CustomSize.sizeHeight(context) / 5.3,
+                                    height: CustomSize.sizeHeight(context) / 5,
                                     child: Row(
                                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                       children: [
@@ -763,6 +763,7 @@ class _CartActivityState extends State<CartActivity> {
                           onTap: ()async{
                             SharedPreferences pref = await SharedPreferences.getInstance();
                             String checkId = pref.getString('restaurantId')??'';
+                            print('ini '+checkId);
 
                             Navigator.push(
                                 context,

@@ -336,9 +336,10 @@ class _AddDetailRestoState extends State<AddDetailResto> {
     print(apiResult.body);
     var data = json.decode(apiResult.body);
 
-    if(data['status_code'] == 200){
+    if(apiResult.statusCode == 200){
       print("success");
       print(data);
+      showAlertDialog();
       // SharedPreferences preferences = await SharedPreferences.getInstance();
       // await preferences.remove('menuJson');
       // await preferences.remove('restoId');
@@ -364,6 +365,38 @@ class _AddDetailRestoState extends State<AddDetailResto> {
         // 'table': (_JumlahMeja.text.toString() != '')?_JumlahMeja.text.toString():''
       }));
     }
+  }
+
+  showAlertDialog() {
+
+    // set up the button
+    Widget okButton = TextButton(
+      child: Text("Oke"),
+      onPressed: () {
+        Navigator.pushReplacement(
+            context,
+            PageTransition(
+                type: PageTransitionType.rightToLeft,
+                child: HomeActivity()));
+      },
+    );
+
+    // set up the AlertDialog
+    AlertDialog alert = AlertDialog(
+      title: Text("Metode Pembayaran"),
+      content: Text("Silahkan hubungi 0838********* untuk lebih lanjut."),
+      actions: [
+        okButton,
+      ],
+    );
+
+    // show the dialog
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return alert;
+      },
+    );
   }
 
   @override

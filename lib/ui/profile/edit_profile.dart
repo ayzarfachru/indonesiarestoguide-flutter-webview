@@ -617,7 +617,7 @@ class _EditProfileState extends State<EditProfile> {
                       thickness: 1,
                     ),
                     // SizedBox(height: CustomSize.sizeHeight(context) / 48,),
-                    //------------------------------------ checkbox reservation -------------------------------------
+                    //------------------------------------ checkbox pass -------------------------------------
                     Row(
                       mainAxisSize: MainAxisSize.max,
                       mainAxisAlignment: MainAxisAlignment.start,
@@ -637,7 +637,7 @@ class _EditProfileState extends State<EditProfile> {
                                 fontWeight: FontWeight.bold, fontSize: 12)),),
                       ],
                     ),
-                    //------------------------------------- harga pesan ----------------------------------------
+                    //------------------------------------- new pass ----------------------------------------
                     (Pass)?CustomText.bodyLight12(text: "Masukkan password baru"):Container(),
                     (Pass)?TextField(
                       maxLines: 1,
@@ -670,7 +670,7 @@ class _EditProfileState extends State<EditProfile> {
                       ),
                     ):Container(),
                     (Pass)?SizedBox(height: CustomSize.sizeHeight(context) / 48,):Container(),
-                    //------------------------------------- meja yang disediakan ----------------------------------------
+                    //------------------------------------- confirm pass ----------------------------------------
                     (Pass)?CustomText.bodyLight12(text: "Konfirmasi password baru"):Container(),
                     (Pass)?TextField(
                       maxLines: 1,

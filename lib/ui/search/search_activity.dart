@@ -61,6 +61,7 @@ class _SearchActivityState extends State<SearchActivity> {
       Menu m = Menu(
           id: v['id'],
           name: v['name'],
+          restoId: v['resto_id'].toString(),
           restoName: v['resto_name'],
           urlImg: v['img'],
           price: Price.discounted(v['price'], v['discounted_price']),
@@ -303,73 +304,82 @@ class _SearchActivityState extends State<SearchActivity> {
                         itemBuilder: (_, index){
                           return Padding(
                             padding: EdgeInsets.only(top: CustomSize.sizeHeight(context) / 48),
-                            child: Container(
-                              width: CustomSize.sizeWidth(context),
-                              height: CustomSize.sizeWidth(context) / 2.6,
-                              decoration: BoxDecoration(
-                                color: Colors.white,
-                                borderRadius: BorderRadius.circular(20),
-                                boxShadow: [
-                                  BoxShadow(
-                                    color: Colors.grey.withOpacity(0.5),
-                                    spreadRadius: 0,
-                                    blurRadius: 7,
-                                    offset: Offset(0, 7), // changes position of shadow
-                                  ),
-                                ],
-                              ),
-                              child: Row(
-                                children: [
-                                  Container(
-                                    width: CustomSize.sizeWidth(context) / 2.6,
-                                    height: CustomSize.sizeWidth(context) / 2.6,
-                                    decoration: BoxDecoration(
-                                      image: DecorationImage(
-                                        image: NetworkImage(Links.subUrl + promo[index].urlImg),
-                                        fit: BoxFit.cover
+                            child: GestureDetector(
+                              onTap: (){
+                                Navigator.push(
+                                    context,
+                                    PageTransition(
+                                        type: PageTransitionType.rightToLeft,
+                                        child: new DetailResto(promo[index].restoId.toString())));
+                              },
+                              child: Container(
+                                width: CustomSize.sizeWidth(context),
+                                height: CustomSize.sizeWidth(context) / 2.6,
+                                decoration: BoxDecoration(
+                                  color: Colors.white,
+                                  borderRadius: BorderRadius.circular(20),
+                                  boxShadow: [
+                                    BoxShadow(
+                                      color: Colors.grey.withOpacity(0.5),
+                                      spreadRadius: 0,
+                                      blurRadius: 7,
+                                      offset: Offset(0, 7), // changes position of shadow
+                                    ),
+                                  ],
+                                ),
+                                child: Row(
+                                  children: [
+                                    Container(
+                                      width: CustomSize.sizeWidth(context) / 2.6,
+                                      height: CustomSize.sizeWidth(context) / 2.6,
+                                      decoration: BoxDecoration(
+                                        image: DecorationImage(
+                                          image: NetworkImage(Links.subUrl + promo[index].urlImg),
+                                          fit: BoxFit.cover
+                                        ),
+                                        borderRadius: BorderRadius.circular(20),
                                       ),
-                                      borderRadius: BorderRadius.circular(20),
                                     ),
-                                  ),
-                                  SizedBox(
-                                    width: CustomSize.sizeWidth(context) / 32,
-                                  ),
-                                  Container(
-                                    width: CustomSize.sizeWidth(context) / 2.1,
-                                    child: Column(
-                                      mainAxisAlignment: MainAxisAlignment.center,
-                                      crossAxisAlignment: CrossAxisAlignment.start,
-                                      children: [
-                                        CustomText.bodyLight12(
-                                            text: promo[index].distance.toString() + " km",
-                                            maxLines: 1,
-                                            minSize: 12
-                                        ),
-                                        SizedBox(height: CustomSize.sizeHeight(context) / 86,),
-                                        CustomText.textHeading4(
-                                            text: promo[index].name,
-                                            minSize: 18,
-                                            maxLines: 1
-                                        ),
-                                        SizedBox(height: CustomSize.sizeHeight(context) / 86,),
-                                        CustomText.bodyMedium12(
-                                            text: promo[index].restoName,
-                                            maxLines: 1,
-                                            minSize: 12
-                                        ),
-                                        SizedBox(height: CustomSize.sizeHeight(context) / 48,),
-                                        Row(
-                                          children: [
-                                            CustomText.bodyRegular12(text: NumberFormat.currency(locale: 'id', symbol: '', decimalDigits: 0).format(promo[index].price.original), minSize: 12,
-                                                decoration: TextDecoration.lineThrough),
-                                            SizedBox(width: CustomSize.sizeWidth(context) / 48,),
-                                            CustomText.bodyRegular12(text: NumberFormat.currency(locale: 'id', symbol: '', decimalDigits: 0).format(promo[index].price.discounted), minSize: 12),
-                                          ],
-                                        )
-                                      ],
+                                    SizedBox(
+                                      width: CustomSize.sizeWidth(context) / 32,
                                     ),
-                                  )
-                                ],
+                                    Container(
+                                      width: CustomSize.sizeWidth(context) / 2.1,
+                                      child: Column(
+                                        mainAxisAlignment: MainAxisAlignment.center,
+                                        crossAxisAlignment: CrossAxisAlignment.start,
+                                        children: [
+                                          CustomText.bodyLight12(
+                                              text: promo[index].distance.toString() + " km",
+                                              maxLines: 1,
+                                              minSize: 12
+                                          ),
+                                          SizedBox(height: CustomSize.sizeHeight(context) / 86,),
+                                          CustomText.textHeading4(
+                                              text: promo[index].name,
+                                              minSize: 18,
+                                              maxLines: 1
+                                          ),
+                                          SizedBox(height: CustomSize.sizeHeight(context) / 86,),
+                                          CustomText.bodyMedium12(
+                                              text: promo[index].restoName,
+                                              maxLines: 1,
+                                              minSize: 12
+                                          ),
+                                          SizedBox(height: CustomSize.sizeHeight(context) / 48,),
+                                          Row(
+                                            children: [
+                                              CustomText.bodyRegular12(text: NumberFormat.currency(locale: 'id', symbol: '', decimalDigits: 0).format(promo[index].price.original), minSize: 12,
+                                                  decoration: TextDecoration.lineThrough),
+                                              SizedBox(width: CustomSize.sizeWidth(context) / 48,),
+                                              CustomText.bodyRegular12(text: NumberFormat.currency(locale: 'id', symbol: '', decimalDigits: 0).format(promo[index].price.discounted), minSize: 12),
+                                            ],
+                                          )
+                                        ],
+                                      ),
+                                    )
+                                  ],
+                                ),
                               ),
                             ),
                           );
@@ -418,67 +428,76 @@ class _SearchActivityState extends State<SearchActivity> {
                             return Padding(
                               padding: EdgeInsets.only(left: CustomSize.sizeWidth(context) / 20,
                                   top: CustomSize.sizeHeight(context) / 86, bottom: CustomSize.sizeHeight(context) / 86),
-                              child: Container(
-                                width: CustomSize.sizeWidth(context) / 1.3,
-                                height: CustomSize.sizeHeight(context) / 5,
-                                decoration: BoxDecoration(
-                                  color: Colors.white,
-                                  borderRadius: BorderRadius.circular(20),
-                                  boxShadow: [
-                                    BoxShadow(
-                                      color: Colors.grey.withOpacity(0.5),
-                                      spreadRadius: 0,
-                                      blurRadius: 4,
-                                      offset: Offset(0, 3),
-                                    ),
-                                  ],
-                                ),
-                                child: Row(
-                                  children: [
-                                    Container(
-                                      width: CustomSize.sizeWidth(context) / 3,
-                                      height: CustomSize.sizeHeight(context) / 5,
-                                      decoration: BoxDecoration(
-                                        image: DecorationImage(
-                                            image: NetworkImage(Links.subUrl + menu[index].urlImg),
-                                            fit: BoxFit.cover
-                                        ),
-                                        borderRadius: BorderRadius.circular(20),
+                              child: GestureDetector(
+                                onTap: (){
+                                  Navigator.push(
+                                      context,
+                                      PageTransition(
+                                          type: PageTransitionType.rightToLeft,
+                                          child: new DetailResto(promo[index].restoId.toString())));
+                                },
+                                child: Container(
+                                  width: CustomSize.sizeWidth(context) / 1.3,
+                                  height: CustomSize.sizeHeight(context) / 5,
+                                  decoration: BoxDecoration(
+                                    color: Colors.white,
+                                    borderRadius: BorderRadius.circular(20),
+                                    boxShadow: [
+                                      BoxShadow(
+                                        color: Colors.grey.withOpacity(0.5),
+                                        spreadRadius: 0,
+                                        blurRadius: 4,
+                                        offset: Offset(0, 3),
                                       ),
-                                    ),
-                                    SizedBox(width: CustomSize.sizeWidth(context) / 32,),
-                                    Padding(
-                                      padding: EdgeInsets.symmetric(vertical: CustomSize.sizeHeight(context) / 86),
-                                      child: Container(
-                                        width: CustomSize.sizeWidth(context) / 2.6,
+                                    ],
+                                  ),
+                                  child: Row(
+                                    children: [
+                                      Container(
+                                        width: CustomSize.sizeWidth(context) / 3,
                                         height: CustomSize.sizeHeight(context) / 5,
-                                        child: Column(
-                                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                          crossAxisAlignment: CrossAxisAlignment.start,
-                                          children: [
-                                            Column(
-                                              crossAxisAlignment: CrossAxisAlignment.start,
-                                              children: [
-                                                CustomText.bodyRegular12(text: menu[index].distance.toString() + " Km", minSize: 12),
-                                                CustomText.textTitle6(text: menu[index].name, minSize: 14, maxLines: 2),
-                                                CustomText.bodyMedium12(text: menu[index].restoName, minSize: 12),
-                                              ],
-                                            ),
-                                            Row(
-                                              children: [
-                                                CustomText.bodyRegular12(text: NumberFormat.currency(locale: 'id', symbol: '', decimalDigits: 0).format(menu[index].price.original), minSize: 12,
-                                                    decoration: (menu[index].price.discounted != null && menu[index].price.discounted.toString() != '0')?TextDecoration.lineThrough:TextDecoration.none),
-                                                SizedBox(width: CustomSize.sizeWidth(context) / 48,),
-                                                (menu[index].price.discounted != null && menu[index].price.discounted.toString() != '0')
-                                                    ?CustomText.bodyRegular12(
-                                                    text: NumberFormat.currency(locale: 'id', symbol: '', decimalDigits: 0).format(menu[index].price.discounted), minSize: 12):SizedBox(),
-                                              ],
-                                            )
-                                          ],
+                                        decoration: BoxDecoration(
+                                          image: DecorationImage(
+                                              image: NetworkImage(Links.subUrl + menu[index].urlImg),
+                                              fit: BoxFit.cover
+                                          ),
+                                          borderRadius: BorderRadius.circular(20),
                                         ),
                                       ),
-                                    )
-                                  ],
+                                      SizedBox(width: CustomSize.sizeWidth(context) / 32,),
+                                      Padding(
+                                        padding: EdgeInsets.symmetric(vertical: CustomSize.sizeHeight(context) / 86),
+                                        child: Container(
+                                          width: CustomSize.sizeWidth(context) / 2.6,
+                                          height: CustomSize.sizeHeight(context) / 5,
+                                          child: Column(
+                                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                            crossAxisAlignment: CrossAxisAlignment.start,
+                                            children: [
+                                              Column(
+                                                crossAxisAlignment: CrossAxisAlignment.start,
+                                                children: [
+                                                  CustomText.bodyRegular12(text: menu[index].distance.toString() + " Km", minSize: 12),
+                                                  CustomText.textTitle6(text: menu[index].name, minSize: 14, maxLines: 2),
+                                                  CustomText.bodyMedium12(text: menu[index].restoName, minSize: 12),
+                                                ],
+                                              ),
+                                              Row(
+                                                children: [
+                                                  CustomText.bodyRegular12(text: NumberFormat.currency(locale: 'id', symbol: '', decimalDigits: 0).format(menu[index].price.original), minSize: 12,
+                                                      decoration: (menu[index].price.discounted != null && menu[index].price.discounted.toString() != '0')?TextDecoration.lineThrough:TextDecoration.none),
+                                                  SizedBox(width: CustomSize.sizeWidth(context) / 48,),
+                                                  (menu[index].price.discounted != null && menu[index].price.discounted.toString() != '0')
+                                                      ?CustomText.bodyRegular12(
+                                                      text: NumberFormat.currency(locale: 'id', symbol: '', decimalDigits: 0).format(menu[index].price.discounted), minSize: 12):SizedBox(),
+                                                ],
+                                              )
+                                            ],
+                                          ),
+                                        ),
+                                      )
+                                    ],
+                                  ),
                                 ),
                               ),
                             );

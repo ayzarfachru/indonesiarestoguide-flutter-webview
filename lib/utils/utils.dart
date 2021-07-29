@@ -249,14 +249,15 @@ class CustomText{
   }
 
   static Widget bodyMedium14({String text, Color color,
-    double minSize, int maxLines,}){
+    double minSize, int maxLines, TextDecoration decoration,}){
     return AutoSizeText(
       text,
       style: GoogleFonts.poppins(
           textStyle: TextStyle(
               fontSize: 14,
               fontWeight:
-              FontWeight.w500, color: color??Colors.black)),
+              FontWeight.w500, color: color??Colors.black,
+              decoration: decoration??TextDecoration.none)),
       minFontSize: minSize??0,
       maxLines: maxLines??1,
     );

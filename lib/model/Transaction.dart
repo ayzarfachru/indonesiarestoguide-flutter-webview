@@ -11,6 +11,7 @@ class Transaction{
   String address;
   int ongkir;
   int total;
+  String chatroom;
   List<Menu> menus;
   String type;
   String table;
@@ -27,6 +28,7 @@ class Transaction{
         this.address,
         this.ongkir,
         this.total,
+        this.chatroom,
         this.menus,
         this.type,
         this.img,
@@ -37,7 +39,7 @@ class Transaction{
   Transaction.withoutMenu(this.id, this.status, this.nameResto, this.datetime, this.method);
 
   Transaction.resto(
-      {this.id, this.status, this.username, this.total, this.type});
+      {this.id, this.status, this.username, this.total, this.chatroom, this.type, this.img});
 
   Transaction.reservation(
       {this.id, this.status, this.username, this.datetime, this.table, this.total, this.img});

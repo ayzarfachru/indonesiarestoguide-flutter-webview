@@ -151,7 +151,7 @@ class _HomeActivityRestoState extends State<HomeActivityResto> {
     if (currentBackPressTime == null ||
         now.difference(currentBackPressTime) > Duration(seconds: 2)) {
       currentBackPressTime = now;
-      Fluttertoast.showToast(msg: 'Press Back Again to Back');
+      Fluttertoast.showToast(msg: 'Tekan sekali lagi untuk keluar');
       return Future.value(false);
     }
 //    SystemNavigator.pop();

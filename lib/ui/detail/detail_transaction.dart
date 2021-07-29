@@ -112,20 +112,23 @@ class _DetailTransactionState extends State<DetailTransaction> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              (type == 'delivery' || type == 'takeaway')?Padding(
-                padding: EdgeInsets.symmetric(horizontal: CustomSize.sizeWidth(context) / 24),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    SizedBox(height: CustomSize.sizeHeight(context) / 32,),
-                    CustomText.bodyLight12(text: (type == 'delivery')?"Alamat Pengiriman":"Alamat Pengambilan"),
-                    SizedBox(height: CustomSize.sizeHeight(context) * 0.005,),
-                    CustomText.textHeading4(
-                        text: address,
-                        minSize: 16,
-                        maxLines: 10
-                    ),
-                  ],
+              (type == 'delivery' || type == 'takeaway')?Container(
+                color: Colors.white,
+                child: Padding(
+                  padding: EdgeInsets.symmetric(horizontal: CustomSize.sizeWidth(context) / 24),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      SizedBox(height: CustomSize.sizeHeight(context) / 32,),
+                      CustomText.bodyLight12(text: (type == 'delivery')?"Alamat Pengiriman":"Alamat Pengambilan"),
+                      SizedBox(height: CustomSize.sizeHeight(context) * 0.005,),
+                      CustomText.textHeading4(
+                          text: address,
+                          minSize: 16,
+                          maxLines: 10
+                      ),
+                    ],
+                  ),
                 ),
               ):SizedBox(),
               SizedBox(height: (type == 'delivery')?CustomSize.sizeHeight(context) / 48:0,),

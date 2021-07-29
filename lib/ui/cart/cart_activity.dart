@@ -116,9 +116,12 @@ class _CartActivityState extends State<CartActivity> {
   String ongkir;
   String totalOngkir = "0";
   String totalHarga = "0";
+  String checkId = "";
 
   List<MenuJson> menuJson = [];
   List<bool> menuReady = [];
+  String can_delivery = "";
+  String can_takeaway = "";
   Future _getData()async{
     List<MenuJson> _menuJson = [];
     List<String> _menuId = [];
@@ -127,8 +130,9 @@ class _CartActivityState extends State<CartActivity> {
       isLoading = true;
     });
     SharedPreferences pref2 = await SharedPreferences.getInstance();
+    _transCode = int.parse(pref2.getString("metodeBeli")??'1');
     name = (pref2.getString('menuJson')??"");
-    print(name);
+    print('ini name '+name.toString());
     restoId.addAll(pref2.getStringList('restoId')??[]);
     qty.addAll(pref2.getStringList('qty')??[]);
     _tempRestoId.addAll(pref2.getStringList('restoId')??[]);
@@ -145,17 +149,21 @@ class _CartActivityState extends State<CartActivity> {
           desc: v['desc'],
           distance: v['distance'],
           price: v['price'],
-          discount: v['discounted_price'],
+          discount: v['discount'],
           urlImg: v['urlImg']
       );
       _menuJson.add(j);
-      harga = harga + int.parse(v['price']) * int.parse(qty[restoId.indexOf(v['id'].toString())]);
+      harga = (v['discount'] == null || v['discount'] == 'null' || v['discount'] == '')?(harga + int.parse(v['price']) * int.parse(qty[restoId.indexOf(v['id'].toString())])):(harga + int.parse(v['discount']) * int.parse(qty[restoId.indexOf(v['id'].toString())]));
       totalHarga = harga.toString();
     }
     print(_menuId.toString().split('[')[1].split(']')[0].replaceAll(' ', ''));
 
     SharedPreferences pref = await SharedPreferences.getInstance();
     String token = pref.getString("token") ?? "";
+    can_delivery = pref.getString('can_deliveryUser');
+    can_takeaway = pref.getString('can_take_awayUser');
+    checkId = pref.getString('restoIdUsr')??'';
+    print('ini '+checkId);
     var apiResult = await http.post(Links.mainUrl + '/trans/check',
         body: {'menu': _menuId.toString().split('[')[1].split(']')[0].replaceAll(' ', '')},
         headers: {
@@ -215,6 +223,20 @@ class _CartActivityState extends State<CartActivity> {
     }
   }
 
+  DateTime currentBackPressTime;
+  Future<bool> onWillPop() async{
+    DateTime now = DateTime.now();
+    if (currentBackPressTime == null ||
+        now.difference(currentBackPressTime) > Duration(seconds: 2)) {
+      currentBackPressTime = now;
+      Fluttertoast.showToast(msg: 'Tekan lagi untuk kembali ke menu utama');
+      return Future.value(false);
+    }
+//    SystemNavigator.pop();
+    Navigator.pushReplacement(context, MaterialPageRoute(builder: (context)=> HomeActivity()));
+    return Future.value(true);
+  }
+
   @override
   void initState() {
     Location.instance.getLocation().then((value) {
@@ -235,13 +257,7 @@ class _CartActivityState extends State<CartActivity> {
   @override
   Widget build(BuildContext context) {
     return WillPopScope(
-      onWillPop: (){
-        return Navigator.pushReplacement(
-            context,
-            PageTransition(
-                type: PageTransitionType.rightToLeft,
-                child: HomeActivity()));
-      },
+      onWillPop: onWillPop,
       child: Scaffold(
         body: SafeArea(
           child: (isLoading)?Container(
@@ -252,12 +268,181 @@ class _CartActivityState extends State<CartActivity> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
+                SizedBox(height: CustomSize.sizeHeight(context) / 32,),
+                Padding(
+                  padding: EdgeInsets.symmetric(horizontal: CustomSize.sizeWidth(context) / 24),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Row(
+                        children: [
+                          Container(
+                            width: CustomSize.sizeWidth(context) / 8,
+                            height: CustomSize.sizeWidth(context) / 8,
+                            decoration: BoxDecoration(
+                                color: CustomColor.primary,
+                                shape: BoxShape.circle
+                            ),
+                            child: Center(
+                              child: Icon((_transCode == 1)?FontAwesome.motorcycle:(_transCode == 2)?MaterialCommunityIcons.shopping:Icons.restaurant, color: Colors.white, size: 20,),
+                            ),
+                          ),
+                          SizedBox(width: CustomSize.sizeWidth(context) / 32,),
+                          CustomText.textHeading6(text: (_transCode == 1)?"Pesan Antar":(_transCode == 2)?"Ambil Langsung":"Makan Ditempat",),
+                        ],
+                      ),
+                      Padding(
+                        padding: EdgeInsets.symmetric(horizontal: CustomSize.sizeWidth(context) / 86),
+                        child: GestureDetector(
+                          onTap: (){
+                            showModalBottomSheet(
+                                isScrollControlled: true,
+                                shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.only(topLeft: Radius.circular(20), topRight: Radius.circular(20))
+                                ),
+                                context: context,
+                                builder: (_){
+                                  return Padding(
+                                    padding: EdgeInsets.symmetric(horizontal: CustomSize.sizeWidth(context) / 32),
+                                    child: Column(
+                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      mainAxisSize: MainAxisSize.min,
+                                      children: [
+                                        SizedBox(height: CustomSize.sizeHeight(context) / 86,),
+                                        Padding(
+                                          padding: EdgeInsets.symmetric(horizontal: CustomSize.sizeWidth(context) / 2.4),
+                                          child: Divider(thickness: 4,),
+                                        ),
+                                        SizedBox(height: CustomSize.sizeHeight(context) / 52,),
+                                        GestureDetector(
+                                          onTap: ()async{
+                                            SharedPreferences pref = await SharedPreferences.getInstance();
+                                            setState(() {
+                                              if (can_delivery == 'true') {
+                                                _transCode = 1;
+                                                pref.setString("metodeBeli", '1');
+                                              } else {
+                                                Fluttertoast.showToast(msg: "Pesan antar tidak tersedia.");
+                                              }
+                                            });
+                                            Navigator.pop(context);
+                                          },
+                                          child: Row(
+                                            children: [
+                                              Container(
+                                                width: CustomSize.sizeWidth(context) / 8,
+                                                height: CustomSize.sizeWidth(context) / 8,
+                                                decoration: BoxDecoration(
+                                                    color: CustomColor.primary,
+                                                    shape: BoxShape.circle
+                                                ),
+                                                child: Center(
+                                                  child: Icon(FontAwesome.motorcycle, color: Colors.white, size: 20,),
+                                                ),
+                                              ),
+                                              SizedBox(width: CustomSize.sizeWidth(context) / 32,),
+                                              CustomText.textHeading6(text: "Pesan Antar",),
+                                            ],
+                                          ),
+                                        ),
+                                        SizedBox(height: CustomSize.sizeHeight(context) / 86,),
+                                        GestureDetector(
+                                          onTap: ()async{
+                                            SharedPreferences pref = await SharedPreferences.getInstance();
+                                            setState(() {
+                                              if (can_takeaway == 'true') {
+                                                _transCode = 2;
+                                                pref.setString("metodeBeli", '2');
+                                              } else {
+                                                Fluttertoast.showToast(msg: "Ambil langsung tidak tersedia.");
+                                              }
+                                            });
+                                            Navigator.pop(context);
+                                          },
+                                          child: Row(
+                                            children: [
+                                              Container(
+                                                width: CustomSize.sizeWidth(context) / 8,
+                                                height: CustomSize.sizeWidth(context) / 8,
+                                                decoration: BoxDecoration(
+                                                    color: CustomColor.primary,
+                                                    shape: BoxShape.circle
+                                                ),
+                                                child: Center(
+                                                  child: Icon(MaterialCommunityIcons.shopping, color: Colors.white, size: 20,),
+                                                ),
+                                              ),
+                                              SizedBox(width: CustomSize.sizeWidth(context) / 32,),
+                                              CustomText.textHeading6(text: "Ambil Langsung",),
+                                            ],
+                                          ),
+                                        ),
+                                        SizedBox(height: CustomSize.sizeHeight(context) / 86,),
+                                        GestureDetector(
+                                          onTap: ()async{
+                                            SharedPreferences pref = await SharedPreferences.getInstance();
+                                            setState(() {
+                                              _transCode = 3;
+                                              pref.setString("metodeBeli", '3');
+                                            });
+                                            Navigator.pop(context);
+                                          },
+                                          child: Row(
+                                            children: [
+                                              Container(
+                                                width: CustomSize.sizeWidth(context) / 8,
+                                                height: CustomSize.sizeWidth(context) / 8,
+                                                decoration: BoxDecoration(
+                                                    color: CustomColor.primary,
+                                                    shape: BoxShape.circle
+                                                ),
+                                                child: Center(
+                                                  child: Icon(Icons.restaurant, color: Colors.white, size: 20,),
+                                                ),
+                                              ),
+                                              SizedBox(width: CustomSize.sizeWidth(context) / 32,),
+                                              CustomText.textHeading6(text: "Makan Ditempat",),
+                                            ],
+                                          ),
+                                        ),
+                                        SizedBox(height: CustomSize.sizeHeight(context) / 86,),
+                                      ],
+                                    ),
+                                  );
+                                }
+                            );
+                          },
+                          child: Container(
+                            height: CustomSize.sizeHeight(context) / 24,
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(20),
+                              border: Border.all(color: Colors.grey, width: 1),
+                              // color: Colors.grey[200]
+                            ),
+                            child: Padding(
+                              padding: EdgeInsets.symmetric(horizontal: CustomSize.sizeWidth(context) / 32),
+                              child: Center(
+                                child: CustomText.textTitle8(
+                                    text: "Ganti",
+                                    color: Colors.grey
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
+                      )
+                    ],
+                  ),
+                ),
+                SizedBox(height: CustomSize.sizeHeight(context) / 48,),
+                (_transCode == 1 || _transCode == 2 || _transCode == 3)?Divider(thickness: 6, color: CustomColor.secondary,):SizedBox(),
+                (_transCode != 3)?SizedBox(height: CustomSize.sizeHeight(context) / 48,):SizedBox(),
                 (_transCode == 2)?Padding(
                   padding: EdgeInsets.symmetric(horizontal: CustomSize.sizeWidth(context) / 24),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      SizedBox(height: CustomSize.sizeHeight(context) / 32,),
+                      // SizedBox(height: CustomSize.sizeHeight(context) / 32,),
                       CustomText.bodyLight12(text: "Alamat Restoran"),
                       SizedBox(height: CustomSize.sizeHeight(context) * 0.005,),
                       CustomText.textHeading6(
@@ -273,7 +458,7 @@ class _CartActivityState extends State<CartActivity> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      SizedBox(height: CustomSize.sizeHeight(context) / 32,),
+                      // SizedBox(height: CustomSize.sizeHeight(context) / 32,),
                       CustomText.bodyLight12(text: "Alamat Pengiriman"),
                       SizedBox(height: CustomSize.sizeHeight(context) * 0.005,),
                       (srchAddress != true)?CustomText.textHeading4(
@@ -298,7 +483,7 @@ class _CartActivityState extends State<CartActivity> {
                       SizedBox(height: CustomSize.sizeHeight(context) * 0.008,),
                       Row(
                         children: [
-                          GestureDetector(
+                          (_srchAddress.text != '')?GestureDetector(
                             onTap: () async{
                               SharedPreferences pref2 = await SharedPreferences.getInstance();
                               if (srchAddress == false) {
@@ -342,8 +527,8 @@ class _CartActivityState extends State<CartActivity> {
                                 ),
                               ),
                             ),
-                          ),
-                          SizedBox(width: CustomSize.sizeWidth(context) / 45,),
+                          ):Container(),
+                          (_srchAddress.text != '')?SizedBox(width: CustomSize.sizeWidth(context) / 45,):Container(),
                           (srchAddress != true)?GestureDetector(
                             onTap: () async{
                               var result = await Navigator.push(
@@ -396,162 +581,9 @@ class _CartActivityState extends State<CartActivity> {
                   ),
                 ):SizedBox(),
                 (_transCode == 1 || _transCode == 2)?SizedBox(height: CustomSize.sizeHeight(context) / 48,):SizedBox(),
-                (_transCode == 1 || _transCode == 2)?Divider(thickness: 6, color: CustomColor.secondary,):SizedBox(),
-                SizedBox(height: CustomSize.sizeHeight(context) / 48,),
-                Padding(
-                  padding: EdgeInsets.symmetric(horizontal: CustomSize.sizeWidth(context) / 24),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Row(
-                        children: [
-                          Container(
-                            width: CustomSize.sizeWidth(context) / 8,
-                            height: CustomSize.sizeWidth(context) / 8,
-                            decoration: BoxDecoration(
-                                color: CustomColor.primary,
-                                shape: BoxShape.circle
-                            ),
-                            child: Center(
-                              child: Icon((_transCode == 1)?FontAwesome.motorcycle:(_transCode == 2)?MaterialCommunityIcons.shopping:Icons.restaurant, color: Colors.white, size: 20,),
-                            ),
-                          ),
-                          SizedBox(width: CustomSize.sizeWidth(context) / 32,),
-                          CustomText.textHeading6(text: (_transCode == 1)?"Pesan Antar":(_transCode == 2)?"Ambil Langsung":"Makan Ditempat",),
-                        ],
-                      ),
-                      Padding(
-                        padding: EdgeInsets.symmetric(horizontal: CustomSize.sizeWidth(context) / 86),
-                        child: GestureDetector(
-                          onTap: (){
-                            showModalBottomSheet(
-                                isScrollControlled: true,
-                                shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.only(topLeft: Radius.circular(20), topRight: Radius.circular(20))
-                                ),
-                                context: context,
-                                builder: (_){
-                                  return Padding(
-                                    padding: EdgeInsets.symmetric(horizontal: CustomSize.sizeWidth(context) / 32),
-                                    child: Column(
-                                      crossAxisAlignment: CrossAxisAlignment.start,
-                                      mainAxisSize: MainAxisSize.min,
-                                      children: [
-                                        SizedBox(height: CustomSize.sizeHeight(context) / 86,),
-                                        Padding(
-                                          padding: EdgeInsets.symmetric(horizontal: CustomSize.sizeWidth(context) / 2.4),
-                                          child: Divider(thickness: 4,),
-                                        ),
-                                        SizedBox(height: CustomSize.sizeHeight(context) / 52,),
-                                        GestureDetector(
-                                          onTap: (){
-                                            setState(() {
-                                              _transCode = 1;
-                                            });
-                                            Navigator.pop(context);
-                                          },
-                                          child: Row(
-                                            children: [
-                                              Container(
-                                                width: CustomSize.sizeWidth(context) / 8,
-                                                height: CustomSize.sizeWidth(context) / 8,
-                                                decoration: BoxDecoration(
-                                                    color: CustomColor.primary,
-                                                    shape: BoxShape.circle
-                                                ),
-                                                child: Center(
-                                                  child: Icon(FontAwesome.motorcycle, color: Colors.white, size: 20,),
-                                                ),
-                                              ),
-                                              SizedBox(width: CustomSize.sizeWidth(context) / 32,),
-                                              CustomText.textHeading6(text: "Pesan Antar",),
-                                            ],
-                                          ),
-                                        ),
-                                        SizedBox(height: CustomSize.sizeHeight(context) / 86,),
-                                        GestureDetector(
-                                          onTap: (){
-                                            setState(() {
-                                              _transCode = 2;
-                                            });
-                                            Navigator.pop(context);
-                                          },
-                                          child: Row(
-                                            children: [
-                                              Container(
-                                                width: CustomSize.sizeWidth(context) / 8,
-                                                height: CustomSize.sizeWidth(context) / 8,
-                                                decoration: BoxDecoration(
-                                                    color: CustomColor.primary,
-                                                    shape: BoxShape.circle
-                                                ),
-                                                child: Center(
-                                                  child: Icon(MaterialCommunityIcons.shopping, color: Colors.white, size: 20,),
-                                                ),
-                                              ),
-                                              SizedBox(width: CustomSize.sizeWidth(context) / 32,),
-                                              CustomText.textHeading6(text: "Ambil Langsung",),
-                                            ],
-                                          ),
-                                        ),
-                                        SizedBox(height: CustomSize.sizeHeight(context) / 86,),
-                                        GestureDetector(
-                                          onTap: (){
-                                            setState(() {
-                                              _transCode = 3;
-                                            });
-                                            Navigator.pop(context);
-                                          },
-                                          child: Row(
-                                            children: [
-                                              Container(
-                                                width: CustomSize.sizeWidth(context) / 8,
-                                                height: CustomSize.sizeWidth(context) / 8,
-                                                decoration: BoxDecoration(
-                                                    color: CustomColor.primary,
-                                                    shape: BoxShape.circle
-                                                ),
-                                                child: Center(
-                                                  child: Icon(Icons.restaurant, color: Colors.white, size: 20,),
-                                                ),
-                                              ),
-                                              SizedBox(width: CustomSize.sizeWidth(context) / 32,),
-                                              CustomText.textHeading6(text: "Makan Ditempat",),
-                                            ],
-                                          ),
-                                        ),
-                                        SizedBox(height: CustomSize.sizeHeight(context) / 86,),
-                                      ],
-                                    ),
-                                  );
-                                }
-                            );
-                          },
-                          child: Container(
-                            height: CustomSize.sizeHeight(context) / 24,
-                            decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(20),
-                              border: Border.all(color: CustomColor.accent, width: 1),
-                              // color: CustomColor.accentLight
-                            ),
-                            child: Padding(
-                              padding: EdgeInsets.symmetric(horizontal: CustomSize.sizeWidth(context) / 32),
-                              child: Center(
-                                child: CustomText.textTitle8(
-                                    text: "Ganti",
-                                    color: CustomColor.accent
-                                ),
-                              ),
-                            ),
-                          ),
-                        ),
-                      )
-                    ],
-                  ),
-                ),
-                SizedBox(height: CustomSize.sizeHeight(context) / 48,),
-                Divider(thickness: 6, color: CustomColor.secondary,),
-                SizedBox(height: CustomSize.sizeHeight(context) / 48,),
+                // SizedBox(height: CustomSize.sizeHeight(context) / 48,),
+                (_transCode != 3)?Divider(thickness: 6, color: CustomColor.secondary,):SizedBox(),
+                // (_transCode != 3)?SizedBox(height: CustomSize.sizeHeight(context) / 48,):SizedBox(),
                 ListView.builder(
                     shrinkWrap: true,
                     physics: NeverScrollableScrollPhysics(),
@@ -597,10 +629,25 @@ class _CartActivityState extends State<CartActivity> {
                                                       minSize: 14
                                                   ),
                                                   SizedBox(height: CustomSize.sizeHeight(context) / 48,),
-                                                  CustomText.bodyMedium14(
+                                                  (menuJson[index].discount == null || menuJson[index].discount == 'null' || menuJson[index].discount == '')?CustomText.bodyMedium14(
                                                       text: NumberFormat.currency(locale: 'id', symbol: '', decimalDigits: 0).format(int.parse(menuJson[index].price)),
                                                       maxLines: 1,
                                                       minSize: 16
+                                                  ):Row(
+                                                    children: [
+                                                      CustomText.bodyMedium14(
+                                                          text: NumberFormat.currency(locale: 'id', symbol: '', decimalDigits: 0).format(int.parse(menuJson[index].price)),
+                                                          maxLines: 1,
+                                                          minSize: 16,
+                                                          decoration: TextDecoration.lineThrough
+                                                      ),
+                                                      SizedBox(width: CustomSize.sizeWidth(context) / 48,),
+                                                      CustomText.bodyMedium14(
+                                                          text: NumberFormat.currency(locale: 'id', symbol: '', decimalDigits: 0).format(int.parse(menuJson[index].discount)),
+                                                          maxLines: 1,
+                                                          minSize: 16
+                                                      ),
+                                                    ],
                                                   ),
                                                 ],
                                               ),
@@ -616,15 +663,24 @@ class _CartActivityState extends State<CartActivity> {
                                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                           crossAxisAlignment: CrossAxisAlignment.end,
                                           children: [
-                                            Container(
-                                              width: CustomSize.sizeWidth(context) / 3.4,
-                                              height: CustomSize.sizeWidth(context) / 3.4,
-                                              decoration: BoxDecoration(
-                                                  image: DecorationImage(
-                                                      image: NetworkImage(Links.subUrl + menuJson[index].urlImg),
-                                                      fit: BoxFit.cover
-                                                  ),
-                                                  borderRadius: BorderRadius.circular(20)
+                                            GestureDetector(
+                                              onTap: (){
+                                                Navigator.push(
+                                                    context,
+                                                    PageTransition(
+                                                        type: PageTransitionType.rightToLeft,
+                                                        child: new DetailResto(checkId)));
+                                              },
+                                              child: Container(
+                                                width: CustomSize.sizeWidth(context) / 3.4,
+                                                height: CustomSize.sizeWidth(context) / 3.4,
+                                                decoration: BoxDecoration(
+                                                    image: DecorationImage(
+                                                        image: NetworkImage(Links.subUrl + menuJson[index].urlImg),
+                                                        fit: BoxFit.cover
+                                                    ),
+                                                    borderRadius: BorderRadius.circular(20)
+                                                ),
                                               ),
                                             ),
                                             Row(
@@ -638,9 +694,21 @@ class _CartActivityState extends State<CartActivity> {
                                                     qty[restoId.indexOf(menuJson[index].id.toString())] = i.toString();
                                                     SharedPreferences pref = await SharedPreferences.getInstance();
                                                     pref.setStringList("qty", qty);
-                                                    harga = harga - int.parse(menuJson[restoId.indexOf(menuJson[index].id.toString())].price);
-                                                    int _total = int.parse(totalHarga) - int.parse(menuJson[restoId.indexOf(menuJson[index].id.toString())].price);
+                                                    harga = (menuJson[restoId.indexOf(menuJson[index].id.toString())].discount.toString() == null || menuJson[restoId.indexOf(menuJson[index].id.toString())].discount.toString() == 'null' || menuJson[restoId.indexOf(menuJson[index].id.toString())].discount.toString() == '')?harga - int.parse(menuJson[restoId.indexOf(menuJson[index].id.toString())].price):harga - int.parse(menuJson[restoId.indexOf(menuJson[index].id.toString())].discount);
+                                                    int _total = (menuJson[restoId.indexOf(menuJson[index].id.toString())].discount.toString() == null || menuJson[restoId.indexOf(menuJson[index].id.toString())].discount.toString() == 'null' || menuJson[restoId.indexOf(menuJson[index].id.toString())].discount.toString() == '')?int.parse(totalHarga) - int.parse(menuJson[restoId.indexOf(menuJson[index].id.toString())].price):int.parse(totalHarga) - int.parse(menuJson[restoId.indexOf(menuJson[index].id.toString())].discount);
                                                     totalHarga = _total.toString();
+
+                                                    if (harga == 0) {
+                                                      Navigator.pushReplacement(context, MaterialPageRoute(builder: (context)=> HomeActivity()));
+                                                      print('ini name '+name.toString());
+                                                      pref.remove('inCart');
+                                                      pref.setString("menuJson", "");
+                                                      pref.setString("restoId", "");
+                                                      pref.setString("qty", "");
+                                                      pref.remove("restoIdUsr");
+                                                      // pref.remove("restoId");
+                                                      // pref.remove("qty");
+                                                    }
 
                                                     if(i == 0){
                                                       qty.removeAt(index);
@@ -688,10 +756,10 @@ class _CartActivityState extends State<CartActivity> {
                                                     width: CustomSize.sizeWidth(context) / 12,
                                                     height: CustomSize.sizeWidth(context) / 12,
                                                     decoration: BoxDecoration(
-                                                        color: CustomColor.accentLight,
+                                                        color: Colors.grey[200],
                                                         shape: BoxShape.circle
                                                     ),
-                                                    child: Center(child: CustomText.textHeading1(text: "-", color: CustomColor.accent)),
+                                                    child: Center(child: CustomText.textHeading1(text: "-", color: Colors.grey)),
                                                   ),
                                                 ),
                                                 SizedBox(width: CustomSize.sizeWidth(context) / 24,),
@@ -707,7 +775,7 @@ class _CartActivityState extends State<CartActivity> {
                                                     SharedPreferences pref = await SharedPreferences.getInstance();
                                                     pref.setStringList("qty", qty);
                                                     harga = harga + int.parse(menuJson[restoId.indexOf(menuJson[index].id.toString())].price);
-                                                    int _total = int.parse(totalHarga) + int.parse(menuJson[restoId.indexOf(menuJson[index].id.toString())].price);
+                                                    int _total = (menuJson[restoId.indexOf(menuJson[index].id.toString())].discount.toString() != null || menuJson[restoId.indexOf(menuJson[index].id.toString())].discount.toString() != 'null' || menuJson[restoId.indexOf(menuJson[index].id.toString())].discount.toString() != '')?(int.parse(totalHarga) + int.parse(menuJson[restoId.indexOf(menuJson[index].id.toString())].price)):(int.parse(totalHarga) + int.parse(menuJson[restoId.indexOf(menuJson[index].id.toString())].discount));
                                                     totalHarga = _total.toString();
                                                     print(harga);
                                                     setState(() {});
@@ -716,10 +784,10 @@ class _CartActivityState extends State<CartActivity> {
                                                     width: CustomSize.sizeWidth(context) / 12,
                                                     height: CustomSize.sizeWidth(context) / 12,
                                                     decoration: BoxDecoration(
-                                                        color: CustomColor.accentLight,
+                                                        color: Colors.grey[200],
                                                         shape: BoxShape.circle
                                                     ),
-                                                    child: Center(child: CustomText.textHeading1(text: "+", color: CustomColor.accent)),
+                                                    child: Center(child: CustomText.textHeading1(text: "+", color: Colors.grey)),
                                                   ),
                                                 ),
                                               ],
@@ -761,10 +829,6 @@ class _CartActivityState extends State<CartActivity> {
                         padding: EdgeInsets.symmetric(horizontal: CustomSize.sizeWidth(context) / 86),
                         child: GestureDetector(
                           onTap: ()async{
-                            SharedPreferences pref = await SharedPreferences.getInstance();
-                            String checkId = pref.getString('restaurantId')??'';
-                            print('ini '+checkId);
-
                             Navigator.push(
                                 context,
                                 PageTransition(
@@ -775,14 +839,14 @@ class _CartActivityState extends State<CartActivity> {
                             height: CustomSize.sizeHeight(context) / 24,
                             decoration: BoxDecoration(
                                 borderRadius: BorderRadius.circular(20),
-                                border: Border.all(color: CustomColor.accent)
+                                border: Border.all(color: Colors.grey)
                             ),
                             child: Padding(
                               padding: EdgeInsets.symmetric(horizontal: CustomSize.sizeWidth(context) / 32),
                               child: Center(
                                 child: CustomText.textTitle8(
                                     text: "Tambah",
-                                    color: CustomColor.accent
+                                    color: Colors.grey
                                 ),
                               ),
                             ),

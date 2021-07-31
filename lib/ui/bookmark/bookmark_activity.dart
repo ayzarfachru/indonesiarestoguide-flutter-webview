@@ -222,7 +222,7 @@ class _BookmarkActivityState extends State<BookmarkActivity> {
                   itemCount: resto.length,
                   itemBuilder: (_, index){
                     return Padding(
-                      padding: EdgeInsets.all(CustomSize.sizeWidth(context) / 52),
+                      padding: EdgeInsets.all(CustomSize.sizeWidth(context) / 48),
                       child: GestureDetector(
                         onTap: (){
                           Navigator.push(

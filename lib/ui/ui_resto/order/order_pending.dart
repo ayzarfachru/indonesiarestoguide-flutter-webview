@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_icons/flutter_icons.dart';
 import 'package:indonesiarestoguide/model/Transaction.dart';
 import 'package:indonesiarestoguide/model/User.dart';
+import 'package:indonesiarestoguide/utils/chat_activity.dart';
 import 'package:indonesiarestoguide/utils/utils.dart';
 import 'package:page_transition/page_transition.dart';
 import 'package:indonesiarestoguide/model/Price.dart';
@@ -91,6 +92,14 @@ class _OrderPendingState extends State<OrderPending> {
     });
   }
 
+  String userName = '';
+  Future getUser()async{
+    SharedPreferences pref = await SharedPreferences.getInstance();
+    setState(() {
+      userName = (pref.getString('name'));
+    });
+  }
+
   String address = "";
   String type = "";
   int all = 0;
@@ -102,8 +111,9 @@ class _OrderPendingState extends State<OrderPending> {
   List<String> qty = [];
   String id;
   List<Menu> menu = [];
+  String chatroom = 'null';
   List<Transaction> detTransaction = [];
-  Future _getDetailTrans(String Id)async{
+  Future _getDetailTrans(String Id, String name, String status)async{
     List<Transaction> _detTransaction = [];
     List<Menu> _menu = [];
 
@@ -169,7 +179,7 @@ class _OrderPendingState extends State<OrderPending> {
                         SizedBox(height: CustomSize.sizeHeight(context) / 48,),
                         Container(
                           width: CustomSize.sizeWidth(context),
-                          height: CustomSize.sizeHeight(context) / 3.4,
+                          height: CustomSize.sizeHeight(context) / 4.4,
                           // height: CustomSize.sizeHeight(context) / 3.8,
                           decoration: BoxDecoration(
                             color: Colors.white,
@@ -189,7 +199,7 @@ class _OrderPendingState extends State<OrderPending> {
                             children: [
                               Container(
                                 width: CustomSize.sizeWidth(context),
-                                height: CustomSize.sizeHeight(context) / 3.4,
+                                height: CustomSize.sizeHeight(context) / 4.4,
                                 padding: EdgeInsets.symmetric(vertical: CustomSize.sizeHeight(context) / 88,),
                                 child: ListView.builder(
                                     shrinkWrap: true,
@@ -229,7 +239,7 @@ class _OrderPendingState extends State<OrderPending> {
                                                             minSize: 14
                                                         ),
                                                         SizedBox(height: CustomSize.sizeHeight(context) / 88,),
-                                                        (menu[index].price.discounted == menu[index].price.original || menu[index].price.discounted == 'null' || menu[index].price.discounted == '')?CustomText.bodyMedium14(
+                                                        (menu[index].price.discounted == menu[index].price.original || menu[index].price.discounted == 'null' || menu[index].price.discounted == '' || menu[index].price.discounted == 0)?CustomText.bodyMedium14(
                                                             text: NumberFormat.currency(locale: 'id', symbol: '', decimalDigits: 0).format(menu[index].price.original??'0'),
                                                             maxLines: 1,
                                                             minSize: 16
@@ -435,27 +445,23 @@ class _OrderPendingState extends State<OrderPending> {
                           ),
                         ),
                         SizedBox(height: CustomSize.sizeHeight(context) / 56,),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceAround,
+                        Column(
                           children: [
                             GestureDetector(
                               onTap: (){
-                                _getPending(operation = "cancel", id);
-                                setStateModal(() {});
-                                Future.delayed(Duration(seconds: 0)).then((_) {
-                                  Navigator.pushReplacement(
-                                      context,
-                                      PageTransition(
-                                          type: PageTransitionType.fade,
-                                          child: OrderActivity()));
-                                });
+                                Navigator.push(
+                                    context,
+                                    PageTransition(
+                                        type: PageTransitionType.rightToLeft,
+                                        child: new ChatActivity(chatroom, userName, status)));
+                                // print(chatroom+ userName+ status);
                               },
                               child: Center(
                                 child: Container(
-                                  width: CustomSize.sizeWidth(context) / 2.3,
+                                  width: CustomSize.sizeWidth(context) / 1,
                                   height: CustomSize.sizeHeight(context) / 14,
                                   decoration: BoxDecoration(
-                                      color: CustomColor.redBtn,
+                                      color: CustomColor.primary,
                                       borderRadius: BorderRadius.circular(50)
                                   ),
                                   child: Center(
@@ -465,8 +471,7 @@ class _OrderPendingState extends State<OrderPending> {
                                         mainAxisAlignment: MainAxisAlignment.center,
                                         crossAxisAlignment: CrossAxisAlignment.center,
                                         children: [
-                                          CustomText.textHeading7(text: "Tolak", color: Colors.white),
-                                          CustomText.textHeading7(text: "Pesanan", color: Colors.white),
+                                          CustomText.textHeading7(text: "Hubungi Customer", color: Colors.white),
                                         ],
                                       ),
                                     ),
@@ -474,41 +479,83 @@ class _OrderPendingState extends State<OrderPending> {
                                 ),
                               ),
                             ),
-                            GestureDetector(
-                              onTap: (){
-                                _getPending(operation = "process", id);
-                                setStateModal(() {});
-                                Future.delayed(Duration(seconds: 0)).then((_) {
-                                  Navigator.pushReplacement(
-                                      context,
-                                      PageTransition(
-                                          type: PageTransitionType.fade,
-                                          child: OrderActivity()));
-                                });
-                              },
-                              child: Center(
-                                child: Container(
-                                  width: CustomSize.sizeWidth(context) / 2.3,
-                                  height: CustomSize.sizeHeight(context) / 14,
-                                  decoration: BoxDecoration(
-                                      color: CustomColor.accent,
-                                      borderRadius: BorderRadius.circular(50)
-                                  ),
+                            SizedBox(height: CustomSize.sizeHeight(context) / 86,),
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceAround,
+                              children: [
+                                GestureDetector(
+                                  onTap: (){
+                                    _getPending(operation = "cancel", id);
+                                    setStateModal(() {});
+                                    Future.delayed(Duration(seconds: 0)).then((_) {
+                                      Navigator.pushReplacement(
+                                          context,
+                                          PageTransition(
+                                              type: PageTransitionType.fade,
+                                              child: OrderActivity()));
+                                    });
+                                  },
                                   child: Center(
-                                    child: Padding(
-                                      padding: const EdgeInsets.symmetric(horizontal: 20.0),
-                                      child: Column(
-                                        mainAxisAlignment: MainAxisAlignment.center,
-                                        crossAxisAlignment: CrossAxisAlignment.center,
-                                        children: [
-                                          CustomText.textHeading7(text: "Terima", color: Colors.white),
-                                          CustomText.textHeading7(text: "Pesanan", color: Colors.white),
-                                        ],
+                                    child: Container(
+                                      width: CustomSize.sizeWidth(context) / 2.3,
+                                      height: CustomSize.sizeHeight(context) / 14,
+                                      decoration: BoxDecoration(
+                                          color: CustomColor.redBtn,
+                                          borderRadius: BorderRadius.circular(50)
+                                      ),
+                                      child: Center(
+                                        child: Padding(
+                                          padding: const EdgeInsets.symmetric(horizontal: 20.0),
+                                          child: Column(
+                                            mainAxisAlignment: MainAxisAlignment.center,
+                                            crossAxisAlignment: CrossAxisAlignment.center,
+                                            children: [
+                                              CustomText.textHeading7(text: "Tolak", color: Colors.white),
+                                              CustomText.textHeading7(text: "Pesanan", color: Colors.white),
+                                            ],
+                                          ),
+                                        ),
                                       ),
                                     ),
                                   ),
                                 ),
-                              ),
+                                GestureDetector(
+                                  onTap: (){
+                                    _getPending(operation = "process", id);
+                                    setStateModal(() {});
+                                    Future.delayed(Duration(seconds: 0)).then((_) {
+                                      Navigator.pushReplacement(
+                                          context,
+                                          PageTransition(
+                                              type: PageTransitionType.fade,
+                                              child: OrderActivity()));
+                                    });
+                                  },
+                                  child: Center(
+                                    child: Container(
+                                      width: CustomSize.sizeWidth(context) / 2.3,
+                                      height: CustomSize.sizeHeight(context) / 14,
+                                      decoration: BoxDecoration(
+                                          color: CustomColor.accent,
+                                          borderRadius: BorderRadius.circular(50)
+                                      ),
+                                      child: Center(
+                                        child: Padding(
+                                          padding: const EdgeInsets.symmetric(horizontal: 20.0),
+                                          child: Column(
+                                            mainAxisAlignment: MainAxisAlignment.center,
+                                            crossAxisAlignment: CrossAxisAlignment.center,
+                                            children: [
+                                              CustomText.textHeading7(text: "Terima", color: Colors.white),
+                                              CustomText.textHeading7(text: "Pesanan", color: Colors.white),
+                                            ],
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              ],
                             ),
                           ],
                         ),
@@ -526,6 +573,7 @@ class _OrderPendingState extends State<OrderPending> {
     }
 
     setState(() {
+      chatroom = data['trx']['chatroom']['id'].toString();
       ongkir = int.parse(data['trx']['ongkir']);
       total = int.parse(data['trx']['total']);
       all = total+ongkir;
@@ -577,6 +625,7 @@ class _OrderPendingState extends State<OrderPending> {
   @override
   void initState() {
     _getTrans();
+    getUser();
     // _getDetailTrans(id);
     super.initState();
   }
@@ -600,7 +649,7 @@ class _OrderPendingState extends State<OrderPending> {
                       itemBuilder: (_, index){
                         return GestureDetector(
                           onTap: ()async{
-                            _getDetailTrans(transaction[index].id.toString());
+                            _getDetailTrans(transaction[index].id.toString(), userName, transaction[index].status);
                             id = transaction[index].id.toString();
                             print(id);
                             setState(() {});

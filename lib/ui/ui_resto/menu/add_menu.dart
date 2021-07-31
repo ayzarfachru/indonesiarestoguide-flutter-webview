@@ -349,7 +349,7 @@ class _AddMenuState extends State<AddMenu> {
                       ),
                     ),
                     SizedBox(height: CustomSize.sizeHeight(context) / 48,),
-                    CustomText.bodyLight12(text: "Harga Delivery"),
+                    CustomText.bodyLight12(text: "Harga + Kemasan (*Harga: 4000 -> 6000)"),
                     SizedBox(
                       height: CustomSize.sizeHeight(context) * 0.005,
                     ),

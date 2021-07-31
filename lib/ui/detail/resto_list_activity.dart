@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_icons/flutter_icons.dart';
+import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 import 'package:indonesiarestoguide/model/MenuJson.dart';
 import 'package:indonesiarestoguide/model/Resto.dart';
 import 'package:indonesiarestoguide/model/Transaction.dart';
@@ -435,212 +436,112 @@ class _RestoListActivityState extends State<RestoListActivity> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        body: SafeArea(
-          child: (isLoading)?Container(
-              width: CustomSize.sizeWidth(context),
-              height: CustomSize.sizeHeight(context),
-              child: Center(child: CircularProgressIndicator())):SmartRefresher(
-            enablePullDown: true,
-            enablePullUp: false,
-            header: WaterDropMaterialHeader(
-              distance: 30,
-              backgroundColor: Colors.white,
-              color: CustomColor.primary,
-            ),
-            controller: _refreshController,
-            onRefresh: _onRefresh,
-            onLoading: _onLoading,
-            child: SingleChildScrollView(
-              controller: _scrollController,
-              child: Padding(
-                padding: EdgeInsets.symmetric(horizontal: CustomSize.sizeWidth(context) / 24),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    SizedBox(
-                      height: CustomSize.sizeHeight(context) / 32,
-                    ),
-                    (homepg != "1")?CustomText.textHeading3(
-                        text: "Semua Pesananmu",
-                        color: CustomColor.primary,
-                        minSize: 18,
-                        maxLines: 1
-                    ):CustomText.textHeading3(
-                        text: "Promo di Restoranmu",
-                        color: CustomColor.primary,
-                        minSize: 18,
-                        maxLines: 1
-                    ),
-                    ListView.builder(
-                        shrinkWrap: true,
-                        controller: _scrollController,
-                        physics: NeverScrollableScrollPhysics(),
-                        itemCount: resto.length,
-                        itemBuilder: (_, index){
-                          Future.delayed(Duration(seconds: 1)).then((_) {
-                            setState(() {
-                              // int hargaAsli = int.parse(promoResto[index].menu.price.oriString);
-                              // int hargaAsliDeliv = int.parse(promoResto[index].menu.price.deliString);
-                              // hargaDiskon = hargaAsli-(hargaAsli*promoResto[index].discountedPrice/100);
-                              // hargaPotongan = (promoResto[index].potongan != null)?hargaAsli-promoResto[index].potongan:hargaAsli;
-                              // hargaOngkir = (promoResto[index].ongkir != null)?hargaAsliDeliv-promoResto[index].ongkir:hargaAsliDeliv;
-
-                              // print(hargaDiskon.toString().split('.')[0]);
-                              // print(hargaOngkir);
-                            });
-                          });
-                          return Padding(
-                            padding: EdgeInsets.only(top: CustomSize.sizeHeight(context) / 48),
-                            child: GestureDetector(
-                              onTap: (){
-                                Navigator.push(
-                                    context,
-                                    PageTransition(
-                                        type: PageTransitionType.rightToLeft,
-                                        child: DetailResto(resto[index].id.toString())));
-                              },
-                              child: Container(
+      body: SafeArea(
+        child: (isLoading)?Container(
+            width: CustomSize.sizeWidth(context),
+            height: CustomSize.sizeHeight(context),
+            child: Center(child: CircularProgressIndicator())):SmartRefresher(
+          enablePullDown: true,
+          enablePullUp: false,
+          header: WaterDropMaterialHeader(
+            distance: 30,
+            backgroundColor: Colors.white,
+            color: CustomColor.primary,
+          ),
+          controller: _refreshController,
+          onRefresh: _onRefresh,
+          onLoading: _onLoading,
+          child: SingleChildScrollView(
+            controller: _scrollController,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                SizedBox(
+                  height: CustomSize.sizeHeight(context) / 32,
+                ),
+                Padding(
+                  padding: EdgeInsets.symmetric(horizontal: CustomSize.sizeWidth(context) / 24),
+                  child: CustomText.textHeading3(
+                      text: "Restoran Dekat Sini",
+                      color: CustomColor.primary,
+                      minSize: 18,
+                      maxLines: 1
+                  ),
+                ),
+                SizedBox(
+                  height: CustomSize.sizeHeight(context) / 62,
+                ),
+                StaggeredGridView.countBuilder(
+                  staggeredTileBuilder: (index) {
+                    return StaggeredTile.count(1, 1.2);
+                  },
+                  crossAxisCount: 2,
+                  controller: _scrollController,
+                  physics: NeverScrollableScrollPhysics(),
+                  shrinkWrap: true,
+                  itemCount: resto.length,
+                  itemBuilder: (_, index){
+                    return Padding(
+                      padding: EdgeInsets.all(CustomSize.sizeWidth(context) / 48),
+                      child: GestureDetector(
+                        onTap: (){
+                          Navigator.push(
+                              context,
+                              PageTransition(
+                                  type: PageTransitionType.rightToLeft,
+                                  child: new DetailResto(resto[index].id.toString())));
+                        },
+                        child: Container(
+                          width: CustomSize.sizeWidth(context) / 2.3,
+                          height: CustomSize.sizeHeight(context) / 3,
+                          decoration: BoxDecoration(
+                            color: Colors.white,
+                            borderRadius: BorderRadius.circular(20),
+                            boxShadow: [
+                              BoxShadow(
+                                color: Colors.grey.withOpacity(0.5),
+                                spreadRadius: 0,
+                                blurRadius: 4,
+                                offset: Offset(0, 3), // changes position of shadow
+                              ),
+                            ],
+                          ),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Container(
                                 width: CustomSize.sizeWidth(context),
-                                height: CustomSize.sizeWidth(context) / 2.6,
+                                height: CustomSize.sizeHeight(context) / 5.8,
                                 decoration: BoxDecoration(
-                                  color: Colors.white,
+                                  image: DecorationImage(
+                                      image: NetworkImage(Links.subUrl + resto[index].img),
+                                      fit: BoxFit.cover
+                                  ),
                                   borderRadius: BorderRadius.circular(20),
-                                  boxShadow: [
-                                    BoxShadow(
-                                      color: Colors.grey.withOpacity(0.5),
-                                      spreadRadius: 0,
-                                      blurRadius: 7,
-                                      offset: Offset(0, 7), // changes position of shadow
-                                    ),
-                                  ],
-                                ),
-                                child: Row(
-                                  children: [
-                                    Container(
-                                      width: CustomSize.sizeWidth(context) / 2.6,
-                                      height: CustomSize.sizeWidth(context) / 2.6,
-                                      decoration: BoxDecoration(
-                                        image: DecorationImage(
-                                            image: NetworkImage(Links.subUrl + resto[index].img),
-                                            fit: BoxFit.cover
-                                        ),
-                                        borderRadius: BorderRadius.circular(20),
-                                      ),
-                                    ),
-                                    SizedBox(
-                                      width: CustomSize.sizeWidth(context) / 32,
-                                    ),
-                                    Container(
-                                      width: CustomSize.sizeWidth(context) / 2.1,
-                                      child: Column(
-                                        mainAxisAlignment: MainAxisAlignment.center,
-                                        crossAxisAlignment: CrossAxisAlignment.start,
-                                        children: [
-                                          Row(
-                                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                            children: [
-                                              (homepg != '1')?CustomText.bodyLight12(
-                                                // text: promo[index].menu.distance.toString().split('.')[0]+' , '+promo[index].menu.distance.toString().split('')[0]+promo[index].menu.distance.toString().split('.')[1].split('')[1]+" km",
-                                                  text: resto[index].distance.toString().split('.')[0]+" km",
-                                                  maxLines: 1,
-                                                  minSize: 12
-                                              ):CustomText.bodyLight12(
-                                                  text: 'Sampai : '+promoResto[index].expired_at.split(' ')[0],
-                                                  maxLines: 1,
-                                                  minSize: 12
-                                              ),
-                                              (homepg != "1")?Container():Row(
-                                                children: [
-                                                  GestureDetector(
-                                                      onTap: (){
-                                                        Navigator.push(
-                                                            context,
-                                                            PageTransition(
-                                                                type: PageTransitionType.rightToLeft,
-                                                                child: EditPromo(promoResto[index])));
-                                                      },
-                                                      child: Icon(Icons.edit, color: CustomColor.primary,)
-                                                  ),
-                                                  SizedBox(width: CustomSize.sizeWidth(context) / 86,),
-                                                  GestureDetector(
-                                                      onTap: (){
-                                                        showAlertDialog(promoResto[index].id.toString());
-                                                      },
-                                                      child: Icon(Icons.delete, color: CustomColor.primary,)
-                                                  ),
-                                                  SizedBox(width: CustomSize.sizeWidth(context) / 98,),
-                                                ],
-                                              )
-                                            ],
-                                          ),
-                                          (homepg != '1')?Container():CustomText.bodyLight12(
-                                              text: 'Jam : '+promoResto[index].expired_at.split(' ')[1].split(':')[0]+':'+promoResto[index].expired_at.split(' ')[1].split(':')[1],
-                                              maxLines: 1,
-                                              minSize: 12
-                                          ),
-                                          SizedBox(height: CustomSize.sizeHeight(context) * 0.00626,),
-                                          (homepg != "1")?CustomText.textHeading4(
-                                              text: resto[index].name,
-                                              minSize: 18,
-                                              maxLines: 1
-                                          ):CustomText.textHeading4(
-                                              text: promoResto[index].menu.name,
-                                              minSize: 18,
-                                              maxLines: 1
-                                          ),
-                                          SizedBox(height: CustomSize.sizeHeight(context) * 0.00126,),
-                                          (homepg != "1")?Container(
-                                            child: CustomText.bodyMedium12(
-                                                text: resto[index].address,
-                                                maxLines: 1,
-                                                minSize: 12
-                                            ),
-                                          ):CustomText.bodyMedium12(
-                                              text: promoResto[index].word,
-                                              maxLines: 1,
-                                              minSize: 12
-                                          ),
-                                          (homepg != "1")?SizedBox(height: CustomSize.sizeHeight(context) / 22,):SizedBox(height: CustomSize.sizeHeight(context) / 108,),
-                                        ],
-                                      ),
-                                    )
-                                  ],
                                 ),
                               ),
-                            ),
-                          );
-                        }
-                    ),
-                    SizedBox(height: CustomSize.sizeHeight(context) / 38,)
-                  ],
-                ),
-              ),
+                              SizedBox(height: CustomSize.sizeHeight(context) / 86,),
+                              Padding(
+                                padding: EdgeInsets.only(left: CustomSize.sizeWidth(context) / 24),
+                                child: CustomText.bodyRegular14(text: resto[index].distance.toString() + " Km"),
+                              ),
+                              Padding(
+                                padding: EdgeInsets.only(left: CustomSize.sizeWidth(context) / 24),
+                                child: CustomText.bodyMedium16(text: resto[index].name),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    );
+                  },
+                )
+              ],
             ),
           ),
         ),
-        floatingActionButton: (homepg != '1')?Container():GestureDetector(
-          onTap: ()async{
-            SharedPreferences pref = await SharedPreferences.getInstance();
-            // pref.remove("idMenu");
-            // pref.remove("nameMenu");
-            pref.setString("idMenu", '');
-            pref.setString("nameMenu", '');
-            Navigator.push(
-                context,
-                PageTransition(
-                    type: PageTransitionType.rightToLeft,
-                    child: AddPromo()));
-          },
-          child: Container(
-            width: CustomSize.sizeWidth(context) / 6.6,
-            height: CustomSize.sizeWidth(context) / 6.6,
-            decoration: BoxDecoration(
-                color: CustomColor.primary,
-                shape: BoxShape.circle
-            ),
-            child: Center(child: Icon(FontAwesome.plus, color: Colors.white, size: 29,)),
-          ),
-        )
+      ),
     );
   }
 }

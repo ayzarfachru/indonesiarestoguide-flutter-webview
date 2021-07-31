@@ -50,26 +50,27 @@ class CuisineChipState extends State<CuisineChip> {
     List<Widget> choices = List();
 
     widget.cuisineList.forEach((item) {
-      choices.add(Container(
-        alignment: Alignment.center,
-        padding: const EdgeInsets.all(2.0),
-        child: FilterChip(
-          checkmarkColor: Colors.black,
-          shadowColor: Colors.black,
-          selectedColor: Colors.green[100],
-          selectedShadowColor: Colors.green,
-          label: Text('✓ '+item),
-          selected: selectedChoices.contains(item),
-          labelStyle: TextStyle(color: CustomColor.primary),
-          backgroundColor: CustomColor.primaryLight,
-          onSelected: (selected) {
-            setState(() {
-              // selectedChoices.contains(item)
-              //     ? selectedChoices.remove(item)
-              //     : selectedChoices.add(item);
-              // widget.onSelectionChanged(selectedChoices);
-            });
-          },
+      choices.add(Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 5.0),
+        child: Container(
+          child: FilterChip(
+            checkmarkColor: Colors.black,
+            shadowColor: Colors.black,
+            selectedColor: Colors.green[100],
+            selectedShadowColor: Colors.green,
+            label: Text('✓ '+item),
+            selected: selectedChoices.contains(item),
+            labelStyle: TextStyle(color: CustomColor.primary),
+            backgroundColor: CustomColor.primaryLight,
+            onSelected: (selected) {
+              setState(() {
+                // selectedChoices.contains(item)
+                //     ? selectedChoices.remove(item)
+                //     : selectedChoices.add(item);
+                // widget.onSelectionChanged(selectedChoices);
+              });
+            },
+          ),
         ),
       ));
     });
@@ -103,26 +104,28 @@ class _FacilityChipState extends State<FacilityChip> {
     List<Widget> choices = List();
 
     widget.facilityList.forEach((item) {
-      choices.add(Container(
-        alignment: Alignment.center,
-        padding: const EdgeInsets.all(2.0),
-        child: FilterChip(
-          checkmarkColor: Colors.black,
-          shadowColor: Colors.black,
-          selectedColor: Colors.green[100],
-          selectedShadowColor: Colors.green,
-          label: Text('✓ '+item),
-          selected: selectedChoices.contains(item),
-          labelStyle: TextStyle(color: CustomColor.primary),
-          backgroundColor: CustomColor.primaryLight,
-          onSelected: (selected) {
-            setState(() {
-              // selectedChoices.contains(item)
-              //     ? selectedChoices.remove(item)
-              //     : selectedChoices.add(item);
-              // widget.onSelectionChanged(selectedChoices);
-            });
-          },
+      choices.add(Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 5.0),
+        child: Container(
+          // padding: const EdgeInsets.symmetric(horizontal: 2.0),
+          child: FilterChip(
+            checkmarkColor: Colors.black,
+            shadowColor: Colors.black,
+            selectedColor: Colors.green[100],
+            selectedShadowColor: Colors.green,
+            label: Text('✓ '+item),
+            selected: selectedChoices.contains(item),
+            labelStyle: TextStyle(color: CustomColor.primary),
+            backgroundColor: CustomColor.primaryLight,
+            onSelected: (selected) {
+              setState(() {
+                // selectedChoices.contains(item)
+                //     ? selectedChoices.remove(item)
+                //     : selectedChoices.add(item);
+                // widget.onSelectionChanged(selectedChoices);
+              });
+            },
+          ),
         ),
       ));
     });
@@ -458,7 +461,7 @@ class _DetailRestoState extends State<DetailResto> {
                         SizedBox(height: CustomSize.sizeHeight(context) / 24,),
                         Padding(
                           padding: EdgeInsets.symmetric(horizontal: CustomSize.sizeWidth(context) / 14),
-                          child: CustomText.bodyRegular14(
+                          child: CustomText.bodyMedium16(
                               text: desc,
                               minSize: 14,
                               maxLines: 100
@@ -489,77 +492,73 @@ class _DetailRestoState extends State<DetailResto> {
                           ),
                         ),
                         SizedBox(height: CustomSize.sizeHeight(context) / 28,),
-                        Padding(
-                          padding: EdgeInsets.symmetric(horizontal: CustomSize.sizeHeight(context) / 52),
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Container(
-                                width: CustomSize.sizeWidth(context) / 2.2,
-                                decoration: BoxDecoration(
-                                  color: CustomColor.secondary,
-                                  borderRadius: BorderRadius.circular(15),
-                                ),
-                                child: Padding(
-                                  padding: EdgeInsets.symmetric(
-                                      horizontal: CustomSize.sizeWidth(context) / 48,
-                                      vertical: CustomSize.sizeHeight(context) / 48
-                                  ),
-                                  child: Column(
-                                    children: [
-                                      CustomText.bodyMedium12(text: "Tipe Masakan", minSize: 12),
-                                      SizedBox(height: CustomSize.sizeHeight(context) / 86,),
-                                      CuisineChip(
-                                        cuisine,
-                                        // onSelectionChanged: (selectedList) {
-                                        //   setState(() {
-                                        //     selectedCuisineList = selectedList;
-                                        //     cuisine = selectedCuisineList.join(",");
-                                        //     print(cuisine);
-                                        //     if (cuisine != "") {
-                                        //       selectedList = cuisine.split(",");
-                                        //     } else {}
-                                        //   });
-                                        // },
-                                      ),
-                                    ],
-                                  ),
-                                ),
+                        Center(
+                          child: Container(
+                            width: CustomSize.sizeWidth(context) / 1.1,
+                            decoration: BoxDecoration(
+                              color: CustomColor.secondary,
+                              borderRadius: BorderRadius.circular(15),
+                            ),
+                            child: Padding(
+                              padding: EdgeInsets.symmetric(
+                                  horizontal: CustomSize.sizeWidth(context) / 48,
+                                  vertical: CustomSize.sizeHeight(context) / 48
                               ),
-                              Container(
-                                width: CustomSize.sizeWidth(context) / 2.2,
-                                decoration: BoxDecoration(
-                                  color: CustomColor.secondary,
-                                  borderRadius: BorderRadius.circular(15),
-                                ),
-                                child: Padding(
-                                  padding: EdgeInsets.symmetric(
-                                      horizontal: CustomSize.sizeWidth(context) / 48,
-                                      vertical: CustomSize.sizeHeight(context) / 48
+                              child: Column(
+                                children: [
+                                  CustomText.bodyMedium12(text: "Tipe Masakan", minSize: 12),
+                                  SizedBox(height: CustomSize.sizeHeight(context) / 86,),
+                                  CuisineChip(
+                                    cuisine,
+                                    // onSelectionChanged: (selectedList) {
+                                    //   setState(() {
+                                    //     selectedCuisineList = selectedList;
+                                    //     cuisine = selectedCuisineList.join(",");
+                                    //     print(cuisine);
+                                    //     if (cuisine != "") {
+                                    //       selectedList = cuisine.split(",");
+                                    //     } else {}
+                                    //   });
+                                    // },
                                   ),
-                                  child: Column(
-                                    children: [
-                                      CustomText.bodyMedium12(text: "Fasilitas", minSize: 12),
-                                      SizedBox(height: CustomSize.sizeHeight(context) / 86,),
-                                      FacilityChip(
-                                        facility,
-                                        // onSelectionChanged: (selectedList) {
-                                        //   setState(() {
-                                        //     selectedFacilityList = selectedList;
-                                        //     facility = selectedFacilityList.join(",");
-                                        //     print(facility);
-                                        //     if (facility != "") {
-                                        //       selectedList = facility.split(",");
-                                        //     } else {  }
-                                        //   });
-                                        // },
-                                      ),
-                                    ],
-                                  ),
-                                ),
+                                ],
                               ),
-                            ],
+                            ),
+                          ),
+                        ),
+                        SizedBox(height: CustomSize.sizeHeight(context) / 78,),
+                        Center(
+                          child: Container(
+                            width: CustomSize.sizeWidth(context) / 1.1,
+                            decoration: BoxDecoration(
+                              color: CustomColor.secondary,
+                              borderRadius: BorderRadius.circular(15),
+                            ),
+                            child: Padding(
+                              padding: EdgeInsets.symmetric(
+                                  horizontal: CustomSize.sizeWidth(context) / 48,
+                                  vertical: CustomSize.sizeHeight(context) / 48
+                              ),
+                              child: Column(
+                                children: [
+                                  CustomText.bodyMedium12(text: "Fasilitas", minSize: 12),
+                                  SizedBox(height: CustomSize.sizeHeight(context) / 86,),
+                                  FacilityChip(
+                                    facility,
+                                    // onSelectionChanged: (selectedList) {
+                                    //   setState(() {
+                                    //     selectedFacilityList = selectedList;
+                                    //     facility = selectedFacilityList.join(",");
+                                    //     print(facility);
+                                    //     if (facility != "") {
+                                    //       selectedList = facility.split(",");
+                                    //     } else {  }
+                                    //   });
+                                    // },
+                                  ),
+                                ],
+                              ),
+                            ),
                           ),
                         ),
                         SizedBox(height: CustomSize.sizeHeight(context) / 38,),

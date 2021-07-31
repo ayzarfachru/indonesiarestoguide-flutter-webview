@@ -367,7 +367,7 @@ class _OrderProcessState extends State<OrderProcess> {
                                     PageTransition(
                                         type: PageTransitionType.rightToLeft,
                                         child: new ChatActivity(chatroom, userName, status)));
-                                // print(chatroom+ userName+ status);
+                                print("ini Status "+ status);
                               },
                               child: Center(
                                 child: Container(

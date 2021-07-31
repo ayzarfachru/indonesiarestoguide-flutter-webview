@@ -237,7 +237,7 @@ class _AddDetailRestoState extends State<AddDetailResto> {
 
 
   FieldCuisine() async {
-    _Tipe = TextEditingController(text: cuisine);
+    _Tipe = TextEditingController(text: cuisine.replaceAll(',', ', '));
   }
 
   List<String> dataCuisine;
@@ -278,7 +278,7 @@ class _AddDetailRestoState extends State<AddDetailResto> {
   }
 
   FieldFacility() async {
-    _Fasilitas = TextEditingController(text: facility);
+    _Fasilitas = TextEditingController(text: facility.replaceAll(',', ', '));
   }
 
   void onTimeOpenChanged(TimeOfDay newTime) {
@@ -323,7 +323,7 @@ class _AddDetailRestoState extends State<AddDetailResto> {
           'hours': buka + '-' + tutup,
           'ongkir': (_Ongkir.text.toString() != null)?_Ongkir.text.toString():'',
           're_price': (_HargaPerMeja.text.toString() != '')?_HargaPerMeja.text.toString():'',
-          'takeaway': (takeaway == true)?'1':'',
+          'takeaway': (takeaway == true)?'1':'1',
           'img': img,
           'type': _Tipe.text.toString(),
           'fasilitas': _Fasilitas.text.toString(),
@@ -595,6 +595,7 @@ class _AddDetailRestoState extends State<AddDetailResto> {
                     //   ),
                     // ),
                     // SizedBox(height: CustomSize.sizeHeight(context) / 48,),
+
                     CustomText.bodyLight12(text: "Jam Buka"),
                     SizedBox(
                       height: CustomSize.sizeHeight(context) * 0.005,
@@ -862,24 +863,24 @@ class _AddDetailRestoState extends State<AddDetailResto> {
                       ),
                     ):Container(),
                     //------------------------------------ checkbox takeaway -------------------------------------
-                    Row(
-                      mainAxisSize: MainAxisSize.max,
-                      mainAxisAlignment: MainAxisAlignment.start,
-                      children: [
-                        Checkbox(
-                          value: takeaway,
-                          onChanged: (bool value) {
-                            setState(() {
-                              takeaway = value;
-                            });
-                          },
-                        ),
-                        // Text('Apakah Restomu melayani ambil ditempat ?', style: TextStyle(fontWeight: FontWeight.bold))
-                        Text('Apakah Restomu melayani ambil ditempat ?', style: GoogleFonts.poppins(
-                            textStyle: TextStyle(
-                                fontWeight: FontWeight.bold, fontSize: 12)),),
-                      ],
-                    ),
+                    // Row(
+                    //   mainAxisSize: MainAxisSize.max,
+                    //   mainAxisAlignment: MainAxisAlignment.start,
+                    //   children: [
+                    //     Checkbox(
+                    //       value: takeaway,
+                    //       onChanged: (bool value) {
+                    //         setState(() {
+                    //           takeaway = value;
+                    //         });
+                    //       },
+                    //     ),
+                    //     // Text('Apakah Restomu melayani ambil ditempat ?', style: TextStyle(fontWeight: FontWeight.bold))
+                    //     Text('Apakah Restomu melayani ambil ditempat ?', style: GoogleFonts.poppins(
+                    //         textStyle: TextStyle(
+                    //             fontWeight: FontWeight.bold, fontSize: 12)),),
+                    //   ],
+                    // ),
                     SizedBox(height: CustomSize.sizeHeight(context) / 48,),
                     GestureDetector(
                       onTap: () async{

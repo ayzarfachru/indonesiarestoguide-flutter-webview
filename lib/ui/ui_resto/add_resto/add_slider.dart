@@ -12,6 +12,7 @@ import 'package:indonesiarestoguide/model/Price.dart';
 import 'package:indonesiarestoguide/ui/detail/detail_resto.dart';
 import 'package:indonesiarestoguide/ui/ui_resto/add_resto/add_detail_resto.dart';
 import 'package:indonesiarestoguide/ui/ui_resto/add_resto/add_view_resto.dart';
+import 'package:indonesiarestoguide/ui/ui_resto/detail/detail_resto.dart';
 import 'package:indonesiarestoguide/ui/ui_resto/home/home_activity.dart';
 import 'package:indonesiarestoguide/ui/ui_resto/menu/menu_activity.dart';
 import 'package:indonesiarestoguide/utils/utils.dart';
@@ -207,7 +208,7 @@ class _AddSliderState extends State<AddSlider> {
         'img': 'data:image/$extension;base64,'+base64Encode(image.readAsBytesSync()).toString(),
       }));
       Navigator.pop(context);
-      Navigator.pushReplacement(context, PageTransition(type: PageTransitionType.fade, child: DetailResto(id)));
+      Navigator.pushReplacement(context, PageTransition(type: PageTransitionType.fade, child: DetailRestoAdmin(id)));
     } else {
       // print(data);
       print(json.encode({

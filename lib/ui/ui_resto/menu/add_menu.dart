@@ -313,6 +313,7 @@ class _AddMenuState extends State<AddMenu> {
                           textStyle:
                           TextStyle(fontSize: 18, color: Colors.black, fontWeight: FontWeight.w600)),
                       decoration: InputDecoration(
+                        hintText: 'Nama menu',
                         isDense: true,
                         contentPadding: EdgeInsets.only(bottom: CustomSize.sizeHeight(context) / 86),
                         hintStyle: GoogleFonts.poppins(
@@ -337,6 +338,7 @@ class _AddMenuState extends State<AddMenu> {
                           textStyle:
                           TextStyle(fontSize: 18, color: Colors.black, fontWeight: FontWeight.w600)),
                       decoration: InputDecoration(
+                        hintText: 'Harga menu',
                         isDense: true,
                         contentPadding: EdgeInsets.only(bottom: CustomSize.sizeHeight(context) / 86),
                         hintStyle: GoogleFonts.poppins(
@@ -349,7 +351,7 @@ class _AddMenuState extends State<AddMenu> {
                       ),
                     ),
                     SizedBox(height: CustomSize.sizeHeight(context) / 48,),
-                    CustomText.bodyLight12(text: "Harga + Kemasan (*Harga: 4000 -> 6000)"),
+                    CustomText.bodyLight12(text: "Harga menu + Harga kemasan"),
                     SizedBox(
                       height: CustomSize.sizeHeight(context) * 0.005,
                     ),
@@ -361,6 +363,7 @@ class _AddMenuState extends State<AddMenu> {
                           textStyle:
                           TextStyle(fontSize: 18, color: Colors.black, fontWeight: FontWeight.w600)),
                       decoration: InputDecoration(
+                        hintText: '*Contoh harga menu: 18000 -> 20000',
                         isDense: true,
                         contentPadding: EdgeInsets.only(bottom: CustomSize.sizeHeight(context) / 86),
                         hintStyle: GoogleFonts.poppins(
@@ -439,6 +442,7 @@ class _AddMenuState extends State<AddMenu> {
                           textStyle:
                           TextStyle(fontSize: 18, color: Colors.black, fontWeight: FontWeight.w600)),
                       decoration: InputDecoration(
+                        hintText: 'Deskripsi menu',
                         isDense: true,
                         contentPadding: EdgeInsets.only(bottom: CustomSize.sizeHeight(context) / 86),
                         hintStyle: GoogleFonts.poppins(

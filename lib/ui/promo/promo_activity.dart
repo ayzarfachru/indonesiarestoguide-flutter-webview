@@ -478,7 +478,7 @@ class _PromoActivityState extends State<PromoActivity> {
                                             minSize: 18,
                                             maxLines: 1
                                         ),
-                                        CustomText.bodyMedium12(text: promo[index].restoName, minSize: 12),
+                                        // CustomText.bodyMedium12(text: promo[index].restoName, minSize: 12),
                                         SizedBox(height: CustomSize.sizeHeight(context) * 0.00126,),
                                         (homepg != "1")?CustomText.bodyMedium12(
                                             text: promo[index].desc,

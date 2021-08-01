@@ -271,11 +271,8 @@ class _DetailRestoAdminState extends State<DetailRestoAdmin> {
     var data = json.decode(apiResult.body);
 
     if (data['msg'].toString() == 'Success') {
-      Navigator.pop(context);
-      Navigator.pushReplacement(context,
-          PageTransition(
-              type: PageTransitionType.fade,
-              child: DetailRestoAdmin(id)));
+      // Navigator.pop(context);
+      Navigator.pushReplacement(context, PageTransition(type: PageTransitionType.fade, child: new DetailRestoAdmin(idRes.toString())));
     }
 
     setState(() {
@@ -318,14 +315,15 @@ class _DetailRestoAdminState extends State<DetailRestoAdmin> {
 
     // set up the buttons
     Widget cancelButton = FlatButton(
-      child: Text("Batal"),
+      child: Text("Batal", style: TextStyle(color: CustomColor.primary),),
       onPressed:  () {
         Navigator.pop(context);
       },
     );
     Widget continueButton = FlatButton(
-      child: Text("Hapus"),
+      child: Text("Hapus", style: TextStyle(color: CustomColor.primary)),
       onPressed:  () {
+        // Navigator.pop(context);
         _delImage(id);
       },
     );
@@ -349,9 +347,12 @@ class _DetailRestoAdminState extends State<DetailRestoAdmin> {
     );
   }
 
+  String idRes = '';
+
   @override
   void initState() {
     _getDetail(id);
+    idRes = id;
     print(id);
     _getData();
     _getImage();
@@ -510,13 +511,13 @@ class _DetailRestoAdminState extends State<DetailRestoAdmin> {
                         (homepg != "1")?SizedBox(height: CustomSize.sizeHeight(context) / 24,):SizedBox(height: CustomSize.sizeHeight(context) / 54,),
                         Padding(
                           padding: EdgeInsets.symmetric(horizontal: CustomSize.sizeWidth(context) / 14),
-                          child: CustomText.bodyRegular14(
+                          child: CustomText.bodyMedium16(
                               text: desc,
                               minSize: 14,
                               maxLines: 100
                           ),
                         ),
-                        (homepg != '1')?SizedBox(height: CustomSize.sizeHeight(context) / 24,):SizedBox(height: CustomSize.sizeHeight(context) / 124,),
+                        (homepg != '1')?SizedBox(height: CustomSize.sizeHeight(context) / 24,):SizedBox(height: CustomSize.sizeHeight(context) / 94,),
                         (homepg != '1')?Container():Padding(
                           padding: EdgeInsets.symmetric(horizontal: CustomSize.sizeHeight(context) / 24, vertical: CustomSize.sizeHeight(context) / 84),
                           child: Container(
@@ -548,6 +549,7 @@ class _DetailRestoAdminState extends State<DetailRestoAdmin> {
                             ),
                           ),
                         ),
+                        SizedBox(height: CustomSize.sizeHeight(context) * 0.004,),
                         (homepg != '1')?Container(
                           height: CustomSize.sizeWidth(context) / 2.4,
                           child: ListView.builder(

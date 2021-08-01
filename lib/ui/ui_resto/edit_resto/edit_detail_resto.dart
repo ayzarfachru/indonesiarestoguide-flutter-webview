@@ -161,7 +161,7 @@ class _EditDetailRestoState extends State<EditDetailResto> {
   String buka;
   String tutup;
 
-  bool isLoading = true;
+  bool isLoading = false;
 
   bool takeaway = false;
   bool reservation = false;
@@ -276,11 +276,11 @@ class _EditDetailRestoState extends State<EditDetailResto> {
   }
 
   getCuisine() async {
-    _Tipe = TextEditingController(text: cuisine);
+    _Tipe = TextEditingController(text: cuisine.replaceAll(',', ', '));
   }
 
   getFacility() async {
-    _Fasilitas = TextEditingController(text: facility);
+    _Fasilitas = TextEditingController(text: facility.replaceAll(',', ', '));
   }
 
   void onTimeOpenChanged(TimeOfDay newTime) {
@@ -314,6 +314,10 @@ class _EditDetailRestoState extends State<EditDetailResto> {
     var phone = pref.getString("notelpResto") ?? "";
     var img = pref.getString("imgResto") ?? "";
 
+    setState(() {
+      isLoading = true;
+    });
+
     var apiResult = await http.post(Links.mainUrl + '/resto/$idResto',
         body: {
           'name': name,
@@ -324,7 +328,7 @@ class _EditDetailRestoState extends State<EditDetailResto> {
           'phone': phone,
           'ongkir': (_Ongkir.text.toString() != null)?_Ongkir.text.toString():'',
           're_price': (_HargaPerMeja.text.toString() != '')?_HargaPerMeja.text.toString():'',
-          'takeaway': (takeaway == true)?'1':'',
+          'takeaway': (takeaway == true)?'1':'1',
           'img': img,
           'type': _Tipe.text.toString(),
           'fasilitas': _Fasilitas.text.toString(),
@@ -678,24 +682,24 @@ class _EditDetailRestoState extends State<EditDetailResto> {
                     ):Container(),
                     (reservation)?SizedBox(height: CustomSize.sizeHeight(context) / 48,):Container(),
                     //------------------------------------ checkbox takeaway -------------------------------------
-                    Row(
-                      mainAxisSize: MainAxisSize.max,
-                      mainAxisAlignment: MainAxisAlignment.start,
-                      children: [
-                        Checkbox(
-                          value: takeaway,
-                          onChanged: (bool value) {
-                            setState(() {
-                              takeaway = value;
-                            });
-                          },
-                        ),
-                        // Text('Apakah Restomu melayani ambil ditempat ?', style: TextStyle(fontWeight: FontWeight.bold))
-                        Text('Apakah Restomu melayani ambil ditempat ?', style: GoogleFonts.poppins(
-                            textStyle: TextStyle(
-                                fontWeight: FontWeight.bold, fontSize: 12)),),
-                      ],
-                    ),
+                    // Row(
+                    //   mainAxisSize: MainAxisSize.max,
+                    //   mainAxisAlignment: MainAxisAlignment.start,
+                    //   children: [
+                    //     Checkbox(
+                    //       value: takeaway,
+                    //       onChanged: (bool value) {
+                    //         setState(() {
+                    //           takeaway = value;
+                    //         });
+                    //       },
+                    //     ),
+                    //     // Text('Apakah Restomu melayani ambil ditempat ?', style: TextStyle(fontWeight: FontWeight.bold))
+                    //     Text('Apakah Restomu melayani ambil ditempat ?', style: GoogleFonts.poppins(
+                    //         textStyle: TextStyle(
+                    //             fontWeight: FontWeight.bold, fontSize: 12)),),
+                    //   ],
+                    // ),
                   ],
                 ),
               ),
@@ -705,7 +709,7 @@ class _EditDetailRestoState extends State<EditDetailResto> {
         ),
       ),
       floatingActionButton:
-      GestureDetector(
+      (isLoading != true)?GestureDetector(
         onTap: () async{
           setState(() {
             isLoading = false;
@@ -732,6 +736,18 @@ class _EditDetailRestoState extends State<EditDetailResto> {
               color: CustomColor.accent
           ),
           child: Center(child: CustomText.bodyRegular16(text: "Simpan", color: Colors.white,)),
+        ),
+      ):Container(
+        width: CustomSize.sizeWidth(context) / 1.1,
+        height: CustomSize.sizeHeight(context) / 14,
+        decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(30),
+            color: CustomColor.accent
+        ),
+        child: Center(
+          child: CircularProgressIndicator(
+            valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+          ),
         ),
       ),
     );

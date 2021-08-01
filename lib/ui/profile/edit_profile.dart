@@ -6,6 +6,7 @@ import 'package:flutter_datetime_picker/flutter_datetime_picker.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:flutter/services.dart';
+import 'package:indonesiarestoguide/ui/ui_resto/home/home_activity.dart';
 import 'package:indonesiarestoguide/utils/utils.dart';
 import 'package:flutter_icons/flutter_icons.dart';
 import 'package:indonesiarestoguide/ui/home/home_activity.dart';
@@ -140,6 +141,7 @@ class _EditProfileState extends State<EditProfile> {
     });
   }
 
+  String homepg = "";
   //------------------------------= IMAGE PICKER =----------------------------------
   File image;
   String extension;
@@ -192,7 +194,8 @@ class _EditProfileState extends State<EditProfile> {
       pref.setString("gender", gender);
       pref.setString("tgl", tgl);
       pref.setString("notelp", _loginNotelpName.text.toString());
-      Navigator.pushReplacement(context, PageTransition(type: PageTransitionType.fade, child: new HomeActivity()));
+      Navigator.of(context).pushReplacement(MaterialPageRoute(
+          builder: (BuildContext context) => (homepg != "1")?HomeActivity():HomeActivityResto()));
     } else {
       Fluttertoast.showToast(
           msg: "The field is required",
@@ -252,7 +255,8 @@ class _EditProfileState extends State<EditProfile> {
       pref.setString("gender", gender);
       pref.setString("tgl", tgl);
       pref.setString("notelp", _loginNotelpName.text.toString());
-      Navigator.pushReplacement(context, PageTransition(type: PageTransitionType.fade, child: new HomeActivity()));
+      Navigator.of(context).pushReplacement(MaterialPageRoute(
+          builder: (BuildContext context) => (homepg != "1")?HomeActivity():HomeActivityResto()));
     } else {
       Fluttertoast.showToast(
           msg: "The field is required",
@@ -334,6 +338,14 @@ class _EditProfileState extends State<EditProfile> {
     pattern.allMatches(text).forEach((match) => print(match.group(0)));
   }
 
+  getHomePg() async {
+    SharedPreferences pref = await SharedPreferences.getInstance();
+    setState(() {
+      homepg = (pref.getString('homepg'));
+      print(homepg);
+    });
+  }
+
   @override
   void dispose() {
     super.dispose();
@@ -343,6 +355,7 @@ class _EditProfileState extends State<EditProfile> {
   void initState() {
     super.initState();
     getPref();
+    getHomePg();
     // getEmail();
     // getImg();
     // (img != '/'.substring(0, 1))?getImg2():print('');
@@ -783,7 +796,7 @@ class _EditProfileState extends State<EditProfile> {
                       ),
                       child: Center(
                         child: CircularProgressIndicator(
-                          backgroundColor: Colors.white,
+                          valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
                         ),
                       ),
                     ),

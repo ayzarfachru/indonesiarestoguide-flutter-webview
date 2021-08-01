@@ -100,7 +100,7 @@ class _EditMenuState extends State<EditMenu> {
   String initial = "";
   String img = "";
 
-  bool isLoading = true;
+  bool isLoading = false;
 
   bool favorite = false;
   bool reservation = false;
@@ -587,7 +587,7 @@ class _EditMenuState extends State<EditMenu> {
         ),
       ),
       floatingActionButton:
-      GestureDetector(
+      (isLoading != true)?GestureDetector(
         onTap: () async{
           setState(() {
             isLoading = false;
@@ -612,6 +612,18 @@ class _EditMenuState extends State<EditMenu> {
               color: CustomColor.accent
           ),
           child: Center(child: CustomText.bodyRegular16(text: "Simpan", color: Colors.white,)),
+        ),
+      ):Container(
+        width: CustomSize.sizeWidth(context) / 1.1,
+        height: CustomSize.sizeHeight(context) / 14,
+        decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(30),
+            color: CustomColor.accent
+        ),
+        child: Center(
+          child: CircularProgressIndicator(
+            valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+          ),
         ),
       ),
     );

@@ -13,5 +13,7 @@ class Price{
 
   Price.delivery(this.original, this.delivery);
 
+  Price.menu(this.original, this.delivery, this.discounted);
+
   Price.promo(this.oriString, this.deliString);
 }

@@ -149,6 +149,7 @@ class _PromoActivityState extends State<PromoActivity> {
     });
   }
 
+  bool kosong = false;
   List<Promo> promoResto = [];
   Future<void> _getPromoResto()async {
     List<Promo> _promoResto = [];
@@ -166,32 +167,38 @@ class _PromoActivityState extends State<PromoActivity> {
     var data = json.decode(apiResult.body);
     // print(data['promo']);
 
-    for (var a in data['promo']) {
-      Promo b = Promo.resto(
-        id: a['id'],
-        menus_id: int.parse(a['menus_id']),
-        word: a['description'],
-        discountedPrice: (a['discount'] != null)?int.parse(a['discount']):a['discount'],
-        potongan: (a['potongan'] != null)?int.parse(a['potongan']):a['potongan'],
-        ongkir: (a['ongkir'] != null)?int.parse(a['ongkir']):a['ongkir'],
-        expired_at: a['expired_at'],
-        menu: Menu(
-            id: a['menus']['id'],
-            name: a['menus']['name'],
-            desc: a['menus']['desc'],
-            urlImg: a['menus']['img'],
-            price: Price.promo(
-                a['menus']['price'].toString(), a['menus']['delivery_price'].toString())
-        ),
-      );
-      _promoResto.add(b);
+      for (var a in data['promo']) {
+        Promo b = Promo.resto(
+          id: a['id'],
+          menus_id: int.parse(a['menus_id']),
+          word: a['description'],
+          discountedPrice: (a['discount'] != null)?int.parse(a['discount']):a['discount'],
+          potongan: (a['potongan'] != null)?int.parse(a['potongan']):a['potongan'],
+          ongkir: (a['ongkir'] != null)?int.parse(a['ongkir']):a['ongkir'],
+          expired_at: a['expired_at'],
+          menu: (a['menus'].toString() != 'null')?Menu(
+              id: a['menus']['id']??null,
+              name: a['menus']['name']??null,
+              desc: a['menus']['desc']??null,
+              urlImg: a['menus']['img'],
+              price: Price.promo(
+                  a['menus']['price'].toString(), a['menus']['delivery_price'].toString())
+          ):null,
+        );
+        _promoResto.add(b);
+      }
+
+      setState(() {
+        promoResto = _promoResto;
+        // print(promoResto);
+        isLoading = false;
+      });
+
+      if (apiResult.statusCode == 200 && promoResto.toString() == '[]') {
+        kosong = true;
+      }
+
     }
-    setState(() {
-      promoResto = _promoResto;
-      // print(promoResto);
-      isLoading = false;
-    });
-  }
 
   RefreshController _refreshController =
   RefreshController(initialRefresh: false);
@@ -338,7 +345,7 @@ class _PromoActivityState extends State<PromoActivity> {
             controller: _scrollController,
             child: Padding(
               padding: EdgeInsets.symmetric(horizontal: CustomSize.sizeWidth(context) / 24),
-              child: Column(
+              child: (kosong.toString() != 'true')?Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   SizedBox(
@@ -409,10 +416,19 @@ class _PromoActivityState extends State<PromoActivity> {
                                   Container(
                                     width: CustomSize.sizeWidth(context) / 2.6,
                                     height: CustomSize.sizeWidth(context) / 2.6,
-                                    decoration: BoxDecoration(
+                                    decoration: (homepg == "1")?(promoResto[index].menu != null)?BoxDecoration(
                                       image: DecorationImage(
-                                        image: (homepg != "1")?NetworkImage(Links.subUrl + promo[index].urlImg):NetworkImage(Links.subUrl + promoResto[index].menu.urlImg),
+                                        image: NetworkImage(Links.subUrl + promoResto[index].menu.urlImg),
                                         fit: BoxFit.cover
+                                      ),
+                                      borderRadius: BorderRadius.circular(20),
+                                    ):BoxDecoration(
+                                      color: CustomColor.primary,
+                                      borderRadius: BorderRadius.circular(20),
+                                    ):BoxDecoration(
+                                      image: DecorationImage(
+                                          image: NetworkImage(Links.subUrl + promo[index].urlImg),
+                                          fit: BoxFit.cover
                                       ),
                                       borderRadius: BorderRadius.circular(20),
                                     ),
@@ -473,9 +489,12 @@ class _PromoActivityState extends State<PromoActivity> {
                                             text: promo[index].name,
                                             minSize: 18,
                                             maxLines: 1
-                                        ):CustomText.textHeading4(
+                                        ):(promoResto[index].menu != null)?CustomText.textHeading4(
                                             text: promoResto[index].menu.name,
                                             minSize: 18,
+                                            maxLines: 1
+                                        ):CustomText.textHeading6(
+                                            text: 'Menu tidak tersedia',
                                             maxLines: 1
                                         ),
                                         // CustomText.bodyMedium12(text: promo[index].restoName, minSize: 12),
@@ -497,7 +516,7 @@ class _PromoActivityState extends State<PromoActivity> {
                                             :Column(
                                               crossAxisAlignment: CrossAxisAlignment.end,
                                               children: [
-                                                Row(
+                                                (promoResto[index].menu != null)?Row(
                                                   children: [
                                                     CustomText.bodyRegular12(text: 'Harga menu : ', minSize: 12),
                                                     SizedBox(width: CustomSize.sizeWidth(context) / 48,),
@@ -505,8 +524,8 @@ class _PromoActivityState extends State<PromoActivity> {
                                                         decoration: TextDecoration.lineThrough)
                                                         :CustomText.bodyRegular12(text: NumberFormat.currency(locale: 'id', symbol: '', decimalDigits: 0).format(int.parse(promoResto[index].menu.price.oriString)), minSize: 12,),
                                                   ],
-                                                ),
-                                                Row(
+                                                ):Container(),
+                                                (promoResto[index].menu != null)?Row(
                                                   children: [
                                                     CustomText.bodyRegular12(text: 'Delivery : ', minSize: 12),
                                                     SizedBox(width: CustomSize.sizeWidth(context) / 48,),
@@ -514,11 +533,11 @@ class _PromoActivityState extends State<PromoActivity> {
                                                         decoration: TextDecoration.lineThrough)
                                                         :CustomText.bodyRegular12(text: NumberFormat.currency(locale: 'id', symbol: '', decimalDigits: 0).format(int.parse(promoResto[index].menu.price.deliString)), minSize: 12,),
                                                   ],
-                                                ),
+                                                ):Container(),
                                               ],
                                             ),
                                             SizedBox(width: CustomSize.sizeWidth(context) / 48,),
-                                            (homepg == "1")?Column(
+                                            (homepg == "1")?(promoResto[index].menu != null)?Column(
                                               crossAxisAlignment: CrossAxisAlignment.start,
                                               children: [
                                                 // (homepg != "1")?CustomText.bodyRegular12(text: NumberFormat.currency(locale: 'id', symbol: '', decimalDigits: 0).format(promo[index].menu.price.discounted), minSize: 12)
@@ -537,7 +556,7 @@ class _PromoActivityState extends State<PromoActivity> {
                                                     NumberFormat.currency(locale: 'id', symbol: '', decimalDigits: 0).format((int.parse(promoResto[index].menu.price.deliString)-promoResto[index].ongkir))
                                                     :'' :'', minSize: 12),
                                               ],
-                                            ):CustomText.bodyRegular12(text: NumberFormat.currency(locale: 'id', symbol: '', decimalDigits: 0).format(promo[index].price.discounted), minSize: 12),
+                                            ):Container():CustomText.bodyRegular12(text: NumberFormat.currency(locale: 'id', symbol: '', decimalDigits: 0).format(promo[index].price.discounted), minSize: 12),
                                           ],
                                         )
                                       ],
@@ -551,6 +570,31 @@ class _PromoActivityState extends State<PromoActivity> {
                       }
                   ),
                   SizedBox(height: CustomSize.sizeHeight(context) / 8,)
+                ],
+              ):Stack(
+                children: [
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      SizedBox(
+                        height: CustomSize.sizeHeight(context) / 32,
+                      ),
+                      CustomText.textHeading3(
+                          text: "Promo di Restoranmu",
+                          color: CustomColor.primary,
+                          minSize: 18,
+                          maxLines: 1
+                      ),
+                    ],
+                  ),
+                  Container(height: CustomSize.sizeHeight(context), child: Center(
+                    child: CustomText.bodyRegular14(
+                        text: 'Promo kosong.',
+                        maxLines: 1,
+                        minSize: 12,
+                        color: Colors.grey
+                    ),
+                  ),),
                 ],
               ),
             ),

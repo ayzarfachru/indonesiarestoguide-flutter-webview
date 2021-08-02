@@ -82,6 +82,7 @@ class _MenuActivityState extends State<MenuActivity> {
   }
 
 
+  bool kosong = false;
   Future<void> _getMenu()async{
     List<Menu> _menu = [];
 
@@ -114,6 +115,10 @@ class _MenuActivityState extends State<MenuActivity> {
       menu = _menu;
       isLoading = false;
     });
+    
+    if (apiResult.statusCode == 200 && menu.toString() == '[]') {
+      kosong = true;
+    }  
   }
 
   showAlertDialog(String id) {
@@ -196,7 +201,7 @@ class _MenuActivityState extends State<MenuActivity> {
           controller: _scrollController,
           child: Padding(
             padding: EdgeInsets.symmetric(horizontal: CustomSize.sizeWidth(context) / 24),
-            child: Column(
+            child: (kosong.toString() != 'true')?Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 SizedBox(
@@ -208,7 +213,7 @@ class _MenuActivityState extends State<MenuActivity> {
                   minSize: 18,
                   maxLines: 1
                 ),
-                ListView.builder(
+                (menu.toString() != '[]')?ListView.builder(
                   shrinkWrap: true,
                   controller: _scrollController,
                   physics: NeverScrollableScrollPhysics(),
@@ -315,7 +320,7 @@ class _MenuActivityState extends State<MenuActivity> {
                                     ),
                                     Row(
                                       children: [
-                                        CustomText.bodyRegular12(text: 'Delivery: '+NumberFormat.currency(locale: 'id', symbol: '', decimalDigits: 0).format(menu[index].delivery_price.delivery), minSize: 12),
+                                        CustomText.bodyRegular12(text: 'Delivery/Takeaway: '+NumberFormat.currency(locale: 'id', symbol: '', decimalDigits: 0).format(menu[index].delivery_price.delivery), minSize: 12),
                                       ],
                                     )
                                   ],
@@ -326,8 +331,34 @@ class _MenuActivityState extends State<MenuActivity> {
                         ),
                       );
                     }
+                ):Container(),
+                (menu.toString() != '[]')?SizedBox(height: CustomSize.sizeHeight(context) / 48,):Container()
+              ],
+            ):Stack(
+              children: [
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    SizedBox(
+                      height: CustomSize.sizeHeight(context) / 32,
+                    ),
+                    CustomText.textHeading3(
+                        text: "Menu di Restoranmu",
+                        color: CustomColor.primary,
+                        minSize: 18,
+                        maxLines: 1
+                    ),
+                    (menu.toString() != '[]')?SizedBox(height: CustomSize.sizeHeight(context) / 48,):Container()
+                  ],
                 ),
-                SizedBox(height: CustomSize.sizeHeight(context) / 48,)
+                Container(height: CustomSize.sizeHeight(context), child: Center(
+                  child: CustomText.bodyRegular14(
+                      text: 'Menu kosong.',
+                      maxLines: 1,
+                      minSize: 12,
+                      color: Colors.grey
+                  ),
+                ),),
               ],
             ),
           ),

@@ -3,6 +3,7 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_icons/flutter_icons.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:indonesiarestoguide/ui/auth/login_activity.dart';
 import 'package:indonesiarestoguide/ui/ui_resto/add_resto/add_view_resto.dart';
 import 'package:indonesiarestoguide/ui/ui_resto/home/home_activity.dart';
@@ -96,6 +97,7 @@ class _ProfileActivityState extends State<ProfileActivity> {
   }
 
   bool isLoading = false;
+  String kosong = '';
   Future _getUserResto()async{
     // List<History> _history = [];
 
@@ -129,6 +131,12 @@ class _ProfileActivityState extends State<ProfileActivity> {
       // history = _history;
       isLoading = false;
     });
+
+    if (apiResult.statusCode == 200) {
+      if (data['resto']['id'] == null && id == 'null' || id == '') {
+        kosong = '1';
+      }
+    }
   }
 
   File image;
@@ -295,7 +303,7 @@ class _ProfileActivityState extends State<ProfileActivity> {
                       // SharedPreferences pref = await SharedPreferences.getInstance();
                       // pref.setString("homepg", "1");
                       setState(() {
-                        Navigator.pushReplacement(context, PageTransition(type: PageTransitionType.fade, child: AddViewResto()));
+                        (kosong == '1')?Navigator.pushReplacement(context, PageTransition(type: PageTransitionType.fade, child: AddViewResto())):Fluttertoast.showToast(msg: "Tunggu sebentar.");
                       });
                     },
                     child: Padding(

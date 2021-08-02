@@ -117,6 +117,12 @@ class HomeActivity extends StatefulWidget {
 }
 
 class _HomeActivityState extends State<HomeActivity> {
+  void setState(fn) {
+    if(mounted) {
+      super.setState(fn);
+    }
+  }
+
   ScrollController _scrollController = ScrollController();
   List<imgBanner> images = [];
   bool isLoading = false;
@@ -622,7 +628,7 @@ class _HomeActivityState extends State<HomeActivity> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         SizedBox(height: CustomSize.sizeHeight(context) / 48,),
-                        Padding(
+                        (transaction.toString() != '[]')?Padding(
                           padding: EdgeInsets.symmetric(horizontal: CustomSize.sizeWidth(context) / 24),
                           child: Row(
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -650,8 +656,8 @@ class _HomeActivityState extends State<HomeActivity> {
                               ),
                             ],
                           ),
-                        ),
-                        Container(
+                        ):Container(),
+                        (transaction.toString() != '[]')?Container(
                           width: CustomSize.sizeWidth(context),
                           height: CustomSize.sizeHeight(context) / 5,
                           child: ListView.builder(
@@ -741,9 +747,9 @@ class _HomeActivityState extends State<HomeActivity> {
                                 );
                               }
                           ),
-                        ),
-                        SizedBox(height: CustomSize.sizeHeight(context) / 48,),
-                        Padding(
+                        ):Container(),
+                        (transaction.toString() != '[]')?SizedBox(height: CustomSize.sizeHeight(context) / 48,):Container(),
+                        (resto.toString() != '[]')?Padding(
                           padding: EdgeInsets.symmetric(horizontal: CustomSize.sizeWidth(context) / 24),
                           child: Row(
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -771,8 +777,8 @@ class _HomeActivityState extends State<HomeActivity> {
                               ),
                             ],
                           ),
-                        ),
-                        (resto != [])?Container(
+                        ):Container(),
+                        (resto.toString() != '[]')?Container(
                           width: CustomSize.sizeWidth(context),
                           height: CustomSize.sizeHeight(context) / 3.6,
                           child: ListView.builder(
@@ -811,12 +817,14 @@ class _HomeActivityState extends State<HomeActivity> {
                                           Container(
                                             width: CustomSize.sizeWidth(context) / 2.3,
                                             height: CustomSize.sizeHeight(context) / 5.8,
-                                            decoration: BoxDecoration(
+                                            decoration: (resto[index].img != null)?BoxDecoration(
                                               image: DecorationImage(
                                                   image: NetworkImage(Links.subUrl + resto[index].img),
                                                   fit: BoxFit.cover
                                               ),
                                               borderRadius: BorderRadius.circular(20),
+                                            ):BoxDecoration(
+                                              color: CustomColor.primary
                                             ),
                                           ),
                                           SizedBox(height: CustomSize.sizeHeight(context) / 86,),
@@ -836,8 +844,8 @@ class _HomeActivityState extends State<HomeActivity> {
                               }
                           ),
                         ):Container(),
-                        SizedBox(height: CustomSize.sizeHeight(context) / 48,),
-                        (promo != [])?Padding(
+                        (resto.toString() != '[]')?SizedBox(height: CustomSize.sizeHeight(context) / 48,):Container(),
+                        (promo.toString() != '[]')?Padding(
                           padding: EdgeInsets.symmetric(horizontal: CustomSize.sizeWidth(context) / 24),
                           child: Row(
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -866,7 +874,7 @@ class _HomeActivityState extends State<HomeActivity> {
                             ],
                           ),
                         ):Container(),
-                        (promo != [])?Container(
+                        (promo.toString() != '[]')?Container(
                           width: CustomSize.sizeWidth(context),
                           height: CustomSize.sizeHeight(context) / 5,
                           child: ListView.builder(
@@ -951,7 +959,7 @@ class _HomeActivityState extends State<HomeActivity> {
                               }
                           ),
                         ):Container(),
-                        (promo != [])?SizedBox(height: CustomSize.sizeHeight(context) / 48,):Container(),
+                        (promo.toString() != '[]')?SizedBox(height: CustomSize.sizeHeight(context) / 48,):Container(),
 
                         (es != '[]')?Padding(
                           padding: EdgeInsets.symmetric(horizontal: CustomSize.sizeWidth(context) / 24),
@@ -1188,7 +1196,7 @@ class _HomeActivityState extends State<HomeActivity> {
                           ),
                         ):Container(),
                         (ng != '[]')?SizedBox(height: CustomSize.sizeHeight(context) / 48,):Container(),
-                        Padding(
+                        (again.toString() != '[]')?Padding(
                           padding: EdgeInsets.symmetric(horizontal: CustomSize.sizeWidth(context) / 24),
                           child: Row(
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -1213,8 +1221,8 @@ class _HomeActivityState extends State<HomeActivity> {
                               ),
                             ],
                           ),
-                        ),
-                        Container(
+                        ):Container(),
+                        (again.toString() != '[]')?Container(
                           width: CustomSize.sizeWidth(context),
                           height: CustomSize.sizeHeight(context) / 3.6,
                           child: ListView.builder(
@@ -1280,11 +1288,11 @@ class _HomeActivityState extends State<HomeActivity> {
                                 );
                               }
                           ),
-                        ),
+                        ):Container(),
                       ],
                     ),
                   ),
-                  SizedBox(height: CustomSize.sizeHeight(context) / 8,)
+                  (again.toString() != '[]')?SizedBox(height: CustomSize.sizeHeight(context) / 8,):SizedBox(height: CustomSize.sizeHeight(context) / 10,)
                 ],
               ),
             ),

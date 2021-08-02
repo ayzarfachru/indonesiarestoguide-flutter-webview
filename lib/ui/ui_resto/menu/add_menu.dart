@@ -214,6 +214,9 @@ class _AddMenuState extends State<AddMenu> {
       }));
       Navigator.pushReplacement(context, PageTransition(type: PageTransitionType.fade, child: HomeActivityResto()));
     } else {
+      setState(() {
+        isLoading = false;
+      });
       // print(data);
       print(json.encode({
         'name': namaMenu.text,

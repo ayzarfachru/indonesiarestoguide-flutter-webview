@@ -188,7 +188,7 @@ class _DetailRestoAdminState extends State<DetailRestoAdmin> {
       phone = data['data']['phone_number'];
       address = data['data']['address'];
       desc = data['data']['desc'];
-      img = data['data']['main_img'];
+      img = data['data']['main_img']??data['data']['img'].toString().split('[')[1].split(']')[0].split(',')[0];
       reservation_fee = data['data']['reservation_fee'].toString();
       ongkir = data['data']['ongkir'].toString();
       range = data['data']['range'];
@@ -323,7 +323,7 @@ class _DetailRestoAdminState extends State<DetailRestoAdmin> {
     Widget continueButton = FlatButton(
       child: Text("Hapus", style: TextStyle(color: CustomColor.primary)),
       onPressed:  () {
-        // Navigator.pop(context);
+        Navigator.pop(context);
         _delImage(id);
       },
     );
@@ -375,11 +375,13 @@ class _DetailRestoAdminState extends State<DetailRestoAdmin> {
               Container(
                 height: CustomSize.sizeHeight(context) / 3.2,
                 width: CustomSize.sizeWidth(context),
-                decoration: BoxDecoration(
+                decoration: (img != null)?BoxDecoration(
                   image: DecorationImage(
                       image: NetworkImage(Links.subUrl + img),
                       fit: BoxFit.cover
                   ),
+                ):BoxDecoration(
+                  color: CustomColor.primary
                 ),
               ),
               Column(

@@ -181,7 +181,7 @@ class _RestoListActivityState extends State<RestoListActivity> {
           id: v['id'],
           name: v['name'],
           distance: double.parse(v['distance'].toString()),
-          img: v['img']
+          img: v['img']??null
       );
       _resto.add(r);
     }
@@ -513,12 +513,14 @@ class _RestoListActivityState extends State<RestoListActivity> {
                               Container(
                                 width: CustomSize.sizeWidth(context),
                                 height: CustomSize.sizeHeight(context) / 5.8,
-                                decoration: BoxDecoration(
+                                decoration: (resto[index].img != null)?BoxDecoration(
                                   image: DecorationImage(
                                       image: NetworkImage(Links.subUrl + resto[index].img),
                                       fit: BoxFit.cover
                                   ),
                                   borderRadius: BorderRadius.circular(20),
+                                ):BoxDecoration(
+                                    color: CustomColor.primary
                                 ),
                               ),
                               SizedBox(height: CustomSize.sizeHeight(context) / 86,),

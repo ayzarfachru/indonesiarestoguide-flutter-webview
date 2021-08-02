@@ -8,6 +8,7 @@ import 'package:indonesiarestoguide/ui/detail/detail_resto.dart';
 import 'package:indonesiarestoguide/ui/history/history_activity.dart';
 import 'package:indonesiarestoguide/ui/home/home_activity.dart';
 import 'package:indonesiarestoguide/ui/profile/profile_activity.dart';
+// import 'package:indonesiarestoguide/ui/ui_resto/promo_resto/promo_activity.dart';
 import 'package:indonesiarestoguide/ui/promo/promo_activity.dart';
 import 'package:indonesiarestoguide/ui/ui_resto/detail/detail_resto.dart';
 import 'package:indonesiarestoguide/ui/ui_resto/employees/employees_activity.dart';
@@ -80,7 +81,7 @@ class _HomeActivityRestoState extends State<HomeActivityResto> {
     // }
     setState(() {
       url = data['link'];
-      print(url + 'aa');
+      // print(url + 'aa');
       meja = _meja;
       isLoading = false;
     });
@@ -359,6 +360,7 @@ class _HomeActivityRestoState extends State<HomeActivityResto> {
                               onTap: (){
                                 setState(() {
                                   print(homepg + "oi");
+                                  // Navigator.push(context, PageTransition(type: PageTransitionType.fade, child: new PromoActivity(id.toString())));
                                   Navigator.push(context, PageTransition(type: PageTransitionType.fade, child: new PromoActivity()));
                                 });
                               },

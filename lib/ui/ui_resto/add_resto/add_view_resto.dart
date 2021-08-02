@@ -165,6 +165,7 @@ class _AddViewRestoState extends State<AddViewResto> {
                           textStyle:
                           TextStyle(fontSize: 18, color: Colors.black, fontWeight: FontWeight.w600)),
                       decoration: InputDecoration(
+                        hintText: 'Nama resto',
                         isDense: true,
                         contentPadding: EdgeInsets.only(bottom: CustomSize.sizeHeight(context) / 86),
                         hintStyle: GoogleFonts.poppins(
@@ -298,6 +299,7 @@ class _AddViewRestoState extends State<AddViewResto> {
                           textStyle:
                           TextStyle(fontSize: 18, color: Colors.black, fontWeight: FontWeight.w600)),
                       decoration: InputDecoration(
+                        hintText: 'Nomor telpon resto',
                         isDense: true,
                         contentPadding: EdgeInsets.only(bottom: CustomSize.sizeHeight(context) / 86),
                         hintStyle: GoogleFonts.poppins(
@@ -323,6 +325,7 @@ class _AddViewRestoState extends State<AddViewResto> {
                           textStyle:
                           TextStyle(fontSize: 18, color: Colors.black, fontWeight: FontWeight.w600)),
                       decoration: InputDecoration(
+                        hintText: 'Deskripsi resto',
                         isDense: true,
                         contentPadding: EdgeInsets.only(bottom: CustomSize.sizeHeight(context) / 86),
                         hintStyle: GoogleFonts.poppins(
@@ -335,42 +338,41 @@ class _AddViewRestoState extends State<AddViewResto> {
                       ),
                     ),
                     SizedBox(height: CustomSize.sizeHeight(context) / 48,),
+                    (btnAddress == true)?Container():GestureDetector(
+                      onTap: () async{
+                        setState(() {
+                          isLoading = false;
+                        });
+                        SharedPreferences pref = await SharedPreferences.getInstance();
+                        pref.setString("imgResto", 'data:image/$extension;base64,'+base64Encode(image.readAsBytesSync()).toString());
+                        pref.setString("nameResto", _Name.text.toString());
+                        pref.setString("notelpResto", _NoTelp.text.toString());
+                        pref.setString("descResto", _Desc.text.toString());
+                        pref.setString("addressResto", _Address.text.toString());
+                        print(pref.getString("imgResto"));
+                        print(pref.getString("nameResto"));
+                        print(pref.getString("latitudeResto"));
+                        print(pref.getString("longitudeResto"));
+                        print(pref.getString("notelpResto"));
+                        print(pref.getString("descResto"));
+
+                        Navigator.push(context, PageTransition(type: PageTransitionType.fade, child: new AddDetailResto()));
+                      },
+                      child: Container(
+                        width: CustomSize.sizeWidth(context) / 1.1,
+                        height: CustomSize.sizeHeight(context) / 14,
+                        decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(30),
+                            color: CustomColor.accent
+                        ),
+                        child: Center(child: CustomText.bodyRegular16(text: "Lanjut", color: Colors.white,)),
+                      ),
+                    ),
                   ],
                 ),
               )
             ],
           ),
-        ),
-      ),
-      floatingActionButton:
-      (btnAddress == true)?Container():GestureDetector(
-        onTap: () async{
-          setState(() {
-            isLoading = false;
-          });
-          SharedPreferences pref = await SharedPreferences.getInstance();
-          pref.setString("imgResto", 'data:image/$extension;base64,'+base64Encode(image.readAsBytesSync()).toString());
-          pref.setString("nameResto", _Name.text.toString());
-          pref.setString("notelpResto", _NoTelp.text.toString());
-          pref.setString("descResto", _Desc.text.toString());
-          pref.setString("addressResto", _Address.text.toString());
-          print(pref.getString("imgResto"));
-          print(pref.getString("nameResto"));
-          print(pref.getString("latitudeResto"));
-          print(pref.getString("longitudeResto"));
-          print(pref.getString("notelpResto"));
-          print(pref.getString("descResto"));
-
-          Navigator.push(context, PageTransition(type: PageTransitionType.fade, child: new AddDetailResto()));
-        },
-        child: Container(
-          width: CustomSize.sizeWidth(context) / 1.1,
-          height: CustomSize.sizeHeight(context) / 14,
-          decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(30),
-              color: CustomColor.accent
-          ),
-          child: Center(child: CustomText.bodyRegular16(text: "Lanjut", color: Colors.white,)),
         ),
       ),
     );

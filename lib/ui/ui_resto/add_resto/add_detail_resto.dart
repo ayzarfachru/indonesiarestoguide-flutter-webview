@@ -9,6 +9,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:indonesiarestoguide/model/Cuisine.dart';
 import 'package:indonesiarestoguide/ui/ui_resto/add_resto/add_view_resto.dart';
+import 'package:indonesiarestoguide/ui/ui_resto/add_resto/payment_resto.dart';
 import 'package:indonesiarestoguide/ui/ui_resto/home/home_activity.dart';
 import 'package:indonesiarestoguide/utils/utils.dart';
 import 'package:indonesiarestoguide/ui/home/home_activity.dart';
@@ -140,7 +141,7 @@ class _AddDetailRestoState extends State<AddDetailResto> {
   String buka;
   String tutup;
 
-  bool isLoading = true;
+  bool isLoading = false;
 
   bool takeaway = false;
   bool reservation = false;
@@ -311,6 +312,9 @@ class _AddDetailRestoState extends State<AddDetailResto> {
     var address = pref.getString("addressResto") ?? "";
     var phone = pref.getString("notelpResto") ?? "";
     var img = pref.getString("imgResto") ?? "";
+    setState(() {
+      isLoading = true;
+    });
 
     var apiResult = await http.post(Links.mainUrl + '/resto',
         body: {
@@ -339,7 +343,11 @@ class _AddDetailRestoState extends State<AddDetailResto> {
     if(apiResult.statusCode == 200){
       print("success");
       print(data);
-      showAlertDialog();
+      Navigator.push(
+          context,
+          PageTransition(
+              type: PageTransitionType.fade,
+              child: PaymentResto()));
       // SharedPreferences preferences = await SharedPreferences.getInstance();
       // await preferences.remove('menuJson');
       // await preferences.remove('restoId');
@@ -348,6 +356,84 @@ class _AddDetailRestoState extends State<AddDetailResto> {
       // await preferences.remove('inCart');
     } else {
       print(data);
+      setState(() {
+        isLoading = false;
+      });
+      print(json.encode({
+        // 'name': name,
+        // 'desc': desc,
+        // 'latitude': latitude,
+        // 'longitude': longitude,
+        // 'address': address,
+        // 'phone': phone,
+        // 'hours': buka + '-' + tutup,
+        // 'ongkir': (_Ongkir.text.toString() != null)?_Ongkir.text.toString():'',
+        // 're_price': (_HargaPerMeja.text.toString() != '')?_HargaPerMeja.text.toString():'',
+        // 'takeaway': (takeaway == true)?'1':'',
+        'img': img,
+        // 'type': _Tipe.text.toString(),
+        // 'fasilitas': _Fasilitas.text.toString(),
+        // 'table': (_JumlahMeja.text.toString() != '')?_JumlahMeja.text.toString():''
+      }));
+    }
+  }
+
+  Future<String> addResto2()async{
+    SharedPreferences pref = await SharedPreferences.getInstance();
+    var token = pref.getString("token") ?? "";
+    var name = pref.getString("nameResto") ?? "";
+    var desc = pref.getString("descResto") ?? "";
+    var latitude = pref.getString("latitudeResto") ?? "";
+    var longitude = pref.getString("longitudeResto") ?? "";
+    var address = pref.getString("addressResto") ?? "";
+    var phone = pref.getString("notelpResto") ?? "";
+    var img = pref.getString("imgResto") ?? "";
+    setState(() {
+      isLoading = true;
+    });
+
+    var apiResult = await http.post(Links.mainUrl + '/resto',
+        body: {
+          'name': name,
+          'desc': desc,
+          'latitude': latitude,
+          'longitude': longitude,
+          'address': address,
+          'phone': phone,
+          'hours': buka + '-' + tutup,
+          're_price': (_HargaPerMeja.text.toString() != '')?_HargaPerMeja.text.toString():'',
+          'takeaway': (takeaway == true)?'1':'1',
+          'img': img,
+          'type': _Tipe.text.toString(),
+          'fasilitas': _Fasilitas.text.toString(),
+          'table': (_JumlahMeja.text.toString() != '')?_JumlahMeja.text.toString():''
+        },
+        headers: {
+          "Accept": "Application/json",
+          "Authorization": "Bearer $token"
+        });
+    print(apiResult.body);
+    var data = json.decode(apiResult.body);
+
+    if(apiResult.statusCode == 200){
+      print("success");
+      print(data);
+      Navigator.push(
+          context,
+          PageTransition(
+              type: PageTransitionType.fade,
+              child: PaymentResto()));
+      // SharedPreferences preferences = await SharedPreferences.getInstance();
+      // await preferences.remove('menuJson');
+      // await preferences.remove('restoId');
+      // await preferences.remove('qty');
+      // await preferences.remove('address');
+      // await preferences.remove('inCart');
+    } else {
+      print(data);
+      setState(() {
+        isLoading = false;
+      });
       print(json.encode({
         // 'name': name,
         // 'desc': desc,
@@ -371,7 +457,7 @@ class _AddDetailRestoState extends State<AddDetailResto> {
 
     // set up the button
     Widget okButton = TextButton(
-      child: Text("Oke"),
+      child: Text("Oke", style: TextStyle(color: CustomColor.primary),),
       onPressed: () {
         Navigator.pushReplacement(
             context,
@@ -383,6 +469,8 @@ class _AddDetailRestoState extends State<AddDetailResto> {
 
     // set up the AlertDialog
     AlertDialog alert = AlertDialog(
+      // backgroundColor: CustomColor.primary,
+
       title: Text("Metode Pembayaran"),
       content: Text("Silahkan hubungi 0838********* untuk lebih lanjut."),
       actions: [
@@ -882,17 +970,19 @@ class _AddDetailRestoState extends State<AddDetailResto> {
                     //   ],
                     // ),
                     SizedBox(height: CustomSize.sizeHeight(context) / 48,),
-                    GestureDetector(
+                    (isLoading != true)?GestureDetector(
                       onTap: () async{
                         setState(() {
                           isLoading = false;
                         });
-                        addResto();
-                        // Navigator.pushReplacement(
-                        //     context,
-                        //     PageTransition(
-                        //         type: PageTransitionType.leftToRight,
-                        //         child: HomeActivityResto()));
+                        if (delivery == true) {
+                          addResto();
+                        } else {
+                          addResto2();
+                        }
+                        // showAlertDialog();
+
+
                         // SharedPreferences pref = await SharedPreferences.getInstance();
                         // pref.setString("name", _loginTextName.text.toString());
                         // pref.setString("email", _loginEmailName.text.toString());
@@ -911,6 +1001,21 @@ class _AddDetailRestoState extends State<AddDetailResto> {
                               color: CustomColor.accent
                           ),
                           child: Center(child: CustomText.bodyRegular16(text: "Simpan", color: Colors.white,)),
+                        ),
+                      ),
+                    ):Center(
+                      child: Container(
+                        alignment: Alignment.center,
+                        width: CustomSize.sizeWidth(context) / 1.1,
+                        height: CustomSize.sizeHeight(context) / 14,
+                        decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(30),
+                            color: CustomColor.accent
+                        ),
+                        child: Center(
+                          child: CircularProgressIndicator(
+                            valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                          ),
                         ),
                       ),
                     ),

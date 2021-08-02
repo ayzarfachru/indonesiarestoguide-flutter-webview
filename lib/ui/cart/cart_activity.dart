@@ -149,11 +149,13 @@ class _CartActivityState extends State<CartActivity> {
           desc: v['desc'],
           distance: v['distance'],
           price: v['price'],
+          pricePlus: v['pricePlus'],
           discount: v['discount'],
           urlImg: v['urlImg']
       );
       _menuJson.add(j);
-      harga = (v['discount'] == null || v['discount'] == 'null' || v['discount'] == '')?(harga + int.parse(v['price']) * int.parse(qty[restoId.indexOf(v['id'].toString())])):(harga + int.parse(v['discount']) * int.parse(qty[restoId.indexOf(v['id'].toString())]));
+      print('hrg '+v.toString());
+      harga = (_transCode != 1 && _transCode != 2)?(v['discount'] == null || v['discount'] == 'null' || v['discount'] == '')?(harga + int.parse(v['price']) * int.parse(qty[restoId.indexOf(v['id'].toString())])):(harga + int.parse(v['discount']) * int.parse(qty[restoId.indexOf(v['id'].toString())])):(harga + int.parse(v['pricePlus']) * int.parse(qty[restoId.indexOf(v['id'].toString())]));
       totalHarga = harga.toString();
     }
     print(_menuId.toString().split('[')[1].split(']')[0].replaceAll(' ', ''));
@@ -184,6 +186,7 @@ class _CartActivityState extends State<CartActivity> {
       ongkir = data1['ongkir'].toString();
       restoAddress = data1['address'];
       menuJson = _menuJson;
+      // print(menuJson);
       _tempMenu = _menuJson;
       _restId = _menuId.toString().split('[')[1].split(']')[0].replaceAll(' ', '');
       _qty = qty.toString().split('[')[1].split(']')[0].replaceAll(' ', '');
@@ -220,6 +223,7 @@ class _CartActivityState extends State<CartActivity> {
       await preferences.remove('qty');
       await preferences.remove('address');
       await preferences.remove('inCart');
+      await pref.remove('restoIdUsr');
     }
   }
 
@@ -321,11 +325,14 @@ class _CartActivityState extends State<CartActivity> {
                                               if (can_delivery == 'true') {
                                                 _transCode = 1;
                                                 pref.setString("metodeBeli", '1');
+                                                Navigator.pop(context);
+                                                Navigator.pushReplacement(context, PageTransition(
+                                                    type: PageTransitionType.fade,
+                                                    child: CartActivity()));
                                               } else {
                                                 Fluttertoast.showToast(msg: "Pesan antar tidak tersedia.");
                                               }
                                             });
-                                            Navigator.pop(context);
                                           },
                                           child: Row(
                                             children: [
@@ -353,11 +360,14 @@ class _CartActivityState extends State<CartActivity> {
                                               if (can_takeaway == 'true') {
                                                 _transCode = 2;
                                                 pref.setString("metodeBeli", '2');
+                                                Navigator.pop(context);
+                                                Navigator.pushReplacement(context, PageTransition(
+                                                    type: PageTransitionType.fade,
+                                                    child: CartActivity()));
                                               } else {
                                                 Fluttertoast.showToast(msg: "Ambil langsung tidak tersedia.");
                                               }
                                             });
-                                            Navigator.pop(context);
                                           },
                                           child: Row(
                                             children: [
@@ -384,8 +394,11 @@ class _CartActivityState extends State<CartActivity> {
                                             setState(() {
                                               _transCode = 3;
                                               pref.setString("metodeBeli", '3');
+                                              Navigator.pop(context);
+                                              Navigator.pushReplacement(context, PageTransition(
+                                                  type: PageTransitionType.fade,
+                                                  child: CartActivity()));
                                             });
-                                            Navigator.pop(context);
                                           },
                                           child: Row(
                                             children: [
@@ -629,14 +642,14 @@ class _CartActivityState extends State<CartActivity> {
                                                       minSize: 14
                                                   ),
                                                   SizedBox(height: CustomSize.sizeHeight(context) / 48,),
-                                                  (menuJson[index].discount == null || menuJson[index].discount == 'null' || menuJson[index].discount == '')?CustomText.bodyMedium14(
+                                            (_transCode != 1 && _transCode != 2)?(menuJson[index].discount == null || menuJson[index].discount == 'null' || menuJson[index].discount == '')?CustomText.bodyMedium14(
                                                       text: NumberFormat.currency(locale: 'id', symbol: '', decimalDigits: 0).format(int.parse(menuJson[index].price)),
                                                       maxLines: 1,
                                                       minSize: 16
                                                   ):Row(
                                                     children: [
                                                       CustomText.bodyMedium14(
-                                                          text: NumberFormat.currency(locale: 'id', symbol: '', decimalDigits: 0).format(int.parse(menuJson[index].price)),
+                                                          text: NumberFormat.currency(locale: 'id', symbol: '', decimalDigits: 0).format(int.parse((_transCode != 1 && _transCode != 2)?menuJson[index].price:menuJson[index].pricePlus)),
                                                           maxLines: 1,
                                                           minSize: 16,
                                                           decoration: TextDecoration.lineThrough
@@ -648,7 +661,11 @@ class _CartActivityState extends State<CartActivity> {
                                                           minSize: 16
                                                       ),
                                                     ],
-                                                  ),
+                                                  ):CustomText.bodyMedium14(
+                                                text: NumberFormat.currency(locale: 'id', symbol: '', decimalDigits: 0).format(int.parse(menuJson[index].pricePlus)),
+                                                maxLines: 1,
+                                                minSize: 16
+                                            ),
                                                 ],
                                               ),
                                               (menuReady[index])?Container():CustomText.bodyMedium14(
@@ -694,8 +711,8 @@ class _CartActivityState extends State<CartActivity> {
                                                     qty[restoId.indexOf(menuJson[index].id.toString())] = i.toString();
                                                     SharedPreferences pref = await SharedPreferences.getInstance();
                                                     pref.setStringList("qty", qty);
-                                                    harga = (menuJson[restoId.indexOf(menuJson[index].id.toString())].discount.toString() == null || menuJson[restoId.indexOf(menuJson[index].id.toString())].discount.toString() == 'null' || menuJson[restoId.indexOf(menuJson[index].id.toString())].discount.toString() == '')?harga - int.parse(menuJson[restoId.indexOf(menuJson[index].id.toString())].price):harga - int.parse(menuJson[restoId.indexOf(menuJson[index].id.toString())].discount);
-                                                    int _total = (menuJson[restoId.indexOf(menuJson[index].id.toString())].discount.toString() == null || menuJson[restoId.indexOf(menuJson[index].id.toString())].discount.toString() == 'null' || menuJson[restoId.indexOf(menuJson[index].id.toString())].discount.toString() == '')?int.parse(totalHarga) - int.parse(menuJson[restoId.indexOf(menuJson[index].id.toString())].price):int.parse(totalHarga) - int.parse(menuJson[restoId.indexOf(menuJson[index].id.toString())].discount);
+                                                    harga = (_transCode != 1 && _transCode != 2)?(menuJson[restoId.indexOf(menuJson[index].id.toString())].discount.toString() == null || menuJson[restoId.indexOf(menuJson[index].id.toString())].discount.toString() == 'null' || menuJson[restoId.indexOf(menuJson[index].id.toString())].discount.toString() == '')?harga - int.parse(menuJson[restoId.indexOf(menuJson[index].id.toString())].price):harga - int.parse(menuJson[restoId.indexOf(menuJson[index].id.toString())].discount):harga - int.parse(menuJson[restoId.indexOf(menuJson[index].id.toString())].pricePlus);
+                                                    int _total = (_transCode != 1 && _transCode != 2)?(menuJson[restoId.indexOf(menuJson[index].id.toString())].discount.toString() == null || menuJson[restoId.indexOf(menuJson[index].id.toString())].discount.toString() == 'null' || menuJson[restoId.indexOf(menuJson[index].id.toString())].discount.toString() == '')?int.parse(totalHarga) - int.parse(menuJson[restoId.indexOf(menuJson[index].id.toString())].price):int.parse(totalHarga) - int.parse(menuJson[restoId.indexOf(menuJson[index].id.toString())].discount):int.parse(totalHarga) - int.parse(menuJson[restoId.indexOf(menuJson[index].id.toString())].pricePlus);
                                                     totalHarga = _total.toString();
 
                                                     if (harga == 0) {
@@ -774,8 +791,8 @@ class _CartActivityState extends State<CartActivity> {
                                                     qty[restoId.indexOf(menuJson[index].id.toString())] = i.toString();
                                                     SharedPreferences pref = await SharedPreferences.getInstance();
                                                     pref.setStringList("qty", qty);
-                                                    harga = harga + int.parse(menuJson[restoId.indexOf(menuJson[index].id.toString())].price);
-                                                    int _total = (menuJson[restoId.indexOf(menuJson[index].id.toString())].discount.toString() != null || menuJson[restoId.indexOf(menuJson[index].id.toString())].discount.toString() != 'null' || menuJson[restoId.indexOf(menuJson[index].id.toString())].discount.toString() != '')?(int.parse(totalHarga) + int.parse(menuJson[restoId.indexOf(menuJson[index].id.toString())].price)):(int.parse(totalHarga) + int.parse(menuJson[restoId.indexOf(menuJson[index].id.toString())].discount));
+                                                    harga = (_transCode != 1 && _transCode != 2)?(menuJson[restoId.indexOf(menuJson[index].id.toString())].discount.toString() != null || menuJson[restoId.indexOf(menuJson[index].id.toString())].discount.toString() != 'null' || menuJson[restoId.indexOf(menuJson[index].id.toString())].discount.toString() != '')?harga + int.parse(menuJson[restoId.indexOf(menuJson[index].id.toString())].price):(int.parse(totalHarga) + int.parse(menuJson[restoId.indexOf(menuJson[index].id.toString())].discount)):harga + int.parse(menuJson[restoId.indexOf(menuJson[index].id.toString())].pricePlus);
+                                                    int _total = (_transCode != 1 && _transCode != 2)?(menuJson[restoId.indexOf(menuJson[index].id.toString())].discount.toString() != null || menuJson[restoId.indexOf(menuJson[index].id.toString())].discount.toString() != 'null' || menuJson[restoId.indexOf(menuJson[index].id.toString())].discount.toString() != '')?(int.parse(totalHarga) + int.parse(menuJson[restoId.indexOf(menuJson[index].id.toString())].price)):(int.parse(totalHarga) + int.parse(menuJson[restoId.indexOf(menuJson[index].id.toString())].discount)):(int.parse(totalHarga) + int.parse(menuJson[restoId.indexOf(menuJson[index].id.toString())].pricePlus));
                                                     totalHarga = _total.toString();
                                                     print(harga);
                                                     setState(() {});

@@ -368,7 +368,7 @@ class _EditMenuState extends State<EditMenu> {
                       ),
                     ),
                     SizedBox(height: CustomSize.sizeHeight(context) / 48,),
-                    CustomText.bodyLight12(text: "Harga Delivery"),
+                    CustomText.bodyLight12(text: "Harga menu + Harga kemasan"),
                     SizedBox(
                       height: CustomSize.sizeHeight(context) * 0.005,
                     ),
@@ -380,6 +380,7 @@ class _EditMenuState extends State<EditMenu> {
                           textStyle:
                           TextStyle(fontSize: 18, color: Colors.black, fontWeight: FontWeight.w600)),
                       decoration: InputDecoration(
+                        hintText: '*Contoh harga menu: 18000 -> 20000',
                         isDense: true,
                         contentPadding: EdgeInsets.only(bottom: CustomSize.sizeHeight(context) / 86),
                         hintStyle: GoogleFonts.poppins(

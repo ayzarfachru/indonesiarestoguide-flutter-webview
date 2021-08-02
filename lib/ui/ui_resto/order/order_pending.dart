@@ -46,12 +46,12 @@ class _OrderPendingState extends State<OrderPending> {
 
     for(var v in data['trx']['pending']){
       Transaction r = Transaction.resto(
-          id: v['id'],
-          status: v['status'],
-          username: v['username'],
+          id: int.parse(v['id'].toString()),
+          status: v['status'].toString(),
+          username: v['username'].toString(),
           total: (v['total'] != null)?int.parse(v['total'].toString()):0,
-          type: v['type'],
-          img: v['user_image']
+          type: v['type'].toString(),
+          img: v['user_image'].toString()
       );
       _transaction.add(r);
     }
@@ -897,7 +897,7 @@ class _OrderPendingState extends State<OrderPending> {
                                     decoration: BoxDecoration(
                                       image: DecorationImage(
                                           image: NetworkImage(Links.subUrl + transaction[index].img),
-                                          fit: BoxFit.cover
+                                          fit: BoxFit.cover,
                                       ),
                                       borderRadius: BorderRadius.circular(20),
                                     ),

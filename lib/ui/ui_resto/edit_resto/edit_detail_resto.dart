@@ -400,6 +400,102 @@ class _EditDetailRestoState extends State<EditDetailResto> {
     }
   }
 
+  Future<String> editResto2(String idResto)async{
+    SharedPreferences pref = await SharedPreferences.getInstance();
+    var token = pref.getString("token") ?? "";
+    var name = pref.getString("nameResto") ?? "";
+    var desc = pref.getString("descResto") ?? "";
+    var latitude = pref.getString("latitudeResto") ?? "";
+    var longitude = pref.getString("longitudeResto") ?? "";
+    var address = pref.getString("addressResto") ?? "";
+    var phone = pref.getString("notelpResto") ?? "";
+    var img = pref.getString("imgResto") ?? "";
+
+    setState(() {
+      isLoading = true;
+    });
+
+    var apiResult = await http.post(Links.mainUrl + '/resto/$idResto',
+        body: {
+          'name': name,
+          'desc': desc,
+          'latitude': latitude,
+          'longitude': longitude,
+          'address': address,
+          'phone': phone,
+          're_price': (_HargaPerMeja.text.toString() != '')?_HargaPerMeja.text.toString():'',
+          'takeaway': (takeaway == true)?'1':'1',
+          'img': img,
+          'type': _Tipe.text.toString(),
+          'fasilitas': _Fasilitas.text.toString(),
+
+          // 'name': name,
+          // 'desc': desc,
+          // 'latitude': latitude,
+          // 'longitude': longitude,
+          // 'address': address,
+          // 'phone': phone,
+          // 'hours': buka + ',' + tutup,
+          // 'ongkir': (_Ongkir.text.toString() != null)?_Ongkir.text.toString():'',
+          // 're_price': (_HargaPerMeja.text.toString() != '')?_HargaPerMeja.text.toString():'',
+          // 'takeaway': (takeaway == true)?'1':'',
+          // 'img': img,
+          // 'type': _Tipe.text.toString(),
+          // 'fasilitas': _Fasilitas.text.toString(),
+          // 'table': (_JumlahMeja.text.toString() != '')?_JumlahMeja.text.toString():''
+        },
+        headers: {
+          "Accept": "Application/json",
+          "Authorization": "Bearer $token"
+        });
+    print(apiResult);
+    var data = json.decode(apiResult.body);
+
+    if(data['status_code'] == 200){
+      print("success");
+      print(data);
+      print(json.encode({
+        'name': name,
+        'desc': desc,
+        'latitude': latitude,
+        'longitude': longitude,
+        'address': address,
+        'phone': phone,
+        'ongkir': (_Ongkir.text.toString() != null)?_Ongkir.text.toString():'',
+        're_price': (_HargaPerMeja.text.toString() != '')?_HargaPerMeja.text.toString():'',
+        'takeaway': (takeaway == true)?'1':'',
+        'img': img,
+        'type': _Tipe.text.toString(),
+        'fasilitas': _Fasilitas.text.toString(),
+      }));
+      Navigator.pop(context);
+      Navigator.pop(context);
+      Navigator.pushReplacement(context, PageTransition(type: PageTransitionType.fade, child: HomeActivityResto()));
+      // SharedPreferences preferences = await SharedPreferences.getInstance();
+      // await preferences.remove('menuJson');
+      // await preferences.remove('restoId');
+      // await preferences.remove('qty');
+      // await preferences.remove('address');
+      // await preferences.remove('inCart');
+    } else {
+      print(data);
+      print(json.encode({
+        'name': name,
+        'desc': desc,
+        'latitude': latitude,
+        'longitude': longitude,
+        'address': address,
+        'phone': phone,
+        'ongkir': (_Ongkir.text.toString() != null)?_Ongkir.text.toString():'',
+        're_price': (_HargaPerMeja.text.toString() != '')?_HargaPerMeja.text.toString():'',
+        'takeaway': (takeaway == true)?'1':'',
+        'img': img,
+        'type': _Tipe.text.toString(),
+        'fasilitas': _Fasilitas.text.toString(),
+      }));
+    }
+  }
+
   List<String> dataCuisine;
   Future<void> getDataCuisine() async {
     SharedPreferences pref = await SharedPreferences.getInstance();
@@ -714,7 +810,11 @@ class _EditDetailRestoState extends State<EditDetailResto> {
           setState(() {
             isLoading = false;
           });
-          editResto(idResto);
+          if (delivery == true) {
+            editResto(idResto);
+          } else {
+            editResto2(idResto);
+          }
           // Navigator.pushReplacement(
           //     context,
           //     PageTransition(

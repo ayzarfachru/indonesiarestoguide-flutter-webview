@@ -5,11 +5,12 @@ class MenuJson{
   String restoId;
   String desc;
   String price;
+  String pricePlus;
   String discount;
   String urlImg;
   double distance;
 
-  MenuJson({this.id, this.name, this.restoName, this.restoId, this.desc, this.price, this.discount, this.urlImg, this.distance});
+  MenuJson({this.id, this.name, this.restoName, this.restoId, this.desc, this.price, this.pricePlus, this.discount, this.urlImg, this.distance});
 
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> data = new Map<String, dynamic>();
@@ -18,6 +19,7 @@ class MenuJson{
     data['restoName'] = this.restoName;
     data['desc'] = this.desc;
     data['price'] = this.price;
+    data['pricePlus'] = this.pricePlus;
     data['discount'] = this.discount;
     data['urlImg'] = this.urlImg;
     data['distance'] = this.distance;

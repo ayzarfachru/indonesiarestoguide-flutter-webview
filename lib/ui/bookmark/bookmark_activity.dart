@@ -225,7 +225,7 @@ class _BookmarkActivityState extends State<BookmarkActivity> {
                       padding: EdgeInsets.all(CustomSize.sizeWidth(context) / 48),
                       child: GestureDetector(
                         onTap: (){
-                          Navigator.push(
+                          Navigator.pushReplacement(
                               context,
                               PageTransition(
                                   type: PageTransitionType.rightToLeft,

@@ -197,7 +197,7 @@ class _DetailRestoState extends State<DetailResto> {
       "Authorization": "Bearer $token"
     });
     var data = json.decode(apiResult.body);
-    print('ini loh sob '+data['data']['recom'].toString());
+    print('ini loh sob '+data['data']['promo'].toString());
 
     for(var v in data['data']['img']){
       _images.add(v);
@@ -221,7 +221,7 @@ class _DetailRestoState extends State<DetailResto> {
               id: a['id'],
               name: a['name'],
               desc: a['desc'],
-              price: Price.menu(a['price'], a['delivery_price'], a['discounted']??null),
+              price: Price.menu(a['price'], a['delivery_price'], a['discounted']??null, a['delivery_price']??null, a['discounted_delivery']??null),
               urlImg: a['img']
           );
           _cateMenu.add(m);
@@ -242,7 +242,7 @@ class _DetailRestoState extends State<DetailResto> {
           restoId: v['restaurants_id'],
           name: v['name'],
           desc: v['desc'],
-          price: Price.menu(v['price'], v['delivery_price'], v['discounted']??null),
+          price: Price.menu(v['price'], v['delivery_price'], v['discounted']??null, v['delivery_price']??null, v['discounted_delivery']??null),
           urlImg: v['img']
       );
       _menu.add(m);
@@ -269,6 +269,7 @@ class _DetailRestoState extends State<DetailResto> {
             desc: v['menu_desc'],
             urlImg: v['menu_img'],
             price: Price(original: int.parse(v['menu_price'].toString()??0), discounted: int.parse(v['menu_discounted'].toString()??0), delivery: int.parse(v['menu_delivery_price'].toString()??0))
+            // price: Price(original: int.parse(v['menu_price'].toString()??0), discounted: int.parse(v['menu_discounted'].toString()??0), delivery: int.parse(v['menu_delivery_price'].toString()??0), takeaway: int.parse(v['delivery_price'].toString()??0), disctakeaway: int.parse(v['discounted_delivery'].toString()??0))
         ),
       );
       _promo.add(p);
@@ -351,6 +352,37 @@ class _DetailRestoState extends State<DetailResto> {
     setState(() {});
   }
 
+  bool isLoading = false;
+
+  Future<void> _bookmark()async{
+    // List<Resto> _schedule = [];
+    setState(() {
+      isLoading = true;
+    });
+    SharedPreferences pref = await SharedPreferences.getInstance();
+    String token = pref.getString("token") ?? "";
+    var apiResult = await http.post(Links.mainUrl + '/resto/fav',
+        body: {
+          'id': id,
+        },
+        headers: {
+          "Accept": "Application/json",
+          "Authorization": "Bearer $token"
+        });
+    // print(apiResult.body);
+    var data = json.decode(apiResult.body);
+
+    if(data['status_code'] == 200){
+      print("success");
+      print(data["status"]);
+    } else {
+      print(data);
+    }
+    setState(() {
+      // schedule = _schedule;
+      isLoading = false;
+    });
+  }
 
   @override
   void initState() {
@@ -410,8 +442,19 @@ class _DetailRestoState extends State<DetailResto> {
                                     minSize: 24
                                 ),
                               ),
-                              Icon(MaterialCommunityIcons.bookmark,
-                                color: (isFav)?CustomColor.primary:CustomColor.dividerDark, size: 40,)
+                              GestureDetector(
+                                onTap: (){
+                                  _bookmark();
+                                  _getDetail(id);
+                                  if (isFav == true) {
+                                    isFav = false;
+                                  } else {
+                                    isFav = true;
+                                  }
+                                },
+                                child: Icon(MaterialCommunityIcons.bookmark,
+                                  color: (isFav == true)?CustomColor.primary:CustomColor.dividerDark, size: 40,),
+                              )
                             ],
                           ),
                         ),
@@ -658,7 +701,7 @@ class _DetailRestoState extends State<DetailResto> {
                                                                   Row(
                                                                     children: [
                                                                       CustomText.bodyMedium14(
-                                                                          text: 'Normal:  ',
+                                                                          text: 'Dine in:  ',
                                                                           maxLines: 1,
                                                                           minSize: 14,
                                                                           color: Colors.grey
@@ -677,10 +720,32 @@ class _DetailRestoState extends State<DetailResto> {
                                                                       ),
                                                                     ],
                                                                   ),
+                                                                  // Row(
+                                                                  //   children: [
+                                                                  //     CustomText.bodyMedium14(
+                                                                  //         text: 'Takeaway:  ',
+                                                                  //         maxLines: 1,
+                                                                  //         minSize: 14,
+                                                                  //         color: Colors.grey
+                                                                  //     ),
+                                                                  //     CustomText.bodyMedium16(
+                                                                  //         text: NumberFormat.currency(locale: 'id', symbol: '', decimalDigits: 0).format(promo[index].menu.price.takeaway),
+                                                                  //         maxLines: 1,
+                                                                  //         minSize: 16,
+                                                                  //         decoration: TextDecoration.lineThrough
+                                                                  //     ),
+                                                                  //     SizedBox(width: CustomSize.sizeWidth(context) / 48,),
+                                                                  //     CustomText.bodyMedium16(
+                                                                  //         text: NumberFormat.currency(locale: 'id', symbol: '', decimalDigits: 0).format(promo[index].menu.price.disctakeaway),
+                                                                  //         maxLines: 1,
+                                                                  //         minSize: 16
+                                                                  //     ),
+                                                                  //   ],
+                                                                  // ),
                                                                   Row(
                                                                     children: [
                                                                       CustomText.bodyMedium14(
-                                                                          text: 'Delivery/Takeaway:  ',
+                                                                          text: 'Delivery:  ',
                                                                           maxLines: 1,
                                                                           minSize: 14,
                                                                           color: Colors.grey
@@ -2268,7 +2333,7 @@ class _DetailRestoState extends State<DetailResto> {
                                                               Row(
                                                                 children: [
                                                                   CustomText.bodyMedium14(
-                                                                      text: 'Normal:  ',
+                                                                      text: 'Dine in:  ',
                                                                       maxLines: 1,
                                                                       minSize: 14,
                                                                       color: Colors.grey
@@ -2298,7 +2363,37 @@ class _DetailRestoState extends State<DetailResto> {
                                                               Row(
                                                                 children: [
                                                                   CustomText.bodyMedium14(
-                                                                      text: 'Delivery/Takeaway:  ',
+                                                                      text: 'Takeaway:  ',
+                                                                      maxLines: 1,
+                                                                      minSize: 14,
+                                                                      color: Colors.grey
+                                                                  ),
+                                                                  (menu[index].price.discounted != null)?Row(
+                                                                    children: [
+                                                                      CustomText.bodyMedium16(
+                                                                          text: NumberFormat.currency(locale: 'id', symbol: '', decimalDigits: 0).format(menu[index].price.takeaway),
+                                                                          maxLines: 1,
+                                                                          minSize: 16,
+                                                                          decoration: TextDecoration.lineThrough
+                                                                      ),
+                                                                      SizedBox(width: CustomSize.sizeWidth(context) / 48,),
+                                                                      CustomText.bodyMedium16(
+                                                                          text: NumberFormat.currency(locale: 'id', symbol: '', decimalDigits: 0).format(menu[index].price.disctakeaway),
+                                                                          maxLines: 1,
+                                                                          minSize: 16
+                                                                      ),
+                                                                    ],
+                                                                  ):CustomText.bodyMedium16(
+                                                                    text: NumberFormat.currency(locale: 'id', symbol: '', decimalDigits: 0).format(menu[index].price.takeaway),
+                                                                    maxLines: 1,
+                                                                    minSize: 16,
+                                                                  ),
+                                                                ],
+                                                              ),
+                                                              Row(
+                                                                children: [
+                                                                  CustomText.bodyMedium14(
+                                                                      text: 'Delivery:  ',
                                                                       maxLines: 1,
                                                                       minSize: 14,
                                                                       color: Colors.grey
@@ -3747,7 +3842,7 @@ class _DetailRestoState extends State<DetailResto> {
                                                           Row(
                                                             children: [
                                                               CustomText.bodyMedium14(
-                                                                  text: 'Normal:  ',
+                                                                  text: 'Dine in:  ',
                                                                   maxLines: 1,
                                                                   minSize: 14,
                                                                   color: Colors.grey
@@ -5105,7 +5200,7 @@ class _DetailRestoState extends State<DetailResto> {
                                                       }
                                                     }
                                                     SharedPreferences pref = await SharedPreferences.getInstance();
-                                                    print('Ini menujson'+pref.getString("menuJson"));
+                                                    // print('Ini menujson'+pref.getString("menuJson"));
 
                                                     // print('ini in cart 3 '+pref.getString('menuJson'));
                                                     setState(() {});
@@ -5338,7 +5433,7 @@ class _DetailRestoState extends State<DetailResto> {
                                                                 Row(
                                                                   children: [
                                                                     CustomText.bodyMedium14(
-                                                                        text: 'Normal:  ',
+                                                                        text: 'Dine in:  ',
                                                                         maxLines: 1,
                                                                         minSize: 14,
                                                                         color: Colors.grey
@@ -6791,7 +6886,7 @@ class _DetailRestoState extends State<DetailResto> {
                                                           Row(
                                                             children: [
                                                               CustomText.bodyMedium14(
-                                                                  text: 'Normal:  ',
+                                                                  text: 'Dine in:  ',
                                                                   maxLines: 1,
                                                                   minSize: 14,
                                                                   color: Colors.grey
@@ -8231,7 +8326,7 @@ class _DetailRestoState extends State<DetailResto> {
           ),
         ),
       ),
-      floatingActionButton: (reservationFee != '0')?(inCart == '1')?GestureDetector(
+      floatingActionButton: (inCart == '1')?GestureDetector(
         onTap: (){
           // Navigator.push(
           //     context,
@@ -8251,7 +8346,7 @@ class _DetailRestoState extends State<DetailResto> {
           ),
           child: Center(child: Icon(CupertinoIcons.cart_fill, color: Colors.white,)),
         ),
-      ):GestureDetector(
+      ):(reservationFee != '0')?GestureDetector(
         onTap: (){
           Navigator.push(
               context,

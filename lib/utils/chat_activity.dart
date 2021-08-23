@@ -199,12 +199,12 @@ class _ChatActivityState extends State<ChatActivity> {
 
                   List<Widget> messages = docs
                       .map((doc) => Message(
-                    type: doc.data['type'],
-                    from: doc.data['from'],
-                    text: doc.data['text'],
-                    img: doc.data['img'],
-                    me: userName == doc.data['from'],
-                    date: doc.data['date'],
+                    type: doc.get('type'),
+                    from: doc.get('from'),
+                    text: doc.get('text'),
+                    img: doc.get('img'),
+                    me: userName == doc.get('from'),
+                    date: doc.get('date'),
                   ))
                       .toList();
                   return Padding(

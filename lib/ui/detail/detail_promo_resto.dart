@@ -120,7 +120,7 @@ class _DetailPromoResto extends State<DetailPromoResto> {
               id: a['id'],
               name: a['name'],
               desc: a['desc'],
-              price: Price.menu(a['price'], a['delivery_price'], a['discounted']??null),
+              price: Price.menu(a['price'], a['delivery_price'], a['discounted']??null, a['delivery_price']??null, a['discounted_delivery']??null),
               urlImg: a['img']
           );
           _cateMenu.add(m);
@@ -141,7 +141,7 @@ class _DetailPromoResto extends State<DetailPromoResto> {
           restoId: v['restaurants_id'],
           name: v['name'],
           desc: v['desc'],
-          price: Price.menu(v['price'], v['delivery_price'], v['discounted']??null),
+          price: Price.menu(v['price'], v['delivery_price'], v['discounted']??null, v['delivery_price']??null, v['discounted_delivery']??null),
           urlImg: v['img']
       );
       _menu.add(m);
@@ -538,7 +538,7 @@ class _DetailPromoResto extends State<DetailPromoResto> {
                                                                 Row(
                                                                   children: [
                                                                     CustomText.bodyMedium14(
-                                                                        text: 'Normal: ',
+                                                                        text: 'Dine in: ',
                                                                         maxLines: 1,
                                                                         minSize: 14,
                                                                         color: Colors.grey

@@ -405,6 +405,44 @@ class _EditScheduleState extends State<EditSchedule> {
     });
   }
 
+  Future<void> _openSchedule()async{
+    List<Schedule> _schedule = [];
+    setState(() {
+      isLoading = true;
+    });
+    SharedPreferences pref = await SharedPreferences.getInstance();
+    String token = pref.getString("token") ?? "";
+    var apiResult = await http.post(Links.mainUrl + '/resto/day',
+        body: {
+          'day': dayId,
+          'hours': '08:30-21:30',
+        },
+        headers: {
+          "Accept": "Application/json",
+          "Authorization": "Bearer $token"
+        });
+    // print(apiResult.body);
+    var data = json.decode(apiResult.body);
+
+    if(data['status_code'] == 200){
+      print("success");
+      print(json.encode({
+        'day': dayId,
+        'hours': '08:00-20:00',
+      }));
+    } else {
+      print(data);
+      print(json.encode({
+        'day': dayId,
+        'hours': '08:00-20:00',
+      }));
+    }
+    setState(() {
+      schedule = _schedule;
+      isLoading = false;
+    });
+  }
+
   @override
   void initState() {
     getHomePg();
@@ -666,7 +704,7 @@ class _EditScheduleState extends State<EditSchedule> {
       floatingActionButton: Column(
         mainAxisAlignment: MainAxisAlignment.end,
         children: [
-          GestureDetector(
+          (detailSchedule.closed_at.split(':')[0]+':'+detailSchedule.closed_at.split(':')[1] != '00:00' && detailSchedule.open_at.split(':')[0]+':'+detailSchedule.open_at.split(':')[1] != '00:00')?GestureDetector(
             onTap: () async{
               setState(() {
                 isLoading = false;
@@ -694,6 +732,35 @@ class _EditScheduleState extends State<EditSchedule> {
                   color: CustomColor.redBtn
               ),
               child: Center(child: CustomText.bodyRegular16(text: "Restoran tutup setiap hari "+detailSchedule.day, color: Colors.white,)),
+            ),
+          ):GestureDetector(
+            onTap: () async{
+              setState(() {
+                isLoading = false;
+              });
+              _openSchedule();
+              Navigator.pop(context);
+              Navigator.pushReplacement(
+                  context,
+                  PageTransition(
+                      type: PageTransitionType.fade,
+                      child: ScheduleActivity()));
+              // SharedPreferences pref = await SharedPreferences.getInstance();
+              // pref.setString("name", _loginTextName.text.toString());
+              // pref.setString("email", _loginEmailName.text.toString());
+              // pref.setString("img", (image == null)?img:base64Encode(image.readAsBytesSync()).toString());
+              // pref.setString("gender", gender);
+              // pref.setString("tgl", tgl);
+              // pref.setString("notelp", _loginNotelpName.text.toString());
+            },
+            child: Container(
+              width: CustomSize.sizeWidth(context) / 1.1,
+              height: CustomSize.sizeHeight(context) / 14,
+              decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(30),
+                  color: Colors.blue[400]
+              ),
+              child: Center(child: CustomText.bodyRegular16(text: "Buka restoran setiap hari "+detailSchedule.day, color: Colors.white,)),
             ),
           ),
           SizedBox(height: CustomSize.sizeHeight(context) / 86,),

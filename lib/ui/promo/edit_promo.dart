@@ -10,14 +10,14 @@ import 'package:flutter_datetime_picker/flutter_datetime_picker.dart';
 import 'package:flutter_icons/flutter_icons.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:indonesiarestoguide/model/Promo.dart';
-import 'package:indonesiarestoguide/ui/promo/promo_activity.dart';
-import 'package:indonesiarestoguide/ui/ui_resto/add_resto/add_detail_resto.dart';
-import 'package:indonesiarestoguide/ui/ui_resto/add_resto/add_view_resto.dart';
-import 'package:indonesiarestoguide/ui/ui_resto/home/home_activity.dart';
-import 'package:indonesiarestoguide/ui/ui_resto/menu/menu_activity.dart';
-import 'package:indonesiarestoguide/utils/utils.dart';
-import 'package:indonesiarestoguide/ui/home/home_activity.dart';
+import 'package:kam5ia/model/Promo.dart';
+import 'package:kam5ia/ui/promo/promo_activity.dart';
+import 'package:kam5ia/ui/ui_resto/add_resto/add_detail_resto.dart';
+import 'package:kam5ia/ui/ui_resto/add_resto/add_view_resto.dart';
+import 'package:kam5ia/ui/ui_resto/home/home_activity.dart';
+import 'package:kam5ia/ui/ui_resto/menu/menu_activity.dart';
+import 'package:kam5ia/utils/utils.dart';
+import 'package:kam5ia/ui/home/home_activity.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:page_transition/page_transition.dart';
@@ -76,8 +76,8 @@ class _EditPromoState extends State<EditPromo> {
     'ongkir',
   ];
 
-  List<String> selectedMenuList = List();
-  String tipe;
+  List<String> selectedMenuList = [];
+  String? tipe;
 
   _showCuisineDialog() {
     showDialog(
@@ -94,7 +94,7 @@ class _EditPromoState extends State<EditPromo> {
                   tipe = selectedMenuList.join(",");
                   print(tipe);
                   if (tipe != "") {
-                    selectedList = tipe.split(",");
+                    selectedList = tipe!.split(",");
                   } else {}
                 });
               },
@@ -144,7 +144,7 @@ class _EditPromoState extends State<EditPromo> {
     });
   }
 
-  TimeOfDay jam = TimeOfDay();
+  TimeOfDay jam = TimeOfDay.now();
 
   void onTimeOpenChanged(TimeOfDay newTime) {
     setState(() {
@@ -157,8 +157,8 @@ class _EditPromoState extends State<EditPromo> {
   }
 
   //------------------------------= IMAGE PICKER =----------------------------------
-  File image;
-  String extension;
+  File? image;
+  String? extension;
   final picker = ImagePicker();
 
   Future getImage() async {
@@ -175,7 +175,7 @@ class _EditPromoState extends State<EditPromo> {
   DateTime selectedDate = DateTime.now().add(const Duration(days: 7));
 
   Future<Null> _selectDate(BuildContext context) async {
-    final DateTime picked = await showDatePicker(
+    final DateTime? picked = await showDatePicker(
       context: context,
       initialDate: selectedDate,
       initialDatePickerMode: DatePickerMode.day,
@@ -184,14 +184,14 @@ class _EditPromoState extends State<EditPromo> {
       confirmText: "Simpan",
       firstDate: DateTime(2021),
       lastDate: DateTime(2101),
-      builder: (BuildContext context, Widget child) {
+      builder: (BuildContext context, Widget? child) {
         return Theme(
           data: ThemeData.dark().copyWith(
               backgroundColor: Colors.black,
               primaryColor: CustomColor.secondary, //Head background
               accentColor: CustomColor.secondary //s //Background color
           ),
-          child: child,
+          child: child!,
         );
       },
     );
@@ -223,11 +223,11 @@ class _EditPromoState extends State<EditPromo> {
   }
 
   getDatePromo() async {
-    _dateController = TextEditingController(text: promoResto.expired_at.split(' ')[0]);
+    _dateController = TextEditingController(text: promoResto.expired_at!.split(' ')[0]);
   }
 
   getJamPromo() async {
-    _Jam = TextEditingController(text: promoResto.expired_at.split(' ')[1].split(':')[0]+':'+promoResto.expired_at.split(' ')[1].split(':')[1]);
+    _Jam = TextEditingController(text: promoResto.expired_at!.split(' ')[1].split(':')[0]+':'+promoResto.expired_at!.split(' ')[1].split(':')[1]);
   }
 
   Future<void> EditPromo(String id)async{
@@ -276,7 +276,7 @@ class _EditPromoState extends State<EditPromo> {
     });
   }
 
-  String id;
+  String? id;
 
   @override
   void initState() {
@@ -461,6 +461,7 @@ class _EditPromoState extends State<EditPromo> {
                               });
                               Navigator.of(context).push(
                                   showPicker(
+                                    is24HrFormat: true,
                                     blurredBackground: true,
                                     accentColor: Colors.blue[400],
                                     context: context,
@@ -536,7 +537,7 @@ class _EditPromoState extends State<EditPromo> {
           // print(deskMenu);
           // print(base64Encode(image.readAsBytesSync()).toString());
           // print(favorite);
-          EditPromo(id);
+          EditPromo(id!);
           Navigator.pop(context);
           Navigator.pushReplacement(context, PageTransition(type: PageTransitionType.fade, child: new PromoActivity()));
         },

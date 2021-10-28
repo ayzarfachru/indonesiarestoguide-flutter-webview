@@ -1,12 +1,15 @@
 import 'dart:convert';
 
+import 'package:day_night_time_picker/lib/constants.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_datetime_picker/flutter_datetime_picker.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:indonesiarestoguide/ui/home/home_activity.dart';
-import 'package:indonesiarestoguide/utils/utils.dart';
+import 'package:kam5ia/ui/cart/final_trans.dart';
+import 'package:kam5ia/ui/home/home_activity.dart';
+import 'package:kam5ia/ui/profile/profile_activity.dart';
+import 'package:kam5ia/utils/utils.dart';
 import 'package:intl/intl.dart';
 import 'package:day_night_time_picker/day_night_time_picker.dart';
 import 'package:page_transition/page_transition.dart';
@@ -50,7 +53,7 @@ class _ReservationActivityState extends State<ReservationActivity> {
           body: {
             'people': _textPerson.text,
             'resto': id,
-            'time': (tgl != '')?tgl:now.toString().split(' ')[0] + " " + t,
+            'time': (tgl != '')?tgl + " " + time.toString().replaceAll(' AM', '').replaceAll(' PM', ''):DateFormat('kk:mm').format(now).toString()+' '+time.toString(),
             'price': total
           },
           headers: {
@@ -61,13 +64,13 @@ class _ReservationActivityState extends State<ReservationActivity> {
       var data = json.decode(apiResult.body);
 
       if(data['status_code'].toString() == "200"){
-        Fluttertoast.showToast(
-          msg: 'Berhasil',);
-        Navigator.pushReplacement(
-            context,
-            PageTransition(
-                type: PageTransitionType.rightToLeft,
-                child: HomeActivity()));
+        // Fluttertoast.showToast(
+        //   msg: 'Berhasil',);
+        // Navigator.pushReplacement(
+        //     context,
+        //     PageTransition(
+        //         type: PageTransitionType.rightToLeft,
+        //         child: HomeActivity()));
       }
     }else{
       Fluttertoast.showToast(
@@ -75,8 +78,50 @@ class _ReservationActivityState extends State<ReservationActivity> {
     }
   }
 
+  //------------------------------= DATE PICKER =----------------------------------
+  DateTime selectedDate = DateTime.now().add(const Duration(days: 7));
+
+  Future<Null> _selectDate(BuildContext context) async {
+    final DateTime? picked = await showDatePicker(
+      context: context,
+      initialDate: selectedDate,
+      initialDatePickerMode: DatePickerMode.day,
+      helpText: "Pilih Tanggal",
+      cancelText: "Batal",
+      confirmText: "Simpan",
+      firstDate: DateTime(2021),
+      lastDate: DateTime(2101),
+      builder: (BuildContext context, Widget? child) {
+        return Theme(
+          data: ThemeData.dark().copyWith(
+              backgroundColor: Colors.black,
+              primaryColor: CustomColor.secondary, //Head background
+              accentColor: CustomColor.secondary //s //Background color
+          ),
+          child: child!,
+        );
+      },
+    );
+    if (picked != null)
+      setState(() {
+        selectedDate = picked;
+        print(selectedDate);
+        tgl = DateFormat('d-MM-y').format(selectedDate);
+      });
+  }
+
+  String notelp = "";
+  getPref() async {
+    SharedPreferences pref = await SharedPreferences.getInstance();
+    setState(() {
+      notelp = (pref.getString('notelp') == '')?'null':pref.getString('notelp');
+      print(notelp+' telp');
+    });
+  }
+
   @override
   void initState() {
+    getPref();
     _textPerson.addListener(() {
       print(_textPerson.text);
     });
@@ -128,7 +173,7 @@ class _ReservationActivityState extends State<ReservationActivity> {
                         int i = int.parse(v);
                         int t = int.parse(reservationFee) * i;
                         setState(() {
-                          _textPerson = TextEditingController(text: (_textPerson.text != '')?v:"0");
+                          // _textPerson = TextEditingController(text: (_textPerson.text != '')?v:"0");
                           total = t.toString();
                         });
                       },
@@ -156,21 +201,22 @@ class _ReservationActivityState extends State<ReservationActivity> {
                     ),
                     GestureDetector(
                       onTap: (){
-                        DatePicker.showDatePicker(context, showTitleActions: true,
-                            onConfirm: (date) {
-                              setState(() {
-                                tgl = DateFormat('dd-MM-yyyy').format(date);
-                              });
-                              print(DateFormat('dd-MM-yyyy').format(date));
-                            },
-                            currentTime: DateTime(DateTime.now().year, DateTime.now().month,
-                                DateTime.now().day),
-                            locale: LocaleType.id,
-                            maxTime: DateTime(DateTime.now().year, 12, 31)
-                        );
+                        // DatePicker.showDatePicker(context, showTitleActions: true,
+                        //     onConfirm: (date) {
+                        //       setState(() {
+                        //         tgl = DateFormat('dd-MM-yyyy').format(date);
+                        //       });
+                        //       print(DateFormat('dd-MM-yyyy').format(date));
+                        //     },
+                        //     currentTime: DateTime(DateTime.now().year, DateTime.now().month,
+                        //         DateTime.now().day),
+                        //     locale: LocaleType.id,
+                        //     maxTime: DateTime(DateTime.now().year, 12, 31)
+                        // );
+                        _selectDate(context);
                       },
                       child: CustomText.textHeading4(
-                          text: (tgl != '')?tgl:DateFormat('dd-MM-yyyy').format(now),
+                          text: (tgl != '')?tgl:'belum diisi.',
                           minSize: 18,
                           maxLines: 1
                       ),
@@ -191,11 +237,18 @@ class _ReservationActivityState extends State<ReservationActivity> {
                         });
                         Navigator.of(context).push(
                           showPicker(
+                            is24HrFormat: true,
                             context: context,
                             value: _time,
+                            minMinute: 0,
+                            maxMinute: 59,
+                            cancelText: 'batal',
+                            okText: 'simpan',
+                            minuteInterval: MinuteInterval.ONE,
                             onChange: (t){
                               setState(() {
-                                time = t.format(context);
+                                time = t.hour.toString()+':'+t.minute.toString();
+                                print(time);
                               });
                             },
                             disableHour: false,
@@ -204,7 +257,7 @@ class _ReservationActivityState extends State<ReservationActivity> {
                         );
                       },
                       child: CustomText.textHeading4(
-                          text: (time != '')?time:DateFormat('kk:mm').format(now),
+                          text: (time != '')?time:'belum diisi.',
                           minSize: 18,
                           maxLines: 1
                       ),
@@ -273,7 +326,89 @@ class _ReservationActivityState extends State<ReservationActivity> {
                     SizedBox(height: CustomSize.sizeHeight(context) / 40,),
                     GestureDetector(
                       onTap: (){
-                        makeReservation();
+                        if (_textPerson.text != '' || _textPerson.text != '0') {
+                          if (tgl != '') {
+                            if (time != '') {
+                              if (notelp.toString() == "null" || notelp.toString() == '') {
+                                Fluttertoast.showToast(
+                                  msg: "Isi nomor telepon anda terlebih dahulu!",);
+                                Navigator.push(context, PageTransition(type: PageTransitionType.fade, child: new ProfileActivity()));
+                              } else {
+                                showDialog(
+                                    context: context,
+                                    builder: (context) {
+                                      return AlertDialog(
+                                        contentPadding: EdgeInsets.only(left: 25, right: 25, top: 15, bottom: 5),
+                                        shape: RoundedRectangleBorder(
+                                            borderRadius: BorderRadius.all(Radius.circular(10))
+                                        ),
+                                        title: Center(child: Text('Peringatan!', style: TextStyle(color: CustomColor.redBtn))),
+                                        content: Text('Semua proses pembayaran dan transaksi di luar tanggung jawab IRG!', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500), textAlign: TextAlign.center),
+                                        actions: <Widget>[
+                                          Center(
+                                            child: Row(
+                                              mainAxisAlignment: MainAxisAlignment.spaceAround,
+                                              children: [
+                                                FlatButton(
+                                                  // minWidth: CustomSize.sizeWidth(context),
+                                                  color: CustomColor.redBtn,
+                                                  textColor: Colors.white,
+                                                  shape: RoundedRectangleBorder(
+                                                      borderRadius: BorderRadius.all(Radius.circular(10))
+                                                  ),
+                                                  child: Text('Batal'),
+                                                  onPressed: () async{
+                                                    setState(() {
+                                                      // codeDialog = valueText;
+                                                      Navigator.pop(context);
+                                                    });
+                                                  },
+                                                ),
+                                                FlatButton(
+                                                  color: CustomColor.accent,
+                                                  textColor: Colors.white,
+                                                  shape: RoundedRectangleBorder(
+                                                      borderRadius: BorderRadius.all(Radius.circular(10))
+                                                  ),
+                                                  child: Text('Setuju'),
+                                                  onPressed: () async{
+                                                    Navigator.pop(context);
+                                                    makeReservation();
+                                                    SharedPreferences pref = await SharedPreferences.getInstance();
+                                                    pref.setString("jmlhMeja", _textPerson.text.toString());
+                                                    pref.setString("tglReser", tgl);
+                                                    pref.setString("jamReser", (time != '')?time.replaceAll(' AM', '').replaceAll(' PM', '').toString():DateFormat('kk:mm').format(now));
+                                                    pref.setString("hargaReser", reservationFee);
+                                                    pref.setString("totalReser", total);
+                                                    Navigator.push(
+                                                        context,
+                                                        PageTransition(
+                                                            type: PageTransitionType.fade,
+                                                            child: FinalTrans()));
+                                                  },
+                                                ),
+                                              ],
+                                            ),
+                                          ),
+
+                                        ],
+                                      );
+                                    });
+                              }
+                            } else {
+                              Fluttertoast.showToast(
+                                msg: 'Wah, datamu kurang lengkap nih!',);
+                            }
+                            // print('ini loh telp '+notelp);
+                          } else {
+                            Fluttertoast.showToast(
+                              msg: 'Wah, datamu kurang lengkap nih!',);
+                          }
+                        } else {
+                          Fluttertoast.showToast(
+                            msg: 'Wah, datamu kurang lengkap nih!',);
+                        }
+
                       },
                       child: Center(
                         child: Container(

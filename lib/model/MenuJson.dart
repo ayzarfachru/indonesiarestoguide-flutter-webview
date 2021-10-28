@@ -6,11 +6,11 @@ class MenuJson{
   String desc;
   String price;
   String pricePlus;
-  String discount;
+  String? discount;
   String urlImg;
-  double distance;
+  double? distance;
 
-  MenuJson({this.id, this.name, this.restoName, this.restoId, this.desc, this.price, this.pricePlus, this.discount, this.urlImg, this.distance});
+  MenuJson({required this.id, required this.name, required this.restoName, required this.restoId, required this.desc, required this.price, required this.pricePlus, required this.discount, required this.urlImg, required this.distance});
 
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> data = new Map<String, dynamic>();

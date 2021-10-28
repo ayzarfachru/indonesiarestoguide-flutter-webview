@@ -6,5 +6,5 @@ class History{
   int price;
   String img;
 
-  History({this.id, this.name, this.time, this.type, this.price, this.img});
+  History({required this.id, required this.name, required this.time, required this.type, required this.price, required this.img});
 }

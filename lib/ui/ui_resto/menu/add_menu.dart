@@ -3,18 +3,19 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_datetime_picker/flutter_datetime_picker.dart';
 import 'package:flutter_icons/flutter_icons.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:indonesiarestoguide/model/Menu.dart';
-import 'package:indonesiarestoguide/model/Price.dart';
-import 'package:indonesiarestoguide/ui/ui_resto/add_resto/add_detail_resto.dart';
-import 'package:indonesiarestoguide/ui/ui_resto/add_resto/add_view_resto.dart';
-import 'package:indonesiarestoguide/ui/ui_resto/home/home_activity.dart';
-import 'package:indonesiarestoguide/ui/ui_resto/menu/menu_activity.dart';
-import 'package:indonesiarestoguide/utils/utils.dart';
-import 'package:indonesiarestoguide/ui/home/home_activity.dart';
+import 'package:kam5ia/model/Menu.dart';
+import 'package:kam5ia/model/Price.dart';
+import 'package:kam5ia/ui/ui_resto/add_resto/add_detail_resto.dart';
+import 'package:kam5ia/ui/ui_resto/add_resto/add_view_resto.dart';
+import 'package:kam5ia/ui/ui_resto/home/home_activity.dart';
+import 'package:kam5ia/ui/ui_resto/menu/menu_activity.dart';
+import 'package:kam5ia/utils/utils.dart';
+import 'package:kam5ia/ui/home/home_activity.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:page_transition/page_transition.dart';
@@ -31,7 +32,7 @@ class MenuChip extends StatefulWidget {
   final Function(List<String>) onSelectionChanged;
   String tipeMenu;
 
-  MenuChip(this.typeList, {this.onSelectionChanged,this.tipeMenu});
+  MenuChip(this.typeList, {required this.onSelectionChanged,required this.tipeMenu});
 
   @override
   MenuChipState createState() => MenuChipState(tipeMenu);
@@ -39,12 +40,12 @@ class MenuChip extends StatefulWidget {
 
 class MenuChipState extends State<MenuChip> {
   // String selectedChoice = "";
-  List<String> selectedChoices = List();
+  List<String> selectedChoices = [];
   String tipeMenu;
   MenuChipState(this.tipeMenu);
 
   _buildChoiceList() {
-    List<Widget> choices = List();
+    List<Widget> choices = [];
 
     widget.typeList.forEach((item) {
       choices.add(Container(
@@ -108,9 +109,16 @@ class _AddMenuState extends State<AddMenu> {
   bool delivery = false;
 
   List<String> typeList = [];
+  List<String> typeList2 = [
+    'makanan pembuka',
+    'makanan utama',
+    'makanan penutup',
+    'minuman dingin',
+    'minuman panas'
+  ];
 
-  List<String> selectedMenuList = List();
-  String tipe;
+  List<String> selectedMenuList = [];
+  String? tipe;
 
 
   _showCuisineDialog() {
@@ -127,7 +135,7 @@ class _AddMenuState extends State<AddMenu> {
                   selectedMenuList = selectedList;
                   tipe = selectedMenuList.single;
                 });
-              },
+              }, tipeMenu: '',
             ),
             actions: <Widget>[
               FlatButton(
@@ -161,8 +169,8 @@ class _AddMenuState extends State<AddMenu> {
   }
 
   //------------------------------= IMAGE PICKER =----------------------------------
-  File image;
-  String extension;
+  File? image;
+  String? extension;
   final picker = ImagePicker();
 
   Future getImage() async {
@@ -189,43 +197,45 @@ class _AddMenuState extends State<AddMenu> {
           'name': namaMenu.text,
           'desc': deskMenu.text,
           'price': hargaMenu.text,
-          'delivery_price': hargaDeliv.text,
+          'delivery_price': '0',
           'is_recommended': (favorite == true)?'true':'false',
           'type': tipeMenu.text,
-          'img': 'data:image/$extension;base64,'+base64Encode(image.readAsBytesSync()).toString(),
+          'img': 'data:image/$extension;base64,'+base64Encode(image!.readAsBytesSync()).toString(),
         },
         headers: {
-        "Accept": "Application/json",
-        "Authorization": "Bearer $token"
-      });
-    // print(apiResult.body);
+          "Accept": "Application/json",
+          "Authorization": "Bearer $token"
+        });
+    print(apiResult.body);
     var data = json.decode(apiResult.body);
 
     if(data['status_code'] == 200){
       print("success");
       print(json.encode({
-        'name': namaMenu.text,
-        'desc': deskMenu.text,
-        'price': hargaMenu.text,
-        'delivery_price': hargaDeliv.text,
-        'is_recommended': favorite.toString(),
-        'type': tipeMenu.text,
-        'img': (image != null)?'data:image/$extension;base64,'+base64Encode(image.readAsBytesSync()).toString():'',
+        // 'name': namaMenu.text,
+        // 'desc': deskMenu.text,
+        // 'price': hargaMenu.text,
+        // // 'delivery_price': hargaDeliv.text,
+        // 'is_recommended': favorite.toString(),
+        // 'type': tipeMenu.text,
+        // 'img': (image != null)?'data:image/$extension;base64,'+base64Encode(image!.readAsBytesSync()).toString():'',
       }));
-      Navigator.pushReplacement(context, PageTransition(type: PageTransitionType.fade, child: HomeActivityResto()));
+      Navigator.pop(context);
+      Navigator.pushReplacement(context, PageTransition(type: PageTransitionType.fade, child: MenuActivity()));
     } else {
       setState(() {
         isLoading = false;
       });
       // print(data);
       print(json.encode({
-        'name': namaMenu.text,
-        'desc': deskMenu.text,
-        'price': hargaMenu.text,
-        'delivery_price': hargaDeliv.text,
-        'is_recommended': (favorite == true)?'1':'0',
-        'type': tipeMenu.text,
-        'img': 'data:image/$extension;base64,'+base64Encode(image.readAsBytesSync()).toString(),
+        // 'name': namaMenu.text,
+        // 'desc': deskMenu.text,
+        // 'price': hargaMenu.text,
+        // // 'delivery_price': hargaDeliv.text,
+        // 'is_recommended': (favorite == true)?'1':'0',
+        // 'type': tipeMenu.text,
+        // 'img': 'data:image/$extension;base64,'+base64Encode(image!.readAsBytesSync()),
+
       }));
     }
     setState(() {
@@ -234,7 +244,7 @@ class _AddMenuState extends State<AddMenu> {
     });
   }
 
-  List<String> dataCuisine;
+  List<String> dataCuisine = [];
   Future<void> getType() async {
     SharedPreferences pref = await SharedPreferences.getInstance();
     var token = pref.getString("token") ?? "";
@@ -270,8 +280,9 @@ class _AddMenuState extends State<AddMenu> {
   void initState() {
     super.initState();
     getInitial();
-    AddMenu();
+    // AddMenu();
     getType();
+    // print('IMAGE ' +image.toString()+'P');
     // Future.delayed(Duration.zero, () async {
     //
     // });
@@ -304,7 +315,7 @@ class _AddMenuState extends State<AddMenu> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     SizedBox(height: CustomSize.sizeHeight(context) / 48,),
-                    CustomText.bodyLight12(text: "Nama Menu"),
+                    CustomText.bodyLight12(text: "Nama"),
                     SizedBox(
                       height: CustomSize.sizeHeight(context) * 0.005,
                     ),
@@ -334,6 +345,7 @@ class _AddMenuState extends State<AddMenu> {
                       height: CustomSize.sizeHeight(context) * 0.005,
                     ),
                     TextField(
+                      inputFormatters: [FilteringTextInputFormatter.digitsOnly],
                       controller: hargaMenu,
                       keyboardType: TextInputType.number,
                       cursorColor: Colors.black,
@@ -354,31 +366,31 @@ class _AddMenuState extends State<AddMenu> {
                       ),
                     ),
                     SizedBox(height: CustomSize.sizeHeight(context) / 48,),
-                    CustomText.bodyLight12(text: "Harga menu + Harga kemasan"),
-                    SizedBox(
-                      height: CustomSize.sizeHeight(context) * 0.005,
-                    ),
-                    TextField(
-                      controller: hargaDeliv,
-                      keyboardType: TextInputType.number,
-                      cursorColor: Colors.black,
-                      style: GoogleFonts.poppins(
-                          textStyle:
-                          TextStyle(fontSize: 18, color: Colors.black, fontWeight: FontWeight.w600)),
-                      decoration: InputDecoration(
-                        hintText: '*Contoh harga menu: 18000 -> 20000',
-                        isDense: true,
-                        contentPadding: EdgeInsets.only(bottom: CustomSize.sizeHeight(context) / 86),
-                        hintStyle: GoogleFonts.poppins(
-                            textStyle:
-                            TextStyle(fontSize: 14, color: Colors.grey)),
-                        helperStyle: GoogleFonts.poppins(
-                            textStyle: TextStyle(fontSize: 14)),
-                        enabledBorder: UnderlineInputBorder(),
-                        focusedBorder: UnderlineInputBorder(),
-                      ),
-                    ),
-                    SizedBox(height: CustomSize.sizeHeight(context) / 48,),
+                    // CustomText.bodyLight12(text: "Harga menu + Harga kemasan"),
+                    // SizedBox(
+                    //   height: CustomSize.sizeHeight(context) * 0.005,
+                    // ),
+                    // TextField(
+                    //   controller: hargaDeliv,
+                    //   keyboardType: TextInputType.number,
+                    //   cursorColor: Colors.black,
+                    //   style: GoogleFonts.poppins(
+                    //       textStyle:
+                    //       TextStyle(fontSize: 18, color: Colors.black, fontWeight: FontWeight.w600)),
+                    //   decoration: InputDecoration(
+                    //     hintText: '*Contoh harga menu: 18000 -> 20000',
+                    //     isDense: true,
+                    //     contentPadding: EdgeInsets.only(bottom: CustomSize.sizeHeight(context) / 86),
+                    //     hintStyle: GoogleFonts.poppins(
+                    //         textStyle:
+                    //         TextStyle(fontSize: 14, color: Colors.grey)),
+                    //     helperStyle: GoogleFonts.poppins(
+                    //         textStyle: TextStyle(fontSize: 14)),
+                    //     enabledBorder: UnderlineInputBorder(),
+                    //     focusedBorder: UnderlineInputBorder(),
+                    //   ),
+                    // ),
+                    // SizedBox(height: CustomSize.sizeHeight(context) / 48,),
                     CustomText.bodyLight12(text: "Tipe Menu"),
                     SizedBox(
                       height: CustomSize.sizeHeight(context) * 0.005,
@@ -433,7 +445,7 @@ class _AddMenuState extends State<AddMenu> {
                       ),
                     ),
                     SizedBox(height: CustomSize.sizeHeight(context) / 48,),
-                    CustomText.bodyLight12(text: "Deskripsikan Menu ini"),
+                    CustomText.bodyLight12(text: "Deskripsi"),
                     SizedBox(
                       height: CustomSize.sizeHeight(context) * 0.005,
                     ),
@@ -469,65 +481,65 @@ class _AddMenuState extends State<AddMenu> {
                       child: Row(
                         children: [
                           (image == null)?Container(
-                        height: CustomSize.sizeHeight(context) / 6.5,
-                        width: CustomSize.sizeWidth(context) / 3.2,
-                        child: Icon(FontAwesome.plus, color: CustomColor.primary, size: 50,),
-                        decoration: BoxDecoration(
-                          border: Border.all(
-                              color: CustomColor.primary,
-                              width: 3.0
+                            height: CustomSize.sizeHeight(context) / 6.5,
+                            width: CustomSize.sizeWidth(context) / 3.2,
+                            child: Icon(FontAwesome.plus, color: CustomColor.primaryLight, size: 50,),
+                            decoration: BoxDecoration(
+                              border: Border.all(
+                                  color: CustomColor.primaryLight,
+                                  width: 3.0
+                              ),
+                              borderRadius: BorderRadius.all(
+                                  Radius.circular(10.0) //         <--- border radius here
+                              ),
+                            ),
+                          ):Container(
+                            height: CustomSize.sizeHeight(context) / 6.5,
+                            width: CustomSize.sizeWidth(context) / 3.2,
+                            decoration: (image==null)?(img == "/".substring(0, 1))?BoxDecoration(
+                              border: Border.all(
+                                  color: CustomColor.primaryLight,
+                                  width: 3.0
+                              ),
+                              borderRadius: BorderRadius.all(
+                                  Radius.circular(10.0) //         <--- border radius here
+                              ),
+                            ):BoxDecoration(
+                              border: Border.all(
+                                  color: CustomColor.primaryLight,
+                                  width: 3.0
+                              ),
+                              borderRadius: BorderRadius.all(
+                                  Radius.circular(10.0) //         <--- border radius here
+                              ),
+                            ): BoxDecoration(
+                              borderRadius: BorderRadius.all(
+                                  Radius.circular(10.0) //         <--- border radius here
+                              ),
+                              image: new DecorationImage(
+                                  image: new FileImage(image!),
+                                  fit: BoxFit.cover
+                              ),
+                            ),
+                            child: (img == "/".substring(0, 1))?Center(
+                              child: CustomText.text(
+                                  size: 38,
+                                  weight: FontWeight.w800,
+                                  text: initial,
+                                  color: Colors.white
+                              ),
+                            ):Padding(
+                              padding: const EdgeInsets.only(left: 1.5),
+                              child: Center(
+                                child: (image == null)?CustomText.text(
+                                    size: 38,
+                                    weight: FontWeight.w800,
+                                    text: initial,
+                                    color: Colors.white
+                                ):Container(),
+                              ),
+                            ),
                           ),
-                          borderRadius: BorderRadius.all(
-                              Radius.circular(10.0) //         <--- border radius here
-                          ),
-                        ),
-                      ):Container(
-                        height: CustomSize.sizeHeight(context) / 6.5,
-                        width: CustomSize.sizeWidth(context) / 3.2,
-                        decoration: (image==null)?(img == "/".substring(0, 1))?BoxDecoration(
-                          border: Border.all(
-                              color: CustomColor.primary,
-                              width: 3.0
-                          ),
-                          borderRadius: BorderRadius.all(
-                              Radius.circular(10.0) //         <--- border radius here
-                          ),
-                        ):BoxDecoration(
-                          border: Border.all(
-                              color: CustomColor.primary,
-                              width: 3.0
-                          ),
-                          borderRadius: BorderRadius.all(
-                              Radius.circular(10.0) //         <--- border radius here
-                          ),
-                        ): BoxDecoration(
-                          borderRadius: BorderRadius.all(
-                              Radius.circular(10.0) //         <--- border radius here
-                          ),
-                          image: new DecorationImage(
-                              image: new FileImage(image),
-                              fit: BoxFit.cover
-                          ),
-                        ),
-                        child: (img == "/".substring(0, 1))?Center(
-                          child: CustomText.text(
-                              size: 38,
-                              weight: FontWeight.w800,
-                              text: initial,
-                              color: Colors.white
-                          ),
-                        ):Padding(
-                          padding: const EdgeInsets.only(left: 1.5),
-                          child: Center(
-                            child: (image == null)?CustomText.text(
-                                size: 38,
-                                weight: FontWeight.w800,
-                                text: initial,
-                                color: Colors.white
-                            ):Container(),
-                          ),
-                        ),
-                      ),
                         ],
                       ),
                     ),
@@ -541,9 +553,9 @@ class _AddMenuState extends State<AddMenu> {
                       children: [
                         Checkbox(
                           value: favorite,
-                          onChanged: (bool value) {
+                          onChanged: (bool? value) {
                             setState(() {
-                              favorite = value;
+                              favorite = value!;
                               print(favorite);
                             });
                           },
@@ -558,7 +570,7 @@ class _AddMenuState extends State<AddMenu> {
                                 maxLines: 1
                             ),
                             CustomText.bodyMedium14(
-                                text: "andalan di restomu ?",
+                                text: "andalan di tokomu ?",
                                 minSize: 14,
                                 maxLines: 1
                             ),
@@ -595,8 +607,12 @@ class _AddMenuState extends State<AddMenu> {
           // print(deskMenu);
           // print(base64Encode(image.readAsBytesSync()).toString());
           // print(favorite);
-          AddMenu();
-          animateButton();
+          if (namaMenu.text != '' && hargaMenu.text != '' && tipeMenu.text != '' && deskMenu.text != '' && image.toString() != 'null') {
+            AddMenu();
+            animateButton();
+          } else {
+            Fluttertoast.showToast(msg: 'Lengkapi data menu terlebih dahulu!');
+          }
         },
         child: Container(
           width: CustomSize.sizeWidth(context) / 1.1,

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:indonesiarestoguide/ui/home/home_activity.dart';
-import 'package:indonesiarestoguide/ui/ui_resto/home/home_activity.dart';
-import 'package:indonesiarestoguide/utils/utils.dart';
+import 'package:kam5ia/ui/home/home_activity.dart';
+import 'package:kam5ia/ui/ui_resto/home/home_activity.dart';
+import 'package:kam5ia/utils/utils.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class SplashScreen extends StatefulWidget {
@@ -45,6 +45,7 @@ class _SplashScreenState extends State<SplashScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      // backgroundColor: CustomColor.primaryLight,
       body: Padding(
         padding: EdgeInsets.symmetric(horizontal: CustomSize.sizeWidth(context) / 86),
         child: Center(
@@ -63,14 +64,14 @@ class _SplashScreenState extends State<SplashScreen> {
               Container(
                 alignment: Alignment.center,
                 width: CustomSize.sizeWidth(context) / 1.1,
-                child: CustomText.textHeading2(text: "Indonesia Resto Guide"),
+                child: CustomText.textHeading9(text: "Indonesia Resto Guide"),
               ),
               SizedBox(
                 height: CustomSize.sizeHeight(context) / 48,
               ),
               CustomText.bodyMedium16(
                   text: "Get your favourite food from your",
-                maxLines: 1
+                  maxLines: 1
               ),
               CustomText.bodyMedium16(
                   text: "favourite restaurant the fastest way",

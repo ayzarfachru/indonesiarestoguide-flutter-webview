@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:indonesiarestoguide/ui/auth/login_activity.dart';
-import 'package:indonesiarestoguide/utils/utils.dart';
+import 'package:kam5ia/ui/auth/login_activity.dart';
+import 'package:kam5ia/utils/utils.dart';
+import 'package:onesignal_flutter/onesignal_flutter.dart';
 import 'package:page_transition/page_transition.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class WelcomeScreen extends StatefulWidget {
   @override
@@ -9,9 +11,29 @@ class WelcomeScreen extends StatefulWidget {
 }
 
 class _WelcomeScreenState extends State<WelcomeScreen> {
+
+  Future idPlayer() async{
+    var status = await OneSignal.shared.getPermissionSubscriptionState();
+    playerId = status.subscriptionStatus.userId;
+
+    SharedPreferences pref = await SharedPreferences.getInstance();
+    pref.setString("playerId", playerId);
+
+    print('player id'+playerId.toString());
+    setState(() {});
+  }
+  String? playerId;
+
+  @override
+  void initState() {
+    idPlayer();
+    super.initState();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      // backgroundColor: CustomColor.primaryLight,
       body: Padding(
         padding: EdgeInsets.symmetric(horizontal: CustomSize.sizeWidth(context) / 86),
         child: Center(
@@ -30,7 +52,7 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
               Container(
                 alignment: Alignment.center,
                 width: CustomSize.sizeWidth(context) / 1.1,
-                child: CustomText.textHeading2(text: "Indonesia Resto Guide"),
+                child: CustomText.textHeading9(text: "Indonesia Resto Guide"),
               ),
               SizedBox(
                 height: CustomSize.sizeHeight(context) / 48,
@@ -48,7 +70,8 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
               ),
               GestureDetector(
                 onTap: (){
-                  Navigator.push(
+                  idPlayer();
+                  Navigator.pushReplacement(
                       context,
                       PageTransition(
                           type: PageTransitionType.rightToLeft,
@@ -58,8 +81,8 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
                   height: CustomSize.sizeHeight(context) / 12,
                   width: CustomSize.sizeWidth(context) / 1.4,
                   decoration: BoxDecoration(
-                    color: CustomColor.primary,
-                    borderRadius: BorderRadius.circular(20)
+                      color: CustomColor.primary,
+                      borderRadius: BorderRadius.circular(20)
                   ),
                   child: Center(
                     child: CustomText.bodyMedium16(

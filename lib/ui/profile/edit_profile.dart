@@ -1,16 +1,17 @@
 import 'dart:convert';
 import 'dart:io';
 
+import 'package:date_time_picker/date_time_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_datetime_picker/flutter_datetime_picker.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:flutter/services.dart';
-import 'package:indonesiarestoguide/ui/ui_resto/home/home_activity.dart';
-import 'package:indonesiarestoguide/utils/utils.dart';
+import 'package:kam5ia/ui/ui_resto/home/home_activity.dart';
+import 'package:kam5ia/utils/utils.dart';
 import 'package:flutter_icons/flutter_icons.dart';
-import 'package:indonesiarestoguide/ui/home/home_activity.dart';
-import 'package:indonesiarestoguide/model/User.dart';
+import 'package:kam5ia/ui/home/home_activity.dart';
+import 'package:kam5ia/model/User.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:page_transition/page_transition.dart';
@@ -34,7 +35,7 @@ class _EditProfileState extends State<EditProfile> {
   String initial = "";
   String email = "";
   String img = "";
-  String gender = "pria";
+  String gender = "";
   String tgl = "";
   String notelp = "";
   bool Pass = false;
@@ -143,8 +144,8 @@ class _EditProfileState extends State<EditProfile> {
 
   String homepg = "";
   //------------------------------= IMAGE PICKER =----------------------------------
-  File image;
-  String extension;
+  File? image;
+  String? extension;
   final picker = ImagePicker();
 
   Future getImage() async {
@@ -172,8 +173,8 @@ class _EditProfileState extends State<EditProfile> {
         body: {
           'name': newName,
           'email' : newEmail,
-          'ttl': newTgl,
-          'gender': newGender,
+          'ttl': (tgl.toString() != 'null')?tgl.toString():DateFormat('dd-MM-y').format(DateTime.now()).toString(),
+          'gender': (gender.toString() != '' && gender.toString() != 'null')?newGender:'Pria',
           'phone': newNotelp,
           'photo': 'data:image/$extension;base64,' +
               base64Encode(newImage.readAsBytesSync()),
@@ -187,8 +188,8 @@ class _EditProfileState extends State<EditProfile> {
       SharedPreferences pref = await SharedPreferences.getInstance();
       pref.setString("name", _loginTextName.text.toString());
       pref.setString("email", _loginEmailName.text.toString());
-      pref.setString("img", (image == null)?img:base64Encode(image.readAsBytesSync()).toString());
-      print('ini lohh'+ img.substring(0,1));
+      pref.setString("img", (image == null)?img:base64Encode(image!.readAsBytesSync()).toString());
+      // print('ini lohh'+ img.substring(0,1));
       // debugPrint('ini image baru '+base64Encode(image.readAsBytesSync()).toString(), wrapWidth: 9024);
       // printWrapped(base64Encode(image.readAsBytesSync()).toString());
       pref.setString("gender", gender);
@@ -198,10 +199,7 @@ class _EditProfileState extends State<EditProfile> {
           builder: (BuildContext context) => (homepg != "1")?HomeActivity():HomeActivityResto()));
     } else {
       Fluttertoast.showToast(
-          msg: "The field is required",
-          backgroundColor: Colors.grey,
-          textColor: Colors.black,
-          fontSize: 16.0
+          msg: "Data anda belum lengkap!"
       );
     }
     final responseJson = jsonDecode(response.body);
@@ -219,7 +217,7 @@ class _EditProfileState extends State<EditProfile> {
     return responseJson["message"];
   }
 
-  Future<String> editProfile2(String newName, String newEmail, String newTgl, String newGender, String newNotelp, File newImage, String newImg) async{
+  Future<String> editProfile2(String newName, String newEmail, String newTgl, String newGender, String newNotelp) async{
     SharedPreferences pref = await SharedPreferences.getInstance();
     var token = pref.getString("token") ?? "";
     var id = pref.getInt("id") ?? "";
@@ -235,8 +233,8 @@ class _EditProfileState extends State<EditProfile> {
         body: {
           'name': newName,
           'email' : newEmail,
-          'ttl': newTgl,
-          'gender': newGender,
+          'ttl': (tgl.toString() != 'null')?tgl.toString():DateFormat('dd-MM-y').format(DateTime.now()).toString(),
+          'gender': (gender.toString() != '' && gender.toString() != 'null')?newGender:'Pria',
           'phone': newNotelp,
         },
         headers: {
@@ -244,12 +242,12 @@ class _EditProfileState extends State<EditProfile> {
           "Authorization": "Bearer $token"
         }
     );
+    print('oy '+response.body.toString());
     if (response.statusCode == 200) {
       SharedPreferences pref = await SharedPreferences.getInstance();
       pref.setString("name", _loginTextName.text.toString());
       pref.setString("email", _loginEmailName.text.toString());
-      pref.setString("img", (image == null)?img:base64Encode(image.readAsBytesSync()).toString());
-      print('ini lohh'+ img.substring(0,1));
+      // print('ini lohh'+ img.substring(0,1));
       // debugPrint('ini image baru '+base64Encode(image.readAsBytesSync()).toString(), wrapWidth: 9024);
       // printWrapped(base64Encode(image.readAsBytesSync()).toString());
       pref.setString("gender", gender);
@@ -259,10 +257,7 @@ class _EditProfileState extends State<EditProfile> {
           builder: (BuildContext context) => (homepg != "1")?HomeActivity():HomeActivityResto()));
     } else {
       Fluttertoast.showToast(
-          msg: "The field is required",
-          backgroundColor: Colors.grey,
-          textColor: Colors.black,
-          fontSize: 16.0
+          msg: "Data anda belum lengkap!"
       );
     }
     final responseJson = jsonDecode(response.body);
@@ -271,8 +266,6 @@ class _EditProfileState extends State<EditProfile> {
     print(newTgl+'tsnl');
     print(newGender+'tsnl');
     print(newNotelp+'tsnl');
-    print(image != null ? 'data:image/$extension;base64,' +
-        base64Encode(newImage.readAsBytesSync()) +'tsnl': img+'tsnl');
     print(responseJson);
     setState(() {
       isLoading = false;
@@ -281,7 +274,7 @@ class _EditProfileState extends State<EditProfile> {
   }
 
 
-  String id;
+  String? id;
   List<User> user = [];
   Future<void> _editPass()async{
     List<User> _user = [];
@@ -346,6 +339,14 @@ class _EditProfileState extends State<EditProfile> {
     });
   }
 
+  getInitial() async {
+    SharedPreferences pref = await SharedPreferences.getInstance();
+    setState(() {
+      initial = (pref.getString('name').substring(0, 1).toUpperCase());
+      print(initial);
+    });
+  }
+
   @override
   void dispose() {
     super.dispose();
@@ -356,6 +357,7 @@ class _EditProfileState extends State<EditProfile> {
     super.initState();
     getPref();
     getHomePg();
+    getInitial();
     // getEmail();
     // getImg();
     // (img != '/'.substring(0, 1))?getImg2():print('');
@@ -427,11 +429,11 @@ class _EditProfileState extends State<EditProfile> {
                             ): BoxDecoration(
                               shape: BoxShape.circle,
                               image: new DecorationImage(
-                                image: new FileImage(image),
+                                image: new FileImage(image!),
                                   fit: BoxFit.cover
                               ),
                             ),
-                            child: (img == "" || img == null)?Center(
+                            child: (img == "" || img == null && image == null || image.toString() == '')?Center(
                               child: CustomText.text(
                                   size: 38,
                                   weight: FontWeight.w800,
@@ -562,7 +564,8 @@ class _EditProfileState extends State<EditProfile> {
                                               child: CustomText.textHeading5(
                                                   text: "Pria",
                                                   minSize: 17,
-                                                  maxLines: 1
+                                                  maxLines: 1,
+                                                  color: Colors.blue
                                               ),
                                             ),
                                           ),
@@ -573,10 +576,15 @@ class _EditProfileState extends State<EditProfile> {
                                             },
                                             child: Padding(
                                               padding: const EdgeInsets.symmetric(vertical: 8.0),
-                                              child: CustomText.textHeading5(
-                                                  text: "Wanita",
-                                                  minSize: 17,
-                                                  maxLines: 1
+                                              child: Row(
+                                                children: [
+                                                  CustomText.textHeading5(
+                                                      text: "Wanita",
+                                                      minSize: 17,
+                                                      maxLines: 1,
+                                                      color: Colors.pink
+                                                  ),
+                                                ],
                                               ),
                                             ),
                                           ),
@@ -590,7 +598,7 @@ class _EditProfileState extends State<EditProfile> {
                             );
                           },
                         child: CustomText.textHeading4(
-                            text: gender.substring(0, 1).toUpperCase()+gender.substring(1),
+                            text: (gender.toString() != '' && gender.toString() != 'null')?gender.toString().substring(0, 1).toUpperCase()+gender.toString().substring(1):'Pria',
                             minSize: 18,
                             maxLines: 1
                         )
@@ -609,9 +617,8 @@ class _EditProfileState extends State<EditProfile> {
                         DatePicker.showDatePicker(context, showTitleActions: true,
                             onConfirm: (date) {
                               setState(() {
-                                tgl = date.toString().split(' ')[0];
+                                tgl = DateFormat('dd-MM-y').format(date);
                               });
-                              print(date.toString().split(' ')[0]);
                             },
                             currentTime: DateTime(DateTime.now().year, DateTime.now().month,
                                 DateTime.now().day),
@@ -620,7 +627,8 @@ class _EditProfileState extends State<EditProfile> {
                         );
                       },
                       child: CustomText.textHeading4(
-                          text: tgl,
+                          // text: (tgl.toString() != 'null')?tgl.toString():DateFormat('dd-MM-y').format(DateTime.now()).toString(),
+                          text: (tgl.toString() != 'null')?tgl.toString():DateFormat('dd-MM-y').format(DateTime.now()).toString(),
                           minSize: 18,
                           maxLines: 1
                       ),
@@ -629,93 +637,101 @@ class _EditProfileState extends State<EditProfile> {
                       color: Colors.black,
                       thickness: 1,
                     ),
-                    // SizedBox(height: CustomSize.sizeHeight(context) / 48,),
-                    //------------------------------------ checkbox pass -------------------------------------
-                    Row(
-                      mainAxisSize: MainAxisSize.max,
-                      mainAxisAlignment: MainAxisAlignment.start,
-                      children: [
-                        Checkbox(
-                          value: Pass,
-                          onChanged: (bool value) {
-                            setState(() {
-                              print(value);
-                              Pass = value;
-                            });
-                          },
-                        ),
-                        // Text('Apakah Restomu melayani reservasi ?', style: TextStyle(fontWeight: FontWeight.bold))
-                        Text('Apakah anda ingin mengganti password ?', style: GoogleFonts.poppins(
-                            textStyle: TextStyle(
-                                fontWeight: FontWeight.bold, fontSize: 12)),),
-                      ],
-                    ),
-                    //------------------------------------- new pass ----------------------------------------
-                    (Pass)?CustomText.bodyLight12(text: "Masukkan password baru"):Container(),
-                    (Pass)?TextField(
-                      maxLines: 1,
-                      controller: newPass,
-                      obscureText: _obscureText,
-                      keyboardType: TextInputType.text,
-                      cursorColor: Colors.black,
-                      style: GoogleFonts.poppins(
-                          textStyle:
-                          TextStyle(fontSize: 18, color: Colors.black, fontWeight: FontWeight.w600)),
-                      decoration: InputDecoration(
-                        suffixIcon: IconButton(
-                          highlightColor: Colors.transparent,
-                          onPressed: _toggle,
-                          icon: Icon(
-                              _obscureText
-                                  ? MaterialCommunityIcons.eye
-                                  : MaterialCommunityIcons.eye_off,
-                              color: Colors.black),
-                        ),
-                        isDense: true,
-                        contentPadding: EdgeInsets.symmetric(vertical: 10.0),
-                        hintStyle: GoogleFonts.poppins(
-                            textStyle:
-                            TextStyle(fontSize: 14, color: Colors.grey)),
-                        helperStyle: GoogleFonts.poppins(
-                            textStyle: TextStyle(fontSize: 14)),
-                        enabledBorder: UnderlineInputBorder(),
-                        focusedBorder: UnderlineInputBorder(),
-                      ),
-                    ):Container(),
-                    (Pass)?SizedBox(height: CustomSize.sizeHeight(context) / 48,):Container(),
-                    //------------------------------------- confirm pass ----------------------------------------
-                    (Pass)?CustomText.bodyLight12(text: "Konfirmasi password baru"):Container(),
-                    (Pass)?TextField(
-                      maxLines: 1,
-                      controller: _newPass,
-                      obscureText: _obscureText2,
-                      keyboardType: TextInputType.text,
-                      cursorColor: Colors.black,
-                      style: GoogleFonts.poppins(
-                          textStyle:
-                          TextStyle(fontSize: 18, color: Colors.black, fontWeight: FontWeight.w600)),
-                      decoration: InputDecoration(
-                        suffixIcon: IconButton(
-                          highlightColor: Colors.transparent,
-                          onPressed: _toggle2,
-                          icon: Icon(
-                              _obscureText2
-                                  ? MaterialCommunityIcons.eye
-                                  : MaterialCommunityIcons.eye_off,
-                              color: Colors.black),
-                        ),
-                        isDense: true,
-                        contentPadding: EdgeInsets.symmetric(vertical: 10.0),
-                        hintStyle: GoogleFonts.poppins(
-                            textStyle:
-                            TextStyle(fontSize: 14, color: Colors.grey)),
-                        helperStyle: GoogleFonts.poppins(
-                            textStyle: TextStyle(fontSize: 14)),
-                        enabledBorder: UnderlineInputBorder(),
-                        focusedBorder: UnderlineInputBorder(),
-                      ),
-                    ):Container(),
-                    (Pass)?SizedBox(height: CustomSize.sizeHeight(context) / 68,):Container(),
+                    // // SizedBox(height: CustomSize.sizeHeight(context) / 48,),
+                    // //------------------------------------ checkbox pass -------------------------------------
+                    // Row(
+                    //   mainAxisSize: MainAxisSize.max,
+                    //   mainAxisAlignment: MainAxisAlignment.start,
+                    //   children: [
+                    //     Checkbox(
+                    //       value: Pass,
+                    //       onChanged: (bool? value) {
+                    //         setState(() {
+                    //           print(value);
+                    //           Pass = value!;
+                    //         });
+                    //       },
+                    //     ),
+                    //     // Text('Apakah Restomu melayani reservasi ?', style: TextStyle(fontWeight: FontWeight.bold))
+                    //     Text('Apakah anda ingin mengganti password ?', style: GoogleFonts.poppins(
+                    //         textStyle: TextStyle(
+                    //             fontWeight: FontWeight.bold, fontSize: 12)),),
+                    //   ],
+                    // ),
+                    // //------------------------------------- new pass ----------------------------------------
+                    // (Pass)?CustomText.bodyLight12(text: "Masukkan password baru"):Container(),
+                    // (Pass)?TextField(
+                    //   maxLines: 1,
+                    //   controller: newPass,
+                    //   obscureText: _obscureText,
+                    //   keyboardType: TextInputType.text,
+                    //   cursorColor: Colors.black,
+                    //   style: GoogleFonts.poppins(
+                    //       textStyle:
+                    //       TextStyle(fontSize: 18, color: Colors.black, fontWeight: FontWeight.w600)),
+                    //   decoration: InputDecoration(
+                    //     suffixIcon: IconButton(
+                    //       highlightColor: Colors.transparent,
+                    //       onPressed: _toggle,
+                    //       icon: Icon(
+                    //           _obscureText
+                    //               ? MaterialCommunityIcons.eye
+                    //               : MaterialCommunityIcons.eye_off,
+                    //           color: Colors.black),
+                    //     ),
+                    //     isDense: true,
+                    //     contentPadding: EdgeInsets.symmetric(vertical: 10.0),
+                    //     hintStyle: GoogleFonts.poppins(
+                    //         textStyle:
+                    //         TextStyle(fontSize: 14, color: Colors.grey)),
+                    //     helperStyle: GoogleFonts.poppins(
+                    //         textStyle: TextStyle(fontSize: 14)),
+                    //     enabledBorder: UnderlineInputBorder(),
+                    //     focusedBorder: UnderlineInputBorder(),
+                    //   ),
+                    // ):Container(),
+                    // (Pass)?SizedBox(height: CustomSize.sizeHeight(context) / 48,):Container(),
+                    // //------------------------------------- confirm pass ----------------------------------------
+                    // (Pass)?CustomText.bodyLight12(text: "Konfirmasi password baru"):Container(),
+                    // (Pass)?TextField(
+                    //   maxLines: 1,
+                    //   controller: _newPass,
+                    //   obscureText: _obscureText2,
+                    //   keyboardType: TextInputType.text,
+                    //   cursorColor: Colors.black,
+                    //   style: GoogleFonts.poppins(
+                    //       textStyle:
+                    //       TextStyle(fontSize: 18, color: Colors.black, fontWeight: FontWeight.w600)),
+                    //   decoration: InputDecoration(
+                    //     suffixIcon: IconButton(
+                    //       highlightColor: Colors.transparent,
+                    //       onPressed: _toggle2,
+                    //       icon: Icon(
+                    //           _obscureText2
+                    //               ? MaterialCommunityIcons.eye
+                    //               : MaterialCommunityIcons.eye_off,
+                    //           color: Colors.black),
+                    //     ),
+                    //     isDense: true,
+                    //     contentPadding: EdgeInsets.symmetric(vertical: 10.0),
+                    //     hintStyle: GoogleFonts.poppins(
+                    //         textStyle:
+                    //         TextStyle(fontSize: 14, color: Colors.grey)),
+                    //     helperStyle: GoogleFonts.poppins(
+                    //         textStyle: TextStyle(fontSize: 14)),
+                    //     enabledBorder: UnderlineInputBorder(),
+                    //     focusedBorder: UnderlineInputBorder(),
+                    //   ),
+                    // ):Container(),
+                    // (Pass)?SizedBox(height: CustomSize.sizeHeight(context) / 68,):Container(),
+                    // SizedBox(height: CustomSize.sizeHeight(context) / 88,),
+                    // Padding(
+                    //   padding: EdgeInsets.only(
+                    //     left: CustomSize.sizeWidth(context) / 32,
+                    //     right: CustomSize.sizeWidth(context) / 32,
+                    //   ),
+                    //   child: CustomText.bodyRegular18(text: "*Jika ingin menggunakan login tanpa google tolong ganti password dan isi semua data anda terlebih dahulu!", color: CustomColor.redBtn, minSize: 15, maxLines: 3),
+                    // ),
                     SizedBox(height: CustomSize.sizeHeight(context) / 48,),
                     (isLoading != true)?GestureDetector(
                       onTap: () async{
@@ -723,24 +739,28 @@ class _EditProfileState extends State<EditProfile> {
                           isLoading = false;
                         });
 
+                        SharedPreferences pref = await SharedPreferences.getInstance();
+                        pref.setString('name',_loginTextName.text.toString());
                         print(image.toString() + 'Ini Image');
                         if (_loginEmailName.text == '') {
                           Fluttertoast.showToast(msg: 'Email wajib diisi!');
                         } else {
                           if (Pass == false) {
                             if (image != null) {
-                              editProfile(_loginTextName.text.toString(), _loginEmailName.text.toString(), tgl.toString(), gender.toString(), _loginNotelpName.text.toString(), image, img.toString());
+                              editProfile(_loginTextName.text.toString(), _loginEmailName.text.toString(), tgl.toString(), gender.toString(), _loginNotelpName.text.toString(), image!, img.toString());
                             } else if (image == null) {
-                              editProfile2(_loginTextName.text.toString(), _loginEmailName.text.toString(), tgl.toString(), gender.toString(), _loginNotelpName.text.toString(), image, img.toString());
+                              editProfile2(_loginTextName.text.toString(), _loginEmailName.text.toString(), tgl.toString(), gender.toString(), _loginNotelpName.text.toString());
                             }
                           } else if (Pass == true) {
                             if (newPass.text.toString() == _newPass.text.toString()) {
                               if (image != null) {
-                                editProfile(_loginTextName.text.toString(), _loginEmailName.text.toString(), tgl.toString(), gender.toString(), _loginNotelpName.text.toString(), image, img.toString());
-                                _editPass();
+                                editProfile(_loginTextName.text.toString(), _loginEmailName.text.toString(), tgl.toString(), gender.toString(), _loginNotelpName.text.toString(), image!, img.toString()).whenComplete(() {
+                                  _editPass();
+                                });
                               } else if (image == null) {
-                                editProfile2(_loginTextName.text.toString(), _loginEmailName.text.toString(), tgl.toString(), gender.toString(), _loginNotelpName.text.toString(), image, img.toString());
-                                _editPass();
+                                editProfile2(_loginTextName.text.toString(), _loginEmailName.text.toString(), tgl.toString(), gender.toString(), _loginNotelpName.text.toString()).whenComplete(() {
+                                  _editPass();
+                                });
                               }
                             } else {
                               Future.delayed(Duration(seconds: 1)).then((_) {

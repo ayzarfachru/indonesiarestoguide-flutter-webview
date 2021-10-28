@@ -5,10 +5,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_datetime_picker/flutter_datetime_picker.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:indonesiarestoguide/ui/ui_resto/employees/employees_activity.dart';
-import 'package:indonesiarestoguide/ui/ui_resto/home/home_activity.dart';
-import 'package:indonesiarestoguide/utils/utils.dart';
-import 'package:indonesiarestoguide/ui/home/home_activity.dart';
+import 'package:kam5ia/ui/ui_resto/employees/employees_activity.dart';
+import 'package:kam5ia/ui/ui_resto/home/home_activity.dart';
+import 'package:kam5ia/utils/utils.dart';
+import 'package:kam5ia/ui/home/home_activity.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:page_transition/page_transition.dart';
@@ -118,8 +118,8 @@ class _AddEmployeesActivityState extends State<AddEmployeesActivity> {
   }
 
   //------------------------------= IMAGE PICKER =----------------------------------
-  File image;
-  String extension;
+  File? image;
+  String? extension;
   final picker = ImagePicker();
 
   Future getImage() async {
@@ -131,7 +131,7 @@ class _AddEmployeesActivityState extends State<AddEmployeesActivity> {
     });
   }
 
-  Future<String> addEployees() async{
+  Future<String?>? addEployees() async{
     SharedPreferences pref = await SharedPreferences.getInstance();
     var token = pref.getString("token") ?? "";
     var id = pref.getInt("id") ?? "";
@@ -289,19 +289,15 @@ class _AddEmployeesActivityState extends State<AddEmployeesActivity> {
           // pref.setString("notelp", _loginNotelpName.text.toString());
 
           if (_loginEmailName.text != '') {
-            addEployees();
-            Navigator.pop(context);
-            Navigator.pushReplacement(context,
-                PageTransition(
-                    type: PageTransitionType.fade,
-                    child: EmployeesActivity()));
+            addEployees()!.whenComplete((){
+              Navigator.pop(context);
+              Navigator.pushReplacement(context,
+                  PageTransition(
+                      type: PageTransitionType.fade,
+                      child: EmployeesActivity()));
+            });
           } else {
-            Fluttertoast.showToast(
-                msg: "The field is required",
-                backgroundColor: Colors.grey,
-                textColor: Colors.black,
-                fontSize: 16.0
-            );
+            Fluttertoast.showToast(msg: "Isi email terlebih dahulu!",);
           }
         },
         child: Container(

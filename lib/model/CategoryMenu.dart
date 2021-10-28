@@ -1,8 +1,8 @@
-import 'package:indonesiarestoguide/model/Menu.dart';
+import 'package:kam5ia/model/Menu.dart';
 
-class CategoryMenu{
+class CategoryMenu {
   String name;
   List<Menu> menu;
 
-  CategoryMenu({this.name, this.menu});
+  CategoryMenu({required this.name, required this.menu});
 }

@@ -2,11 +2,12 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_icons/flutter_icons.dart';
-import 'package:indonesiarestoguide/model/Menu.dart';
-import 'package:indonesiarestoguide/model/Price.dart';
-import 'package:indonesiarestoguide/ui/detail/detail_resto.dart';
-import 'package:indonesiarestoguide/ui/history/history_activity.dart';
-import 'package:indonesiarestoguide/utils/utils.dart';
+import 'package:full_screen_image/full_screen_image.dart';
+import 'package:kam5ia/model/Menu.dart';
+import 'package:kam5ia/model/Price.dart';
+import 'package:kam5ia/ui/detail/detail_resto.dart';
+import 'package:kam5ia/ui/history/history_activity.dart';
+import 'package:kam5ia/utils/utils.dart';
 import 'package:intl/intl.dart';
 import 'package:page_transition/page_transition.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -23,7 +24,6 @@ class DetailHistory extends StatefulWidget {
 
 class _DetailHistoryState extends State<DetailHistory> {
   int id;
-  String homepg = "";
 
   _DetailHistoryState(this.id);
 
@@ -36,12 +36,15 @@ class _DetailHistoryState extends State<DetailHistory> {
   int ongkir = 0;
   int harga = 0;
   int total = 0;
-  int restoId;
+  int? restoId;
+  String homepg = "";
+  String karyawan = "";
 
   getHomePg() async {
     SharedPreferences pref = await SharedPreferences.getInstance();
     setState(() {
       homepg = (pref.getString('homepg'));
+      karyawan = (pref.getString("karyawan"));
       print(homepg);
     });
   }
@@ -55,6 +58,7 @@ class _DetailHistoryState extends State<DetailHistory> {
     });
     SharedPreferences pref = await SharedPreferences.getInstance();
     var token = pref.getString("token") ?? "";
+    print(karyawan);
 
     var apiResult = await http.get(Links.mainUrl + '/page/history?id=$id',
         headers: {
@@ -64,25 +68,28 @@ class _DetailHistoryState extends State<DetailHistory> {
     print(apiResult.body);
     var data = json.decode(apiResult.body);
 
-    for(var v in data['menus']){
-      Menu m = Menu(
-          id: v['menus_id'],
-          qty: v['qty'].toString(),
-          price: Price(original: v['price']),
-          name: v['name'],
-          urlImg: v['img'],
-          desc: v['desc']
-      );
-      _menu.add(m);
+    if (data['menus'] != null) {
+      for(var v in data['menus']){
+        Menu m = Menu(
+            id: v['menus_id'],
+            qty: v['qty'].toString(),
+            price: Price(original: v['price'], discounted: null, delivery: null),
+            name: v['name'],
+            urlImg: v['img'],
+            desc: v['desc'], delivery_price: null, restoId: '', type: '', distance: null, restoName: '', is_recommended: ''
+        );
+        _menu.add(m);
+      }
     }
+
     setState(() {
       menu = _menu;
       restoId = data['resto'];
       type = data['type'];
       address = data['address']??'';
-      ongkir = data['ongkir'];
-      total = data['total'];
-      harga = data['total'] - data['ongkir'];
+      ongkir = data['ongkir']??0;
+      total = data['total']??0;
+      harga = (data['total']??0) - (data['ongkir']??0);
       isLoading = false;
     });
   }
@@ -99,7 +106,11 @@ class _DetailHistoryState extends State<DetailHistory> {
     });
     print(apiResult.body);
     var data = json.decode(apiResult.body);
-    print(data);
+    print('oi2002');
+
+    if (apiResult.statusCode == 200) {
+      print('oi200');
+    }
 
     // for(var v in data['trx']['process']){
     //   Transaction r = Transaction.resto(
@@ -120,8 +131,9 @@ class _DetailHistoryState extends State<DetailHistory> {
 
   @override
   void initState() {
-    getData();
     getHomePg();
+    getData();
+    // print(karyawan);
     super.initState();
   }
 
@@ -137,7 +149,9 @@ class _DetailHistoryState extends State<DetailHistory> {
         child: (isLoading)?Container(
             width: CustomSize.sizeWidth(context),
             height: CustomSize.sizeHeight(context),
-            child: Center(child: CircularProgressIndicator())):SingleChildScrollView(
+            child: Center(child: CircularProgressIndicator(
+              color: CustomColor.primaryLight,
+            ))):SingleChildScrollView(
           controller: _scrollController,
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -151,7 +165,7 @@ class _DetailHistoryState extends State<DetailHistory> {
                     CustomText.bodyLight12(text: "Alamat Pengiriman"),
                     SizedBox(height: CustomSize.sizeHeight(context) * 0.005,),
                     CustomText.textHeading4(
-                        text: address,
+                        text: (address != '')?address:'kosong.',
                         minSize: 16,
                         maxLines: 10
                     ),
@@ -172,7 +186,7 @@ class _DetailHistoryState extends State<DetailHistory> {
                           width: CustomSize.sizeWidth(context) / 8,
                           height: CustomSize.sizeWidth(context) / 8,
                           decoration: BoxDecoration(
-                              color: CustomColor.primary,
+                              color: CustomColor.primaryLight,
                               shape: BoxShape.circle
                           ),
                           child: Center(
@@ -193,7 +207,7 @@ class _DetailHistoryState extends State<DetailHistory> {
                   shrinkWrap: true,
                   physics: NeverScrollableScrollPhysics(),
                   controller: _scrollController,
-                  itemCount: menu.length,
+                  itemCount: (menu.toString() != '[]')?menu.length:1,
                   itemBuilder: (_, index){
                     return Padding(
                       padding: EdgeInsets.only(
@@ -224,30 +238,30 @@ class _DetailHistoryState extends State<DetailHistory> {
                                               crossAxisAlignment: CrossAxisAlignment.start,
                                               children: [
                                                 CustomText.textHeading4(
-                                                    text: menu[index].name,
+                                                    text: (menu.toString() != '[]')?menu[index].name:'Kosong',
                                                     minSize: 18,
                                                     maxLines: 1
                                                 ),
                                                 CustomText.bodyRegular14(
-                                                    text: menu[index].desc,
+                                                    text: (menu.toString() != '[]')?menu[index].desc:'Menu tidak ditemukan.',
                                                     maxLines: 2,
                                                     minSize: 14
                                                 ),
                                                 SizedBox(height: CustomSize.sizeHeight(context) / 48,),
                                                 Row(
                                                   children: [
+                                                    // CustomText.bodyMedium14(
+                                                    //     text: NumberFormat.currency(locale: 'id', symbol: '', decimalDigits: 0).format(menu[index].price!.original) ,
+                                                    //     maxLines: 1,
+                                                    //     minSize: 16
+                                                    // ),
+                                                    // CustomText.bodyLight14(
+                                                    //     text: "  x  ",
+                                                    //     maxLines: 1,
+                                                    //     minSize: 14
+                                                    // ),
                                                     CustomText.bodyMedium14(
-                                                        text: NumberFormat.currency(locale: 'id', symbol: '', decimalDigits: 0).format(menu[index].price.original) ,
-                                                        maxLines: 1,
-                                                        minSize: 16
-                                                    ),
-                                                    CustomText.bodyLight14(
-                                                        text: "  x  ",
-                                                        maxLines: 1,
-                                                        minSize: 14
-                                                    ),
-                                                    CustomText.bodyMedium14(
-                                                        text: menu[index].qty.toString(),
+                                                        text: (menu.toString() != '[]')?menu[index].qty.toString()+' Items':'',
                                                         maxLines: 1,
                                                         minSize: 16
                                                     ),
@@ -262,17 +276,27 @@ class _DetailHistoryState extends State<DetailHistory> {
                                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                         crossAxisAlignment: CrossAxisAlignment.end,
                                         children: [
-                                          Container(
-                                            width: CustomSize.sizeWidth(context) / 3.8,
-                                            height: CustomSize.sizeWidth(context) / 3.8,
-                                            decoration: BoxDecoration(
-                                                image: DecorationImage(
-                                                    image: NetworkImage(Links.subUrl + menu[index].urlImg),
-                                                    fit: BoxFit.cover
-                                                ),
-                                                borderRadius: BorderRadius.circular(20)
+                                          FullScreenWidget(
+                                            child: Container(
+                                              width: CustomSize.sizeWidth(context) / 3.8,
+                                              height: CustomSize.sizeWidth(context) / 3.8,
+                                              child: ClipRRect(
+                                                borderRadius: BorderRadius.circular(20),
+                                                child: (menu.toString() != '[]')?Image.network(Links.subUrl + menu[index].urlImg, fit: BoxFit.fitWidth):Container(color: CustomColor.primary,),
+                                              ),
                                             ),
                                           ),
+                                          // Container(
+                                          //   width: CustomSize.sizeWidth(context) / 3.8,
+                                          //   height: CustomSize.sizeWidth(context) / 3.8,
+                                          //   decoration: BoxDecoration(
+                                          //       image: DecorationImage(
+                                          //           image: NetworkImage(Links.subUrl + menu[index].urlImg),
+                                          //           fit: BoxFit.cover
+                                          //       ),
+                                          //       borderRadius: BorderRadius.circular(20)
+                                          //   ),
+                                          // ),
                                         ],
                                       ),
                                     ],
@@ -326,8 +350,8 @@ class _DetailHistoryState extends State<DetailHistory> {
                                   CustomText.bodyLight16(text: NumberFormat.currency(locale: 'id', symbol: '', decimalDigits: 0).format(harga)),
                                 ],
                               ),
-                              SizedBox(height: (type == 'delivery')?CustomSize.sizeHeight(context) / 100:0,),
-                              (type == 'delivery')?Row(mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              SizedBox(height: (type == 'Pesan antar')?CustomSize.sizeHeight(context) / 100:0,),
+                              (type == 'Pesan antar')?Row(mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                 children: [
                                   CustomText.bodyLight16(text: "Ongkir"),
                                   CustomText.bodyLight16(text: NumberFormat.currency(locale: 'id', symbol: '', decimalDigits: 0).format(ongkir)),
@@ -373,31 +397,70 @@ class _DetailHistoryState extends State<DetailHistory> {
                         ),
                       ),
                     ):Container(),
-                    SizedBox(height: CustomSize.sizeHeight(context) / 54,),
+                    (homepg != "1")?SizedBox(height: CustomSize.sizeHeight(context) / 88,):Container(),
+                    (homepg != "1")?Center(
+                      child: GestureDetector(
+                        onTap: (){
+                          // Navigator.push(
+                          //     context,
+                          //     PageTransition(
+                          //         type: PageTransitionType.rightToLeft,
+                          //         child: new DetailResto(restoId.toString())));
+                          _deleteHistory(operation = "delete", id.toString()).whenComplete((){
+                            Navigator.pop(context);
+                            Navigator.pushReplacement(
+                                context,
+                                PageTransition(
+                                    type: PageTransitionType.rightToLeft,
+                                    child: new HistoryActivity()));
+                          });
+                        },
+                        child: Container(
+                          width: CustomSize.sizeWidth(context) / 1.1,
+                          height: CustomSize.sizeHeight(context) / 14,
+                          decoration: BoxDecoration(
+                              color: CustomColor.redBtn,
+                              borderRadius: BorderRadius.circular(50)
+                          ),
+                          child: Center(
+                            child: Padding(
+                              padding: const EdgeInsets.symmetric(horizontal: 20.0),
+                              child: CustomText.textTitle2(text: "Hapus", color: Colors.white),
+                            ),
+                          ),
+                        ),
+                      ),
+                    ):Container(),
+                    (homepg != "1")?Container():(karyawan != "1")?Container():GestureDetector(
+                      onTap: () async{
+                        setState(() {
+                          isLoading = false;
+                        });
+                        _deleteHistory(operation = "delete", id.toString());
+                        Navigator.pop(context);
+                        Navigator.pushReplacement(context, PageTransition(type: PageTransitionType.fade, child: new HistoryActivity()));
+                      },
+                      child: Container(
+                        width: CustomSize.sizeWidth(context) / 1.1,
+                        height: CustomSize.sizeHeight(context) / 14,
+                        decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(30),
+                            color: CustomColor.redBtn
+                        ),
+                        child: Center(
+                          child: Padding(
+                            padding: const EdgeInsets.symmetric(horizontal: 20.0),
+                            child: CustomText.textTitle2(text: "Hapus", color: Colors.white),
+                          ),
+                        ),
+                      ),
+                    ),
+                    SizedBox(height: CustomSize.sizeHeight(context) / 48,),
                   ],
                 ),
               ),
             ],
           ),
-        ),
-      ),
-      floatingActionButton: (homepg != "1")?Container():GestureDetector(
-        onTap: () async{
-          setState(() {
-            isLoading = false;
-          });
-          _deleteHistory(operation = "delete", id.toString());
-          Navigator.pop(context);
-          Navigator.pushReplacement(context, PageTransition(type: PageTransitionType.fade, child: new HistoryActivity()));
-        },
-        child: Container(
-          width: CustomSize.sizeWidth(context) / 1.1,
-          height: CustomSize.sizeHeight(context) / 14,
-          decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(30),
-              color: CustomColor.redBtn
-          ),
-          child: Center(child: CustomText.bodyRegular16(text: "Hapus history", color: Colors.white,)),
         ),
       ),
     );

@@ -2,11 +2,11 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_icons/flutter_icons.dart';
-import 'package:indonesiarestoguide/model/Resto.dart';
-import 'package:indonesiarestoguide/ui/detail/detail_resto.dart';
-import 'package:indonesiarestoguide/ui/promo/add_promo.dart';
-import 'package:indonesiarestoguide/ui/promo/edit_promo.dart';
-import 'package:indonesiarestoguide/utils/utils.dart';
+import 'package:kam5ia/model/Resto.dart';
+import 'package:kam5ia/ui/detail/detail_resto.dart';
+import 'package:kam5ia/ui/promo/add_promo.dart';
+import 'package:kam5ia/ui/promo/edit_promo.dart';
+import 'package:kam5ia/utils/utils.dart';
 import 'package:intl/intl.dart';
 import 'package:location/location.dart';
 import 'package:page_transition/page_transition.dart';
@@ -139,8 +139,8 @@ class EsActivityState extends State<EsActivity> {
             desc: v['desc'],
             distance: double.parse(v['distance'].toString()),
             urlImg: v['img'],
-            price: Price.discounted(int.parse(v['price']), v['discounted_price'])
-        ),
+            price: Price.discounted(int.parse(v['price']), v['discounted_price']), delivery_price: null, restoId: '', type: '', restoName: '', is_recommended: '', qty: ''
+        ), discountedPrice: null, id: null, word: '',
       );
       _promo.add(p);
     }
@@ -182,7 +182,7 @@ class EsActivityState extends State<EsActivity> {
             desc: a['menus']['desc'],
             urlImg: a['menus']['img'],
             price: Price.promo(
-                a['menus']['price'].toString(), a['menus']['delivery_price'].toString())
+                a['menus']['price'].toString(), a['menus']['delivery_price'].toString()), qty: '', is_recommended: '', restoName: '', type: '', distance: null, restoId: '', delivery_price: null
         ),
       );
       _promoResto.add(b);
@@ -326,7 +326,7 @@ class EsActivityState extends State<EsActivity> {
         restoName: x['resto_name'],
         urlImg: x['img'],
         price: Price.discounted(x['price'], x['discounted_price']),
-        distance: double.parse(x['resto_distance'].toString()),
+        distance: double.parse(x['resto_distance'].toString()), type: '', is_recommended: '', qty: '', delivery_price: null, desc: '',
       );
       _menu.add(z);
     }
@@ -389,13 +389,15 @@ class EsActivityState extends State<EsActivity> {
           child: (isLoading)?Container(
               width: CustomSize.sizeWidth(context),
               height: CustomSize.sizeHeight(context),
-              child: Center(child: CircularProgressIndicator())):SmartRefresher(
+              child: Center(child: CircularProgressIndicator(
+                color: CustomColor.primaryLight,
+              ))):SmartRefresher(
             enablePullDown: true,
             enablePullUp: false,
             header: WaterDropMaterialHeader(
               distance: 30,
               backgroundColor: Colors.white,
-              color: CustomColor.primary,
+              color: CustomColor.primaryLight,
             ),
             controller: _refreshController,
             onRefresh: _onRefresh,
@@ -477,7 +479,7 @@ class EsActivityState extends State<EsActivity> {
                                       height: CustomSize.sizeWidth(context) / 2.6,
                                       decoration: BoxDecoration(
                                         image: DecorationImage(
-                                            image: (homepg != "1")?NetworkImage(Links.subUrl + menuNG[index].urlImg):NetworkImage(Links.subUrl + promoResto[index].menu.urlImg),
+                                            image: (homepg != "1")?NetworkImage(Links.subUrl + menuNG[index].urlImg):NetworkImage(Links.subUrl + promoResto[index].menu!.urlImg),
                                             fit: BoxFit.cover
                                         ),
                                         borderRadius: BorderRadius.circular(20),
@@ -501,7 +503,7 @@ class EsActivityState extends State<EsActivity> {
                                                   maxLines: 1,
                                                   minSize: 12
                                               ):CustomText.bodyLight12(
-                                                  text: 'Sampai : '+promoResto[index].expired_at.split(' ')[0],
+                                                  text: 'Sampai : '+promoResto[index].expired_at!.split(' ')[0],
                                                   maxLines: 1,
                                                   minSize: 12
                                               ),
@@ -530,21 +532,20 @@ class EsActivityState extends State<EsActivity> {
                                             ],
                                           ),
                                           (homepg != '1')?Container():CustomText.bodyLight12(
-                                              text: 'Jam : '+promoResto[index].expired_at.split(' ')[1].split(':')[0]+':'+promoResto[index].expired_at.split(' ')[1].split(':')[1],
+                                              text: 'Jam : '+promoResto[index].expired_at!.split(' ')[1].split(':')[0]+':'+promoResto[index].expired_at!.split(' ')[1].split(':')[1],
                                               maxLines: 1,
                                               minSize: 12
                                           ),
-                                          SizedBox(height: CustomSize.sizeHeight(context) * 0.00626,),
+                                          SizedBox(height: CustomSize.sizeHeight(context) * 0.00426,),
                                           (homepg != "1")?CustomText.textHeading4(
                                               text: menuNG[index].name,
                                               minSize: 18,
                                               maxLines: 1
                                           ):CustomText.textHeading4(
-                                              text: promoResto[index].menu.name,
+                                              text: promoResto[index].menu!.name,
                                               minSize: 18,
                                               maxLines: 1
                                           ),
-                                          SizedBox(height: CustomSize.sizeHeight(context) * 0.00126,),
                                           (homepg != "1")?CustomText.bodyMedium12(
                                               text: menuNG[index].restoName,
                                               maxLines: 1,
@@ -554,15 +555,15 @@ class EsActivityState extends State<EsActivity> {
                                               maxLines: 1,
                                               minSize: 12
                                           ),
-                                          (homepg != "1")?SizedBox(height: CustomSize.sizeHeight(context) / 22,):SizedBox(height: CustomSize.sizeHeight(context) / 108,),
+                                          (homepg != "1")?SizedBox(height: CustomSize.sizeHeight(context) / 16,):SizedBox(height: CustomSize.sizeHeight(context) / 108,),
                                           Row(
                                             children: [
-                                              CustomText.bodyRegular12(text: NumberFormat.currency(locale: 'id', symbol: '', decimalDigits: 0).format(menuNG[index].price.original), minSize: 12,
-                                                  decoration: (menuNG[index].price.discounted != null && menuNG[index].price.discounted.toString() != '0')?TextDecoration.lineThrough:TextDecoration.none),
+                                              CustomText.bodyRegular12(text: NumberFormat.currency(locale: 'id', symbol: '', decimalDigits: 0).format(menuNG[index].price!.original), minSize: 12,
+                                                  decoration: (menuNG[index].price!.discounted != null && menuNG[index].price!.discounted.toString() != '0')?TextDecoration.lineThrough:TextDecoration.none),
                                               SizedBox(width: CustomSize.sizeWidth(context) / 48,),
-                                              (menuNG[index].price.discounted != null && menuNG[index].price.discounted.toString() != '0')
+                                              (menuNG[index].price!.discounted != null && menuNG[index].price!.discounted.toString() != '0')
                                                   ?CustomText.bodyRegular12(
-                                                  text: NumberFormat.currency(locale: 'id', symbol: '', decimalDigits: 0).format(menuNG[index].price.discounted), minSize: 12):SizedBox(),
+                                                  text: NumberFormat.currency(locale: 'id', symbol: '', decimalDigits: 0).format(menuNG[index].price!.discounted), minSize: 12):SizedBox(),
                                             ],
                                           )
                                         ],
@@ -599,7 +600,7 @@ class EsActivityState extends State<EsActivity> {
             width: CustomSize.sizeWidth(context) / 6.6,
             height: CustomSize.sizeWidth(context) / 6.6,
             decoration: BoxDecoration(
-                color: CustomColor.primary,
+                color: CustomColor.primaryLight,
                 shape: BoxShape.circle
             ),
             child: Center(child: Icon(FontAwesome.plus, color: Colors.white, size: 29,)),

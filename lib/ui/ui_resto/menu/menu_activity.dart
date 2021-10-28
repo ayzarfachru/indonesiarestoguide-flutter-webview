@@ -3,14 +3,15 @@ import 'dart:convert';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_icons/flutter_icons.dart';
-import 'package:indonesiarestoguide/model/CategoryMenu.dart';
-import 'package:indonesiarestoguide/model/Menu.dart';
-import 'package:indonesiarestoguide/model/MenuJson.dart';
-import 'package:indonesiarestoguide/model/Price.dart';
-import 'package:indonesiarestoguide/model/Promo.dart';
-import 'package:indonesiarestoguide/ui/ui_resto/menu/add_menu.dart';
-import 'package:indonesiarestoguide/ui/ui_resto/menu/edit_menu.dart';
-import 'package:indonesiarestoguide/utils/utils.dart';
+import 'package:full_screen_image/full_screen_image.dart';
+import 'package:kam5ia/model/CategoryMenu.dart';
+import 'package:kam5ia/model/Menu.dart';
+import 'package:kam5ia/model/MenuJson.dart';
+import 'package:kam5ia/model/Price.dart';
+import 'package:kam5ia/model/Promo.dart';
+import 'package:kam5ia/ui/ui_resto/menu/add_menu.dart';
+import 'package:kam5ia/ui/ui_resto/menu/edit_menu.dart';
+import 'package:kam5ia/utils/utils.dart';
 import 'package:intl/intl.dart';
 import 'package:page_transition/page_transition.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -67,7 +68,7 @@ class _MenuActivityState extends State<MenuActivity> {
               name: a['name'],
               desc: a['desc'],
               price: Price.delivery(a['price'], a['delivery_price']),
-              urlImg: a['img']
+              urlImg: a['img'], restoId: '', delivery_price: null, distance: null, type: '', qty: '', is_recommended: '', restoName: ''
           );
           _cateMenu.add(m);
         }
@@ -106,8 +107,8 @@ class _MenuActivityState extends State<MenuActivity> {
             urlImg: v['img'],
             type: v['type'],
             is_recommended: v['is_recommended'],
-            price: Price(original: int.parse(v['price'].toString())),
-            delivery_price: Price.delivery(int.parse(v['price']), int.parse(v['delivery_price']))
+            price: Price(original: int.parse(v['price'].toString()), discounted: null, delivery: null),
+            delivery_price: Price(original: int.parse(v['price']), delivery: null, discounted: null), restoId: '', restoName: '', distance: null, qty: ''
         );
       _menu.add(p);
     }
@@ -208,7 +209,7 @@ class _MenuActivityState extends State<MenuActivity> {
                   height: CustomSize.sizeHeight(context) / 32,
                 ),
                 CustomText.textHeading3(
-                  text: "Menu di Restoranmu",
+                  text: "Menu di Restomu",
                   color: CustomColor.primary,
                   minSize: 18,
                   maxLines: 1
@@ -238,17 +239,27 @@ class _MenuActivityState extends State<MenuActivity> {
                           ),
                           child: Row(
                             children: [
-                              Container(
-                                width: CustomSize.sizeWidth(context) / 2.6,
-                                height: CustomSize.sizeWidth(context) / 2.6,
-                                decoration: BoxDecoration(
-                                  image: DecorationImage(
-                                      image: NetworkImage(Links.subUrl + menu[index].urlImg),
-                                      fit: BoxFit.cover
+                              FullScreenWidget(
+                                child: Container(
+                                  width: CustomSize.sizeWidth(context) / 2.6,
+                                  height: CustomSize.sizeWidth(context) / 2.6,
+                                  child: ClipRRect(
+                                    borderRadius: BorderRadius.circular(20),
+                                    child: Image.network(Links.subUrl + menu[index].urlImg, fit: BoxFit.fitWidth),
                                   ),
-                                  borderRadius: BorderRadius.circular(20),
                                 ),
                               ),
+                              // Container(
+                              //   width: CustomSize.sizeWidth(context) / 2.6,
+                              //   height: CustomSize.sizeWidth(context) / 2.6,
+                              //   decoration: BoxDecoration(
+                              //     image: DecorationImage(
+                              //         image: NetworkImage(Links.subUrl + menu[index].urlImg),
+                              //         fit: BoxFit.cover
+                              //     ),
+                              //     borderRadius: BorderRadius.circular(20),
+                              //   ),
+                              // ),
                               SizedBox(
                                 width: CustomSize.sizeWidth(context) / 32,
                               ),
@@ -270,27 +281,27 @@ class _MenuActivityState extends State<MenuActivity> {
                                           children: [
                                             GestureDetector(
                                                 onTap: (){
-                                                  Navigator.pushReplacement(
+                                                  Navigator.push(
                                                       context,
                                                       PageTransition(
                                                           type: PageTransitionType.rightToLeft,
                                                           child: EditMenu(menu[index])));
                                                 },
-                                                child: Icon(Icons.edit, color: CustomColor.primary,)
+                                                child: Icon(Icons.edit, color: Colors.grey,)
                                             ),
                                             SizedBox(width: CustomSize.sizeWidth(context) / 86,),
                                             GestureDetector(
                                                 onTap: (){
                                                   showAlertDialog(menu[index].id.toString());
                                                 },
-                                                child: Icon(Icons.delete, color: CustomColor.primary,)
+                                                child: Icon(Icons.delete, color: CustomColor.redBtn,)
                                             ),
                                             SizedBox(width: CustomSize.sizeWidth(context) / 98,),
                                           ],
                                         )
                                       ],
                                     ),
-                                    SizedBox(height: CustomSize.sizeHeight(context) / 86,),
+                                    SizedBox(height: CustomSize.sizeHeight(context) * 0.0025,),
                                     CustomText.textHeading4(
                                         text: menu[index].name,
                                         minSize: 18,
@@ -301,6 +312,7 @@ class _MenuActivityState extends State<MenuActivity> {
                                       maxLines: 1,
                                       minSize: 12
                                     ),
+                                    SizedBox(height: CustomSize.sizeHeight(context) * 0.005,),
                                     (menu[index].is_recommended != '0')?CustomText.bodyMedium12(
                                         text: (menu[index].is_recommended == '1')?'Recommended':'',
                                       maxLines: 1,
@@ -312,17 +324,17 @@ class _MenuActivityState extends State<MenuActivity> {
                                         minSize: 12,
                                         color: CustomColor.accent
                                     ),
-                                    SizedBox(height: CustomSize.sizeHeight(context) / 136,),
+                                    SizedBox(height: CustomSize.sizeHeight(context) / 56,),
                                     Row(
                                       children: [
-                                        CustomText.bodyRegular12(text: 'Original: '+NumberFormat.currency(locale: 'id', symbol: '', decimalDigits: 0).format(menu[index].price.original), minSize: 12),
+                                        CustomText.bodyRegular12(text: 'Harga: '+NumberFormat.currency(locale: 'id', symbol: '', decimalDigits: 0).format(menu[index].price!.original), minSize: 12),
                                       ],
                                     ),
-                                    Row(
-                                      children: [
-                                        CustomText.bodyRegular12(text: 'Delivery/Takeaway: '+NumberFormat.currency(locale: 'id', symbol: '', decimalDigits: 0).format(menu[index].delivery_price.delivery), minSize: 12),
-                                      ],
-                                    )
+                                    // Row(
+                                    //   children: [
+                                    //     CustomText.bodyRegular12(text: 'Delivery/Takeaway: '+NumberFormat.currency(locale: 'id', symbol: '', decimalDigits: 0).format(menu[index].delivery_price.delivery), minSize: 12),
+                                    //   ],
+                                    // )
                                   ],
                                 ),
                               )
@@ -343,7 +355,7 @@ class _MenuActivityState extends State<MenuActivity> {
                       height: CustomSize.sizeHeight(context) / 32,
                     ),
                     CustomText.textHeading3(
-                        text: "Menu di Restoranmu",
+                        text: "Menu di Restomu",
                         color: CustomColor.primary,
                         minSize: 18,
                         maxLines: 1
@@ -376,7 +388,7 @@ class _MenuActivityState extends State<MenuActivity> {
             width: CustomSize.sizeWidth(context) / 6.6,
             height: CustomSize.sizeWidth(context) / 6.6,
             decoration: BoxDecoration(
-                color: CustomColor.primary,
+                color: CustomColor.primaryLight,
                 shape: BoxShape.circle
             ),
             child: Center(child: Icon(FontAwesome.plus, color: Colors.white, size: 29,)),

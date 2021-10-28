@@ -1,13 +1,13 @@
 class Price{
-  int original;
-  int discounted;
-  int delivery;
-  int takeaway;
-  int disctakeaway;
-  String oriString;
-  String deliString;
+  int? original;
+  int? discounted;
+  int? delivery;
+  int? takeaway;
+  int? disctakeaway;
+  String? oriString;
+  String? deliString;
 
-  Price({this.original, this.discounted, this.delivery});
+  Price({required this.original, required this.discounted, required this.delivery});
 
   Price.original(this.original);
 

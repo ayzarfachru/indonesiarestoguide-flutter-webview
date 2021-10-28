@@ -4,29 +4,33 @@ import 'package:day_night_time_picker/lib/constants.dart';
 import 'package:day_night_time_picker/lib/daynight_timepicker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_icons/flutter_icons.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:indonesiarestoguide/model/History.dart';
-import 'package:indonesiarestoguide/model/Schedule.dart';
-import 'package:indonesiarestoguide/ui/ui_resto/home/home_activity.dart';
-import 'package:indonesiarestoguide/ui/ui_resto/schedule_resto/edit_schedule.dart';
-import 'package:indonesiarestoguide/utils/utils.dart';
+import 'package:kam5ia/model/History.dart';
+import 'package:kam5ia/model/Schedule.dart';
+import 'package:kam5ia/ui/ui_resto/home/home_activity.dart';
+import 'package:kam5ia/ui/ui_resto/schedule_resto/edit_schedule.dart';
+import 'package:kam5ia/utils/utils.dart';
 import 'package:intl/intl.dart';
 import 'package:page_transition/page_transition.dart';
 import 'package:pull_to_refresh/pull_to_refresh.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:http/http.dart' as http;
-import 'package:indonesiarestoguide/ui/detail/detail_history.dart';
+import 'package:kam5ia/ui/detail/detail_history.dart';
 
 class ScheduleActivity extends StatefulWidget {
+  String id = '';
+  ScheduleActivity(this.id);
+
   @override
-  _ScheduleActivityState createState() => _ScheduleActivityState();
+  _ScheduleActivityState createState() => _ScheduleActivityState(id);
 }
 
 class DayChip extends StatefulWidget {
   final List<String> dayList;
   final Function(List<String>) onSelectionChanged;
 
-  DayChip(this.dayList, {this.onSelectionChanged});
+  DayChip(this.dayList, {required this.onSelectionChanged});
 
   @override
   CuisineChipState createState() => CuisineChipState();
@@ -34,10 +38,10 @@ class DayChip extends StatefulWidget {
 
 class CuisineChipState extends State<DayChip> {
   // String selectedChoice = "";
-  List<String> selectedChoices = List();
+  List<String> selectedChoices = [];
 
   _buildChoiceList() {
-    List<Widget> choices = List();
+    List<Widget> choices = [];
 
     widget.dayList.forEach((item) {
       choices.add(Container(
@@ -75,6 +79,10 @@ class CuisineChipState extends State<DayChip> {
 }
 
 class _ScheduleActivityState extends State<ScheduleActivity> {
+  String id = '';
+
+  _ScheduleActivityState(this.id);
+
   void setState(fn) {
     if(mounted) {
       super.setState(fn);
@@ -89,10 +97,10 @@ class _ScheduleActivityState extends State<ScheduleActivity> {
   String homepg = "";
   String img = "";
 
-  TimeOfDay jamBuka = TimeOfDay();
-  TimeOfDay jamTutup = TimeOfDay();
-  String buka;
-  String tutup;
+  TimeOfDay jamBuka = TimeOfDay.now();
+  TimeOfDay jamTutup = TimeOfDay.now();
+  String? buka;
+  String? tutup;
 
   bool isLoading = false;
 
@@ -106,8 +114,8 @@ class _ScheduleActivityState extends State<ScheduleActivity> {
     "Minggu",
   ];
 
-  List<String> selectedDayList = List();
-  String openDay;
+  List<String> selectedDayList = [];
+  String? openDay;
 
   _showOpenDayDialog() {
     showDialog(
@@ -123,7 +131,7 @@ class _ScheduleActivityState extends State<ScheduleActivity> {
                   selectedDayList = selectedList;
                   openDay = selectedDayList.join(",");
                   if (openDay != "") {
-                    selectedList = openDay.split(",");
+                    selectedList = openDay!.split(",");
                   } else {}
                 });
               },
@@ -151,7 +159,7 @@ class _ScheduleActivityState extends State<ScheduleActivity> {
     _openDayController = TextEditingController(text: openDay);
   }
 
-  String closeDay;
+  String? closeDay;
 
   _showCloseDayDialog() {
     showDialog(
@@ -167,7 +175,7 @@ class _ScheduleActivityState extends State<ScheduleActivity> {
                   selectedDayList = selectedList;
                   closeDay = selectedDayList.join(",");
                   if (closeDay != "") {
-                    selectedList = closeDay.split(",");
+                    selectedList = closeDay!.split(",");
                   } else {}
                 });
               },
@@ -206,11 +214,11 @@ class _ScheduleActivityState extends State<ScheduleActivity> {
   RefreshController _refreshController =
   RefreshController(initialRefresh: false);
 
-  Future<List<Schedule>> future;
+  Future<List<Schedule?>?>? future;
   void _onRefresh() async {
     // monitor network fetch
     setState(() {
-      Navigator.pushReplacement(context, PageTransition(type: PageTransitionType.fade, child: new ScheduleActivity()));
+      Navigator.pushReplacement(context, PageTransition(type: PageTransitionType.fade, child: new ScheduleActivity(id)));
     });
     await Future.delayed(Duration(milliseconds: 1000));
     // if failed,use refreshFailed()
@@ -247,11 +255,11 @@ class _ScheduleActivityState extends State<ScheduleActivity> {
   //------------------------------= DATE PICKER =----------------------------------
   DateTime selectedDate = DateTime.now().add(const Duration(days: 7));
   List<String> selectedDateList = [];
-  String dates;
-  String dates2;
+  String? dates;
+  String? dates2;
 
   Future<Null> _selectDate(BuildContext context) async {
-    final DateTime picked = await showDatePicker(
+    final DateTime? picked = await showDatePicker(
       context: context,
       initialDate: selectedDate,
       initialDatePickerMode: DatePickerMode.day,
@@ -260,14 +268,14 @@ class _ScheduleActivityState extends State<ScheduleActivity> {
       confirmText: "Simpan",
       firstDate: DateTime(2009),
       lastDate: DateTime(2101),
-      builder: (BuildContext context, Widget child) {
+      builder: (BuildContext context, Widget? child) {
         return Theme(
           data: ThemeData.dark().copyWith(
               backgroundColor: Colors.black,
               primaryColor: CustomColor.secondary, //Head background
               accentColor: CustomColor.secondary //s //Background color
           ),
-          child: child,
+          child: child!,
         );
       },
     );
@@ -275,16 +283,16 @@ class _ScheduleActivityState extends State<ScheduleActivity> {
       setState(() {
         selectedDate = picked;
         dates = DateFormat('dd-MM-yyyy').format(selectedDate);
-        selectedDateList = dates.split(",");
+        selectedDateList = dates!.split(",");
         print(selectedDateList);
         // selectedDate = picked;
-        _openDayController.text = dates;
+        _openDayController.text = dates!;
       });
     } else if (picked != null && dates != null) {
       setState(() {
         selectedDate = picked;
         dates = DateFormat('dd-MM-yyyy').format(selectedDate);
-        selectedDateList.add(dates);
+        selectedDateList.add(dates!);
         dates2 = selectedDateList.join(",");
         print(selectedDateList);
         _openDayController.text = selectedDateList.join(",");
@@ -323,6 +331,7 @@ class _ScheduleActivityState extends State<ScheduleActivity> {
     setState(() {
       openAndClose = pref.getString('openclose');
       print(openAndClose);
+      // isOpen = pref.getString('isOpen');
     });
   }
 
@@ -375,6 +384,11 @@ class _ScheduleActivityState extends State<ScheduleActivity> {
     if(data['status_code'] == 200){
       print("success");
       print(data["status"]);
+      Navigator.pushReplacement(
+          context,
+          PageTransition(
+              type: PageTransitionType.fade,
+              child: HomeActivityResto()));
     } else {
       print(data);
     }
@@ -382,6 +396,41 @@ class _ScheduleActivityState extends State<ScheduleActivity> {
       schedule = _schedule;
       isLoading = false;
     });
+  }
+
+  String isOpen = "";
+  String status = "";
+  Future _getDetail()async{
+    SharedPreferences pref = await SharedPreferences.getInstance();
+    String token = pref.getString("token") ?? "";
+    var apiResult = await http.get(Links.mainUrl + '/resto/detail/$id', headers: {
+      "Accept": "Application/json",
+      "Authorization": "Bearer $token"
+    });
+    var data = json.decode(apiResult.body);
+    print('PIII'+data['data']['status'].toString()+','+data['data']['isOpen'].toString());
+
+    setState(() {
+      isOpen = data['data']['isOpen'].toString();
+      status = data['data']['status'].toString();
+    });
+  }
+
+  DateTime? currentBackPressTime;
+  Future<bool> onWillPop() async{
+    // DateTime now = DateTime.now();
+    // if (currentBackPressTime == null ||
+    //     now.difference(currentBackPressTime!) > Duration(seconds: 2)) {
+    //   currentBackPressTime = now;
+    //   // Fluttertoast.showToast(msg: 'Tekan sekali lagi untuk keluar');
+    //   return Future.value(false);
+    // }
+//    SystemNavigator.pop();
+    SharedPreferences pref = await SharedPreferences.getInstance();
+    // pref.setString("homepg", "");
+    // pref.setString("idresto", "");
+    Navigator.pushReplacement(context, MaterialPageRoute(builder: (context)=> HomeActivityResto()));
+    return Future.value(true);
   }
 
   @override
@@ -393,6 +442,7 @@ class _ScheduleActivityState extends State<ScheduleActivity> {
     getBuka();
     getHariBuka();
     print(selectedDateList);
+    _getDetail();
     super.initState();
   }
 
@@ -403,174 +453,189 @@ class _ScheduleActivityState extends State<ScheduleActivity> {
   }
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Colors.white,
-      body: SafeArea(
-        child: (isLoading)?Container(
-            width: CustomSize.sizeWidth(context),
-            height: CustomSize.sizeHeight(context),
-            child: Center(child: CircularProgressIndicator())):SmartRefresher(
-          enablePullDown: true,
-          enablePullUp: false,
-          header: WaterDropMaterialHeader(
-            distance: 30,
-            backgroundColor: Colors.white,
-            color: CustomColor.primary,
-          ),
-          controller: _refreshController,
-          onRefresh: _onRefresh,
-          onLoading: _onLoading,
-          child: SingleChildScrollView(
-            controller: _scrollController,
-            child: Padding(
-              padding: EdgeInsets.symmetric(horizontal: CustomSize.sizeWidth(context) / 24),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  SizedBox(
-                    height: CustomSize.sizeHeight(context) / 32,
-                  ),
-                  CustomText.textHeading3(
-                      text: "Jadwal Operasional",
-                      color: CustomColor.primary,
-                      minSize: 18,
-                      maxLines: 1
-                  ),
-                  ListView.builder(
-                      shrinkWrap: true,
-                      controller: _scrollController,
-                      physics: NeverScrollableScrollPhysics(),
-                      itemCount: schedule.length,
-                      itemBuilder: (_, index){
-                        return Padding(
-                          padding: EdgeInsets.only(top: CustomSize.sizeHeight(context) / 48),
-                          child: Container(
-                            width: CustomSize.sizeWidth(context),
-                            height: CustomSize.sizeWidth(context) / 5.4,
-                            decoration: BoxDecoration(
-                              color: Colors.white,
-                              borderRadius: BorderRadius.circular(20),
-                              boxShadow: [
-                                BoxShadow(
-                                  color: Colors.grey.withOpacity(0.5),
-                                  spreadRadius: 0,
-                                  blurRadius: 7,
-                                  offset: Offset(0, 0), // changes position of shadow
-                                ),
-                              ],
-                            ),
-                            child: Row(
-                              children: [
-                                SizedBox(
-                                  width: CustomSize.sizeWidth(context) / 32,
-                                ),
-                                Container(
-                                  width: CustomSize.sizeWidth(context) / 1.2,
-                                  child: Column(
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    crossAxisAlignment: CrossAxisAlignment.start,
-                                    children: [
-                                      Row(
-                                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                        children: [
-                                          Column(
-                                            crossAxisAlignment: CrossAxisAlignment.start,
-                                            children: [
-                                              CustomText.textHeading4(
-                                                  text: schedule[index].day,
-                                                  minSize: 18,
-                                                  maxLines: 1
-                                              ),
-                                              SizedBox(
-                                                width: CustomSize.sizeWidth(context) / 32,
-                                              ),
-                                              (schedule[index].open_at == "00:00:00" && schedule[index].open_at == "00:00:00")?
-                                              CustomText.bodyMedium12(
-                                                  text: "Hari ini tutup",
-                                                  color: CustomColor.redBtn,
-                                                  maxLines: 1,
-                                                  minSize: 12
-                                              )
-                                              :CustomText.bodyMedium12(
-                                                  text: schedule[index].open_at.split(':')[0]+':'+schedule[index].open_at.split(':')[1]
-                                                      +' - '+schedule[index].closed_at.split(':')[0]+':'+schedule[index].closed_at.split(':')[1],
-                                                  maxLines: 1,
-                                                  minSize: 12
-                                              ),
-                                            ],
-                                          ),
-                                          GestureDetector(
-                                              onTap: (){
-                                                Navigator.push(
-                                                    context,
-                                                    PageTransition(
-                                                        type: PageTransitionType.rightToLeft,
-                                                        child: EditSchedule(schedule[index])));
-                                              },
-                                              child: Icon(Icons.edit, color: CustomColor.primary, size: 20,)
-                                          ),
-                                        ],
-                                      ),
-                                      SizedBox(
-                                        width: CustomSize.sizeWidth(context) / 32,
-                                      ),
-                                    ],
+    return WillPopScope(
+      onWillPop: onWillPop,
+      child: Scaffold(
+        backgroundColor: Colors.white,
+        body: SafeArea(
+          child: (isLoading)?Container(
+              width: CustomSize.sizeWidth(context),
+              height: CustomSize.sizeHeight(context),
+              child: Center(child: CircularProgressIndicator(
+                color: CustomColor.primaryLight,
+              ))):SmartRefresher(
+            enablePullDown: true,
+            enablePullUp: false,
+            header: WaterDropMaterialHeader(
+              distance: 30,
+              backgroundColor: Colors.white,
+              color: CustomColor.primaryLight,
+            ),
+            controller: _refreshController,
+            onRefresh: _onRefresh,
+            onLoading: _onLoading,
+            child: SingleChildScrollView(
+              controller: _scrollController,
+              child: Padding(
+                padding: EdgeInsets.symmetric(horizontal: CustomSize.sizeWidth(context) / 24),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    SizedBox(
+                      height: CustomSize.sizeHeight(context) / 32,
+                    ),
+                    CustomText.textHeading3(
+                        text: "Jadwal Operasional",
+                        color: CustomColor.primary,
+                        minSize: 18,
+                        maxLines: 1
+                    ),
+                    ListView.builder(
+                        shrinkWrap: true,
+                        controller: _scrollController,
+                        physics: NeverScrollableScrollPhysics(),
+                        itemCount: schedule.length,
+                        itemBuilder: (_, index){
+                          return Padding(
+                            padding: EdgeInsets.only(top: CustomSize.sizeHeight(context) / 48),
+                            child: Container(
+                              width: CustomSize.sizeWidth(context),
+                              height: CustomSize.sizeWidth(context) / 5.4,
+                              decoration: BoxDecoration(
+                                color: Colors.white,
+                                borderRadius: BorderRadius.circular(20),
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: Colors.grey.withOpacity(0.5),
+                                    spreadRadius: 0,
+                                    blurRadius: 7,
+                                    offset: Offset(0, 0), // changes position of shadow
                                   ),
-                                )
-                              ],
+                                ],
+                              ),
+                              child: Row(
+                                children: [
+                                  SizedBox(
+                                    width: CustomSize.sizeWidth(context) / 32,
+                                  ),
+                                  Container(
+                                    width: CustomSize.sizeWidth(context) / 1.2,
+                                    child: Column(
+                                      mainAxisAlignment: MainAxisAlignment.center,
+                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      children: [
+                                        Row(
+                                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                          children: [
+                                            Column(
+                                              crossAxisAlignment: CrossAxisAlignment.start,
+                                              children: [
+                                                CustomText.textHeading4(
+                                                    text: schedule[index].day,
+                                                    minSize: 18,
+                                                    maxLines: 1
+                                                ),
+                                                SizedBox(
+                                                  width: CustomSize.sizeWidth(context) / 32,
+                                                ),
+                                                (schedule[index].open_at == "00:00:00" && schedule[index].open_at == "00:00:00")?
+                                                CustomText.bodyMedium12(
+                                                    text: "Hari ini tutup",
+                                                    color: CustomColor.redBtn,
+                                                    maxLines: 1,
+                                                    minSize: 12
+                                                )
+                                                :CustomText.bodyMedium12(
+                                                    text: schedule[index].open_at.split(':')[0]+':'+schedule[index].open_at.split(':')[1]
+                                                        +' - '+schedule[index].closed_at.split(':')[0]+':'+schedule[index].closed_at.split(':')[1],
+                                                    maxLines: 1,
+                                                    minSize: 12
+                                                ),
+                                              ],
+                                            ),
+                                            GestureDetector(
+                                                onTap: (){
+                                                  Navigator.push(
+                                                      context,
+                                                      PageTransition(
+                                                          type: PageTransitionType.rightToLeft,
+                                                          child: EditSchedule(schedule[index], id)));
+                                                },
+                                                child: Icon(Icons.edit, color: Colors.grey, size: 20,)
+                                            ),
+                                          ],
+                                        ),
+                                        SizedBox(
+                                          width: CustomSize.sizeWidth(context) / 32,
+                                        ),
+                                      ],
+                                    ),
+                                  )
+                                ],
+                              ),
                             ),
-                          ),
-                        );
-                      }
-                  ),
-                  SizedBox(height: CustomSize.sizeHeight(context) / 9,),
-                ],
+                          );
+                        }
+                    ),
+                    SizedBox(height: CustomSize.sizeHeight(context) / 9,),
+                  ],
+                ),
               ),
             ),
           ),
         ),
-      ),
-      floatingActionButton: Column(
-        mainAxisAlignment: MainAxisAlignment.end,
-        children: [
-          GestureDetector(
-            onTap: () async{
-              if(openAndClose == null){
-                SharedPreferences pref = await SharedPreferences.getInstance();
-                pref.setString("openclose", "1");
-              }else if(openAndClose == '1'){
-                SharedPreferences pref = await SharedPreferences.getInstance();
-                pref.setString("openclose", null);
-              }
-              setState(() {
-                isLoading = false;
-              });
-              _closeNow();
-              Navigator.pushReplacement(
-                  context,
-                  PageTransition(
-                      type: PageTransitionType.fade,
-                      child: HomeActivityResto()));
-              // SharedPreferences pref = await SharedPreferences.getInstance();
-              // pref.setString("name", _loginTextName.text.toString());
-              // pref.setString("email", _loginEmailName.text.toString());
-              // pref.setString("img", (image == null)?img:base64Encode(image.readAsBytesSync()).toString());
-              // pref.setString("gender", gender);
-              // pref.setString("tgl", tgl);
-              // pref.setString("notelp", _loginNotelpName.text.toString());
-            },
-            child: Container(
-              width: CustomSize.sizeWidth(context) / 1.1,
-              height: CustomSize.sizeHeight(context) / 14,
-              decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(30),
-                  color: (openAndClose == null)?CustomColor.redBtn:CustomColor.accent
+        floatingActionButton: (isOpen == '')?Container():Column(
+          mainAxisAlignment: MainAxisAlignment.end,
+          children: [
+            GestureDetector(
+              onTap: () async{
+                // if(openAndClose == '0'){
+                //   SharedPreferences pref = await SharedPreferences.getInstance();
+                //   pref.setString("openclose", "1");
+                // }else if(openAndClose == '1'){
+                //   SharedPreferences pref = await SharedPreferences.getInstance();
+                //   pref.setString("openclose", '0');
+                // }
+                setState(() {
+                  isLoading = false;
+                });
+                
+                if (status == 'active') {
+                  if (isOpen == 'true') {
+                    _closeNow();
+                  } else {
+                    Fluttertoast.showToast(msg: "Tokomu saat ini sudah tutup",);
+                  }
+                } else {
+                  _closeNow();
+                }
+                // if (isOpen != 'false') {
+                //   _closeNow();
+                // } else {
+                //   Fluttertoast.showToast(msg: "Tokomu saat ini sudah tutup",);
+                // }
+
+                // SharedPreferences pref = await SharedPreferences.getInstance();
+                // pref.setString("name", _loginTextName.text.toString());
+                // pref.setString("email", _loginEmailName.text.toString());
+                // pref.setString("img", (image == null)?img:base64Encode(image.readAsBytesSync()).toString());
+                // pref.setString("gender", gender);
+                // pref.setString("tgl", tgl);
+                // pref.setString("notelp", _loginNotelpName.text.toString());
+              },
+              child: Container(
+                width: CustomSize.sizeWidth(context) / 1.1,
+                height: CustomSize.sizeHeight(context) / 14,
+                decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(30),
+                    color: (status == 'active')?(isOpen == 'true')?CustomColor.redBtn:CustomColor.redBtn:CustomColor.accent
+                ),
+                child: Center(child: CustomText.bodyRegular16(text: (status == 'active')?(isOpen == 'true')?"Tutup Sekarang!":"Tutup Sekarang!":"Buka Sekarang!", color: Colors.white,)),
               ),
-              child: Center(child: CustomText.bodyRegular16(text: (openAndClose == null)?"Tutup Sekarang!":"Buka Sekarang!", color: Colors.white,)),
             ),
-          ),
-          // SizedBox(height: CustomSize.sizeHeight(context) * 0.005,),
-        ],
+            // SizedBox(height: CustomSize.sizeHeight(context) * 0.005,),
+          ],
+        ),
       ),
     );
   }

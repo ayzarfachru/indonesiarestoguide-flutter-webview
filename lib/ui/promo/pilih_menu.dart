@@ -3,15 +3,15 @@ import 'dart:convert';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_icons/flutter_icons.dart';
-import 'package:indonesiarestoguide/model/CategoryMenu.dart';
-import 'package:indonesiarestoguide/model/Menu.dart';
-import 'package:indonesiarestoguide/model/MenuJson.dart';
-import 'package:indonesiarestoguide/model/Price.dart';
-import 'package:indonesiarestoguide/model/Promo.dart';
-import 'package:indonesiarestoguide/ui/promo/add_promo.dart';
-import 'package:indonesiarestoguide/ui/ui_resto/menu/add_menu.dart';
-import 'package:indonesiarestoguide/ui/ui_resto/menu/edit_menu.dart';
-import 'package:indonesiarestoguide/utils/utils.dart';
+import 'package:kam5ia/model/CategoryMenu.dart';
+import 'package:kam5ia/model/Menu.dart';
+import 'package:kam5ia/model/MenuJson.dart';
+import 'package:kam5ia/model/Price.dart';
+import 'package:kam5ia/model/Promo.dart';
+import 'package:kam5ia/ui/promo/add_promo.dart';
+import 'package:kam5ia/ui/ui_resto/menu/add_menu.dart';
+import 'package:kam5ia/ui/ui_resto/menu/edit_menu.dart';
+import 'package:kam5ia/utils/utils.dart';
 import 'package:intl/intl.dart';
 import 'package:page_transition/page_transition.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -68,7 +68,7 @@ class _PilihMenuActivityState extends State<PilihMenuActivity> {
               name: a['name'],
               desc: a['desc'],
               price: Price.delivery(a['price'], a['delivery_price']),
-              urlImg: a['img']
+              urlImg: a['img'], type: '', restoId: '', delivery_price: null, distance: null, restoName: '', qty: '', is_recommended: ''
           );
           _cateMenu.add(m);
         }
@@ -106,8 +106,8 @@ class _PilihMenuActivityState extends State<PilihMenuActivity> {
           urlImg: v['img'],
           type: v['type'],
           is_recommended: v['is_recommended'],
-          price: Price(original: int.parse(v['price'].toString())),
-          delivery_price: Price.delivery(int.parse(v['price']), int.parse(v['delivery_price']))
+          price: Price(original: int.parse(v['price'].toString()), discounted: null, delivery: null),
+          delivery_price: Price(original: int.parse(v['price']), delivery: null, discounted: null), restoId: '', distance: null, restoName: '', qty: ''
       );
       _menu.add(p);
     }
@@ -268,6 +268,7 @@ class _PilihMenuActivityState extends State<PilihMenuActivity> {
                                             maxLines: 1,
                                             minSize: 12
                                         ),
+                                        SizedBox(height: CustomSize.sizeHeight(context) * 0.0025,),
                                         (menu[index].is_recommended != '0')?CustomText.bodyMedium12(
                                             text: (menu[index].is_recommended == '1')?'Recommended':'',
                                             maxLines: 1,
@@ -279,17 +280,12 @@ class _PilihMenuActivityState extends State<PilihMenuActivity> {
                                             minSize: 12,
                                             color: CustomColor.accent
                                         ),
-                                        SizedBox(height: CustomSize.sizeHeight(context) / 136,),
+                                        SizedBox(height: CustomSize.sizeHeight(context) / 56,),
                                         Row(
                                           children: [
-                                            CustomText.bodyRegular12(text: 'Original: '+NumberFormat.currency(locale: 'id', symbol: '', decimalDigits: 0).format(menu[index].price.original), minSize: 12),
+                                            CustomText.bodyRegular12(text: 'Harga: '+NumberFormat.currency(locale: 'id', symbol: '', decimalDigits: 0).format(menu[index].price!.original), minSize: 12),
                                           ],
                                         ),
-                                        Row(
-                                          children: [
-                                            CustomText.bodyRegular12(text: 'Delivery: '+NumberFormat.currency(locale: 'id', symbol: '', decimalDigits: 0).format(menu[index].delivery_price.delivery), minSize: 12),
-                                          ],
-                                        )
                                       ],
                                     ),
                                   )

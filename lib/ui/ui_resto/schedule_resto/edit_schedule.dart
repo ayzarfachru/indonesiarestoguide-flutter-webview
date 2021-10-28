@@ -5,32 +5,33 @@ import 'package:day_night_time_picker/lib/daynight_timepicker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_icons/flutter_icons.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:indonesiarestoguide/model/History.dart';
-import 'package:indonesiarestoguide/model/Schedule.dart';
-import 'package:indonesiarestoguide/ui/ui_resto/home/home_activity.dart';
-import 'package:indonesiarestoguide/ui/ui_resto/schedule_resto/schedule_activity.dart';
-import 'package:indonesiarestoguide/utils/utils.dart';
+import 'package:kam5ia/model/History.dart';
+import 'package:kam5ia/model/Schedule.dart';
+import 'package:kam5ia/ui/ui_resto/home/home_activity.dart';
+import 'package:kam5ia/ui/ui_resto/schedule_resto/schedule_activity.dart';
+import 'package:kam5ia/utils/utils.dart';
 import 'package:intl/intl.dart';
 import 'package:page_transition/page_transition.dart';
 import 'package:pull_to_refresh/pull_to_refresh.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:http/http.dart' as http;
-import 'package:indonesiarestoguide/ui/detail/detail_history.dart';
+import 'package:kam5ia/ui/detail/detail_history.dart';
 
 class EditSchedule extends StatefulWidget {
   Schedule detailSchedule;
+  String idResto = '';
 
-  EditSchedule(this.detailSchedule);
+  EditSchedule(this.detailSchedule, this.idResto);
 
   @override
-  _EditScheduleState createState() => _EditScheduleState(detailSchedule);
+  _EditScheduleState createState() => _EditScheduleState(detailSchedule, idResto);
 }
 
 class DayChip extends StatefulWidget {
   final List<String> dayList;
   final Function(List<String>) onSelectionChanged;
 
-  DayChip(this.dayList, {this.onSelectionChanged});
+  DayChip(this.dayList, {required this.onSelectionChanged});
 
   @override
   CuisineChipState createState() => CuisineChipState();
@@ -38,10 +39,10 @@ class DayChip extends StatefulWidget {
 
 class CuisineChipState extends State<DayChip> {
   // String selectedChoice = "";
-  List<String> selectedChoices = List();
+  List<String> selectedChoices = [];
 
   _buildChoiceList() {
-    List<Widget> choices = List();
+    List<Widget> choices = [];
 
     widget.dayList.forEach((item) {
       choices.add(Container(
@@ -84,9 +85,11 @@ class _EditScheduleState extends State<EditSchedule> {
       super.setState(fn);
     }
   }
-  Schedule detailSchedule;
 
-  _EditScheduleState(this.detailSchedule);
+  Schedule detailSchedule;
+  String idResto = '';
+
+  _EditScheduleState(this.detailSchedule, this.idResto);
 
   ScrollController _scrollController = ScrollController();
   TextEditingController _JamOperasionalBuka = TextEditingController(text: "");
@@ -96,10 +99,10 @@ class _EditScheduleState extends State<EditSchedule> {
   String homepg = "";
   String img = "";
 
-  TimeOfDay jamBuka = TimeOfDay();
-  TimeOfDay jamTutup = TimeOfDay();
-  String buka;
-  String tutup;
+  TimeOfDay jamBuka = TimeOfDay.now();
+  TimeOfDay jamTutup = TimeOfDay.now();
+  String? buka;
+  String? tutup;
 
   bool isLoading = false;
 
@@ -113,8 +116,8 @@ class _EditScheduleState extends State<EditSchedule> {
     "Minggu",
   ];
 
-  List<String> selectedDayList = List();
-  String openDay;
+  List<String> selectedDayList = [];
+  String? openDay;
 
 
   _showOpenDayDialog() {
@@ -131,7 +134,7 @@ class _EditScheduleState extends State<EditSchedule> {
                   selectedDayList = selectedList;
                   openDay = selectedDayList.join(",");
                   if (openDay != "") {
-                    selectedList = openDay.split(",");
+                    selectedList = openDay!.split(",");
                   } else {}
                 });
               },
@@ -167,7 +170,7 @@ class _EditScheduleState extends State<EditSchedule> {
     _openDayController = TextEditingController(text: detailSchedule.day);
   }
 
-  String closeDay;
+  String? closeDay;
 
   _showCloseDayDialog() {
     showDialog(
@@ -183,7 +186,7 @@ class _EditScheduleState extends State<EditSchedule> {
                   selectedDayList = selectedList;
                   closeDay = selectedDayList.join(",");
                   if (closeDay != "") {
-                    selectedList = closeDay.split(",");
+                    selectedList = closeDay!.split(",");
                   } else {}
                 });
               },
@@ -222,7 +225,7 @@ class _EditScheduleState extends State<EditSchedule> {
   RefreshController _refreshController =
   RefreshController(initialRefresh: false);
 
-  Future<List<Schedule>> future;
+  Future<List<Schedule?>?>? future;
 
   void _onLoading() async {
     // monitor network fetch
@@ -254,11 +257,11 @@ class _EditScheduleState extends State<EditSchedule> {
   //------------------------------= DATE PICKER =----------------------------------
   DateTime selectedDate = DateTime.now().add(const Duration(days: 7));
   List<String> selectedDateList = [];
-  String dates;
-  String dates2;
+  String? dates;
+  String? dates2;
 
   Future<Null> _selectDate(BuildContext context) async {
-    final DateTime picked = await showDatePicker(
+    final DateTime? picked = await showDatePicker(
       context: context,
       initialDate: selectedDate,
       initialDatePickerMode: DatePickerMode.day,
@@ -267,14 +270,14 @@ class _EditScheduleState extends State<EditSchedule> {
       confirmText: "Simpan",
       firstDate: DateTime(2009),
       lastDate: DateTime(2101),
-      builder: (BuildContext context, Widget child) {
+      builder: (BuildContext context, Widget? child) {
         return Theme(
           data: ThemeData.dark().copyWith(
               backgroundColor: Colors.black,
               primaryColor: CustomColor.secondary, //Head background
               accentColor: CustomColor.secondary //s //Background color
           ),
-          child: child,
+          child: child!,
         );
       },
     );
@@ -282,16 +285,16 @@ class _EditScheduleState extends State<EditSchedule> {
       setState(() {
         selectedDate = picked;
         dates = DateFormat('dd-MM-yyyy').format(selectedDate);
-        selectedDateList = dates.split(",");
+        selectedDateList = dates!.split(",");
         print(selectedDateList);
         // selectedDate = picked;
-        _openDayController.text = dates;
+        _openDayController.text = dates!;
       });
     } else if (picked != null && dates != null) {
       setState(() {
         selectedDate = picked;
         dates = DateFormat('dd-MM-yyyy').format(selectedDate);
-        selectedDateList.add(dates);
+        selectedDateList.add(dates!);
         dates2 = selectedDateList.join(",");
         print(selectedDateList);
         _openDayController.text = selectedDateList.join(",");
@@ -325,8 +328,8 @@ class _EditScheduleState extends State<EditSchedule> {
   //   });
   // }
 
-  String id;
-  String dayId;
+  String? id;
+  String? dayId;
   List<Schedule> _schedule = [];
   List<Schedule> schedule = [];
   Future<void> _editSchedule()async{
@@ -354,6 +357,12 @@ class _EditScheduleState extends State<EditSchedule> {
         'day': dayId,
         'hours': _JamOperasionalBuka.text+'-'+_JamOperasionalTutup.text,
       }));
+      Navigator.pop(context);
+      Navigator.pushReplacement(
+          context,
+          PageTransition(
+              type: PageTransitionType.fade,
+              child: ScheduleActivity(idResto)));
     } else {
       print(data);
       print(json.encode({
@@ -392,6 +401,12 @@ class _EditScheduleState extends State<EditSchedule> {
         'day': dayId,
         'hours': '00:00-00:00',
       }));
+      Navigator.pop(context);
+      Navigator.pushReplacement(
+          context,
+          PageTransition(
+              type: PageTransitionType.fade,
+              child: ScheduleActivity(idResto)));
     } else {
       print(data);
       print(json.encode({
@@ -430,6 +445,12 @@ class _EditScheduleState extends State<EditSchedule> {
         'day': dayId,
         'hours': '08:00-20:00',
       }));
+      Navigator.pop(context);
+      Navigator.pushReplacement(
+          context,
+          PageTransition(
+              type: PageTransitionType.fade,
+              child: ScheduleActivity(idResto)));
     } else {
       print(data);
       print(json.encode({
@@ -483,7 +504,9 @@ class _EditScheduleState extends State<EditSchedule> {
         child: (isLoading)?Container(
             width: CustomSize.sizeWidth(context),
             height: CustomSize.sizeHeight(context),
-            child: Center(child: CircularProgressIndicator())):SingleChildScrollView(
+            child: Center(child: CircularProgressIndicator(
+              color: CustomColor.primaryLight,
+            ))):SingleChildScrollView(
               controller: _scrollController,
               child: Padding(
                 padding: EdgeInsets.symmetric(horizontal: CustomSize.sizeWidth(context) / 38),
@@ -564,6 +587,7 @@ class _EditScheduleState extends State<EditSchedule> {
                                   });
                                   Navigator.of(context).push(
                                       showPicker(
+                                        is24HrFormat: true,
                                         blurredBackground: true,
                                         accentColor: Colors.blue[400],
                                         context: context,
@@ -655,11 +679,12 @@ class _EditScheduleState extends State<EditSchedule> {
                                       maxMinute: 59,
                                       cancelText: 'batal',
                                       okText: 'simpan',
+                                      is24HrFormat: true,
                                       // Optional onChange to receive value as DateTime
                                       onChangeDateTime: (DateTime dateTime) {
                                         print(jamBuka.hour.toString() + ':' + jamBuka.minute.toString());
                                         print(jamTutup.hour.toString() + ':' + jamTutup.minute.toString()+'ini tutup');
-                                        print(buka + 'ini buka');
+                                        print(buka! + 'ini buka');
                                         tutup = jamTutup.hour.toString() + ':' + jamTutup.minute.toString();
                                         getTutup();
                                       },
@@ -710,12 +735,6 @@ class _EditScheduleState extends State<EditSchedule> {
                 isLoading = false;
               });
               _closedSchedule();
-              Navigator.pop(context);
-              Navigator.pushReplacement(
-                  context,
-                  PageTransition(
-                      type: PageTransitionType.fade,
-                      child: ScheduleActivity()));
               // SharedPreferences pref = await SharedPreferences.getInstance();
               // pref.setString("name", _loginTextName.text.toString());
               // pref.setString("email", _loginEmailName.text.toString());
@@ -739,12 +758,6 @@ class _EditScheduleState extends State<EditSchedule> {
                 isLoading = false;
               });
               _openSchedule();
-              Navigator.pop(context);
-              Navigator.pushReplacement(
-                  context,
-                  PageTransition(
-                      type: PageTransitionType.fade,
-                      child: ScheduleActivity()));
               // SharedPreferences pref = await SharedPreferences.getInstance();
               // pref.setString("name", _loginTextName.text.toString());
               // pref.setString("email", _loginEmailName.text.toString());
@@ -770,12 +783,6 @@ class _EditScheduleState extends State<EditSchedule> {
                 isLoading = false;
               });
               _editSchedule();
-              Navigator.pop(context);
-              Navigator.pushReplacement(
-                  context,
-                  PageTransition(
-                      type: PageTransitionType.fade,
-                      child: ScheduleActivity()));
               // SharedPreferences pref = await SharedPreferences.getInstance();
               // pref.setString("name", _loginTextName.text.toString());
               // pref.setString("email", _loginEmailName.text.toString());

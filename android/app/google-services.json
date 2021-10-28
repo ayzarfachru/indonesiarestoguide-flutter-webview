@@ -22,6 +22,38 @@
           }
         },
         {
+          "client_id": "839490096186-dloiaack0n9e6e2p19cek8chrjvi3ln6.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.devus.indonesiarestoguide",
+            "certificate_hash": "e8b553cd22807edadc2eae9cbdfc9a3e3f30457e"
+          }
+        },
+        {
+          "client_id": "839490096186-oqk4j36l6thtfah9f957n8mesndhpkns.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.devus.indonesiarestoguide",
+            "certificate_hash": "54e549d241a0adae02b062501f04ca81be55130f"
+          }
+        },
+        {
+          "client_id": "839490096186-qdg38o31d34ca0t354tppc9cim9oohv1.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.devus.indonesiarestoguide",
+            "certificate_hash": "d6bdc4c0e66f07bd84afa0b0860db887e9fc3c48"
+          }
+        },
+        {
+          "client_id": "839490096186-sm5o6p4h05bp4k1fld53t6rj0im4vok0.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.devus.indonesiarestoguide",
+            "certificate_hash": "17d634efc50a6bf1fd1d232c659ee395c5cc49b5"
+          }
+        },
+        {
           "client_id": "839490096186-4ulavkeso7qrl384n3tmd55qmh4iot2o.apps.googleusercontent.com",
           "client_type": 3
         }

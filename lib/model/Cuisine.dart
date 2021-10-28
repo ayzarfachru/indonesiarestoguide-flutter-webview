@@ -2,5 +2,5 @@ class Cuisine{
   int id;
   String name;
 
-  Cuisine({this.id, this.name});
+  Cuisine({required this.id, required this.name});
 }

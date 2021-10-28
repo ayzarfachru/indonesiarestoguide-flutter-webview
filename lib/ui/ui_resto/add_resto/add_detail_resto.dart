@@ -7,12 +7,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter_datetime_picker/flutter_datetime_picker.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:indonesiarestoguide/model/Cuisine.dart';
-import 'package:indonesiarestoguide/ui/ui_resto/add_resto/add_view_resto.dart';
-import 'package:indonesiarestoguide/ui/ui_resto/add_resto/payment_resto.dart';
-import 'package:indonesiarestoguide/ui/ui_resto/home/home_activity.dart';
-import 'package:indonesiarestoguide/utils/utils.dart';
-import 'package:indonesiarestoguide/ui/home/home_activity.dart';
+import 'package:kam5ia/model/Cuisine.dart';
+import 'package:kam5ia/ui/ui_resto/add_resto/add_view_resto.dart';
+import 'package:kam5ia/ui/ui_resto/add_resto/payment_resto.dart';
+import 'package:kam5ia/ui/ui_resto/home/home_activity.dart';
+import 'package:kam5ia/utils/utils.dart';
+import 'package:kam5ia/ui/home/home_activity.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:page_transition/page_transition.dart';
@@ -28,7 +28,7 @@ class CuisineChip extends StatefulWidget {
   final List cuisineList;
   final Function(List<String>) onSelectionChanged;
 
-  CuisineChip(this.cuisineList, {this.onSelectionChanged});
+  CuisineChip(this.cuisineList, {required this.onSelectionChanged});
 
   @override
   CuisineChipState createState() => CuisineChipState();
@@ -36,10 +36,10 @@ class CuisineChip extends StatefulWidget {
 
 class CuisineChipState extends State<CuisineChip> {
   // String selectedChoice = "";
-  List<String> selectedChoices = List();
+  List<String> selectedChoices = [];
 
   _buildChoiceList() {
-    List<Widget> choices = List();
+    List<Widget> choices = [];
 
     widget.cuisineList.forEach((item) {
       choices.add(Container(
@@ -78,7 +78,7 @@ class FacilityChip extends StatefulWidget {
   final List<String> facilityList;
   final Function(List<String>) onSelectionChanged;
 
-  FacilityChip(this.facilityList, {this.onSelectionChanged});
+  FacilityChip(this.facilityList, {required this.onSelectionChanged});
 
   @override
   _FacilityChipState createState() => _FacilityChipState();
@@ -86,10 +86,10 @@ class FacilityChip extends StatefulWidget {
 
 class _FacilityChipState extends State<FacilityChip> {
   // String selectedChoice = "";
-  List<String> selectedChoices = List();
+  List<String> selectedChoices = [];
 
   _buildChoiceList() {
-    List<Widget> choices = List();
+    List<Widget> choices = [];
 
     widget.facilityList.forEach((item) {
       choices.add(Container(
@@ -107,6 +107,13 @@ class _FacilityChipState extends State<FacilityChip> {
                   ? selectedChoices.remove(item)
                   : selectedChoices.add(item);
               widget.onSelectionChanged(selectedChoices);
+              // if (selectedChoices.contains(item) != null) {
+              //   selectedChoices.clear();
+              //   selectedChoices.add(item);
+              // } else {
+              //   selectedChoices.add(item);
+              // }
+              // widget.onSelectionChanged(selectedChoices);
             });
           },
         ),
@@ -136,10 +143,10 @@ class _AddDetailRestoState extends State<AddDetailResto> {
   TextEditingController _JamOperasionalBuka = TextEditingController(text: "");
   TextEditingController _JamOperasionalTutup = TextEditingController(text: "");
 
-  TimeOfDay jamBuka = TimeOfDay();
-  TimeOfDay jamTutup = TimeOfDay();
-  String buka;
-  String tutup;
+  TimeOfDay jamBuka = TimeOfDay.now();
+  TimeOfDay jamTutup = TimeOfDay.now();
+  String? buka;
+  String? tutup;
 
   bool isLoading = false;
 
@@ -148,29 +155,58 @@ class _AddDetailRestoState extends State<AddDetailResto> {
   bool delivery = false;
 
   List cuisineList = [];
+  List cuisineList2 = [
+    'Indonesian Food',
+    'Chinese Food',
+    'Japanese Food',
+    'Australian Food',
+    'Korean Food',
+    'Coffe',
+    'Orther Drinks'
+  ];
 
-  List<String> selectedCuisineList = List();
-  String cuisine;
+  List<String> selectedCuisineList = [];
+  String? cuisine;
 
   _showCuisineDialog() {
+    // ListView(
+    //     // controller: _controller,
+    //     physics: BouncingScrollPhysics(),
+    //     padding: EdgeInsets.zero,
+    //     shrinkWrap: true,
+    //     children: [
+    //
+    //     ]);
     showDialog(
         context: context,
         builder: (BuildContext context) {
           //Here we will build the content of the dialog
           return AlertDialog(
             title: Text("Tipe Resto"),
-            content: CuisineChip(
-              cuisineList,
-              onSelectionChanged: (selectedList) {
-                setState(() {
-                  selectedCuisineList = selectedList;
-                  cuisine = selectedCuisineList.join(",");
-                  print(cuisine);
-                  if (cuisine != "") {
-                    selectedList = cuisine.split(",");
-                  } else {}
-                });
-              },
+            content: Container(
+              height: CustomSize.sizeHeight(context) / 2.2,
+              width: CustomSize.sizeWidth(context) / 1.5,
+              child: ListView(
+                // controller: _controller,
+                physics: BouncingScrollPhysics(),
+                padding: EdgeInsets.zero,
+                shrinkWrap: true,
+                children: [
+                  CuisineChip(
+                    cuisineList,
+                    onSelectionChanged: (selectedList) {
+                      setState(() {
+                        selectedCuisineList = selectedList;
+                        cuisine = selectedCuisineList.join(",");
+                        print(cuisine);
+                        if (cuisine != "") {
+                          selectedList = cuisine!.split(",");
+                        } else {}
+                      });
+                    },
+                  ),
+                ],
+              ),
             ),
             actions: <Widget>[
               FlatButton(
@@ -193,9 +229,17 @@ class _AddDetailRestoState extends State<AddDetailResto> {
 
 
   List<String> facilityList = [];
+  List<String> facilityList2 = [
+    'Kaki Lima',
+    'Food Stall',
+    'Food Truck',
+    'Toko Roti/Kue',
+    'Toko Oleh-Oleh',
+    'Other'
+  ];
 
-  List<String> selectedFacilityList = List();
-  String facility;
+  List<String> selectedFacilityList = [];
+  String facility = '';
 
   _showFacilityDialog() {
     showDialog(
@@ -204,18 +248,34 @@ class _AddDetailRestoState extends State<AddDetailResto> {
           //Here we will build the content of the dialog
           return AlertDialog(
             title: Text("Fasilitas Resto"),
-            content: FacilityChip(
-              facilityList,
-              onSelectionChanged: (selectedList) {
-                setState(() {
-                  selectedFacilityList = selectedList;
-                  facility = selectedFacilityList.join(",");
-                  print(facility);
-                  if (facility != "") {
-                    selectedList = facility.split(",");
-                  } else {}
-                });
-              },
+            content: Container(
+              height: CustomSize.sizeHeight(context) / 2.2,
+              width: CustomSize.sizeWidth(context) / 1.5,
+              child: ListView(
+                // controller: _controller,
+                physics: BouncingScrollPhysics(),
+                padding: EdgeInsets.zero,
+                shrinkWrap: true,
+                children: [
+                  FacilityChip(
+                    facilityList,
+                    onSelectionChanged: (selectedList) {
+                      setState(() {
+                        print(facility);
+                        selectedFacilityList = selectedList;
+                        facility = selectedFacilityList.join(",");
+                        print(facility);
+                        if (facility != "") {
+                          selectedList = facility.split(",");
+                        } else {}
+                        // if (facility != "") {
+                        //   selectedList = facility!.split(",");
+                        // } else {}
+                      });
+                    },
+                  ),
+                ],
+              ),
             ),
             actions: <Widget>[
               FlatButton(
@@ -238,10 +298,11 @@ class _AddDetailRestoState extends State<AddDetailResto> {
 
 
   FieldCuisine() async {
-    _Tipe = TextEditingController(text: cuisine.replaceAll(',', ', '));
+    _Tipe = TextEditingController(text: cuisine!.replaceAll(',', ', '));
   }
 
-  List<String> dataCuisine;
+  String cuiOk = '';
+  List<String?>? dataCuisine;
   Future<void> getCuisine() async {
     SharedPreferences pref = await SharedPreferences.getInstance();
     var token = pref.getString("token") ?? "";
@@ -256,6 +317,10 @@ class _AddDetailRestoState extends State<AddDetailResto> {
 
     for(var v in jsonData['data']){
       cuisineList.add(v['name']);
+    }
+
+    if (data.statusCode == 200) {
+      cuiOk = 'true';
     }
     setState(() {});
   }
@@ -279,7 +344,7 @@ class _AddDetailRestoState extends State<AddDetailResto> {
   }
 
   FieldFacility() async {
-    _Fasilitas = TextEditingController(text: facility.replaceAll(',', ', '));
+    _Fasilitas = TextEditingController(text: facility!.replaceAll(',', ', '));
   }
 
   void onTimeOpenChanged(TimeOfDay newTime) {
@@ -302,16 +367,68 @@ class _AddDetailRestoState extends State<AddDetailResto> {
     _JamOperasionalTutup = (jamTutup.hour != null)?TextEditingController(text: jamTutup.hour.toString() + ':' + jamTutup.minute.toString()):TextEditingController(text: "");
   }
 
-  Future<String> addResto()async{
+  String name = '';
+  String email = '';
+  String desc = '';
+  String latitude = '';
+  String longitude = '';
+  String address = '';
+  String phone = '';
+  String img = '';
+  String badanUsaha = '';
+  String namaPemilik = '';
+  String namaPenanggungJwb = '';
+  String imgSelfie = '';
+  String imgKtp = '';
+  String nameRekening = '';
+  String nameBank = '';
+  String norek = '';
+
+  getShared()async{
+    SharedPreferences pref = await SharedPreferences.getInstance();
+    // var token = pref.getString("token") ?? "";
+    name = pref.getString("nameResto") ?? "";
+    email = pref.getString("emailResto");
+    desc = pref.getString("descResto") ?? "";
+    latitude = pref.getString("latitudeResto") ?? "";
+    longitude = pref.getString("longitudeResto") ?? "";
+    address = pref.getString("addressResto") ?? "";
+    phone = pref.getString("notelpResto") ?? "";
+    img = pref.getString("imgResto") ?? "";
+    badanUsaha = pref.getString("nameBadanUsaha");
+    namaPemilik = pref.getString("namePemilik") ?? "";
+    namaPenanggungJwb = pref.getString("namePenanggungJawab") ?? "";
+    imgSelfie = pref.getString("imgSelfie") ?? "";
+    imgKtp = pref.getString("imgKTP") ?? "";
+    nameRekening = pref.getString("nameRekening");
+    nameBank = pref.getString("nameBank");
+    norek = pref.getString("noRekeningBank") ?? "";
+    print('1'+email);
+    print('2'+badanUsaha);
+    print('3'+nameRekening);
+    print('4'+nameBank);
+  }
+
+  Future<String?>? addResto()async{
     SharedPreferences pref = await SharedPreferences.getInstance();
     var token = pref.getString("token") ?? "";
-    var name = pref.getString("nameResto") ?? "";
-    var desc = pref.getString("descResto") ?? "";
-    var latitude = pref.getString("latitudeResto") ?? "";
-    var longitude = pref.getString("longitudeResto") ?? "";
-    var address = pref.getString("addressResto") ?? "";
-    var phone = pref.getString("notelpResto") ?? "";
-    var img = pref.getString("imgResto") ?? "";
+    // var name = pref.getString("nameResto") ?? "";
+    // var email = pref.getString("emailResto") ?? "";
+    // var desc = pref.getString("descResto") ?? "";
+    // var latitude = pref.getString("latitudeResto") ?? "";
+    // var longitude = pref.getString("longitudeResto") ?? "";
+    // var address = pref.getString("addressResto") ?? "";
+    // var phone = pref.getString("notelpResto") ?? "";
+    // var img = pref.getString("imgResto") ?? "";
+    // var badanUsaha = pref.getString("nameBadanUsaha") ?? "";
+    // var namaPemilik = pref.getString("namePemilik") ?? "";
+    // var namaPenanggungJwb = pref.getString("namePenanggungJawab") ?? "";
+    // var imgSelfie = pref.getString("imgSelfie") ?? "";
+    // var imgKtp = pref.getString("imgKTP") ?? "";
+    // var nameRekening = pref.getString("nameRekening") ?? "";
+    // var nameBank = pref.getString("nameBank") ?? "";
+    // var norek = pref.getString("noRekeningBank") ?? "";
+    // pref.setString('jUsaha', _Fasilitas.text.toString());
     setState(() {
       isLoading = true;
     });
@@ -319,19 +436,30 @@ class _AddDetailRestoState extends State<AddDetailResto> {
     var apiResult = await http.post(Links.mainUrl + '/resto',
         body: {
           'name': name,
+          'data_email': email,
           'desc': desc,
           'latitude': latitude,
           'longitude': longitude,
           'address': address,
           'phone': phone,
-          'hours': buka + '-' + tutup,
+          'hours': buka! + '-' + tutup!,
           'ongkir': (_Ongkir.text.toString() != null)?_Ongkir.text.toString():'',
           're_price': (_HargaPerMeja.text.toString() != '')?_HargaPerMeja.text.toString():'',
-          'takeaway': (takeaway == true)?'1':'1',
+          'takeaway': (takeaway == true)?'1':'0',
           'img': img,
           'type': _Tipe.text.toString(),
+          // 'type': (_Tipe.text.toString() == 'Indonesian Food' || _Tipe.text.toString() == 'Chinese Food' || _Tipe.text.toString() == 'Japanese Food' || _Tipe.text.toString() == 'Australian Food' || _Tipe.text.toString() == 'Korean Food' || _Tipe.text.toString() == 'Coffe' || _Tipe.text.toString() == 'Orther Drinks')?'Indonesian':_Tipe.text.toString(),
           'fasilitas': _Fasilitas.text.toString(),
-          'table': (_JumlahMeja.text.toString() != '')?_JumlahMeja.text.toString():''
+          // 'fasilitas': (_Fasilitas.text.toString() == 'Kaki Lima' || _Fasilitas.text.toString() == 'Food Stall' || _Fasilitas.text.toString() == 'Food Truck' || _Fasilitas.text.toString() == 'Toko Roti/Kue' || _Fasilitas.text.toString() == 'Toko Oleh-Oleh' || _Fasilitas.text.toString() == 'Other')?'Smoking Area':_Fasilitas.text.toString(),
+          'table': (_JumlahMeja.text.toString() != '')?_JumlahMeja.text.toString():'',
+          'data_pt': badanUsaha,
+          'data_owner': namaPemilik,
+          'data_name_pj': namaPenanggungJwb,
+          'data_selfie_pj': imgSelfie,
+          'data_ktp': imgKtp,
+          'data_nama_norek': nameRekening,
+          'data_bank_norek': nameBank,
+          'data_norek': norek,
         },
         headers: {
           "Accept": "Application/json",
@@ -340,14 +468,24 @@ class _AddDetailRestoState extends State<AddDetailResto> {
     print(apiResult.body);
     var data = json.decode(apiResult.body);
 
+    print(email);
+    print(badanUsaha);
+    print(namaPemilik);
+    print(namaPenanggungJwb);
+    print(imgSelfie);
+    print(imgKtp);
+    print(nameRekening);
+    print(nameBank);
+    print(norek);
+
     if(apiResult.statusCode == 200){
       print("success");
       print(data);
-      Navigator.push(
+      Navigator.pushReplacement(
           context,
           PageTransition(
               type: PageTransitionType.fade,
-              child: PaymentResto()));
+              child: PaymentResto(name, phone, address)));
       // SharedPreferences preferences = await SharedPreferences.getInstance();
       // await preferences.remove('menuJson');
       // await preferences.remove('restoId');
@@ -378,16 +516,26 @@ class _AddDetailRestoState extends State<AddDetailResto> {
     }
   }
 
-  Future<String> addResto2()async{
+  Future<String?>? addResto2()async{
     SharedPreferences pref = await SharedPreferences.getInstance();
     var token = pref.getString("token") ?? "";
-    var name = pref.getString("nameResto") ?? "";
-    var desc = pref.getString("descResto") ?? "";
-    var latitude = pref.getString("latitudeResto") ?? "";
-    var longitude = pref.getString("longitudeResto") ?? "";
-    var address = pref.getString("addressResto") ?? "";
-    var phone = pref.getString("notelpResto") ?? "";
-    var img = pref.getString("imgResto") ?? "";
+    // var name = pref.getString("nameResto") ?? "";
+    // var email = pref.getString("emailResto") ?? "";
+    // var desc = pref.getString("descResto") ?? "";
+    // var latitude = pref.getString("latitudeResto") ?? "";
+    // var longitude = pref.getString("longitudeResto") ?? "";
+    // var address = pref.getString("addressResto") ?? "";
+    // var phone = pref.getString("notelpResto") ?? "";
+    // var img = pref.getString("imgResto") ?? "";
+    // var badanUsaha = pref.getString("nameBadanUsaha") ?? "";
+    // var namaPemilik = pref.getString("namePemilik") ?? "";
+    // var namaPenanggungJwb = pref.getString("namePenanggungJawab") ?? "";
+    // var imgSelfie = pref.getString("imgSelfie") ?? "";
+    // var imgKtp = pref.getString("imgKTP") ?? "";
+    // var nameRekening = pref.getString("nameRekening") ?? "";
+    // var nameBank = pref.getString("nameBank") ?? "";
+    // var norek = pref.getString("noRekeningBank") ?? "";
+    // pref.setString('jUsaha', _Fasilitas.text.toString());
     setState(() {
       isLoading = true;
     });
@@ -395,18 +543,29 @@ class _AddDetailRestoState extends State<AddDetailResto> {
     var apiResult = await http.post(Links.mainUrl + '/resto',
         body: {
           'name': name,
+          'data_email': email,
           'desc': desc,
           'latitude': latitude,
           'longitude': longitude,
           'address': address,
           'phone': phone,
-          'hours': buka + '-' + tutup,
+          'hours': buka! + '-' + tutup!,
           're_price': (_HargaPerMeja.text.toString() != '')?_HargaPerMeja.text.toString():'',
-          'takeaway': (takeaway == true)?'1':'1',
+          'takeaway': (takeaway == true)?'1':'0',
           'img': img,
           'type': _Tipe.text.toString(),
+          // 'type': (_Tipe.text.toString() == 'Indonesian Food' || _Tipe.text.toString() == 'Chinese Food' || _Tipe.text.toString() == 'Japanese Food' || _Tipe.text.toString() == 'Australian Food' || _Tipe.text.toString() == 'Korean Food' || _Tipe.text.toString() == 'Coffe' || _Tipe.text.toString() == 'Orther Drinks')?'Indonesian':_Tipe.text.toString(),
           'fasilitas': _Fasilitas.text.toString(),
-          'table': (_JumlahMeja.text.toString() != '')?_JumlahMeja.text.toString():''
+          // 'fasilitas': (_Fasilitas.text.toString() == 'Kaki Lima' || _Fasilitas.text.toString() == 'Food Stall' || _Fasilitas.text.toString() == 'Food Truck' || _Fasilitas.text.toString() == 'Toko Roti/Kue' || _Fasilitas.text.toString() == 'Toko Oleh-Oleh' || _Fasilitas.text.toString() == 'Other')?'Smoking Area':_Fasilitas.text.toString(),
+          'table': (_JumlahMeja.text.toString() != '')?_JumlahMeja.text.toString():'',
+          'data_pt': badanUsaha,
+          'data_owner': namaPemilik,
+          'data_name_pj': namaPenanggungJwb,
+          'data_selfie_pj': imgSelfie,
+          'data_ktp': imgKtp,
+          'data_nama_norek': nameRekening,
+          'data_bank_norek': nameBank,
+          'data_norek': norek,
         },
         headers: {
           "Accept": "Application/json",
@@ -415,14 +574,24 @@ class _AddDetailRestoState extends State<AddDetailResto> {
     print(apiResult.body);
     var data = json.decode(apiResult.body);
 
+    print(email);
+    print(badanUsaha);
+    print(namaPemilik);
+    print(namaPenanggungJwb);
+    print(imgSelfie);
+    print(imgKtp);
+    print(nameRekening);
+    print(nameBank);
+    print(norek);
+
     if(apiResult.statusCode == 200){
       print("success");
       print(data);
-      Navigator.push(
+      Navigator.pushReplacement(
           context,
           PageTransition(
               type: PageTransitionType.fade,
-              child: PaymentResto()));
+              child: PaymentResto(name, phone, address)));
       // SharedPreferences preferences = await SharedPreferences.getInstance();
       // await preferences.remove('menuJson');
       // await preferences.remove('restoId');
@@ -490,8 +659,9 @@ class _AddDetailRestoState extends State<AddDetailResto> {
   @override
   void initState() {
     super.initState();
-    getTutup();
-    getBuka();
+    getShared();
+    // getTutup();
+    // getBuka();
     getCuisine();
     getFacility();
     // getCuisine();
@@ -529,7 +699,7 @@ class _AddDetailRestoState extends State<AddDetailResto> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     SizedBox(height: CustomSize.sizeHeight(context) / 48,),
-                    CustomText.bodyLight12(text: "Tipe Restomu"),
+                    CustomText.bodyLight12(text: "Tipe Resto"),
                     SizedBox(
                       height: CustomSize.sizeHeight(context) * 0.005,
                     ),
@@ -557,7 +727,11 @@ class _AddDetailRestoState extends State<AddDetailResto> {
                               print(cuisine);
                               // print(cuisine.split(",")[0]);
                             });
-                            _showCuisineDialog();
+                            if (cuiOk == 'true') {
+                              _showCuisineDialog();
+                            } else {
+                              Fluttertoast.showToast(msg: 'Coba lagi sebentar lagi');
+                            }
                           },
                           child: Stack(
                             children: [
@@ -715,6 +889,7 @@ class _AddDetailRestoState extends State<AddDetailResto> {
                               });
                               Navigator.of(context).push(
                                   showPicker(
+                                    is24HrFormat: true,
                                     blurredBackground: true,
                                     accentColor: Colors.blue[400],
                                     context: context,
@@ -794,6 +969,7 @@ class _AddDetailRestoState extends State<AddDetailResto> {
                             });
                             Navigator.of(context).push(
                                 showPicker(
+                                  is24HrFormat: true,
                                   blurredBackground: true,
                                   accentColor: Colors.blue[400],
                                   context: context,
@@ -810,7 +986,7 @@ class _AddDetailRestoState extends State<AddDetailResto> {
                                   onChangeDateTime: (DateTime dateTime) {
                                     print(jamBuka.hour.toString() + ':' + jamBuka.minute.toString());
                                     print(jamTutup.hour.toString() + ':' + jamTutup.minute.toString()+'ini tutup');
-                                    print(buka + 'ini buka');
+                                    print(buka! + 'ini buka');
                                     tutup = jamTutup.hour.toString() + ':' + jamTutup.minute.toString();
                                     getTutup();
                                   },
@@ -855,9 +1031,9 @@ class _AddDetailRestoState extends State<AddDetailResto> {
                       children: [
                         Checkbox(
                           value: delivery,
-                          onChanged: (bool value) {
+                          onChanged: (bool? value) {
                             setState(() {
-                              delivery = value;
+                              delivery = value!;
                             });
                           },
                         ),
@@ -895,9 +1071,9 @@ class _AddDetailRestoState extends State<AddDetailResto> {
                       children: [
                         Checkbox(
                           value: reservation,
-                          onChanged: (bool value) {
+                          onChanged: (bool? value) {
                             setState(() {
-                              reservation = value;
+                              reservation = value!;
                             });
                           },
                         ),
@@ -950,58 +1126,202 @@ class _AddDetailRestoState extends State<AddDetailResto> {
                         focusedBorder: UnderlineInputBorder(),
                       ),
                     ):Container(),
-                    //------------------------------------ checkbox takeaway -------------------------------------
-                    // Row(
-                    //   mainAxisSize: MainAxisSize.max,
-                    //   mainAxisAlignment: MainAxisAlignment.start,
-                    //   children: [
-                    //     Checkbox(
-                    //       value: takeaway,
-                    //       onChanged: (bool value) {
-                    //         setState(() {
-                    //           takeaway = value;
-                    //         });
-                    //       },
-                    //     ),
-                    //     // Text('Apakah Restomu melayani ambil ditempat ?', style: TextStyle(fontWeight: FontWeight.bold))
-                    //     Text('Apakah Restomu melayani ambil ditempat ?', style: GoogleFonts.poppins(
-                    //         textStyle: TextStyle(
-                    //             fontWeight: FontWeight.bold, fontSize: 12)),),
-                    //   ],
-                    // ),
-                    SizedBox(height: CustomSize.sizeHeight(context) / 48,),
-                    (isLoading != true)?GestureDetector(
-                      onTap: () async{
-                        setState(() {
-                          isLoading = false;
-                        });
-                        if (delivery == true) {
-                          addResto();
-                        } else {
-                          addResto2();
-                        }
-                        // showAlertDialog();
-
-
-                        // SharedPreferences pref = await SharedPreferences.getInstance();
-                        // pref.setString("name", _loginTextName.text.toString());
-                        // pref.setString("email", _loginEmailName.text.toString());
-                        // pref.setString("img", (image == null)?img:base64Encode(image.readAsBytesSync()).toString());
-                        // pref.setString("gender", gender);
-                        // pref.setString("tgl", tgl);
-                        // pref.setString("notelp", _loginNotelpName.text.toString());
-                      },
-                      child: Center(
-                        child: Container(
-                          alignment: Alignment.center,
-                          width: CustomSize.sizeWidth(context) / 1.1,
-                          height: CustomSize.sizeHeight(context) / 14,
-                          decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(30),
-                              color: CustomColor.accent
-                          ),
-                          child: Center(child: CustomText.bodyRegular16(text: "Simpan", color: Colors.white,)),
+                    // ------------------------------------ checkbox takeaway -------------------------------------
+                    Row(
+                      mainAxisSize: MainAxisSize.max,
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      children: [
+                        Checkbox(
+                          value: takeaway,
+                          onChanged: (bool? value) {
+                            setState(() {
+                              takeaway = value!;
+                            });
+                          },
                         ),
+                        // Text('Apakah Restomu melayani ambil ditempat ?', style: TextStyle(fontWeight: FontWeight.bold))
+                        Text('Apakah Restomu melayani ambil ditempat ?', style: GoogleFonts.poppins(
+                            textStyle: TextStyle(
+                                fontWeight: FontWeight.bold, fontSize: 12)),),
+                      ],
+                    ),
+                    SizedBox(height: CustomSize.sizeHeight(context) / 48,),
+                    (isLoading != true)?Container(
+                      width: CustomSize.sizeWidth(context),
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          GestureDetector(
+                            onTap: () async{
+                              setState(() {
+                                isLoading = false;
+                              });
+                              if (_Tipe.text.toString() == '') {
+                                Fluttertoast.showToast(msg: "Lengkapi data terlebih dahulu!");
+                              } else if (_Fasilitas.text.toString() == '') {
+                                Fluttertoast.showToast(msg: "Lengkapi data terlebih dahulu!");
+                              } else if (buka.toString() == 'null') {
+                                Fluttertoast.showToast(msg: "Lengkapi data terlebih dahulu!");
+                              } else if (tutup.toString() == 'null') {
+                                Fluttertoast.showToast(msg: "Lengkapi data terlebih dahulu!");
+                              } else {
+                                if (delivery == true) {
+                                  showDialog(
+                                      context: context,
+                                      builder: (context) {
+                                        return AlertDialog(
+                                          contentPadding: EdgeInsets.only(left: 25, right: 25, top: 15, bottom: 5),
+                                          shape: RoundedRectangleBorder(
+                                              borderRadius: BorderRadius.all(Radius.circular(10))
+                                          ),
+                                          title: Center(child: Text('Perhatian!', style: TextStyle(color: CustomColor.redBtn))),
+                                          content: Text('Apakah data anda sudah diisi dengan benar dan dapat dipertanggung jawabkan?', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500), textAlign: TextAlign.center),
+                                          actions: <Widget>[
+                                            Center(
+                                              child: Row(
+                                                mainAxisAlignment: MainAxisAlignment.spaceAround,
+                                                children: [
+                                                  FlatButton(
+                                                    // minWidth: CustomSize.sizeWidth(context),
+                                                    color: CustomColor.redBtn,
+                                                    textColor: Colors.white,
+                                                    shape: RoundedRectangleBorder(
+                                                        borderRadius: BorderRadius.all(Radius.circular(10))
+                                                    ),
+                                                    child: Text('Batal'),
+                                                    onPressed: () async{
+                                                      setState(() {
+                                                        // codeDialog = valueText;
+                                                        Navigator.pop(context);
+                                                      });
+                                                    },
+                                                  ),
+                                                  FlatButton(
+                                                    color: CustomColor.primaryLight,
+                                                    textColor: Colors.white,
+                                                    shape: RoundedRectangleBorder(
+                                                        borderRadius: BorderRadius.all(Radius.circular(10))
+                                                    ),
+                                                    child: Text('Iya'),
+                                                    onPressed: () async{
+                                                      Navigator.pop(context);
+                                                      String qrcode = '';
+                                                      addResto();
+                                                    },
+                                                  ),
+                                                ],
+                                              ),
+                                            ),
+
+                                          ],
+                                        );
+                                      });
+                                  // SharedPreferences pref = await SharedPreferences.getInstance();
+                                  // var token = pref.getString("token") ?? "";
+                                  // var name = pref.getString("nameResto") ?? "";
+                                  // var desc = pref.getString("descResto") ?? "";
+                                  // var latitude = pref.getString("latitudeResto") ?? "";
+                                  // var longitude = pref.getString("longitudeResto") ?? "";
+                                  // var address = pref.getString("addressResto") ?? "";
+                                  // var phone = pref.getString("notelpResto") ?? "";
+                                  // var img = pref.getString("imgResto") ?? "";
+                                  // Navigator.pushReplacement(
+                                  //     context,
+                                  //     PageTransition(
+                                  //         type: PageTransitionType.fade,
+                                  //         child: PaymentResto(name, phone, address)));
+                                } else {
+                                  showDialog(
+                                      context: context,
+                                      builder: (context) {
+                                        return AlertDialog(
+                                          contentPadding: EdgeInsets.only(left: 25, right: 25, top: 15, bottom: 5),
+                                          shape: RoundedRectangleBorder(
+                                              borderRadius: BorderRadius.all(Radius.circular(10))
+                                          ),
+                                          title: Center(child: Text('Perhatian!', style: TextStyle(color: CustomColor.redBtn))),
+                                          content: Text('Apakah data anda sudah diisi dengan benar dan dapat dipertanggung jawabkan?', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500), textAlign: TextAlign.center),
+                                          actions: <Widget>[
+                                            Center(
+                                              child: Row(
+                                                mainAxisAlignment: MainAxisAlignment.spaceAround,
+                                                children: [
+                                                  FlatButton(
+                                                    // minWidth: CustomSize.sizeWidth(context),
+                                                    color: CustomColor.redBtn,
+                                                    textColor: Colors.white,
+                                                    shape: RoundedRectangleBorder(
+                                                        borderRadius: BorderRadius.all(Radius.circular(10))
+                                                    ),
+                                                    child: Text('Batal'),
+                                                    onPressed: () async{
+                                                      setState(() {
+                                                        // codeDialog = valueText;
+                                                        Navigator.pop(context);
+                                                      });
+                                                    },
+                                                  ),
+                                                  FlatButton(
+                                                    color: CustomColor.primaryLight,
+                                                    textColor: Colors.white,
+                                                    shape: RoundedRectangleBorder(
+                                                        borderRadius: BorderRadius.all(Radius.circular(10))
+                                                    ),
+                                                    child: Text('Iya'),
+                                                    onPressed: () async{
+                                                      Navigator.pop(context);
+                                                      String qrcode = '';
+                                                      addResto2();
+                                                    },
+                                                  ),
+                                                ],
+                                              ),
+                                            ),
+
+                                          ],
+                                        );
+                                      });
+                                  // SharedPreferences pref = await SharedPreferences.getInstance();
+                                  // var token = pref.getString("token") ?? "";
+                                  // var name = pref.getString("nameResto") ?? "";
+                                  // var desc = pref.getString("descResto") ?? "";
+                                  // var latitude = pref.getString("latitudeResto") ?? "";
+                                  // var longitude = pref.getString("longitudeResto") ?? "";
+                                  // var address = pref.getString("addressResto") ?? "";
+                                  // var phone = pref.getString("notelpResto") ?? "";
+                                  // var img = pref.getString("imgResto") ?? "";
+                                  // Navigator.pushReplacement(
+                                  //     context,
+                                  //     PageTransition(
+                                  //         type: PageTransitionType.fade,
+                                  //         child: PaymentResto(name, phone, address)));
+                                }
+                              }
+                              // showAlertDialog();
+
+
+                              // SharedPreferences pref = await SharedPreferences.getInstance();
+                              // pref.setString("name", _loginTextName.text.toString());
+                              // pref.setString("email", _loginEmailName.text.toString());
+                              // pref.setString("img", (image == null)?img:base64Encode(image.readAsBytesSync()).toString());
+                              // pref.setString("gender", gender);
+                              // pref.setString("tgl", tgl);
+                              // pref.setString("notelp", _loginNotelpName.text.toString());
+                            },
+                            child: Center(
+                              child: Container(
+                                alignment: Alignment.center,
+                                width: CustomSize.sizeWidth(context) / 1.1,
+                                height: CustomSize.sizeHeight(context) / 14,
+                                decoration: BoxDecoration(
+                                    borderRadius: BorderRadius.circular(30),
+                                    color: CustomColor.accent
+                                ),
+                                child: Center(child: CustomText.bodyRegular16(text: "Simpan", color: Colors.white,)),
+                              ),
+                            ),
+                          ),
+                        ],
                       ),
                     ):Center(
                       child: Container(

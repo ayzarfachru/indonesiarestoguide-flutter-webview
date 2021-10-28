@@ -4,17 +4,17 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_icons/flutter_icons.dart';
 import 'package:fluttertoast/fluttertoast.dart';
-import 'package:indonesiarestoguide/model/CategoryMenu.dart';
-import 'package:indonesiarestoguide/model/Menu.dart';
-import 'package:indonesiarestoguide/model/MenuJson.dart';
-import 'package:indonesiarestoguide/model/Price.dart';
-import 'package:indonesiarestoguide/model/Promo.dart';
-import 'package:indonesiarestoguide/model/Meja.dart';
-import 'package:indonesiarestoguide/ui/ui_resto/menu/add_menu.dart';
-import 'package:indonesiarestoguide/ui/ui_resto/menu/edit_menu.dart';
-import 'package:indonesiarestoguide/utils/utils.dart';
+import 'package:kam5ia/model/CategoryMenu.dart';
+import 'package:kam5ia/model/Menu.dart';
+import 'package:kam5ia/model/MenuJson.dart';
+import 'package:kam5ia/model/Price.dart';
+import 'package:kam5ia/model/Promo.dart';
+import 'package:kam5ia/model/Meja.dart';
+import 'package:kam5ia/ui/ui_resto/menu/add_menu.dart';
+import 'package:kam5ia/ui/ui_resto/menu/edit_menu.dart';
+import 'package:kam5ia/utils/utils.dart';
 import 'package:page_transition/page_transition.dart';
-import 'package:indonesiarestoguide/model/Transaction.dart';
+import 'package:kam5ia/model/Transaction.dart';
 import 'package:qr_flutter/qr_flutter.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:http/http.dart' as http;
@@ -182,7 +182,7 @@ class _MejaActivityState extends State<MejaActivity> {
     });
   }
 
-  List<String> items;
+  List<String?>? items;
   getNumber() async {
 
   }
@@ -191,7 +191,8 @@ class _MejaActivityState extends State<MejaActivity> {
   void initState() {
     _getQr();
     getDownloadAll();
-    items= List<String>.generate(9999, (i) => (i + 1).toString());
+    items= List<String>.generate(meja.length, (i) => (meja.length + 1).toString());
+    print(items);
     super.initState();
   }
 
@@ -232,6 +233,8 @@ class _MejaActivityState extends State<MejaActivity> {
                           padding: EdgeInsets.only(top: CustomSize.sizeHeight(context) / 48),
                           child: GestureDetector(
                             onTap: () async{
+                              print(meja[index]);
+                              print(meja.length);
                               showModalBottomSheet(
                                   isScrollControlled: true,
                                   shape: RoundedRectangleBorder(
@@ -282,7 +285,7 @@ class _MejaActivityState extends State<MejaActivity> {
                                         //   ),
                                         // ),
                                         SizedBox(height: CustomSize.sizeHeight(context) / 52,),
-                                        Center(
+                                        (int.parse(meja[index].name) == meja.length)?Center(
                                           child: Container(
                                             width: CustomSize.sizeWidth(context) / 1.1,
                                             height: CustomSize.sizeHeight(context) / 14,
@@ -322,7 +325,7 @@ class _MejaActivityState extends State<MejaActivity> {
                                               ],
                                             ),
                                           ),
-                                        ),
+                                        ):Container(),
                                         SizedBox(height: CustomSize.sizeHeight(context) / 86,),
                                       ],
                                     );
@@ -359,7 +362,7 @@ class _MejaActivityState extends State<MejaActivity> {
                                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                           children: [
                                             CustomText.textHeading4(
-                                                text: "Meja "+items[index],
+                                                text: "Meja "+meja[index].name.toString(),
                                                 minSize: 18,
                                                 maxLines: 1
                                             ),
@@ -406,11 +409,7 @@ class _MejaActivityState extends State<MejaActivity> {
           children: [
             GestureDetector(
               onTap: () async{
-                if (await canLaunch(downloadAll)) {
-                await launch(downloadAll);
-                } else {
-                throw 'Error';
-                }
+                launch(downloadAll);
               },
               child: Container(
                 width: CustomSize.sizeWidth(context) / 6.6,
@@ -439,13 +438,15 @@ class _MejaActivityState extends State<MejaActivity> {
                   );
                 } else {
                   AddMeja();
+                  Fluttertoast.showToast(
+                    msg: "Tunggu sebentar.",);
                 }
               },
               child: Container(
                 width: CustomSize.sizeWidth(context) / 6.6,
                 height: CustomSize.sizeWidth(context) / 6.6,
                 decoration: BoxDecoration(
-                    color: CustomColor.primary,
+                    color: CustomColor.primaryLight,
                     shape: BoxShape.circle
                 ),
                 child: Center(child: Icon(FontAwesome.plus, color: Colors.white, size: 29,)),

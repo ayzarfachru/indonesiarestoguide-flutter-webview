@@ -4,14 +4,15 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_icons/flutter_icons.dart';
 import 'package:fluttertoast/fluttertoast.dart';
-import 'package:indonesiarestoguide/ui/auth/login_activity.dart';
-import 'package:indonesiarestoguide/ui/ui_resto/add_resto/add_view_resto.dart';
-import 'package:indonesiarestoguide/ui/ui_resto/home/home_activity.dart';
-import 'package:indonesiarestoguide/utils/utils.dart';
+import 'package:full_screen_image/full_screen_image.dart';
+import 'package:kam5ia/ui/auth/login_activity.dart';
+import 'package:kam5ia/ui/ui_resto/add_resto/add_view_resto.dart';
+import 'package:kam5ia/ui/ui_resto/home/home_activity.dart';
+import 'package:kam5ia/utils/utils.dart';
 import 'package:page_transition/page_transition.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:indonesiarestoguide/ui/profile/edit_profile.dart';
-import 'package:indonesiarestoguide/ui/about/about_activity.dart';
+import 'package:kam5ia/ui/profile/edit_profile.dart';
+import 'package:kam5ia/ui/about/about_activity.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:http/http.dart' as http;
 
@@ -69,7 +70,7 @@ class _ProfileActivityState extends State<ProfileActivity> {
     SharedPreferences pref = await SharedPreferences.getInstance();
     setState(() {
       notelp = (pref.getString('notelp'));
-      print(notelp);
+      print(notelp+' telp');
     });
   }
 
@@ -84,8 +85,9 @@ class _ProfileActivityState extends State<ProfileActivity> {
   _launchURL() async {
     final Uri params = Uri(
       scheme: 'mailto',
-      path: 'indonesiarestoguide@gmail.com',
-      query: 'subject=App Feedback&body=App Version 1.1.0', //add subject and body here
+      path: 'kamsia.owner@gmail.com',
+      // query: 'subject=App Feedback&body=App Version 1.1.0', //add subject and body here
+      query: 'subject=Saran/Masukan untuk Kamsia', //add subject and body here
     );
 
     var url = params.toString();
@@ -98,6 +100,7 @@ class _ProfileActivityState extends State<ProfileActivity> {
 
   bool isLoading = false;
   String kosong = '';
+  String openAndClose = "0";
   Future _getUserResto()async{
     // List<History> _history = [];
 
@@ -126,20 +129,97 @@ class _ProfileActivityState extends State<ProfileActivity> {
     // }
 
     setState(() {
-      id = data['resto']['id'].toString();
-      restoName = data['resto']['name'];
+      id = (data['msg'].toString() == "User tidak punya resto")?'':data['resto']['id'].toString();
+      restoName = (data['msg'].toString() == "User tidak punya resto")?'':data['resto']['name'];
       // history = _history;
+      openAndClose = (data['status'].toString() == "closed")?'1':'0';
       isLoading = false;
     });
 
+    // if(openAndClose == '0'){
+    //   SharedPreferences pref = await SharedPreferences.getInstance();
+    //   pref.setString("openclose", '1');
+    // }else if(openAndClose == '1'){
+    //   SharedPreferences pref = await SharedPreferences.getInstance();
+    //   pref.setString("openclose", '0');
+    // }
+
     if (apiResult.statusCode == 200) {
-      if (data['resto']['id'] == null && id == 'null' || id == '') {
+      if (data['msg'].toString() == "User tidak punya resto") {
+        kosong = '1';
+      } else if (data['resto']['id'] == null || id == 'null' || id == '') {
         kosong = '1';
       }
     }
   }
 
-  File image;
+  Future logOut()async{
+    // List<History> _history = [];
+
+    setState(() {
+      isLoading = true;
+    });
+    SharedPreferences pref = await SharedPreferences.getInstance();
+    String token = pref.getString("token") ?? "";
+    var apiResult = await http.post(Links.mainUrl + '/auth/logout', headers: {
+      "Accept": "Application/json",
+      "Authorization": "Bearer $token"
+    });
+    print('oyyy '+apiResult.body.toString());
+    var data = json.decode(apiResult.body);
+
+    // for(var v in data['trans']){
+    //   History h = History(
+    //       id: v['id'],
+    //       name: v['resto_name'],
+    //       time: v['time'],
+    //       price: v['price'],
+    //       img: v['resto_img'],
+    //       type: v['type']
+    //   );
+    //   _history.add(h);
+    // }
+
+    // setState(() {
+    //   // id = (data['msg'].toString() == "User tidak punya resto")?'':data['resto']['id'].toString();
+    //   // restoName = (data['msg'].toString() == "User tidak punya resto")?'':data['resto']['name'];
+    //   // // history = _history;
+    //   // openAndClose = (data['status'].toString() == "closed")?'1':'0';
+    //   // isLoading = false;
+    // });
+
+    // if(openAndClose == '0'){
+    //   SharedPreferences pref = await SharedPreferences.getInstance();
+    //   pref.setString("openclose", '1');
+    // }else if(openAndClose == '1'){
+    //   SharedPreferences pref = await SharedPreferences.getInstance();
+    //   pref.setString("openclose", '0');
+    // }
+
+    if (apiResult.statusCode == 200) {
+      print('pb');
+    }
+  }
+
+  File? image;
+
+  getPref() async {
+    SharedPreferences pref = await SharedPreferences.getInstance();
+    setState(() {
+      name = (pref.getString('name'));
+      print(name);
+      email = (pref.getString('email'));
+      print(email);
+      img = (pref.getString('img'));
+      print(img);
+      notelp = (pref.getString('notelp'));
+      print(notelp);
+      // gender = (pref.getString('gender'));
+      // print(gender);
+      // tgl = (pref.getString('tgl'));
+      // print(tgl);
+    });
+  }
 
   @override
   void initState() {
@@ -147,9 +227,10 @@ class _ProfileActivityState extends State<ProfileActivity> {
     _getUserResto();
     getName();
     getInitial();
-    getEmail();
-    getImg();
-    getNotelp();
+    getPref();
+    // getEmail();
+    // getImg();
+    // getNotelp();
     getHomePg();
   }
 
@@ -178,7 +259,7 @@ class _ProfileActivityState extends State<ProfileActivity> {
                     children: [
                       Row(
                         children: [
-                          Container(
+                          (img == "" || img == null)?Container(
                             width: CustomSize.sizeWidth(context) / 6,
                             height: CustomSize.sizeWidth(context) / 6,
                             decoration: (image==null)?(img == "" || img == null)?BoxDecoration(
@@ -197,7 +278,7 @@ class _ProfileActivityState extends State<ProfileActivity> {
                             ): BoxDecoration(
                               shape: BoxShape.circle,
                               image: new DecorationImage(
-                                  image: new FileImage(image),
+                                  image: new FileImage(image!),
                                   fit: BoxFit.cover
                               ),
                             ),
@@ -209,6 +290,25 @@ class _ProfileActivityState extends State<ProfileActivity> {
                                   color: Colors.white
                               ),
                             ):Container(),
+                          ):FullScreenWidget(
+                            child: Container(
+                              width: CustomSize.sizeWidth(context) / 6,
+                              height: CustomSize.sizeWidth(context) / 6,
+                              child: ClipRRect(
+                                borderRadius: BorderRadius.circular(50),
+                                child: (img == "" || img == null)?Image.network(Links.subUrl + "$img", fit: BoxFit.fitWidth):Container(decoration: BoxDecoration(
+                                  shape: BoxShape.circle,
+                                  image: ("$img".substring(0, 8) == '/storage')?DecorationImage(
+                                      image: NetworkImage(Links.subUrl +
+                                          "$img"),
+                                      fit: BoxFit.cover
+                                  ):DecorationImage(
+                                      image: Image.memory(Base64Decoder().convert(img)).image,
+                                      fit: BoxFit.cover
+                                  ),
+                                ),),
+                              ),
+                            ),
                           ),
                           SizedBox(width: CustomSize.sizeWidth(context) / 32,),
                           Container(
@@ -222,7 +322,7 @@ class _ProfileActivityState extends State<ProfileActivity> {
                                     maxLines: 1,
                                     minSize: 18
                                 ),
-                                (notelp != "null" && notelp != '')?CustomText.bodyLight16(text: notelp, maxLines: 1, minSize: 12)
+                                (notelp.toString() != "null" && notelp.toString() != '')?CustomText.bodyLight16(text: notelp, maxLines: 1, minSize: 12)
                                     :CustomText.bodyLight16(text: "Nomor belum diisi.", maxLines: 1, minSize: 12),
                                 CustomText.bodyLight16(text: email, maxLines: 1, minSize: 12),
                               ],
@@ -241,16 +341,24 @@ class _ProfileActivityState extends State<ProfileActivity> {
                     ],
                   ),
                   SizedBox(height: CustomSize.sizeHeight(context) / 32,),
-                  Padding(
+                  (homepg != "1")?Padding(
                     padding: EdgeInsets.symmetric(horizontal: CustomSize.sizeWidth(context) / 48),
                     child: CustomText.textHeading4(
                         text: "Akun",
                         minSize: 18,
                         maxLines: 1
                     ),
+                  ):
+                  Padding(
+                    padding: EdgeInsets.symmetric(horizontal: CustomSize.sizeWidth(context) / 48),
+                    child: CustomText.textHeading4(
+                        text: "Info Lainnya",
+                        minSize: 18,
+                        maxLines: 1
+                    ),
                   ),
                   Divider(),
-                  GestureDetector(
+                  (homepg != "1")?GestureDetector(
                     onTap: (){
                       Navigator.push(
                           context,
@@ -275,15 +383,18 @@ class _ProfileActivityState extends State<ProfileActivity> {
                         ],
                       ),
                     ),
-                  ),
-                  Divider(),
+                  ):Container(),
+                  (homepg != "1")?Divider():Container(),
                   Padding(
                     padding: EdgeInsets.symmetric(
                         horizontal: CustomSize.sizeWidth(context) / 48,
                         vertical: CustomSize.sizeHeight(context) / 86
                     ),
                     child: GestureDetector(
-                      onTap: _launchURL,
+                      onTap: (){
+                        // _launchURL();
+                        launch('mailto:info@irg.com');
+                      },
                       child: Row(
                         children: [
                           Icon(MaterialCommunityIcons.inbox_arrow_down),
@@ -313,10 +424,10 @@ class _ProfileActivityState extends State<ProfileActivity> {
                       ),
                       child: Row(
                         children: [
-                          Icon(MaterialIcons.restaurant),
+                          Icon(MaterialIcons.store),
                           SizedBox(width: CustomSize.sizeWidth(context) / 48,),
                           CustomText.bodyRegular16(
-                              text: "Kelola Restaurant",
+                              text: "Kelola Restomu",
                               minSize: 16,
                               maxLines: 1
                           ),
@@ -339,10 +450,10 @@ class _ProfileActivityState extends State<ProfileActivity> {
                       ),
                       child: Row(
                         children: [
-                          Icon(MaterialIcons.restaurant),
+                          Icon(MaterialIcons.store),
                           SizedBox(width: CustomSize.sizeWidth(context) / 48,),
                           CustomText.bodyRegular16(
-                              text: "Kelola Restaurant",
+                              text: "Kelola Restomu",
                               minSize: 16,
                               maxLines: 1
                           ),
@@ -350,17 +461,17 @@ class _ProfileActivityState extends State<ProfileActivity> {
                       ),
                     ),
                   ):Container(),
-                  Divider(),
-                  SizedBox(height: CustomSize.sizeHeight(context) / 32,),
-                  Padding(
+                  (homepg != "1")?Divider():Container(),
+                  (homepg != "1")?SizedBox(height: CustomSize.sizeHeight(context) / 32,):Container(),
+                  (homepg != "1")?Padding(
                     padding: EdgeInsets.symmetric(horizontal: CustomSize.sizeWidth(context) / 48),
                     child: CustomText.textHeading4(
                         text: "Info Lainnya",
                         minSize: 18,
                         maxLines: 1
                     ),
-                  ),
-                  Divider(),
+                  ):Container(),
+                  (homepg != "1")?Divider():Container(),
                   GestureDetector(
                     onTap: (){
                       Navigator.pushReplacement(context, PageTransition(type: PageTransitionType.fade, child: AboutActivity()));
@@ -388,6 +499,7 @@ class _ProfileActivityState extends State<ProfileActivity> {
               ),
               GestureDetector(
                 onTap: () async{
+                  logOut();
                   SharedPreferences pref = await SharedPreferences.getInstance();
                   pref.clear();
                   setState(() {

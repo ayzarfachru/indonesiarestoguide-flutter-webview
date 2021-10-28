@@ -1,12 +1,12 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_icons/flutter_icons.dart';
-import 'package:indonesiarestoguide/ui/ui_resto/order/order_pending.dart';
-import 'package:indonesiarestoguide/ui/ui_resto/order/order_process.dart';
-import 'package:indonesiarestoguide/ui/ui_resto/order/order_ready.dart';
-import 'package:indonesiarestoguide/ui/ui_resto/reservation_resto/reservation_done_page.dart';
-import 'package:indonesiarestoguide/ui/ui_resto/reservation_resto/reservation_pending_page.dart';
-import 'package:indonesiarestoguide/utils/utils.dart';
+import 'package:kam5ia/ui/ui_resto/order/order_pending.dart';
+import 'package:kam5ia/ui/ui_resto/order/order_process.dart';
+import 'package:kam5ia/ui/ui_resto/order/order_ready.dart';
+import 'package:kam5ia/ui/ui_resto/reservation_resto/reservation_done_page.dart';
+import 'package:kam5ia/ui/ui_resto/reservation_resto/reservation_pending_page.dart';
+import 'package:kam5ia/utils/utils.dart';
 import 'package:page_transition/page_transition.dart';
 
 class ReservationRestoActivity extends StatefulWidget {

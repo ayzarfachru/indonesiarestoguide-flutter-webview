@@ -2,16 +2,16 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_icons/flutter_icons.dart';
-import 'package:indonesiarestoguide/model/History.dart';
-import 'package:indonesiarestoguide/model/User.dart';
-import 'package:indonesiarestoguide/ui/ui_resto/employees/add_employees.dart';
-import 'package:indonesiarestoguide/utils/utils.dart';
+import 'package:kam5ia/model/History.dart';
+import 'package:kam5ia/model/User.dart';
+import 'package:kam5ia/ui/ui_resto/employees/add_employees.dart';
+import 'package:kam5ia/utils/utils.dart';
 import 'package:intl/intl.dart';
 import 'package:page_transition/page_transition.dart';
 import 'package:pull_to_refresh/pull_to_refresh.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:http/http.dart' as http;
-import 'package:indonesiarestoguide/ui/detail/detail_history.dart';
+import 'package:kam5ia/ui/detail/detail_history.dart';
 
 class EmployeesActivity extends StatefulWidget {
   @override
@@ -33,6 +33,7 @@ class _EmployeesActivityState extends State<EmployeesActivity> {
     });
   }
 
+  bool kosong = false;
   List<User> user = [];
   Future _getKaryawan()async{
     List<User> _user = [];
@@ -64,6 +65,10 @@ class _EmployeesActivityState extends State<EmployeesActivity> {
       print(user);
       isLoading = false;
     });
+
+    if (apiResult.statusCode == 200 && user.toString() == '[]') {
+      kosong = true;
+    }
   }
 
   getHomePg() async {
@@ -177,20 +182,22 @@ class _EmployeesActivityState extends State<EmployeesActivity> {
         child: (isLoading)?Container(
             width: CustomSize.sizeWidth(context),
             height: CustomSize.sizeHeight(context),
-            child: Center(child: CircularProgressIndicator())):SmartRefresher(
+            child: Center(child: CircularProgressIndicator(
+              color: CustomColor.primaryLight,
+            ))):SmartRefresher(
           enablePullDown: true,
           enablePullUp: false,
           header: WaterDropMaterialHeader(
             distance: 30,
             backgroundColor: Colors.white,
-            color: CustomColor.primary,
+            color: CustomColor.primaryLight,
           ),
           controller: _refreshController,
           onRefresh: _onRefresh,
           onLoading: _onLoading,
           child: SingleChildScrollView(
             controller: _scrollController,
-            child: Column(
+            child: (kosong.toString() != 'true')?Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 SizedBox(
@@ -243,13 +250,13 @@ class _EmployeesActivityState extends State<EmployeesActivity> {
                                       width: CustomSize.sizeWidth(context) / 6,
                                       height: CustomSize.sizeWidth(context) / 6,
                                       decoration: (user[index].img == "/".substring(0, 1))?BoxDecoration(
-                                          color: CustomColor.primary,
+                                          color: CustomColor.primaryLight,
                                           shape: BoxShape.circle
                                       ):BoxDecoration(
                                         shape: BoxShape.circle,
                                         image: new DecorationImage(
                                             image: (user[index].img != null)?NetworkImage(Links.subUrl +
-                                                user[index].img):AssetImage('assets/default.png'),
+                                                user[index].img!):AssetImage('assets/default.png') as ImageProvider,
                                             fit: BoxFit.cover
                                         ),
                                       ),
@@ -300,6 +307,43 @@ class _EmployeesActivityState extends State<EmployeesActivity> {
                 ),
                 SizedBox(height: CustomSize.sizeHeight(context) / 48,)
               ],
+            ):Stack(
+              children: [
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    SizedBox(
+                      height: CustomSize.sizeHeight(context) / 32,
+                    ),
+                    Container(
+                      width: CustomSize.sizeWidth(context),
+                      color: Colors.white,
+                      child: Padding(
+                        padding: EdgeInsets.symmetric(horizontal: CustomSize.sizeWidth(context) / 24),
+                        child: (homepg != "1")?CustomText.textHeading3(
+                            text: "Riwayat",
+                            minSize: 18,
+                            maxLines: 1
+                        ):CustomText.textHeading3(
+                            text: "Data Pegawai",
+                            color: CustomColor.primary,
+                            minSize: 18,
+                            maxLines: 1
+                        ),
+                      ),
+                    ),
+                    (user.toString() != '[]')?SizedBox(height: CustomSize.sizeHeight(context) / 48,):Container()
+                  ],
+                ),
+                Container(height: CustomSize.sizeHeight(context), child: Center(
+                  child: CustomText.bodyRegular14(
+                      text: 'Pegawai kosong.',
+                      maxLines: 1,
+                      minSize: 12,
+                      color: Colors.grey
+                  ),
+                ),),
+              ],
             ),
           ),
         ),
@@ -316,7 +360,7 @@ class _EmployeesActivityState extends State<EmployeesActivity> {
             width: CustomSize.sizeWidth(context) / 6.6,
             height: CustomSize.sizeWidth(context) / 6.6,
             decoration: BoxDecoration(
-                color: CustomColor.primary,
+                color: CustomColor.primaryLight,
                 shape: BoxShape.circle
             ),
             child: Center(child: Icon(FontAwesome.plus, color: Colors.white, size: 29,)),

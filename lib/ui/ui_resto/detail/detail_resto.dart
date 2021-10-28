@@ -5,24 +5,25 @@ import 'package:flutter/material.dart';
 import 'package:flutter_icons/flutter_icons.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'package:indonesiarestoguide/model/CategoryMenu.dart';
-import 'package:indonesiarestoguide/model/Cuisine.dart';
-import 'package:indonesiarestoguide/model/Menu.dart';
-import 'package:indonesiarestoguide/model/MenuJson.dart';
-import 'package:indonesiarestoguide/model/PrefCart.dart';
-import 'package:indonesiarestoguide/model/Price.dart';
-import 'package:indonesiarestoguide/model/Promo.dart';
-import 'package:indonesiarestoguide/ui/cart/cart_activity.dart';
-import 'package:indonesiarestoguide/ui/home/home_activity.dart';
-import 'package:indonesiarestoguide/ui/reservation/reservation_activity.dart';
-import 'package:indonesiarestoguide/ui/ui_resto/add_resto/add_slider.dart';
-import 'package:indonesiarestoguide/utils/utils.dart';
+import 'package:full_screen_image/full_screen_image.dart';
+import 'package:kam5ia/model/CategoryMenu.dart';
+import 'package:kam5ia/model/Cuisine.dart';
+import 'package:kam5ia/model/Menu.dart';
+import 'package:kam5ia/model/MenuJson.dart';
+import 'package:kam5ia/model/PrefCart.dart';
+import 'package:kam5ia/model/Price.dart';
+import 'package:kam5ia/model/Promo.dart';
+import 'package:kam5ia/ui/cart/cart_activity.dart';
+import 'package:kam5ia/ui/home/home_activity.dart';
+import 'package:kam5ia/ui/reservation/reservation_activity.dart';
+import 'package:kam5ia/ui/ui_resto/add_resto/add_slider.dart';
+import 'package:kam5ia/utils/utils.dart';
 import 'package:http/http.dart' as http;
 import 'package:intl/intl.dart';
 import 'package:page_transition/page_transition.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:url_launcher/url_launcher.dart';
-import 'package:indonesiarestoguide/ui/ui_resto/edit_resto/edit_view_resto.dart';
+import 'package:kam5ia/ui/ui_resto/edit_resto/edit_view_resto.dart';
 
 class DetailRestoAdmin extends StatefulWidget {
   String id;
@@ -75,6 +76,35 @@ class _DetailRestoAdminState extends State<DetailRestoAdmin> {
   String idResto = '';
   String reservation_fee = '';
   String ongkir = '';
+
+  String email = "";
+  String badanU = '';
+  String pemilikU = '';
+  String penanggungJwb = '';
+  String nameRekening = '';
+  String nameBank = '';
+  String nomorRekening = '';
+
+  Future _getData()async{
+    SharedPreferences pref2 = await SharedPreferences.getInstance();
+    inCart = pref2.getString('inCart')??"";
+    email = pref2.getString('emailResto')??"";
+    badanU = pref2.getString('nameBadanUsaha')??"";
+    // print('ini Loh Badan'+badanU);
+    pemilikU = pref2.getString('namePemilik')??"";
+    penanggungJwb = pref2.getString('namePenanggungJawab')??"";
+    nomorRekening = pref2.getString('noRekeningBank')??"";
+    if(pref2.getString('inCart') == '1'){
+      name = pref2.getString('menuJson')??"";
+      print("Ini pref2 " +name+" SP");
+      restoId.addAll(pref2.getStringList('restoId')??[]);
+      print(restoId);
+      qty.addAll(pref2.getStringList('qty')??[]);
+      print(qty);
+    }
+    setState(() {});
+  }
+
   Future _getDetail(String id)async{
     List<String> _images = [];
     List<Promo> _promo = [];
@@ -100,8 +130,10 @@ class _DetailRestoAdminState extends State<DetailRestoAdmin> {
     // print(data['data']['fasilitas']);
     // print(data['data']['type']);
 
-    for(var v in data['data']['type']){
-      _cuisine.add(v['name']);
+    if (data['data']['type'] != null) {
+      for(var v in data['data']['type']){
+        _cuisine.add(v['name']);
+      }
     }
 
     for(var v in data['data']['fasilitas']){
@@ -123,7 +155,7 @@ class _DetailRestoAdminState extends State<DetailRestoAdmin> {
               name: a['name'],
               desc: a['desc'],
               price: Price.delivery(a['price'], a['delivery_price']),
-              urlImg: a['img']
+              urlImg: a['img'], distance: null, is_recommended: '', restoName: '', type: '', qty: '', restoId: '', delivery_price: null
           );
           _cateMenu.add(m);
         }
@@ -137,28 +169,28 @@ class _DetailRestoAdminState extends State<DetailRestoAdmin> {
       // print(_categoryMenu);
     }
 
-    for(var v in data['data']['recom']){
-      Menu m = Menu(
-          id: v['id'],
-          name: v['name'],
-          desc: v['desc'],
-          price: Price.delivery(v['price'], v['delivery_price']),
-          urlImg: v['img']
-      );
-      _menu.add(m);
-    }
-
-    for(var v in data['data']['recom']){
-      MenuJson m = MenuJson(
-          id: v['id'],
-          name: v['name'],
-          desc: v['desc'],
-          price: v['price'].toString(),
-          discount: v['discounted_price'].toString(),
-          urlImg: v['img']
-      );
-      _menuJson.add(m);
-    }
+    // for(var v in data['data']['recom']){
+    //   Menu m = Menu(
+    //       id: v['id'],
+    //       name: v['name'],
+    //       desc: v['desc'],
+    //       price: Price.delivery(v['price'], v['delivery_price']),
+    //       urlImg: v['img'], type: '', distance: null, is_recommended: '', restoName: '', restoId: '', delivery_price: null, qty: ''
+    //   );
+    //   _menu.add(m);
+    // }
+    //
+    // for(var v in data['data']['recom']){
+    //   MenuJson m = MenuJson(
+    //       id: v['id'],
+    //       name: v['name'],
+    //       desc: v['desc'],
+    //       price: v['price'].toString(),
+    //       discount: v['discounted_price'].toString(),
+    //       urlImg: v['img'], distance: null, restoName: '', restoId: '', pricePlus: ''
+    //   );
+    //   _menuJson.add(m);
+    // }
 
     if (data['data']['promo'] != null) {
       if (homepg != "1") {
@@ -170,8 +202,8 @@ class _DetailRestoAdminState extends State<DetailRestoAdmin> {
                 name: v['menu_name'],
                 desc: v['menu_desc'],
                 urlImg: v['menu_img'],
-                price: Price.discounted(v['menu_price'], v['menu_discounted'])
-            ),
+                price: Price.discounted(v['menu_price'], v['menu_discounted']), qty: '', restoId: '', delivery_price: null, is_recommended: '', restoName: '', distance: null, type: ''
+            ), discountedPrice: null, id: null,
           );
           _promo.add(p);
         }
@@ -196,6 +228,7 @@ class _DetailRestoAdminState extends State<DetailRestoAdmin> {
       openClose = data['data']['openclose'];
       reservationFee = data['data']['reservation_fee'].toString();
       can_delivery = data['data']['can_delivery'].toString();
+      print('deliv '+data['data']['can_delivery'].toString());
       can_takeaway = data['data']['can_take_away'].toString();
       lat = data['data']['lat'].toString();
       long = data['data']['long'].toString();
@@ -203,16 +236,19 @@ class _DetailRestoAdminState extends State<DetailRestoAdmin> {
       promo = _promo;
       menu = _menu;
       facility = _facility.toString().split('[')[1].split(']')[0].replaceAll(new RegExp(r",\s+"), ",");
-      print(facility);
+      // print(facility);
+      print('ini Loh Badan'+facility);
       cuisine = _cuisine.toString().split('[')[1].split(']')[0].replaceAll(new RegExp(r",\s+"), ",");
-      // print(cuisine);
+      print(cuisine);
       if(promo.length <= 3){
         indexPromo = promo.length;
       }else{
         indexPromo = 3;
         isPromo = true;
       }
-      isLoading = false;
+      if (apiResult.statusCode == 200) {
+        isLoading = false;
+      }
     });
   }
 
@@ -224,6 +260,43 @@ class _DetailRestoAdminState extends State<DetailRestoAdmin> {
     });
   }
 
+  String img2 = "";
+  String img3 = "";
+  Future<void> _getUserDataResto()async{
+    // List<Menu> _menu = [];
+
+    setState(() {
+      isLoading = true;
+    });
+    SharedPreferences pref = await SharedPreferences.getInstance();
+    String token = pref.getString("token") ?? "";
+    var apiResult = await http.get(Links.mainUrl + '/resto/userdata', headers: {
+      "Accept": "Application/json",
+      "Authorization": "Bearer $token"
+    });
+    print('ini loh oyy'+apiResult.body.toString());
+    var data = json.decode(apiResult.body);
+
+    setState(() {
+      // menu = _menu;
+      email = data['email'].toString();
+      badanU = data['badan_usaha'].toString();
+      pemilikU = data['name_owner'].toString();
+      penanggungJwb = data['name_pj'].toString();
+      nameRekening = data['nama_norek'].toString();
+      nameBank = data['bank_norek'].toString();
+      nomorRekening = data['norek'].toString();
+      img2 = data['selfie_pj'].toString();
+      img3 = data['ktp'].toString();
+
+      // isLoading = false;
+    });
+
+    // if (apiResult.statusCode == 200 && menu.toString() == '[]') {
+    //   kosong = true;
+    // }
+  }
+
   _launchURL() async {
     var url = 'https://www.google.co.id/maps/place/' + address;
     if (await canLaunch(url)) {
@@ -233,23 +306,18 @@ class _DetailRestoAdminState extends State<DetailRestoAdmin> {
     }
   }
 
-  Future _getData()async{
-    SharedPreferences pref2 = await SharedPreferences.getInstance();
-    inCart = pref2.getString('inCart')??"";
-    if(pref2.getString('inCart') == '1'){
-      name = pref2.getString('menuJson')??"";
-      print("Ini pref2 " +name+" SP");
-      restoId.addAll(pref2.getStringList('restoId')??[]);
-      print(restoId);
-      qty.addAll(pref2.getStringList('qty')??[]);
-      print(qty);
-    }
-    setState(() {});
-  }
-
   Future triggerToast() async{
     Fluttertoast.showToast(
         msg: "Tekan dan tahan untuk hapus",
+        backgroundColor: Colors.grey,
+        textColor: Colors.black,
+        fontSize: 16.0
+    );
+  }
+
+  Future triggerToast2() async{
+    Fluttertoast.showToast(
+        msg: "Anda tidak dapat menghapus foto yang tersisa",
         backgroundColor: Colors.grey,
         textColor: Colors.black,
         fontSize: 16.0
@@ -273,11 +341,10 @@ class _DetailRestoAdminState extends State<DetailRestoAdmin> {
     if (data['msg'].toString() == 'Success') {
       // Navigator.pop(context);
       Navigator.pushReplacement(context, PageTransition(type: PageTransitionType.fade, child: new DetailRestoAdmin(idRes.toString())));
+      setState(() {
+        isLoading = false;
+      });
     }
-
-    setState(() {
-      isLoading = false;
-    });
   }
 
   List<Menu> imagesSlider = [];
@@ -299,7 +366,8 @@ class _DetailRestoAdminState extends State<DetailRestoAdmin> {
     for(var p in data['img']){
       Menu v = Menu(
           id: p['id'],
-          urlImg: p['img']
+          urlImg: p['img'], delivery_price: null, restoId: '', qty: '', type: '', price: null, distance: null, name: '',
+          restoName: '', is_recommended: '', desc: ''
       );
       _imagesSlider.add(v);
     }
@@ -307,7 +375,7 @@ class _DetailRestoAdminState extends State<DetailRestoAdmin> {
     setState(() {
       imagesSlider = _imagesSlider;
       // print(imagesSlider);
-      isLoading = false;
+      // isLoading = false;
     });
   }
 
@@ -357,6 +425,7 @@ class _DetailRestoAdminState extends State<DetailRestoAdmin> {
     _getData();
     _getImage();
     getHomePg();
+    _getUserDataResto();
     print(homepg + ' hoi kafir');
     super.initState();
   }
@@ -368,22 +437,40 @@ class _DetailRestoAdminState extends State<DetailRestoAdmin> {
         child: (isLoading)?Container(
             width: CustomSize.sizeWidth(context),
             height: CustomSize.sizeHeight(context),
-            child: Center(child: CircularProgressIndicator())):SingleChildScrollView(
+            child: Center(child: CircularProgressIndicator(
+              color: CustomColor.primaryLight,
+            ))):SingleChildScrollView(
           controller: _scrollController,
           child: Stack(
             children: [
-              Container(
+              (img != null)?FullScreenWidget(
+                child: Container(
+                  height: CustomSize.sizeHeight(context) / 3.2,
+                  width: CustomSize.sizeWidth(context),
+                  child: ClipRRect(
+                    // borderRadius: BorderRadius.circular(16),
+                    child: Image.network(Links.subUrl + img, fit: BoxFit.fitWidth),
+                  ),
+                ),
+              ):Container(
                 height: CustomSize.sizeHeight(context) / 3.2,
                 width: CustomSize.sizeWidth(context),
-                decoration: (img != null)?BoxDecoration(
-                  image: DecorationImage(
-                      image: NetworkImage(Links.subUrl + img),
-                      fit: BoxFit.cover
-                  ),
-                ):BoxDecoration(
-                  color: CustomColor.primary
+                decoration: BoxDecoration(
+                    color: CustomColor.primaryLight
                 ),
               ),
+              // Container(
+              //   height: CustomSize.sizeHeight(context) / 3.2,
+              //   width: CustomSize.sizeWidth(context),
+              //   decoration: (img != null)?BoxDecoration(
+              //     image: DecorationImage(
+              //         image: NetworkImage(Links.subUrl + img),
+              //         fit: BoxFit.cover
+              //     ),
+              //   ):BoxDecoration(
+              //     color: CustomColor.primary
+              //   ),
+              // ),
               Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -417,7 +504,7 @@ class _DetailRestoAdminState extends State<DetailRestoAdmin> {
                               GestureDetector(
                                 onTap: (){
                                   setState(() {
-                                    Navigator.push(context, PageTransition(type: PageTransitionType.fade, child: new EditViewResto(idResto, name, img, address, phone, desc, lat, long, facility, cuisine, can_delivery, can_takeaway, ongkir, reservation_fee)));
+                                    Navigator.push(context, PageTransition(type: PageTransitionType.fade, child: new EditViewResto(idResto, name, img, address, phone, desc, lat, long, facility, cuisine, can_delivery, can_takeaway, ongkir, reservation_fee, email, badanU, pemilikU, penanggungJwb, nameRekening, nameBank, nomorRekening, img2, img3)));
                                   });
                                 },
                                 child: Container(
@@ -441,6 +528,7 @@ class _DetailRestoAdminState extends State<DetailRestoAdmin> {
                             ],
                           ),
                         ),
+                        SizedBox(height: CustomSize.sizeHeight(context) / 56,),
                         Padding(
                           padding: EdgeInsets.symmetric(horizontal: CustomSize.sizeHeight(context) / 24),
                           child: GestureDetector(
@@ -491,7 +579,7 @@ class _DetailRestoAdminState extends State<DetailRestoAdmin> {
                                     children: [
                                       CustomText.bodyMedium12(text: "Jam Buka & Tutup", minSize: 12),
                                       SizedBox(height: CustomSize.sizeHeight(context) / 86,),
-                                      CustomText.bodyRegular16(text: openClose, minSize: 16, color: CustomColor.primary),
+                                      CustomText.bodyRegular16(text: DateFormat('kk:mm').format(DateTime.parse(DateTime.now().toString().split(' ')[0]+' '+openClose.split(' -')[0].toString())).toString()+' - '+DateFormat('kk:mm').format(DateTime.parse(DateTime.now().toString().split(' ')[0]+' '+openClose.split('- ')[1].toString())).toString(), minSize: 16, color: CustomColor.primary),
                                     ],
                                   ),
                                 ),
@@ -551,7 +639,7 @@ class _DetailRestoAdminState extends State<DetailRestoAdmin> {
                             ),
                           ),
                         ),
-                        SizedBox(height: CustomSize.sizeHeight(context) * 0.004,),
+                        SizedBox(height: CustomSize.sizeHeight(context) / 56,),
                         (homepg != '1')?Container(
                           height: CustomSize.sizeWidth(context) / 2.4,
                           child: ListView.builder(
@@ -559,7 +647,7 @@ class _DetailRestoAdminState extends State<DetailRestoAdmin> {
                               itemCount: images.length,
                               itemBuilder: (_, index){
                                 return Padding(
-                                  padding: EdgeInsets.only(left: CustomSize.sizeWidth(context) * 0.03),
+                                  padding: EdgeInsets.only(left: CustomSize.sizeWidth(context) * 0.015, right: CustomSize.sizeWidth(context) * 0.015),
                                   child: Container(
                                     width: CustomSize.sizeWidth(context) / 2.4,
                                     height: CustomSize.sizeWidth(context) / 2.4,
@@ -581,25 +669,39 @@ class _DetailRestoAdminState extends State<DetailRestoAdmin> {
                               itemCount: imagesSlider.length,
                               itemBuilder: (_, index){
                                 return Padding(
-                                  padding: EdgeInsets.only(left: CustomSize.sizeWidth(context) * 0.03),
+                                  padding: EdgeInsets.only(left: CustomSize.sizeWidth(context) * 0.015, right: CustomSize.sizeWidth(context) * 0.015),
                                   child: GestureDetector(
-                                    onTap: () {
+                                    onDoubleTap: () {
                                       triggerToast();
                                     },
                                     onLongPress: () {
-                                      showAlertDialog(imagesSlider[index].id.toString());
+                                      if (images.length == 1) {
+                                        triggerToast2();
+                                      } else {
+                                        showAlertDialog(imagesSlider[index].id.toString());
+                                      }
                                     },
-                                    child: Container(
-                                      width: CustomSize.sizeWidth(context) / 2.4,
-                                      height: CustomSize.sizeWidth(context) / 2.4,
-                                      decoration: BoxDecoration(
-                                          image: DecorationImage(
-                                              image: NetworkImage(Links.subUrl + imagesSlider[index].urlImg),
-                                              fit: BoxFit.cover
-                                          ),
-                                          borderRadius: BorderRadius.circular(10)
+                                    child: FullScreenWidget(
+                                      child: Container(
+                                        width: CustomSize.sizeWidth(context) / 2.4,
+                                        height: CustomSize.sizeWidth(context) / 2.4,
+                                        child: ClipRRect(
+                                          borderRadius: BorderRadius.circular(10),
+                                          child: Image.network(Links.subUrl + imagesSlider[index].urlImg, fit: BoxFit.fitWidth),
+                                        ),
                                       ),
                                     ),
+                                    // child: Container(
+                                    //   width: CustomSize.sizeWidth(context) / 2.4,
+                                    //   height: CustomSize.sizeWidth(context) / 2.4,
+                                    //   decoration: BoxDecoration(
+                                    //       image: DecorationImage(
+                                    //           image: NetworkImage(Links.subUrl + imagesSlider[index].urlImg),
+                                    //           fit: BoxFit.cover
+                                    //       ),
+                                    //       borderRadius: BorderRadius.circular(10)
+                                    //   ),
+                                    // ),
                                   ),
                                 );
                               }
@@ -653,7 +755,7 @@ class _DetailRestoAdminState extends State<DetailRestoAdmin> {
                                                         height: CustomSize.sizeWidth(context) / 1.2,
                                                         decoration: BoxDecoration(
                                                           image: DecorationImage(
-                                                              image: NetworkImage(Links.subUrl + promo[index].menu.urlImg),
+                                                              image: NetworkImage(Links.subUrl + promo[index].menu!.urlImg),
                                                               fit: BoxFit.cover
                                                           ),
                                                           borderRadius: BorderRadius.circular(10),
@@ -667,13 +769,13 @@ class _DetailRestoAdminState extends State<DetailRestoAdmin> {
                                                         crossAxisAlignment: CrossAxisAlignment.start,
                                                         children: [
                                                           CustomText.textHeading5(
-                                                              text: promo[index].menu.name,
+                                                              text: promo[index].menu!.name,
                                                               minSize: 18,
                                                               maxLines: 1
                                                           ),
                                                           SizedBox(height: CustomSize.sizeHeight(context) / 32,),
                                                           CustomText.bodyRegular16(
-                                                              text: promo[index].menu.desc,
+                                                              text: promo[index].menu!.desc,
                                                               maxLines: 100,
                                                               minSize: 16
                                                           ),
@@ -682,20 +784,20 @@ class _DetailRestoAdminState extends State<DetailRestoAdmin> {
                                                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                                             children: [
                                                               CustomText.bodyMedium16(
-                                                                  text: NumberFormat.currency(locale: 'id', symbol: '', decimalDigits: 0).format(promo[index].menu.price.original),
+                                                                  text: NumberFormat.currency(locale: 'id', symbol: '', decimalDigits: 0).format(promo[index].menu!.price!.original),
                                                                   maxLines: 1,
                                                                   minSize: 16
                                                               ),
-                                                              (restoId.contains(promo[index].menu.id.toString()) != true)?SizedBox():Row(
+                                                              (restoId.contains(promo[index].menu!.id.toString()) != true)?SizedBox():Row(
                                                                 children: [
                                                                   GestureDetector(
                                                                     onTap: ()async{
-                                                                      if(int.parse(qty[restoId.indexOf(promo[index].menu.id.toString())]) > 1){
-                                                                        String s = qty[restoId.indexOf(promo[index].menu.id.toString())];
+                                                                      if(int.parse(qty[restoId.indexOf(promo[index].menu!.id.toString())]) > 1){
+                                                                        String s = qty[restoId.indexOf(promo[index].menu!.id.toString())];
                                                                         print(s);
                                                                         int i = int.parse(s) - 1;
                                                                         print(i);
-                                                                        qty[restoId.indexOf(promo[index].menu.id.toString())] = i.toString();
+                                                                        qty[restoId.indexOf(promo[index].menu!.id.toString())] = i.toString();
                                                                         SharedPreferences pref = await SharedPreferences.getInstance();
                                                                         pref.setStringList("qty", qty);
                                                                         setStateModal(() {});
@@ -713,15 +815,15 @@ class _DetailRestoAdminState extends State<DetailRestoAdmin> {
                                                                     ),
                                                                   ),
                                                                   SizedBox(width: CustomSize.sizeWidth(context) / 24,),
-                                                                  CustomText.bodyRegular16(text: qty[restoId.indexOf(promo[index].menu.id.toString())]),
+                                                                  CustomText.bodyRegular16(text: qty[restoId.indexOf(promo[index].menu!.id.toString())]),
                                                                   SizedBox(width: CustomSize.sizeWidth(context) / 24,),
                                                                   GestureDetector(
                                                                     onTap: ()async{
-                                                                      String s = qty[restoId.indexOf(promo[index].menu.id.toString())];
+                                                                      String s = qty[restoId.indexOf(promo[index].menu!.id.toString())];
                                                                       print(s);
                                                                       int i = int.parse(s) + 1;
                                                                       print(i);
-                                                                      qty[restoId.indexOf(promo[index].menu.id.toString())] = i.toString();
+                                                                      qty[restoId.indexOf(promo[index].menu!.id.toString())] = i.toString();
                                                                       SharedPreferences pref = await SharedPreferences.getInstance();
                                                                       pref.setStringList("qty", qty);
                                                                       setStateModal(() {});
@@ -745,7 +847,7 @@ class _DetailRestoAdminState extends State<DetailRestoAdmin> {
                                                       ),
                                                     ),
                                                     SizedBox(height: CustomSize.sizeHeight(context) / 32,),
-                                                    (restoId.contains(promo[index].menu.id.toString()) != true)?Center(
+                                                    (restoId.contains(promo[index].menu!.id.toString()) != true)?Center(
                                                       child: Container(
                                                         width: CustomSize.sizeWidth(context) / 1.1,
                                                         height: CustomSize.sizeHeight(context) / 14,
@@ -759,9 +861,9 @@ class _DetailRestoAdminState extends State<DetailRestoAdmin> {
                                                                 id: menu[index].id,
                                                                 name: menu[index].name,
                                                                 desc: menu[index].desc,
-                                                                price: menu[index].price.original.toString(),
-                                                                discount: menu[index].price.discounted.toString(),
-                                                                urlImg: menu[index].urlImg,
+                                                                price: menu[index].price!.original.toString(),
+                                                                discount: menu[index].price!.discounted.toString(),
+                                                                urlImg: menu[index].urlImg, distance: null, pricePlus: '', restoId: '', restoName: '',
                                                               );
                                                               menuJson.add(m);
                                                               // List<String> _restoId = [];
@@ -914,7 +1016,7 @@ class _DetailRestoAdminState extends State<DetailRestoAdmin> {
                                                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                                       children: [
                                                         CustomText.bodyMedium16(
-                                                            text: NumberFormat.currency(locale: 'id', symbol: '', decimalDigits: 0).format(menu[index].price.original),
+                                                            text: NumberFormat.currency(locale: 'id', symbol: '', decimalDigits: 0).format(menu[index].price!.original),
                                                             maxLines: 1,
                                                             minSize: 16
                                                         ),
@@ -922,12 +1024,12 @@ class _DetailRestoAdminState extends State<DetailRestoAdmin> {
                                                           children: [
                                                             GestureDetector(
                                                               onTap: ()async{
-                                                                if(int.parse(qty[restoId.indexOf(promo[index].menu.id.toString())]) > 1){
-                                                                  String s = qty[restoId.indexOf(promo[index].menu.id.toString())];
+                                                                if(int.parse(qty[restoId.indexOf(promo[index].menu!.id.toString())]) > 1){
+                                                                  String s = qty[restoId.indexOf(promo[index].menu!.id.toString())];
                                                                   print(s);
                                                                   int i = int.parse(s) - 1;
                                                                   print(i);
-                                                                  qty[restoId.indexOf(promo[index].menu.id.toString())] = i.toString();
+                                                                  qty[restoId.indexOf(promo[index].menu!.id.toString())] = i.toString();
                                                                   SharedPreferences pref = await SharedPreferences.getInstance();
                                                                   pref.setStringList("qty", qty);
                                                                   setStateModal(() {});
@@ -945,15 +1047,15 @@ class _DetailRestoAdminState extends State<DetailRestoAdmin> {
                                                               ),
                                                             ),
                                                             SizedBox(width: CustomSize.sizeWidth(context) / 24,),
-                                                            CustomText.bodyRegular16(text: qty[restoId.indexOf(promo[index].menu.id.toString())]),
+                                                            CustomText.bodyRegular16(text: qty[restoId.indexOf(promo[index].menu!.id.toString())]),
                                                             SizedBox(width: CustomSize.sizeWidth(context) / 24,),
                                                             GestureDetector(
                                                               onTap: ()async{
-                                                                String s = qty[restoId.indexOf(promo[index].menu.id.toString())];
+                                                                String s = qty[restoId.indexOf(promo[index].menu!.id.toString())];
                                                                 print(s);
                                                                 int i = int.parse(s) + 1;
                                                                 print(i);
-                                                                qty[restoId.indexOf(promo[index].menu.id.toString())] = i.toString();
+                                                                qty[restoId.indexOf(promo[index].menu!.id.toString())] = i.toString();
                                                                 SharedPreferences pref = await SharedPreferences.getInstance();
                                                                 pref.setStringList("qty", qty);
                                                                 setStateModal(() {});
@@ -991,9 +1093,9 @@ class _DetailRestoAdminState extends State<DetailRestoAdmin> {
                                                           id: menu[index].id,
                                                           name: menu[index].name,
                                                           desc: menu[index].desc,
-                                                          price: menu[index].price.original.toString(),
-                                                          discount: menu[index].price.discounted.toString(),
-                                                          urlImg: menu[index].urlImg,
+                                                          price: menu[index].price!.original.toString(),
+                                                          discount: menu[index].price!.discounted.toString(),
+                                                          urlImg: menu[index].urlImg, restoName: '', pricePlus: '', distance: null, restoId: '',
                                                         );
                                                         menuJson.add(m);
                                                         // List<String> _restoId = [];
@@ -1057,7 +1159,7 @@ class _DetailRestoAdminState extends State<DetailRestoAdmin> {
                                                     crossAxisAlignment: CrossAxisAlignment.start,
                                                     children: [
                                                       CustomText.bodyMedium16(
-                                                          text: NumberFormat.currency(locale: 'id', symbol: '', decimalDigits: 0).format(menu[index].price.original),
+                                                          text: NumberFormat.currency(locale: 'id', symbol: '', decimalDigits: 0).format(menu[index].price!.original),
                                                           maxLines: 1,
                                                           minSize: 16
                                                       ),
@@ -1089,9 +1191,9 @@ class _DetailRestoAdminState extends State<DetailRestoAdmin> {
                                                       id: menu[index].id,
                                                       name: menu[index].name,
                                                       desc: menu[index].desc,
-                                                      price: menu[index].price.original.toString(),
-                                                      discount: menu[index].price.discounted.toString(),
-                                                      urlImg: menu[index].urlImg,
+                                                      price: menu[index].price!.original.toString(),
+                                                      discount: menu[index].price!.discounted.toString(),
+                                                      urlImg: menu[index].urlImg, restoName: '', restoId: '', pricePlus: '', distance: null,
                                                     );
                                                     menuJson.add(m);
                                                     // List<String> _restoId = [];
@@ -1315,7 +1417,7 @@ class _DetailRestoAdminState extends State<DetailRestoAdmin> {
                                                     ),
                                                     SizedBox(height: CustomSize.sizeHeight(context) / 32,),
                                                     CustomText.bodyMedium16(
-                                                        text: NumberFormat.currency(locale: 'id', symbol: '', decimalDigits: 0).format(categoryMenu[categoryMenu.indexWhere((v) => v.name == nameCategory)].menu[index].price.original),
+                                                        text: NumberFormat.currency(locale: 'id', symbol: '', decimalDigits: 0).format(categoryMenu[categoryMenu.indexWhere((v) => v.name == nameCategory)].menu[index].price!.original),
                                                         maxLines: 1,
                                                         minSize: 16
                                                     ),
@@ -1379,7 +1481,7 @@ class _DetailRestoAdminState extends State<DetailRestoAdmin> {
                                                     crossAxisAlignment: CrossAxisAlignment.start,
                                                     children: [
                                                       CustomText.bodyMedium16(
-                                                          text: NumberFormat.currency(locale: 'id', symbol: '', decimalDigits: 0).format(categoryMenu[categoryMenu.indexWhere((v) => v.name == nameCategory)].menu[index].price.original),
+                                                          text: NumberFormat.currency(locale: 'id', symbol: '', decimalDigits: 0).format(categoryMenu[categoryMenu.indexWhere((v) => v.name == nameCategory)].menu[index].price!.original),
                                                           maxLines: 1,
                                                           minSize: 16
                                                       ),
@@ -1411,9 +1513,9 @@ class _DetailRestoAdminState extends State<DetailRestoAdmin> {
                                                       id: categoryMenu[categoryMenu.indexWhere((v) => v.name == nameCategory)].menu[index].id,
                                                       name: categoryMenu[categoryMenu.indexWhere((v) => v.name == nameCategory)].menu[index].name,
                                                       desc: categoryMenu[categoryMenu.indexWhere((v) => v.name == nameCategory)].menu[index].desc,
-                                                      price: categoryMenu[categoryMenu.indexWhere((v) => v.name == nameCategory)].menu[index].price.original.toString(),
-                                                      discount: categoryMenu[categoryMenu.indexWhere((v) => v.name == nameCategory)].menu[index].price.discounted.toString(),
-                                                      urlImg: categoryMenu[categoryMenu.indexWhere((v) => v.name == nameCategory)].menu[index].urlImg,
+                                                      price: categoryMenu[categoryMenu.indexWhere((v) => v.name == nameCategory)].menu[index].price!.original.toString(),
+                                                      discount: categoryMenu[categoryMenu.indexWhere((v) => v.name == nameCategory)].menu[index].price!.discounted.toString(),
+                                                      urlImg: categoryMenu[categoryMenu.indexWhere((v) => v.name == nameCategory)].menu[index].urlImg, pricePlus: '', distance: null, restoName: '', restoId: '',
                                                     );
                                                     menuJson.add(m);
                                                     // List<String> _restoId = [];

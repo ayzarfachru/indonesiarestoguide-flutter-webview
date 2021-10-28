@@ -7,16 +7,16 @@ import 'package:flutter_datetime_picker/flutter_datetime_picker.dart';
 import 'package:flutter_icons/flutter_icons.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:indonesiarestoguide/model/Menu.dart';
-import 'package:indonesiarestoguide/model/Price.dart';
-import 'package:indonesiarestoguide/ui/detail/detail_resto.dart';
-import 'package:indonesiarestoguide/ui/ui_resto/add_resto/add_detail_resto.dart';
-import 'package:indonesiarestoguide/ui/ui_resto/add_resto/add_view_resto.dart';
-import 'package:indonesiarestoguide/ui/ui_resto/detail/detail_resto.dart';
-import 'package:indonesiarestoguide/ui/ui_resto/home/home_activity.dart';
-import 'package:indonesiarestoguide/ui/ui_resto/menu/menu_activity.dart';
-import 'package:indonesiarestoguide/utils/utils.dart';
-import 'package:indonesiarestoguide/ui/home/home_activity.dart';
+import 'package:kam5ia/model/Menu.dart';
+import 'package:kam5ia/model/Price.dart';
+import 'package:kam5ia/ui/detail/detail_resto.dart';
+import 'package:kam5ia/ui/ui_resto/add_resto/add_detail_resto.dart';
+import 'package:kam5ia/ui/ui_resto/add_resto/add_view_resto.dart';
+import 'package:kam5ia/ui/ui_resto/detail/detail_resto.dart';
+import 'package:kam5ia/ui/ui_resto/home/home_activity.dart';
+import 'package:kam5ia/ui/ui_resto/menu/menu_activity.dart';
+import 'package:kam5ia/utils/utils.dart';
+import 'package:kam5ia/ui/home/home_activity.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:page_transition/page_transition.dart';
@@ -35,7 +35,7 @@ class MenuChip extends StatefulWidget {
   final List<String> typeList;
   final Function(List<String>) onSelectionChanged;
 
-  MenuChip(this.typeList, {this.onSelectionChanged});
+  MenuChip(this.typeList, {required this.onSelectionChanged});
 
   @override
   CuisineChipState createState() => CuisineChipState();
@@ -43,10 +43,10 @@ class MenuChip extends StatefulWidget {
 
 class CuisineChipState extends State<MenuChip> {
   // String selectedChoice = "";
-  List<String> selectedChoices = List();
+  List<String> selectedChoices = [];
 
   _buildChoiceList() {
-    List<Widget> choices = List();
+    List<Widget> choices = [];
 
     widget.typeList.forEach((item) {
       choices.add(Container(
@@ -114,8 +114,8 @@ class _AddSliderState extends State<AddSlider> {
 
   List<String> typeList = [];
 
-  List<String> selectedMenuList = List();
-  String tipe;
+  List<String> selectedMenuList = [];
+  String? tipe;
 
 
   _showCuisineDialog() {
@@ -166,8 +166,8 @@ class _AddSliderState extends State<AddSlider> {
   }
 
   //------------------------------= IMAGE PICKER =----------------------------------
-  File image;
-  String extension;
+  File? image;
+  String? extension;
   final picker = ImagePicker();
 
   Future getImage() async {
@@ -192,7 +192,7 @@ class _AddSliderState extends State<AddSlider> {
     var apiResult = await http.post(Links.mainUrl + '/resto/img',
         body: {
           'resto': id,
-          'img': 'data:image/$extension;base64,'+base64Encode(image.readAsBytesSync()).toString(),
+          'img': 'data:image/$extension;base64,'+base64Encode(image!.readAsBytesSync()).toString(),
         },
         headers: {
           "Accept": "Application/json",
@@ -205,7 +205,7 @@ class _AddSliderState extends State<AddSlider> {
       print("success");
       print(json.encode({
         'resto': id,
-        'img': 'data:image/$extension;base64,'+base64Encode(image.readAsBytesSync()).toString(),
+        'img': 'data:image/$extension;base64,'+base64Encode(image!.readAsBytesSync()).toString(),
       }));
       Navigator.pop(context);
       Navigator.pushReplacement(context, PageTransition(type: PageTransitionType.fade, child: DetailRestoAdmin(id)));
@@ -213,7 +213,7 @@ class _AddSliderState extends State<AddSlider> {
       // print(data);
       print(json.encode({
         'resto': id,
-        'img': 'data:image/$extension;base64,'+base64Encode(image.readAsBytesSync()).toString(),
+        'img': 'data:image/$extension;base64,'+base64Encode(image!.readAsBytesSync()).toString(),
       }));
     }
     setState(() {
@@ -222,7 +222,7 @@ class _AddSliderState extends State<AddSlider> {
     });
   }
 
-  List<String> dataCuisine;
+  List<String?>? dataCuisine;
   Future<void> getType() async {
     SharedPreferences pref = await SharedPreferences.getInstance();
     var token = pref.getString("token") ?? "";
@@ -302,10 +302,10 @@ class _AddSliderState extends State<AddSlider> {
                           (image == null)?Container(
                             height: CustomSize.sizeHeight(context) / 4.5,
                             width: CustomSize.sizeWidth(context) / 2.2,
-                            child: Icon(FontAwesome.plus, color: CustomColor.primary, size: 50,),
+                            child: Icon(FontAwesome.plus, color: CustomColor.primaryLight, size: 50,),
                             decoration: BoxDecoration(
                               border: Border.all(
-                                  color: CustomColor.primary,
+                                  color: CustomColor.primaryLight,
                                   width: 3.0
                               ),
                               borderRadius: BorderRadius.all(
@@ -317,7 +317,7 @@ class _AddSliderState extends State<AddSlider> {
                             width: CustomSize.sizeWidth(context) / 2.2,
                             decoration: (image==null)?(img == "/".substring(0, 1))?BoxDecoration(
                               border: Border.all(
-                                  color: CustomColor.primary,
+                                  color: CustomColor.primaryLight,
                                   width: 3.0
                               ),
                               borderRadius: BorderRadius.all(
@@ -325,7 +325,7 @@ class _AddSliderState extends State<AddSlider> {
                               ),
                             ):BoxDecoration(
                               border: Border.all(
-                                  color: CustomColor.primary,
+                                  color: CustomColor.primaryLight,
                                   width: 3.0
                               ),
                               borderRadius: BorderRadius.all(
@@ -336,7 +336,7 @@ class _AddSliderState extends State<AddSlider> {
                                   Radius.circular(10.0) //         <--- border radius here
                               ),
                               image: new DecorationImage(
-                                  image: new FileImage(image),
+                                  image: new FileImage(image!),
                                   fit: BoxFit.cover
                               ),
                             ),

@@ -1,18 +1,61 @@
+import 'package:kam5ia/model/Resto.dart';
+
 import 'Price.dart';
 
 class Menu{
+  int id = 0;
+  String restoId = '';
+  String name = '';
+  String restoName = '';
+  String desc = '';
+  String qty = '';
+  Price? price = null;
+  Price? delivery_price = null;
+  String urlImg = '';
+  String type = '';
+  String is_recommended = '';
+  double? distance;
+
+  Menu({required this.id, required this.restoId, required this.name, required this.restoName, required this.desc, required this.qty, required this.price, required this.delivery_price, required this.urlImg, required this.type, required this.is_recommended, required this.distance});
+  Menu.qty(this.qty);
+}
+
+// import 'package:kam5ia/model/Resto.dart';
+//
+// import 'Price.dart';
+
+class Menu2{
   int id;
   String restoId;
   String name;
   String restoName;
   String desc;
   String qty;
-  Price price;
-  Price delivery_price;
+  Price? price;
+  Price? delivery_price;
   String urlImg;
   String type;
   String is_recommended;
-  double distance;
+  double? distance;
+  Resto usaha;
 
-  Menu({this.id, this.restoId, this.name, this.restoName, this.desc, this.qty, this.price, this.delivery_price, this.urlImg, this.type, this.is_recommended, this.distance});
+  Menu2({required this.id, required this.restoId, required this.name, required this.restoName, required this.desc, required this.qty, required this.price, required this.delivery_price, required this.urlImg, required this.type, required this.is_recommended, required this.distance, required this.usaha});
+}
+
+class Menu3{
+  int id = 0;
+  String restoId = '';
+  String name = '';
+  String restoName = '';
+  String desc = '';
+  String qty = '';
+  Price? price = null;
+  Price? delivery_price = null;
+  String urlImg = '';
+  String type = '';
+  String ex_date = '';
+  String is_recommended = '';
+  double? distance;
+
+  Menu3({required this.id, required this.restoId, required this.name, required this.restoName, required this.desc, required this.qty, required this.price, required this.delivery_price, required this.urlImg, required this.type, required this.is_recommended, required this.distance, required this.ex_date});
 }

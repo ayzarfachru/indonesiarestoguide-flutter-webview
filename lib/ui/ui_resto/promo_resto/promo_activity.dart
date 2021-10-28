@@ -2,13 +2,14 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_icons/flutter_icons.dart';
-import 'package:indonesiarestoguide/ui/detail/detail_resto.dart';
-import 'package:indonesiarestoguide/ui/promo/add_promo.dart';
-import 'package:indonesiarestoguide/ui/promo/edit_promo.dart';
-import 'package:indonesiarestoguide/model/Promo.dart';
-import 'package:indonesiarestoguide/model/Price.dart';
-import 'package:indonesiarestoguide/model/Menu.dart';
-import 'package:indonesiarestoguide/utils/utils.dart';
+import 'package:full_screen_image/full_screen_image.dart';
+import 'package:kam5ia/ui/detail/detail_resto.dart';
+import 'package:kam5ia/ui/promo/add_promo.dart';
+import 'package:kam5ia/ui/promo/edit_promo.dart';
+import 'package:kam5ia/model/Promo.dart';
+import 'package:kam5ia/model/Price.dart';
+import 'package:kam5ia/model/Menu.dart';
+import 'package:kam5ia/utils/utils.dart';
 import 'package:intl/intl.dart';
 import 'package:location/location.dart';
 import 'package:page_transition/page_transition.dart';
@@ -147,7 +148,7 @@ class _PromoActivityState extends State<PromoActivity> {
           desc: v['desc']??'',
           urlImg: v['img'],
           price: Price.discounted(int.parse(v['price'].toString()), int.parse(v['discounted_price'].toString())),
-          distance: double.parse(v['resto_distance'].toString())
+          distance: double.parse(v['resto_distance'].toString()), type: '', is_recommended: '', delivery_price: null, qty: ''
       );
       _promo.add(m);
     }
@@ -184,14 +185,15 @@ class _PromoActivityState extends State<PromoActivity> {
         potongan: (a['potongan'] != null)?int.parse(a['potongan']):a['potongan'],
         ongkir: (a['ongkir'] != null)?int.parse(a['ongkir']):a['ongkir'],
         expired_at: a['expired_at'],
-        menu: (a['menus'].toString() != 'null')?Menu(
+        menu: Menu(
             id: a['menus']['id']??null,
             name: a['menus']['name']??null,
             desc: a['menus']['desc']??null,
             urlImg: a['menus']['img'],
             price: Price.promo(
-                a['menus']['price'].toString(), a['menus']['delivery_price'].toString())
-        ):null,
+                a['menus']['price'].toString(), a['menus']['delivery_price'].toString()), qty: '', restoId: '', delivery_price: null,
+            restoName: '', is_recommended: '', type: '', distance: null
+        ),
       );
       _promoResto.add(b);
     }
@@ -338,13 +340,15 @@ class _PromoActivityState extends State<PromoActivity> {
           child: (isLoading)?Container(
               width: CustomSize.sizeWidth(context),
               height: CustomSize.sizeHeight(context),
-              child: Center(child: CircularProgressIndicator())):SmartRefresher(
+              child: Center(child: CircularProgressIndicator(
+                color: CustomColor.primaryLight,
+              ))):SmartRefresher(
             enablePullDown: true,
             enablePullUp: false,
             header: WaterDropMaterialHeader(
               distance: 30,
               backgroundColor: Colors.white,
-              color: CustomColor.primary,
+              color: CustomColor.primaryLight,
             ),
             controller: _refreshController,
             onRefresh: _onRefresh,
@@ -384,8 +388,8 @@ class _PromoActivityState extends State<PromoActivity> {
                         itemBuilder: (_, index){
                           Future.delayed(Duration(seconds: 1)).then((_) {
                             setState(() {
-                              // int hargaAsli = int.parse(promoResto[index].menu.price.oriString);
-                              // int hargaAsliDeliv = int.parse(promoResto[index].menu.price.deliString);
+                              // int hargaAsli = int.parse(promoResto[index].menu!.price!.oriString!);
+                              // int hargaAsliDeliv = int.parse(promoResto[index].menu!.price!.deliString!);
                               // hargaDiskon = hargaAsli-(hargaAsli*promoResto[index].discountedPrice/100);
                               // hargaPotongan = (promoResto[index].potongan != null)?hargaAsli-promoResto[index].potongan:hargaAsli;
                               // hargaOngkir = (promoResto[index].ongkir != null)?hargaAsliDeliv-promoResto[index].ongkir:hargaAsliDeliv;
@@ -421,26 +425,36 @@ class _PromoActivityState extends State<PromoActivity> {
                                 ),
                                 child: Row(
                                   children: [
-                                    Container(
-                                      width: CustomSize.sizeWidth(context) / 2.6,
-                                      height: CustomSize.sizeWidth(context) / 2.6,
-                                      decoration: (homepg == "1")?(promoResto[index].menu != null)?BoxDecoration(
-                                        image: DecorationImage(
-                                            image: NetworkImage(Links.subUrl + promoResto[index].menu.urlImg),
-                                            fit: BoxFit.cover
+                                    FullScreenWidget(
+                                      child: Container(
+                                        width: CustomSize.sizeWidth(context) / 2.6,
+                                        height: CustomSize.sizeWidth(context) / 2.6,
+                                        child: ClipRRect(
+                                          borderRadius: BorderRadius.circular(20),
+                                          child: Image.network(Links.subUrl + promoResto[index].menu!.urlImg, fit: BoxFit.fitWidth),
                                         ),
-                                        borderRadius: BorderRadius.circular(20),
-                                      ):BoxDecoration(
-                                        color: CustomColor.primary,
-                                        borderRadius: BorderRadius.circular(20),
-                                      ):BoxDecoration(
-                                        image: DecorationImage(
-                                            image: NetworkImage(Links.subUrl + promo[index].urlImg),
-                                            fit: BoxFit.cover
-                                        ),
-                                        borderRadius: BorderRadius.circular(20),
                                       ),
                                     ),
+                                    // Container(
+                                    //   width: CustomSize.sizeWidth(context) / 2.6,
+                                    //   height: CustomSize.sizeWidth(context) / 2.6,
+                                    //   decoration: (homepg == "1")?(promoResto[index].menu != null)?BoxDecoration(
+                                    //     image: DecorationImage(
+                                    //         image: NetworkImage(Links.subUrl + promoResto[index].menu!.urlImg),
+                                    //         fit: BoxFit.cover
+                                    //     ),
+                                    //     borderRadius: BorderRadius.circular(20),
+                                    //   ):BoxDecoration(
+                                    //     color: CustomColor.primaryLight,
+                                    //     borderRadius: BorderRadius.circular(20),
+                                    //   ):BoxDecoration(
+                                    //     image: DecorationImage(
+                                    //         image: NetworkImage(Links.subUrl + promo[index].urlImg),
+                                    //         fit: BoxFit.cover
+                                    //     ),
+                                    //     borderRadius: BorderRadius.circular(20),
+                                    //   ),
+                                    // ),
                                     SizedBox(
                                       width: CustomSize.sizeWidth(context) / 32,
                                     ),
@@ -459,7 +473,7 @@ class _PromoActivityState extends State<PromoActivity> {
                                                   maxLines: 1,
                                                   minSize: 12
                                               ):CustomText.bodyLight12(
-                                                  text: 'Sampai : '+promoResto[index].expired_at.split(' ')[0],
+                                                  text: 'Sampai : '+promoResto[index].expired_at!.split(' ')[0],
                                                   maxLines: 1,
                                                   minSize: 12
                                               ),
@@ -488,7 +502,7 @@ class _PromoActivityState extends State<PromoActivity> {
                                             ],
                                           ),
                                           (homepg != '1')?Container():CustomText.bodyLight12(
-                                              text: 'Jam : '+promoResto[index].expired_at.split(' ')[1].split(':')[0]+':'+promoResto[index].expired_at.split(' ')[1].split(':')[1],
+                                              text: 'Jam : '+promoResto[index].expired_at!.split(' ')[1].split(':')[0]+':'+promoResto[index].expired_at!.split(' ')[1].split(':')[1],
                                               maxLines: 1,
                                               minSize: 12
                                           ),
@@ -498,7 +512,7 @@ class _PromoActivityState extends State<PromoActivity> {
                                               minSize: 18,
                                               maxLines: 1
                                           ):(promoResto[index].menu != null)?CustomText.textHeading4(
-                                              text: promoResto[index].menu.name,
+                                              text: promoResto[index].menu!.name,
                                               minSize: 18,
                                               maxLines: 1
                                           ):CustomText.textHeading6(
@@ -519,7 +533,7 @@ class _PromoActivityState extends State<PromoActivity> {
                                           (homepg != "1")?SizedBox(height: CustomSize.sizeHeight(context) / 22,):SizedBox(height: CustomSize.sizeHeight(context) / 108,),
                                           Row(
                                             children: [
-                                              (homepg != "1")?CustomText.bodyRegular12(text: NumberFormat.currency(locale: 'id', symbol: '', decimalDigits: 0).format(promo[index].price.original), minSize: 12,
+                                              (homepg != "1")?CustomText.bodyRegular12(text: NumberFormat.currency(locale: 'id', symbol: '', decimalDigits: 0).format(promo[index].price!.original!), minSize: 12,
                                                   decoration: TextDecoration.lineThrough)
                                                   :Column(
                                                 crossAxisAlignment: CrossAxisAlignment.end,
@@ -528,18 +542,18 @@ class _PromoActivityState extends State<PromoActivity> {
                                                     children: [
                                                       CustomText.bodyRegular12(text: 'Harga menu : ', minSize: 12),
                                                       SizedBox(width: CustomSize.sizeWidth(context) / 48,),
-                                                      (promoResto[index].discountedPrice != null || promoResto[index].potongan != null)?CustomText.bodyRegular12(text: NumberFormat.currency(locale: 'id', symbol: '', decimalDigits: 0).format(int.parse(promoResto[index].menu.price.oriString)), minSize: 12, color: CustomColor.redBtn,
+                                                      (promoResto[index].discountedPrice != null || promoResto[index].potongan != null)?CustomText.bodyRegular12(text: NumberFormat.currency(locale: 'id', symbol: '', decimalDigits: 0).format(int.parse(promoResto[index].menu!.price!.oriString!)), minSize: 12, color: CustomColor.redBtn,
                                                           decoration: TextDecoration.lineThrough)
-                                                          :CustomText.bodyRegular12(text: NumberFormat.currency(locale: 'id', symbol: '', decimalDigits: 0).format(int.parse(promoResto[index].menu.price.oriString)), minSize: 12,),
+                                                          :CustomText.bodyRegular12(text: NumberFormat.currency(locale: 'id', symbol: '', decimalDigits: 0).format(int.parse(promoResto[index].menu!.price!.oriString!)), minSize: 12,),
                                                     ],
                                                   ):Container(),
                                                   (promoResto[index].menu != null)?Row(
                                                     children: [
                                                       CustomText.bodyRegular12(text: 'Delivery : ', minSize: 12),
                                                       SizedBox(width: CustomSize.sizeWidth(context) / 48,),
-                                                      (promoResto[index].ongkir != null)?CustomText.bodyRegular12(text: NumberFormat.currency(locale: 'id', symbol: '', decimalDigits: 0).format(int.parse(promoResto[index].menu.price.deliString)), minSize: 12, color: CustomColor.redBtn,
+                                                      (promoResto[index].ongkir != null)?CustomText.bodyRegular12(text: NumberFormat.currency(locale: 'id', symbol: '', decimalDigits: 0).format(int.parse(promoResto[index].menu!.price!.deliString!)), minSize: 12, color: CustomColor.redBtn,
                                                           decoration: TextDecoration.lineThrough)
-                                                          :CustomText.bodyRegular12(text: NumberFormat.currency(locale: 'id', symbol: '', decimalDigits: 0).format(int.parse(promoResto[index].menu.price.deliString)), minSize: 12,),
+                                                          :CustomText.bodyRegular12(text: NumberFormat.currency(locale: 'id', symbol: '', decimalDigits: 0).format(int.parse(promoResto[index].menu!.price!.deliString!)), minSize: 12,),
                                                     ],
                                                   ):Container(),
                                                 ],
@@ -552,19 +566,19 @@ class _PromoActivityState extends State<PromoActivity> {
                                                   //     :
                                                   CustomText.bodyRegular12(text:
                                                   (promoResto[index].discountedPrice != null)?
-                                                  NumberFormat.currency(locale: 'id', symbol: '', decimalDigits: 0).format((int.parse(promoResto[index].menu.price.oriString)-(int.parse(promoResto[index].menu.price.oriString)*promoResto[index].discountedPrice/100)))
-                                                      :(promoResto[index].potongan != null)?NumberFormat.currency(locale: 'id', symbol: '', decimalDigits: 0).format(int.parse(promoResto[index].menu.price.oriString)-promoResto[index].potongan)
+                                                  NumberFormat.currency(locale: 'id', symbol: '', decimalDigits: 0).format((int.parse(promoResto[index].menu!.price!.oriString!)-(int.parse(promoResto[index].menu!.price!.oriString!)*promoResto[index].discountedPrice!/100)))
+                                                      :(promoResto[index].potongan != null)?NumberFormat.currency(locale: 'id', symbol: '', decimalDigits: 0).format(int.parse(promoResto[index].menu!.price!.oriString!)-promoResto[index].potongan!)
                                                       :'', minSize: 12),
 
                                                   // (homepg != "1")?CustomText.bodyRegular12(text: NumberFormat.currency(locale: 'id', symbol: '', decimalDigits: 0).format(promo[index].menu.price.discounted), minSize: 12)
                                                   //     :
                                                   CustomText.bodyRegular12(text:
-                                                  (promoResto[index].menu.price.deliString != null)?
+                                                  (promoResto[index].menu!.price!.deliString! != null)?
                                                   (promoResto[index].ongkir != null)?
-                                                  NumberFormat.currency(locale: 'id', symbol: '', decimalDigits: 0).format((int.parse(promoResto[index].menu.price.deliString)-promoResto[index].ongkir))
+                                                  NumberFormat.currency(locale: 'id', symbol: '', decimalDigits: 0).format((int.parse(promoResto[index].menu!.price!.deliString!)-promoResto[index].ongkir!))
                                                       :'' :'', minSize: 12),
                                                 ],
-                                              ):Container():CustomText.bodyRegular12(text: NumberFormat.currency(locale: 'id', symbol: '', decimalDigits: 0).format(promo[index].price.discounted), minSize: 12),
+                                              ):Container():CustomText.bodyRegular12(text: NumberFormat.currency(locale: 'id', symbol: '', decimalDigits: 0).format(promo[index].price!.discounted!), minSize: 12),
                                             ],
                                           )
                                         ],

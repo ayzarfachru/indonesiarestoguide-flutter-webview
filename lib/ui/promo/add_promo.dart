@@ -10,15 +10,17 @@ import 'package:flutter_datetime_picker/flutter_datetime_picker.dart';
 import 'package:flutter_icons/flutter_icons.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:indonesiarestoguide/model/Menu.dart';
-import 'package:indonesiarestoguide/ui/promo/pilih_menu.dart';
-import 'package:indonesiarestoguide/ui/promo/promo_activity.dart';
-import 'package:indonesiarestoguide/ui/ui_resto/add_resto/add_detail_resto.dart';
-import 'package:indonesiarestoguide/ui/ui_resto/add_resto/add_view_resto.dart';
-import 'package:indonesiarestoguide/ui/ui_resto/home/home_activity.dart';
-import 'package:indonesiarestoguide/ui/ui_resto/menu/menu_activity.dart';
-import 'package:indonesiarestoguide/utils/utils.dart';
-import 'package:indonesiarestoguide/ui/home/home_activity.dart';
+import 'package:kam5ia/model/Menu.dart';
+import 'package:kam5ia/model/User.dart';
+import 'package:kam5ia/ui/promo/pilih_menu.dart';
+import 'package:kam5ia/ui/promo/promo_activity.dart';
+import 'package:kam5ia/ui/ui_resto/add_resto/add_detail_resto.dart';
+import 'package:kam5ia/ui/ui_resto/add_resto/add_view_resto.dart';
+import 'package:kam5ia/ui/ui_resto/home/home_activity.dart';
+import 'package:kam5ia/ui/ui_resto/menu/menu_activity.dart';
+import 'package:kam5ia/utils/utils.dart';
+import 'package:kam5ia/ui/home/home_activity.dart';
+import 'package:onesignal_flutter/onesignal_flutter.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:page_transition/page_transition.dart';
@@ -34,7 +36,7 @@ class MenuChip extends StatefulWidget {
   final List<String> menuList;
   final Function(List<String>) onSelectionChanged;
 
-  MenuChip(this.menuList, {this.onSelectionChanged});
+  MenuChip(this.menuList, {required this.onSelectionChanged});
 
   @override
   CuisineChipState createState() => CuisineChipState();
@@ -42,10 +44,10 @@ class MenuChip extends StatefulWidget {
 
 class CuisineChipState extends State<MenuChip> {
   // String selectedChoice = "";
-  List<String> selectedChoices = List();
+  List<String> selectedChoices = [];
 
   _buildChoiceList() {
-    List<Widget> choices = List();
+    List<Widget> choices = [];
 
     widget.menuList.forEach((item) {
       choices.add(Container(
@@ -120,8 +122,8 @@ class _AddPromoState extends State<AddPromo> {
     "Sang Pisang Kaesang",
   ];
 
-  List<String> selectedMenuList = List();
-  String tipe;
+  List<String> selectedMenuList = [];
+  String? tipe;
 
   _showCuisineDialog() {
     showDialog(
@@ -167,10 +169,12 @@ class _AddPromoState extends State<AddPromo> {
     typePromo = TextEditingController(text: tipe);
   }
 
+  String nameRes = '';
   getInitial() async {
     SharedPreferences pref = await SharedPreferences.getInstance();
     setState(() {
       initial = (pref.getString('name').substring(0, 1).toUpperCase());
+      nameRes = (pref.getString('resProm'));
       print(initial);
     });
   }
@@ -191,8 +195,8 @@ class _AddPromoState extends State<AddPromo> {
 
 
   //------------------------------= IMAGE PICKER =----------------------------------
-  File image;
-  String extension;
+  File? image;
+  String? extension;
   final picker = ImagePicker();
 
   Future getImage() async {
@@ -209,7 +213,7 @@ class _AddPromoState extends State<AddPromo> {
   DateTime selectedDate = DateTime.now().add(const Duration(days: 7));
 
   Future<Null> _selectDate(BuildContext context) async {
-    final DateTime picked = await showDatePicker(
+    final DateTime? picked = await showDatePicker(
       context: context,
       initialDate: selectedDate,
       initialDatePickerMode: DatePickerMode.day,
@@ -218,14 +222,14 @@ class _AddPromoState extends State<AddPromo> {
       confirmText: "Simpan",
       firstDate: DateTime(2021),
       lastDate: DateTime(2101),
-      builder: (BuildContext context, Widget child) {
+      builder: (BuildContext context, Widget? child) {
         return Theme(
           data: ThemeData.dark().copyWith(
               backgroundColor: Colors.black,
               primaryColor: CustomColor.secondary, //Head background
               accentColor: CustomColor.secondary //s //Background color
           ),
-          child: child,
+          child: child!,
         );
       },
     );
@@ -242,7 +246,7 @@ class _AddPromoState extends State<AddPromo> {
   List<String> type = [
     'diskon',
     'potongan',
-    'ongkir',
+    // 'ongkir'
   ];
   String menus = '';
   String menus2 = '';
@@ -299,7 +303,7 @@ class _AddPromoState extends State<AddPromo> {
     });
   }
 
-  TimeOfDay jam = TimeOfDay();
+  TimeOfDay jam = TimeOfDay.now();
 
   void onTimeOpenChanged(TimeOfDay newTime) {
     setState(() {
@@ -357,6 +361,106 @@ class _AddPromoState extends State<AddPromo> {
     });
   }
 
+  List<User> user = [];
+  String user2 = '';
+  List<String> user3 = [];
+  Future _getKaryawan()async{
+    List<User> _user = [];
+
+    setState(() {
+      // isLoading = true;
+    });
+    SharedPreferences pref = await SharedPreferences.getInstance();
+    String token = pref.getString("token") ?? "";
+    var apiResult = await http.get(Links.mainUrl + '/resto/follower', headers: {
+      "Accept": "Application/json",
+      "Authorization": "Bearer $token"
+    });
+    print(apiResult.body);
+    var data = json.decode(apiResult.body);
+
+    for(var v in data){
+      // User p = User.resto(
+      //   name: v['device_id'],
+      // );
+      List<String> id = [];
+      id.add(v['device_id']);
+      OneSignal.shared.postNotification(OSCreateNotification(
+        playerIds: id,
+        heading: "Ada promo baru di $nameRes nih...",
+        content: "Cek sekarang !",
+        androidChannelId: "28c77296-719c-46b3-9331-93a100bac57c",
+      ));
+      // await OneSignal.shared.postNotificationWithJson();
+      user3.add(v['device_id']);
+      // _user.add(p);
+    }
+
+    setState(() {
+      // user = _user;
+      // user2 = _user.toList().toString().replaceAll('[', '').replaceAll(']', '');
+      print(user3.toSet().toString().replaceAll('[', '').replaceAll(']', '').replaceAll(', null', ''));
+      // isLoading = false;
+    });
+
+
+    if (apiResult.statusCode == 200) {
+      // notif(user3.toSet().toString().replaceAll('[', '').replaceAll(']', '').replaceAll(', null', '').replaceAll('{', '').replaceAll('}', ''));
+      // print('print u3 '+user3.toString());
+    }
+  }
+
+  Future _getKaryawan2()async{
+    List<User> _user = [];
+
+    setState(() {
+      // isLoading = true;
+    });
+    SharedPreferences pref = await SharedPreferences.getInstance();
+    String token = pref.getString("token") ?? "";
+    var apiResult = await http.get(Links.mainUrl + '/resto/follower', headers: {
+      "Accept": "Application/json",
+      "Authorization": "Bearer $token"
+    });
+    print(apiResult.body);
+    var data = json.decode(apiResult.body);
+
+    for(var v in data){
+      // User p = User.resto(
+      //   name: v['device_id'],
+      // );
+      user3.add(v['device_id']);
+      // _user.add(p);
+    }
+
+    setState(() {
+      user = _user;
+      // user3.toSet().toString().replaceAll('[', '').replaceAll(']', '').replaceAll(', null', '').replaceAll('{', '').replaceAll('}', '');
+      print(user3.toSet().toList().toString().replaceAll(', null', '').replaceAll('{', '').replaceAll('}', ''));
+
+      // isLoading = false;
+    });
+
+
+    // if (apiResult.statusCode == 200) {
+    //   notif(user2.toString());
+    //   print('print u2 '+user2);
+    // }
+  }
+
+  Future notif(String device)async{
+    print('dev '+device);
+    List<String> id = [];
+    id.add(device);
+    print('iki '+id.toString());
+    await OneSignal.shared.postNotification(OSCreateNotification(
+      playerIds: id,
+      heading: "Ada promo baru di $nameRes nih...",
+      content: "Cek sekarang !",
+      androidChannelId: "2482eb14-bcdf-4045-b69e-422011d9e6ef",
+    ));
+  }
+
   @override
   void initState() {
     super.initState();
@@ -364,6 +468,9 @@ class _AddPromoState extends State<AddPromo> {
     getInitial();
     _getMenu();
     getMenu();
+    _getKaryawan2().whenComplete((){
+      print('print u3 '+tipeMenu.text.toString()+'O');
+    });
     typePromo = TextEditingController(text: 'diskon');
     // Future.delayed(Duration.zero, () async {
     //
@@ -536,7 +643,7 @@ class _AddPromoState extends State<AddPromo> {
                       ),
                     ),
                     SizedBox(height: CustomSize.sizeHeight(context) / 48,),
-                    CustomText.bodyLight12(text: (typePromo.text == 'diskon')?"Diskon Harga":(typePromo.text == 'potongan')?"Potongan Harga":"Potongan Ongkir"),
+                    CustomText.bodyLight12(text: (typePromo.text == 'diskon')?"Diskon Harga (sudah dalam bentuk %)":(typePromo.text == 'potongan')?"Potongan Harga (sudah dalam bentuk Rupiah)":"Potongan Ongkir (sudah dalam bentuk %)"),
                     SizedBox(
                       height: CustomSize.sizeHeight(context) * 0.005,
                     ),
@@ -649,6 +756,7 @@ class _AddPromoState extends State<AddPromo> {
                               });
                               Navigator.of(context).push(
                                   showPicker(
+                                    is24HrFormat: true,
                                     blurredBackground: true,
                                     accentColor: Colors.blue[400],
                                     context: context,
@@ -709,9 +817,15 @@ class _AddPromoState extends State<AddPromo> {
           setState(() {
             isLoading = false;
           });
-          AddPromo();
-          Navigator.pop(context);
-          Navigator.pushReplacement(context, PageTransition(type: PageTransitionType.fade, child: new PromoActivity()));
+          if (tipeMenu.text != '' && descPromo.text != '' && percentPromo.text != '' && _dateController.text != '' && _Jam.text != '') {
+            AddPromo().whenComplete((){
+              _getKaryawan();
+              Navigator.pop(context);
+              Navigator.pushReplacement(context, PageTransition(type: PageTransitionType.fade, child: new PromoActivity()));
+            });
+          } else {
+            Fluttertoast.showToast(msg: 'Lengkapi data promo terlebih dahulu!');
+          }
           // SharedPreferences pref = await SharedPreferences.getInstance();
           // pref.setString("name", descPromo.text.toString());
           // pref.setString("email", endPromo.text.toString());

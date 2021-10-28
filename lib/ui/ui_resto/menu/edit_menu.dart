@@ -2,18 +2,19 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_datetime_picker/flutter_datetime_picker.dart';
 import 'package:flutter_icons/flutter_icons.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:indonesiarestoguide/model/Menu.dart';
-import 'package:indonesiarestoguide/model/Price.dart';
-import 'package:indonesiarestoguide/ui/ui_resto/add_resto/add_detail_resto.dart';
-import 'package:indonesiarestoguide/ui/ui_resto/add_resto/add_view_resto.dart';
-import 'package:indonesiarestoguide/ui/ui_resto/home/home_activity.dart';
-import 'package:indonesiarestoguide/ui/ui_resto/menu/menu_activity.dart';
-import 'package:indonesiarestoguide/utils/utils.dart';
-import 'package:indonesiarestoguide/ui/home/home_activity.dart';
+import 'package:kam5ia/model/Menu.dart';
+import 'package:kam5ia/model/Price.dart';
+import 'package:kam5ia/ui/ui_resto/add_resto/add_detail_resto.dart';
+import 'package:kam5ia/ui/ui_resto/add_resto/add_view_resto.dart';
+import 'package:kam5ia/ui/ui_resto/home/home_activity.dart';
+import 'package:kam5ia/ui/ui_resto/menu/menu_activity.dart';
+import 'package:kam5ia/utils/utils.dart';
+import 'package:kam5ia/ui/home/home_activity.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:page_transition/page_transition.dart';
@@ -33,7 +34,7 @@ class MenuChip extends StatefulWidget {
   final List<String> typeList;
   final Function(List<String>) onSelectionChanged;
 
-  MenuChip(this.typeList, {this.onSelectionChanged});
+  MenuChip(this.typeList, {required this.onSelectionChanged});
 
   @override
   CuisineChipState createState() => CuisineChipState();
@@ -41,10 +42,10 @@ class MenuChip extends StatefulWidget {
 
 class CuisineChipState extends State<MenuChip> {
   // String selectedChoice = "";
-  List<String> selectedChoices = List();
+  List<String> selectedChoices = [];
 
   _buildChoiceList() {
-    List<Widget> choices = List();
+    List<Widget> choices = [];
 
     widget.typeList.forEach((item) {
       choices.add(Container(
@@ -82,6 +83,12 @@ class CuisineChipState extends State<MenuChip> {
 }
 
 class _EditMenuState extends State<EditMenu> {
+  @override
+  void setState(fn) {
+    if(mounted) {
+      super.setState(fn);
+    }
+  }
   Menu detailMenu;
 
   _EditMenuState(this.detailMenu);
@@ -108,8 +115,8 @@ class _EditMenuState extends State<EditMenu> {
 
   List<String> menuList = [];
 
-  List<String> selectedMenuList = List();
-  String tipe;
+  List<String> selectedMenuList = [];
+  String? tipe;
 
   _showCuisineDialog() {
     showDialog(
@@ -151,11 +158,11 @@ class _EditMenuState extends State<EditMenu> {
   }
 
   getHargaMenu() async {
-    hargaMenu = TextEditingController(text: detailMenu.price.original.toString());
+    hargaMenu = TextEditingController(text: detailMenu.price!.original.toString());
   }
 
   getDelivMenu() async {
-    hargaDeliv = TextEditingController(text: detailMenu.delivery_price.delivery.toString());
+    hargaDeliv = TextEditingController(text: detailMenu.delivery_price!.delivery.toString());
   }
 
   getTipeMenu() async {
@@ -183,8 +190,8 @@ class _EditMenuState extends State<EditMenu> {
 
 
   //------------------------------= IMAGE PICKER =----------------------------------
-  File image;
-  String extension;
+  File? image;
+  String? extension;
   final picker = ImagePicker();
 
   Future getImage() async {
@@ -198,7 +205,15 @@ class _EditMenuState extends State<EditMenu> {
 
 
   List<String> typeList = [];
-  List<String> dataCuisine;
+  List<String> typeList2 = [
+    'makanan pembuka',
+    'makanan utama',
+    'makanan penutup',
+    'minuman dingin',
+    'minuman panas'
+  ];
+
+  List<String?>? dataCuisine;
   Future<void> getType() async {
     SharedPreferences pref = await SharedPreferences.getInstance();
     var token = pref.getString("token") ?? "";
@@ -218,7 +233,7 @@ class _EditMenuState extends State<EditMenu> {
   }
 
 
-  String id;
+  String? id;
   List<Menu> menu = [];
   Future<void> _editMenu()async{
     List<Menu> _menu = [];
@@ -233,10 +248,9 @@ class _EditMenuState extends State<EditMenu> {
           'name': namaMenu.text,
           'desc': deskMenu.text,
           'price': hargaMenu.text,
-          'delivery_price': hargaDeliv.text,
           'is_recommended': (favorite == true)?'true':'false',
           'type': tipeMenu.text,
-          'img': (image != null)?'data:image/$extension;base64,'+base64Encode(image.readAsBytesSync()).toString():'',
+          'img': (image != null)?'data:image/$extension;base64,'+base64Encode(image!.readAsBytesSync()).toString():'',
         },
         headers: {
           "Accept": "Application/json",
@@ -247,14 +261,15 @@ class _EditMenuState extends State<EditMenu> {
 
     if(data['status_code'] == 200){
       print("success");
+      Navigator.pop(context);
+      Navigator.pushReplacement(context, PageTransition(type: PageTransitionType.fade, child: new MenuActivity()));
       print(json.encode({
         'name': namaMenu.text,
         'desc': deskMenu.text,
         'price': hargaMenu.text,
-        'delivery_price': hargaDeliv.text,
         'is_recommended': (favorite == true)?'true':'false',
         'type': tipeMenu.text,
-        'img': (image != null)?'data:image/$extension;base64,'+base64Encode(image.readAsBytesSync()).toString():'',
+        'img': (image != null)?'data:image/$extension;base64,'+base64Encode(image!.readAsBytesSync()).toString():'',
       }));
     } else {
       print(data);
@@ -262,10 +277,10 @@ class _EditMenuState extends State<EditMenu> {
         'name': namaMenu.text,
         'desc': deskMenu.text,
         'price': hargaMenu.text,
-        'delivery_price': hargaDeliv.text,
+        // 'delivery_price': hargaDeliv.text,
         'is_recommended': favorite.toString(),
         'type': tipeMenu.text,
-        'img': (image != null)?'data:image/$extension;base64,'+base64Encode(image.readAsBytesSync()).toString():'',
+        'img': (image != null)?'data:image/$extension;base64,'+base64Encode(image!.readAsBytesSync()).toString():'',
       }));
     }
     setState(() {
@@ -320,7 +335,7 @@ class _EditMenuState extends State<EditMenu> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     SizedBox(height: CustomSize.sizeHeight(context) / 48,),
-                    CustomText.bodyLight12(text: "Nama Menu"),
+                    CustomText.bodyLight12(text: "Nama"),
                     SizedBox(
                       height: CustomSize.sizeHeight(context) * 0.005,
                     ),
@@ -349,6 +364,7 @@ class _EditMenuState extends State<EditMenu> {
                       height: CustomSize.sizeHeight(context) * 0.005,
                     ),
                     TextField(
+                      inputFormatters: [FilteringTextInputFormatter.digitsOnly],
                       controller: hargaMenu,
                       keyboardType: TextInputType.number,
                       cursorColor: Colors.black,
@@ -368,31 +384,31 @@ class _EditMenuState extends State<EditMenu> {
                       ),
                     ),
                     SizedBox(height: CustomSize.sizeHeight(context) / 48,),
-                    CustomText.bodyLight12(text: "Harga menu + Harga kemasan"),
-                    SizedBox(
-                      height: CustomSize.sizeHeight(context) * 0.005,
-                    ),
-                    TextField(
-                      controller: hargaDeliv,
-                      keyboardType: TextInputType.number,
-                      cursorColor: Colors.black,
-                      style: GoogleFonts.poppins(
-                          textStyle:
-                          TextStyle(fontSize: 18, color: Colors.black, fontWeight: FontWeight.w600)),
-                      decoration: InputDecoration(
-                        hintText: '*Contoh harga menu: 18000 -> 20000',
-                        isDense: true,
-                        contentPadding: EdgeInsets.only(bottom: CustomSize.sizeHeight(context) / 86),
-                        hintStyle: GoogleFonts.poppins(
-                            textStyle:
-                            TextStyle(fontSize: 14, color: Colors.grey)),
-                        helperStyle: GoogleFonts.poppins(
-                            textStyle: TextStyle(fontSize: 14)),
-                        enabledBorder: UnderlineInputBorder(),
-                        focusedBorder: UnderlineInputBorder(),
-                      ),
-                    ),
-                    SizedBox(height: CustomSize.sizeHeight(context) / 48,),
+                    // CustomText.bodyLight12(text: "Harga menu + Harga kemasan"),
+                    // SizedBox(
+                    //   height: CustomSize.sizeHeight(context) * 0.005,
+                    // ),
+                    // TextField(
+                    //   controller: hargaDeliv,
+                    //   keyboardType: TextInputType.number,
+                    //   cursorColor: Colors.black,
+                    //   style: GoogleFonts.poppins(
+                    //       textStyle:
+                    //       TextStyle(fontSize: 18, color: Colors.black, fontWeight: FontWeight.w600)),
+                    //   decoration: InputDecoration(
+                    //     hintText: '*Contoh harga menu: 18000 -> 20000',
+                    //     isDense: true,
+                    //     contentPadding: EdgeInsets.only(bottom: CustomSize.sizeHeight(context) / 86),
+                    //     hintStyle: GoogleFonts.poppins(
+                    //         textStyle:
+                    //         TextStyle(fontSize: 14, color: Colors.grey)),
+                    //     helperStyle: GoogleFonts.poppins(
+                    //         textStyle: TextStyle(fontSize: 14)),
+                    //     enabledBorder: UnderlineInputBorder(),
+                    //     focusedBorder: UnderlineInputBorder(),
+                    //   ),
+                    // ),
+                    // SizedBox(height: CustomSize.sizeHeight(context) / 48,),
                     CustomText.bodyLight12(text: "Tipe Menu"),
                     SizedBox(
                       height: CustomSize.sizeHeight(context) * 0.005,
@@ -447,7 +463,7 @@ class _EditMenuState extends State<EditMenu> {
                       ),
                     ),
                     SizedBox(height: CustomSize.sizeHeight(context) / 48,),
-                    CustomText.bodyLight12(text: "Deskripsikan Menu ini"),
+                    CustomText.bodyLight12(text: "Deskripsi"),
                     SizedBox(
                       height: CustomSize.sizeHeight(context) * 0.005,
                     ),
@@ -498,7 +514,7 @@ class _EditMenuState extends State<EditMenu> {
                             width: CustomSize.sizeWidth(context) / 3.2,
                             decoration: (image==null)?(img == "/".substring(0, 1))?BoxDecoration(
                               border: Border.all(
-                                  color: CustomColor.primary,
+                                  color: CustomColor.primaryLight,
                                   width: 3.0
                               ),
                               borderRadius: BorderRadius.all(
@@ -506,7 +522,7 @@ class _EditMenuState extends State<EditMenu> {
                               ),
                             ):BoxDecoration(
                               border: Border.all(
-                                  color: CustomColor.primary,
+                                  color: CustomColor.primaryLight,
                                   width: 3.0
                               ),
                               borderRadius: BorderRadius.all(
@@ -517,7 +533,7 @@ class _EditMenuState extends State<EditMenu> {
                                   Radius.circular(10.0) //         <--- border radius here
                               ),
                               image: new DecorationImage(
-                                  image: new FileImage(image),
+                                  image: new FileImage(image!),
                                   fit: BoxFit.cover
                               ),
                             ),
@@ -553,9 +569,9 @@ class _EditMenuState extends State<EditMenu> {
                       children: [
                         Checkbox(
                           value: favorite,
-                          onChanged: (bool value) {
+                          onChanged: (bool? value) {
                             setState(() {
-                              favorite = value;
+                              favorite = value!;
                               print(favorite);
                             });
                           },
@@ -602,7 +618,6 @@ class _EditMenuState extends State<EditMenu> {
           // pref.setString("gender", gender);
           // pref.setString("tgl", tgl);
           // pref.setString("notelp", hargaMenu.text.toString());
-          Navigator.pushReplacement(context, PageTransition(type: PageTransitionType.fade, child: new MenuActivity()));
           print(favorite);
         },
         child: Container(

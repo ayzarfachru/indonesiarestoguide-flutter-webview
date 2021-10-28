@@ -2,14 +2,14 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_icons/flutter_icons.dart';
-import 'package:indonesiarestoguide/model/MenuJson.dart';
-import 'package:indonesiarestoguide/model/Resto.dart';
-import 'package:indonesiarestoguide/model/Transaction.dart';
-import 'package:indonesiarestoguide/model/imgBanner.dart';
-import 'package:indonesiarestoguide/ui/detail/detail_transaction.dart';
-import 'package:indonesiarestoguide/ui/promo/add_promo.dart';
-import 'package:indonesiarestoguide/ui/promo/edit_promo.dart';
-import 'package:indonesiarestoguide/utils/utils.dart';
+import 'package:kam5ia/model/MenuJson.dart';
+import 'package:kam5ia/model/Resto.dart';
+import 'package:kam5ia/model/Transaction.dart';
+import 'package:kam5ia/model/imgBanner.dart';
+import 'package:kam5ia/ui/detail/detail_transaction.dart';
+import 'package:kam5ia/ui/promo/add_promo.dart';
+import 'package:kam5ia/ui/promo/edit_promo.dart';
+import 'package:kam5ia/utils/utils.dart';
 import 'package:intl/intl.dart';
 import 'package:location/location.dart';
 import 'package:page_transition/page_transition.dart';
@@ -151,25 +151,31 @@ class _HistoryOrderActivityState extends State<HistoryOrderActivity> {
     print(data['trans']);
 
     print('ini banner '+data['banner'].toString());
-    for(var v in data['banner']){
-      imgBanner t = imgBanner(
-          id: int.parse(v['resto_id'].toString()),
-          urlImg: v['img']
-      );
-      _images.add(t);
-    }
+    // for(var v in data['banner']){
+    //   imgBanner t = imgBanner(
+    //       id: int.parse(v['resto_id'].toString()),
+    //       urlImg: v['img']
+    //   );
+    //   _images.add(t);
+    // }
 
-    for(var v in data['trans']){
-      Transaction t = Transaction(
+    if (data['trans'].toString() != '[]') {
+      for(var v in data['trans']){
+        Transaction t = Transaction.all2(
           id: v['id'],
+          idResto: v['restaurants_id'].toString(),
           date: v['date'],
           img: v['img'],
           nameResto: v['resto_name'],
-          status: v['status_text'],
-          total: v['total'],
-          type: v['type_text']
-      );
-      _transaction.add(t);
+          status: v['status'],
+          total: int.parse((v['total']??0).toString())+int.parse((v['ongkir']??0).toString()),
+          type: v['type_text'],
+          note: v['note'].toString(),
+          chat_user: v['chat_resto'].toString(),
+          // address: v['address'].toString(),
+        );
+        _transaction.add(t);
+      }
     }
 
     print('ini resto '+data['resto'].toString());
@@ -205,7 +211,7 @@ class _HistoryOrderActivityState extends State<HistoryOrderActivity> {
           desc: v['desc']??'',
           urlImg: v['img'],
           price: Price.discounted(int.parse(v['price'].toString()), int.parse(v['discounted_price'].toString())),
-          distance: double.parse(v['resto_distance'].toString())
+          distance: double.parse(v['resto_distance'].toString()), type: '', delivery_price: null, is_recommended: '', qty: ''
       );
       _promo.add(m);
     }
@@ -244,8 +250,8 @@ class _HistoryOrderActivityState extends State<HistoryOrderActivity> {
             desc: v['desc'],
             distance: double.parse(v['distance'].toString()),
             urlImg: v['img'],
-            price: Price.discounted(int.parse(v['price']), v['discounted_price'])
-        ),
+            price: Price.discounted(int.parse(v['price']), v['discounted_price']), delivery_price: null, restoId: '', type: '', is_recommended: '', qty: '', restoName: ''
+        ), word: '', discountedPrice: null, id: null,
       );
       _promo.add(p);
     }
@@ -287,7 +293,8 @@ class _HistoryOrderActivityState extends State<HistoryOrderActivity> {
             desc: a['menus']['desc'],
             urlImg: a['menus']['img'],
             price: Price.promo(
-                a['menus']['price'].toString(), a['menus']['delivery_price'].toString())
+                a['menus']['price'].toString(), a['menus']['delivery_price'].toString()),
+            type: '', distance: null, restoName: '', is_recommended: '', qty: '', delivery_price: null, restoId: ''
         ),
       );
       _promoResto.add(b);
@@ -438,7 +445,9 @@ class _HistoryOrderActivityState extends State<HistoryOrderActivity> {
           child: (isLoading)?Container(
               width: CustomSize.sizeWidth(context),
               height: CustomSize.sizeHeight(context),
-              child: Center(child: CircularProgressIndicator())):SmartRefresher(
+              child: Center(child: CircularProgressIndicator(
+                color: CustomColor.primaryLight,
+              ))):SmartRefresher(
             enablePullDown: true,
             enablePullUp: false,
             header: WaterDropMaterialHeader(
@@ -491,13 +500,19 @@ class _HistoryOrderActivityState extends State<HistoryOrderActivity> {
                           return Padding(
                             padding: EdgeInsets.only(top: CustomSize.sizeHeight(context) / 48),
                             child: GestureDetector(
-                              onTap: (){
-                                if(transaction[index].type.startsWith('Reservasi') != true){
+                              onTap: ()async{
+                                if(transaction[index].type!.startsWith('Reservasi') != true){
+                                  SharedPreferences pref = await SharedPreferences.getInstance();
+                                  pref.setString("chatUserCount", transaction[index].chat_user);
+                                  pref.setString("idnyatrans", transaction[index].id.toString());
+                                  pref.setString("idnyatransRes", transaction[index].idResto.toString());
+                                  pref.setString("restoNameTrans99", transaction[index].nameResto);
+                                  pref.setString("alamateResto99", transaction[index].address);
                                   Navigator.push(
                                       context,
                                       PageTransition(
                                           type: PageTransitionType.rightToLeft,
-                                          child: new DetailTransaction(transaction[index].id, transaction[index].status)));
+                                          child: new DetailTransaction(transaction[index].id!, transaction[index].status!, transaction[index].note!, transaction[index].idResto!)));
                                 }
                               },
                               child: Container(
@@ -522,7 +537,7 @@ class _HistoryOrderActivityState extends State<HistoryOrderActivity> {
                                       height: CustomSize.sizeWidth(context) / 2.6,
                                       decoration: BoxDecoration(
                                         image: DecorationImage(
-                                            image: (homepg != "1")?NetworkImage(Links.subUrl + transaction[index].img):NetworkImage(Links.subUrl + promoResto[index].menu.urlImg),
+                                            image: (homepg != "1")?NetworkImage(Links.subUrl + transaction[index].img!):NetworkImage(Links.subUrl + promoResto[index].menu!.urlImg),
                                             fit: BoxFit.cover
                                         ),
                                         borderRadius: BorderRadius.circular(20),
@@ -544,7 +559,7 @@ class _HistoryOrderActivityState extends State<HistoryOrderActivity> {
                                               children: [
                                                 CustomText.bodyMedium14(text: transaction[index].nameResto.toString(), minSize: 14, maxLines: 1),
                                                 CustomText.bodyLight12(text: transaction[index].date, minSize: 12),
-                                                (transaction[index].type.startsWith('Reservasi'))
+                                                (transaction[index].type!.startsWith('Reservasi'))
                                                     ?CustomText.bodyMedium10(text: transaction[index].type, minSize: 11)
                                                     :CustomText.bodyMedium12(text: transaction[index].type, minSize: 12),
                                               ],

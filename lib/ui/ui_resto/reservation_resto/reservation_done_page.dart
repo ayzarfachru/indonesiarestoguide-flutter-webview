@@ -3,15 +3,17 @@ import 'dart:convert';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_icons/flutter_icons.dart';
-import 'package:indonesiarestoguide/model/Transaction.dart';
-import 'package:indonesiarestoguide/model/User.dart';
-import 'package:indonesiarestoguide/ui/ui_resto/reservation_resto/reservation_activity.dart';
-import 'package:indonesiarestoguide/utils/utils.dart';
+import 'package:kam5ia/model/Transaction.dart';
+import 'package:kam5ia/model/User.dart';
+import 'package:kam5ia/ui/ui_resto/reservation_resto/reservation_activity.dart';
+import 'package:kam5ia/utils/chat_activity.dart';
+import 'package:kam5ia/utils/utils.dart';
 import 'package:page_transition/page_transition.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:http/http.dart' as http;
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:intl/intl.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class ReservationDone extends StatefulWidget {
   @override
@@ -20,6 +22,8 @@ class ReservationDone extends StatefulWidget {
 
 class _ReservationDoneState extends State<ReservationDone> {
   ScrollController _scrollController = ScrollController();
+
+  bool ksg = false;
 
   List<Transaction> transaction = [];
   Future _getTrans()async{
@@ -35,17 +39,24 @@ class _ReservationDoneState extends State<ReservationDone> {
     var data = json.decode(apiResult.body);
     print(data);
 
-    for(var v in data['trx']['process']){
-      Transaction r = Transaction.reservation(
-        id: v['id'],
-        status: v['status'],
-        username: v['user_name'],
-        datetime: v['datetime'],
-        table: v['table'].toString(),
-        img: v['user_img'],
-        total: int.parse(v['price']),
-      );
-      _transaction.add(r);
+    if (data['trx'].toString().contains('process')) {
+      for(var v in data['trx']['process']){
+        Transaction r = Transaction.reservation(
+          id: v['id'],
+          status: v['status'],
+          username: v['user_name'],
+          datetime: v['datetime'],
+          table: v['table'].toString(),
+          img: v['user_img'],
+          total: int.parse(v['price']),
+            chatroom: '',
+            chat_user: v['chat_user']??'0',
+            is_opened: v['is_opened']??'1'
+        );
+        _transaction.add(r);
+      }
+    } else {
+      ksg = true;
     }
 
     setState(() {
@@ -54,11 +65,15 @@ class _ReservationDoneState extends State<ReservationDone> {
   }
 
   String status = "";
+  String chatroom = "";
+  String phone = "";
   String datetime = "";
   String table = "";
   String username = "";
   String total = "";
-  String id;
+  String? id;
+  String chatRestoCount = '';
+
   // List<Menu> menu = [];
   List<Transaction> detTransaction = [];
   Future _getDetailTrans(String Id)async{
@@ -75,6 +90,11 @@ class _ReservationDoneState extends State<ReservationDone> {
     var data = json.decode(apiResult.body);
     print(data);
 
+    if (data['trx']['chat_user'] != null) {
+      chatRestoCount = data['trx']['chat_user'].toString();
+    } else {
+      chatRestoCount = '0';
+    }
 
     if (data['status_code'].toString() == "200") {
       showModalBottomSheet(
@@ -173,9 +193,116 @@ class _ReservationDoneState extends State<ReservationDone> {
                       SizedBox(height: CustomSize.sizeHeight(context) / 56,),
                       Column(
                         children: [
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceAround,
+                            children: [
+                              GestureDetector(
+                                onTap: (){
+                                  Navigator.push(
+                                      context,
+                                      PageTransition(
+                                          type: PageTransitionType.rightToLeft,
+                                          child: new ChatActivity(chatroom, userName, status)));
+                                  // print(chatroom+ userName+ status);
+                                },
+                                child: Center(
+                                  child: Container(
+                                    width: CustomSize.sizeWidth(context) / 2.3,
+                                    height: CustomSize.sizeHeight(context) / 14,
+                                    decoration: BoxDecoration(
+                                        color: Colors.blue,
+                                        borderRadius: BorderRadius.circular(50)
+                                    ),
+                                    child: Center(
+                                      child: Padding(
+                                        padding: const EdgeInsets.symmetric(horizontal: 20.0),
+                                        child: Column(
+                                          mainAxisAlignment: MainAxisAlignment.center,
+                                          crossAxisAlignment: CrossAxisAlignment.center,
+                                          children: [
+                                            Row(
+                                              mainAxisAlignment: MainAxisAlignment.center,
+                                              crossAxisAlignment: CrossAxisAlignment.center,
+                                              children: [
+                                                Padding(
+                                                  padding: const EdgeInsets.only(left: 9),
+                                                  child: Icon(FontAwesome.comments_o, color: Colors.white , size: 25,),
+                                                ),
+                                                SizedBox(width: CustomSize.sizeWidth(context) / 72,),
+                                                Stack(
+                                                  children: [
+                                                    Padding(
+                                                      padding: const EdgeInsets.only(left: 7.0, right: 16),
+                                                      child: CustomText.textHeading7(text: "Chat", color: Colors.white, minSize: 16),
+                                                    ),
+                                                    Positioned(  // draw a red marble
+                                                        top: -2,
+                                                        right: 0,
+                                                        child: Stack(
+                                                          alignment: Alignment.center,
+                                                          children: [
+                                                            Icon(Icons.circle, color: (chatRestoCount != '0')?CustomColor.redBtn:Colors.transparent, size: 20,),
+                                                            CustomText.bodyMedium12(text: chatRestoCount, color: (chatRestoCount != '0')?Colors.white:Colors.transparent)
+                                                          ],
+                                                        )),
+                                                  ],
+                                                ),
+                                              ],
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              ),
+                              GestureDetector(
+                                onTap: (){
+                                  launch("tel:$phone");
+                                  // Navigator.push(
+                                  //     context,
+                                  //     PageTransition(
+                                  //         type: PageTransitionType.rightToLeft,
+                                  //         child: new ChatActivity(chatroom, userName, status)));
+                                  // print(chatroom+ userName+ status);
+                                },
+                                child: Center(
+                                  child: Container(
+                                    width: CustomSize.sizeWidth(context) / 2.3,
+                                    height: CustomSize.sizeHeight(context) / 14,
+                                    decoration: BoxDecoration(
+                                        color: CustomColor.primaryLight,
+                                        borderRadius: BorderRadius.circular(50)
+                                    ),
+                                    child: Center(
+                                      child: Padding(
+                                        padding: const EdgeInsets.symmetric(horizontal: 20.0),
+                                        child: Column(
+                                          mainAxisAlignment: MainAxisAlignment.center,
+                                          crossAxisAlignment: CrossAxisAlignment.center,
+                                          children: [
+                                            Row(
+                                              mainAxisAlignment: MainAxisAlignment.center,
+                                              crossAxisAlignment: CrossAxisAlignment.center,
+                                              children: [
+                                                Icon(FontAwesome.phone, color: Colors.white , size: 22.5,),
+                                                SizedBox(width: CustomSize.sizeWidth(context) / 88,),
+                                                CustomText.textHeading7(text: "Telpon", color: Colors.white, minSize: 16),
+                                              ],
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                          SizedBox(height: CustomSize.sizeHeight(context) / 86,),
                           GestureDetector(
                             onTap: (){
-                              _Operation(operation = "done", id);
+                              _Operation(operation = "done", id!);
                               setStateModal(() {});
                               Future.delayed(Duration(seconds: 0)).then((_) {
                                 Navigator.pushReplacement(
@@ -224,15 +351,47 @@ class _ReservationDoneState extends State<ReservationDone> {
     }
 
     setState(() {
+      chatroom = data['trx']['chatroom']['id'].toString();
       id = data['trx']['id'].toString();
       status = data['trx']['status'];
       datetime = data['trx']['datetime'];
       table = data['trx']['table'].toString();
       total = data['trx']['price'];
       username = data['trx']['user_name'];
+      phone = (data['trx']['no_telp_user']??'').toString();
       // print(price);
       // detTransaction = _detTransaction;
       // menu = _menu;
+    });
+  }
+
+  Future _open(String operation, String id)async{
+    List<Transaction> _transaction = [];
+
+    SharedPreferences pref = await SharedPreferences.getInstance();
+    String token = pref.getString("token") ?? "";
+    var apiResult = await http.get(Links.mainUrl + '/reservation/op/open/$id', headers: {
+      "Accept": "Application/json",
+      "Authorization": "Bearer $token"
+    });
+    print(apiResult.body);
+    var data = json.decode(apiResult.body);
+    print(data);
+
+    // for(var v in data['trx']['process']){
+    //   Transaction r = Transaction.resto(
+    //       id: v['id'],
+    //       status: v['status'],
+    //       username: v['username'],
+    //       total: int.parse(v['total']),
+    //       type: v['type']
+    //   );
+    //   _transaction.add(r);
+    // }
+
+    setState(() {
+      // transaction = _transaction;
+      print(operation+'   '+id);
     });
   }
 
@@ -267,6 +426,15 @@ class _ReservationDoneState extends State<ReservationDone> {
     });
   }
 
+  Future getUser()async{
+    SharedPreferences pref = await SharedPreferences.getInstance();
+    setState(() {
+      userName = (pref.getString('name'));
+    });
+  }
+
+  String userName = '';
+
   @override
   void dispose() {
     _scrollController.dispose();
@@ -276,6 +444,7 @@ class _ReservationDoneState extends State<ReservationDone> {
   @override
   void initState() {
     _getTrans();
+    getUser();
     super.initState();
   }
 
@@ -283,7 +452,7 @@ class _ReservationDoneState extends State<ReservationDone> {
   Widget build(BuildContext context) {
     return Scaffold(
       body: SafeArea(
-        child: SingleChildScrollView(
+        child: (ksg != true)?SingleChildScrollView(
           controller: _scrollController,
           child: Padding(
             padding: EdgeInsets.symmetric(horizontal: CustomSize.sizeWidth(context) / 24),
@@ -297,89 +466,139 @@ class _ReservationDoneState extends State<ReservationDone> {
                     itemCount: transaction.length,
                     itemBuilder: (_, index){
                       return GestureDetector(
-                        onTap: (){
-                          _getDetailTrans(transaction[index].id.toString());
+                        onTap: ()async{
+                          Fluttertoast.showToast(msg: "Tunggu sebentar");
+                          _getDetailTrans(transaction[index].id.toString()).whenComplete(() {
+                            _getTrans();
+                          });
+                          id = transaction[index].id.toString();
+                          _open('', id!);
+                          SharedPreferences pref = await SharedPreferences.getInstance();
+                          pref.setString('idnyatrans', transaction[index].id.toString());
                           // print((transaction[index].id.toString()));
                         },
                         child: Padding(
                           padding: EdgeInsets.only(top: CustomSize.sizeHeight(context) / 48),
-                          child: Container(
-                            width: CustomSize.sizeWidth(context),
-                            height: CustomSize.sizeWidth(context) / 3.3,
-                            decoration: BoxDecoration(
-                              color: Colors.white,
-                              borderRadius: BorderRadius.circular(20),
-                              boxShadow: [
-                                BoxShadow(
-                                  color: Colors.grey.withOpacity(0.5),
-                                  spreadRadius: 0,
-                                  blurRadius: 7,
-                                  offset: Offset(0, 7), // changes position of shadow
-                                ),
-                              ],
-                            ),
-                            child: Row(
-                              children: [
-                                Container(
-                                  width: CustomSize.sizeWidth(context) / 3.3,
-                                  height: CustomSize.sizeWidth(context) / 3.3,
-                                  decoration: BoxDecoration(
-                                    image: DecorationImage(
-                                        image: NetworkImage(Links.subUrl + transaction[index].img),
-                                        fit: BoxFit.cover
+                          child: Stack(
+                            alignment: Alignment.topCenter,
+                            children: [
+                              Container(
+                                width: CustomSize.sizeWidth(context),
+                                height: CustomSize.sizeWidth(context) / 3.3,
+                                decoration: BoxDecoration(
+                                  color: Colors.white,
+                                  borderRadius: BorderRadius.circular(20),
+                                  boxShadow: [
+                                    BoxShadow(
+                                      color: Colors.grey.withOpacity(0.5),
+                                      spreadRadius: 0,
+                                      blurRadius: 7,
+                                      offset: Offset(0, 7), // changes position of shadow
                                     ),
-                                    borderRadius: BorderRadius.circular(20),
-                                  ),
+                                  ],
                                 ),
-                                SizedBox(
-                                  width: CustomSize.sizeWidth(context) / 32,
+                                child: Row(
+                                  children: [
+                                    Container(
+                                      width: CustomSize.sizeWidth(context) / 3.3,
+                                      height: CustomSize.sizeWidth(context) / 3.3,
+                                      decoration: (transaction[index].img.toString() != 'null')?BoxDecoration(
+                                        image: DecorationImage(
+                                          image: NetworkImage(Links.subUrl + transaction[index].img!),
+                                          fit: BoxFit.cover,
+                                        ),
+                                        borderRadius: BorderRadius.circular(20),
+                                      ):BoxDecoration(
+                                        image: new DecorationImage(
+                                            image: AssetImage('assets/default.png') as ImageProvider,
+                                            fit: BoxFit.cover
+                                        ),
+                                        color: Color.fromRGBO(231,236,237, 1),
+                                        borderRadius: BorderRadius.circular(20),
+                                      ),
+                                    ),
+                                    SizedBox(
+                                      width: CustomSize.sizeWidth(context) / 32,
+                                    ),
+                                    Container(
+                                      width: CustomSize.sizeWidth(context) / 2.1,
+                                      child: Column(
+                                        mainAxisAlignment: MainAxisAlignment.center,
+                                        crossAxisAlignment: CrossAxisAlignment.start,
+                                        children: [
+                                          CustomText.bodyLight12(
+                                            // text: (transaction[index].type.toString() != "Makan Ditempat")?(transaction[index].type.toString() != "Ambil Sekarang")?"Isi nya Alamat":"Ambil Ditempat":transaction[index].type.toString(),
+                                              text: transaction[index].datetime!.split(' ')[0],
+                                              maxLines: 1,
+                                              minSize: 12
+                                          ),
+                                          CustomText.textHeading4(
+                                              text: transaction[index].username.toString(),
+                                              minSize: 20,
+                                              maxLines: 1
+                                          ),
+                                          CustomText.bodyLight12(
+                                            // text: (transaction[index].type.toString() != "Makan Ditempat")?(transaction[index].type.toString() != "Ambil Sekarang")?"Isi nya Alamat":"Ambil Ditempat":transaction[index].type.toString(),
+                                              text: 'Pukul: '+transaction[index].datetime!.split(' ')[1].split(':')[0]+':'+transaction[index].datetime!.split(' ')[1].split(':')[1],
+                                              maxLines: 1,
+                                              minSize: 12
+                                          ),
+                                          CustomText.bodyLight12(
+                                            // text: (transaction[index].type.toString() != "Makan Ditempat")?(transaction[index].type.toString() != "Ambil Sekarang")?"Isi nya Alamat":"Ambil Ditempat":transaction[index].type.toString(),
+                                              text: transaction[index].table!+' meja',
+                                              maxLines: 1,
+                                              minSize: 12
+                                          ),
+                                          SizedBox(height: CustomSize.sizeHeight(context) * 0.00468,),
+                                          CustomText.bodyMedium12(
+                                            // text: transaction[index].type.toString(),
+                                              text: transaction[index].total.toString(),
+                                              maxLines: 1,
+                                              minSize: 13
+                                          ),
+                                          // Row(
+                                          //   children: [
+                                          //     CustomText.bodyRegular12(text: "Rp "+transaction[index].total.toString(), minSize: 14),
+                                          //   ],
+                                          // )
+                                        ],
+                                      ),
+                                    )
+                                  ],
                                 ),
-                                Container(
-                                  width: CustomSize.sizeWidth(context) / 2.1,
-                                  child: Column(
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    crossAxisAlignment: CrossAxisAlignment.start,
-                                    children: [
-                                      CustomText.bodyLight12(
-                                        // text: (transaction[index].type.toString() != "Makan Ditempat")?(transaction[index].type.toString() != "Ambil Sekarang")?"Isi nya Alamat":"Ambil Ditempat":transaction[index].type.toString(),
-                                          text: transaction[index].datetime.split(' ')[0],
-                                          maxLines: 1,
-                                          minSize: 12
-                                      ),
-                                      CustomText.textHeading4(
-                                          text: transaction[index].username.toString(),
-                                          minSize: 20,
-                                          maxLines: 1
-                                      ),
-                                      CustomText.bodyLight12(
-                                        // text: (transaction[index].type.toString() != "Makan Ditempat")?(transaction[index].type.toString() != "Ambil Sekarang")?"Isi nya Alamat":"Ambil Ditempat":transaction[index].type.toString(),
-                                          text: 'Pukul: '+transaction[index].datetime.split(' ')[1].split(':')[0]+':'+transaction[index].datetime.split(' ')[1].split(':')[1],
-                                          maxLines: 1,
-                                          minSize: 12
-                                      ),
-                                      CustomText.bodyLight12(
-                                        // text: (transaction[index].type.toString() != "Makan Ditempat")?(transaction[index].type.toString() != "Ambil Sekarang")?"Isi nya Alamat":"Ambil Ditempat":transaction[index].type.toString(),
-                                          text: transaction[index].table+' meja',
-                                          maxLines: 1,
-                                          minSize: 12
-                                      ),
-                                      SizedBox(height: CustomSize.sizeHeight(context) * 0.00468,),
-                                      CustomText.bodyMedium12(
-                                        // text: transaction[index].type.toString(),
-                                          text: transaction[index].total.toString(),
-                                          maxLines: 1,
-                                          minSize: 13
-                                      ),
-                                      // Row(
-                                      //   children: [
-                                      //     CustomText.bodyRegular12(text: "Rp "+transaction[index].total.toString(), minSize: 14),
-                                      //   ],
-                                      // )
-                                    ],
-                                  ),
-                                )
-                              ],
-                            ),
+                              ),
+                              Container(
+                                width: CustomSize.sizeWidth(context),
+                                child: Row(
+                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    Container(
+                                        padding: EdgeInsets.only(top: 0, left: 5),
+                                        child: Icon(Icons.circle, color: Colors.transparent, size: 14,)
+                                    ),
+                                    (transaction[index].chat_user != '')?Container(
+                                        padding: EdgeInsets.only(top: 15, right: 15),
+                                        child: Stack(
+                                          alignment: Alignment.center,
+                                          children: [
+                                            Icon(Icons.circle, color: (transaction[index].chat_user != '0')?CustomColor.redBtn:Colors.transparent, size: 26,),
+                                            CustomText.bodyMedium12(text: (transaction[index].chat_user != '0')?transaction[index].chat_user:'', color: (transaction[index].chat_user != '0')?Colors.white:Colors.transparent)
+                                          ],
+                                        )
+                                    ):Container(
+                                        padding: EdgeInsets.only(top: 15, right: 15),
+                                        child: Stack(
+                                          alignment: Alignment.center,
+                                          children: [
+                                            // Icon(Icons.circle, color: (transaction[index].chat_user != '0')?CustomColor.redBtn:Colors.transparent, size: 26,),
+                                            // CustomText.bodyMedium12(text: transaction[index].chat_user, color: (transaction[index].chat_user != '0')?Colors.white:Colors.transparent)
+                                          ],
+                                        )
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ],
                           ),
                         ),
                       );
@@ -389,7 +608,7 @@ class _ReservationDoneState extends State<ReservationDone> {
               ],
             ),
           ),
-        ),
+        ):Container(child: CustomText.bodyMedium12(text: "kosong", minSize: 12), alignment: Alignment.center, height: CustomSize.sizeHeight(context),),
       ),
       // floatingActionButton: GestureDetector(
       //   onTap: (){

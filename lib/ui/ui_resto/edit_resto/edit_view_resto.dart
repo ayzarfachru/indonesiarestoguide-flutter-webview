@@ -3,16 +3,18 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_datetime_picker/flutter_datetime_picker.dart';
-import 'package:geolocator/geolocator.dart';
+// import 'package:geolocator/geolocator.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:geocoding/geocoding.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:indonesiarestoguide/utils/search_address_maps_resto.dart';
-import 'package:indonesiarestoguide/utils/utils.dart';
-import 'package:indonesiarestoguide/ui/home/home_activity.dart';
+import 'package:kam5ia/ui/ui_resto/edit_resto/edit_data_usaha.dart';
+// import 'package:kam5ia/utils/search_address_maps_resto.dart';
+import 'package:kam5ia/utils/utils.dart';
+// import 'package:kam5ia/ui/home/home_activity.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:page_transition/page_transition.dart';
-import 'package:indonesiarestoguide/ui/ui_resto/edit_resto/edit_detail_resto.dart';
+import 'package:kam5ia/ui/ui_resto/edit_resto/edit_detail_resto.dart';
 
 import 'package:http/http.dart' as http;
 
@@ -32,10 +34,20 @@ class EditViewResto extends StatefulWidget {
   String reservation_fee = '';
   String idResto = '';
 
-  EditViewResto(this.idResto, this.name, this.img, this.address, this.phone, this.desc, this.lat, this.long, this.facility, this.cuisine, this.can_delivery, this.can_takeaway, this.ongkir, this.reservation_fee, );
+  String email = "";
+  String badanU = '';
+  String pemilikU = '';
+  String penanggungJwb = '';
+  String nameRekening = '';
+  String nameBank = '';
+  String nomorRekening = '';
+  String foto_pj = '';
+  String ktp = '';
+
+  EditViewResto(this.idResto, this.name, this.img, this.address, this.phone, this.desc, this.lat, this.long, this.facility, this.cuisine, this.can_delivery, this.can_takeaway, this.ongkir, this.reservation_fee, this.email, this.badanU, this.pemilikU, this.penanggungJwb, this.nameRekening, this.nameBank, this.nomorRekening, this.foto_pj, this.ktp);
 
   @override
-  _EditViewRestoState createState() => _EditViewRestoState(idResto, name, img, address, phone, desc, lat, long, facility, cuisine, can_delivery, can_takeaway, ongkir, reservation_fee);
+  _EditViewRestoState createState() => _EditViewRestoState(idResto, name, img, address, phone, desc, lat, long, facility, cuisine, can_delivery, can_takeaway, ongkir, reservation_fee, email, badanU, pemilikU, penanggungJwb, nameRekening, nameBank, nomorRekening, foto_pj, ktp);
 }
 
 class _EditViewRestoState extends State<EditViewResto> {
@@ -54,9 +66,20 @@ class _EditViewRestoState extends State<EditViewResto> {
   String reservation_fee = '';
   String idResto = '';
 
-  _EditViewRestoState(this.idResto, this.name, this.img, this.address, this.phone, this.desc, this.lat, this.long, this.facility, this.cuisine, this.can_delivery, this.can_takeaway, this.ongkir, this.reservation_fee,);
+  String email = "";
+  String badanU = '';
+  String pemilikU = '';
+  String penanggungJwb = '';
+  String nameRekening = '';
+  String nameBank = '';
+  String nomorRekening = '';
+  String foto_pj = '';
+  String ktp = '';
+
+  _EditViewRestoState(this.idResto, this.name, this.img, this.address, this.phone, this.desc, this.lat, this.long, this.facility, this.cuisine, this.can_delivery, this.can_takeaway, this.ongkir, this.reservation_fee, this.email, this.badanU, this.pemilikU, this.penanggungJwb, this.nameRekening, this.nameBank, this.nomorRekening, this.foto_pj, this.ktp);
 
   TextEditingController _Name = TextEditingController(text: "");
+  TextEditingController _Email = TextEditingController(text: "");
   TextEditingController _Address = TextEditingController(text: "");
   TextEditingController _NoTelp = TextEditingController(text: "");
   TextEditingController _Desc = TextEditingController(text: "");
@@ -66,12 +89,14 @@ class _EditViewRestoState extends State<EditViewResto> {
   bool isLoading = true;
   bool btnAddress = false;
 
-  double latitude;
-  double longitude;
+  double? latitude;
+  double? longitude;
+  String karyawan = "";
 
   getInitial() async {
     SharedPreferences pref = await SharedPreferences.getInstance();
     setState(() {
+      karyawan = (pref.getString("karyawan"));
       initial = (pref.getString('name').substring(0, 1).toUpperCase());
       print(initial);
     });
@@ -79,6 +104,7 @@ class _EditViewRestoState extends State<EditViewResto> {
 
   getEditView() async {
     _Name = TextEditingController(text: name);
+    _Email = TextEditingController(text: email);
     _Address = TextEditingController(text: address);
     _NoTelp = TextEditingController(text: (phone.split('')[0] == '+')?'0'+phone.split('+62')[1]:phone);
     _Desc = TextEditingController(text: desc);
@@ -86,8 +112,8 @@ class _EditViewRestoState extends State<EditViewResto> {
 
 
   //------------------------------= IMAGE PICKER =----------------------------------
-  File image;
-  String extension;
+  File? image;
+  String? extension;
   final picker = ImagePicker();
 
   Future getImage() async {
@@ -105,15 +131,16 @@ class _EditViewRestoState extends State<EditViewResto> {
     getInitial();
     getEditView();
     print(facility);
-    Location.instance.getLocation().then((value) {
-      setState(() {
-        latitude = value.latitude;
-        longitude = value.longitude;
-      });
-    });
+    // Location.instance.getLocation().then((value) {
+    //   setState(() {
+    //     latitude = value.latitude;
+    //     longitude = value.longitude;
+    //   });
+    // });
     // Future.delayed(Duration.zero, () async {
     //
     // });
+
   }
 
   @override
@@ -150,7 +177,8 @@ class _EditViewRestoState extends State<EditViewResto> {
                       children: [
                         GestureDetector(
                           onTap: () async{
-                            getImage();
+                            // getImage();
+                            Fluttertoast.showToast(msg: 'Anda hanya bisa merubah email, nomor telepon, dan deskripsi resto di halaman ini.',);
                           },
                           child: Container(
                             width: CustomSize.sizeWidth(context) / 6,
@@ -168,7 +196,7 @@ class _EditViewRestoState extends State<EditViewResto> {
                             ): BoxDecoration(
                               shape: BoxShape.circle,
                               image: new DecorationImage(
-                                  image: new FileImage(image),
+                                  image: new FileImage(image!),
                                   fit: BoxFit.cover
                               ),
                             ),
@@ -183,7 +211,7 @@ class _EditViewRestoState extends State<EditViewResto> {
                           ),
                         ),
                         SizedBox(width: CustomSize.sizeWidth(context) / 32,),
-                        CustomText.bodyLight12(text: "Edit foto profile resto"),
+                        // CustomText.bodyLight12(text: "Edit foto profile usaha"),
                       ],
                     ),
                     SizedBox(height: CustomSize.sizeHeight(context) / 48,),
@@ -192,7 +220,10 @@ class _EditViewRestoState extends State<EditViewResto> {
                       height: CustomSize.sizeHeight(context) * 0.005,
                     ),
                     TextField(
-                      // readOnly: (btnAddress == true)?true:false,
+                      readOnly: true,
+                      onTap: (){
+                        Fluttertoast.showToast(msg: 'Anda hanya bisa merubah email, nomor telepon, dan deskripsi resto di halaman ini.',);
+                      },
                       controller: _Name,
                       keyboardType: TextInputType.text,
                       cursorColor: Colors.black,
@@ -221,9 +252,32 @@ class _EditViewRestoState extends State<EditViewResto> {
                       height: CustomSize.sizeHeight(context) * 0.005,
                     ),
                     TextField(
-                      onTap: () {
-                        btnAddress = true;
+                      onTap: () async{
+                        Fluttertoast.showToast(msg: 'Tekan sekali lagi untuk refresh lokasi.',);
+                        List<Location> locations = await locationFromAddress(_Address.text.toString());
+                        // print('s '+locations.toString());
+                        // print(lat);
+                        // print(long);
+                        SharedPreferences pref = await SharedPreferences.getInstance();
+                        pref.setString("latitudeResto", (locations[0].toString().split(': ')[1].split(',')[0]).toString());
+                        pref.setString("longitudeResto", (locations[0].toString().split(',')[1].split(': ')[1]).toString());
+                        // lat = locations[0].toString().split(': ')[1].split(',')[0];
+                        // long = locations[0].toString().split(',')[1].split(': ')[1];
+                        print(locations[0].toString().split(': ')[1].split(',')[0]);
+                        print(locations[0].toString().split(',')[1].split(': ')[1]);
+
+                        // var result = await Navigator.push(
+                        //     context,
+                        //     PageTransition(
+                        //         type: PageTransitionType.rightToLeft,
+                        //         child: SearchAddressMapsResto(latitude!,longitude!)));
+                        // if(result != ""){
+                        //   SharedPreferences pref = await SharedPreferences.getInstance();
+                        //   _Address = TextEditingController(text: pref.getString('address'));
+                        //   setState(() {});
+                        // }
                       },
+                      readOnly: true,
                       controller: _Address,
                       keyboardType: TextInputType.text,
                       cursorColor: Colors.black,
@@ -240,81 +294,69 @@ class _EditViewRestoState extends State<EditViewResto> {
                             textStyle: TextStyle(fontSize: 14)),
                         enabledBorder: UnderlineInputBorder(),
                         focusedBorder: UnderlineInputBorder(),
-                        suffixIcon: (btnAddress != true)?GestureDetector(
-                          onTap: () async{
-                            var result = await Navigator.push(
-                                context,
-                                PageTransition(
-                                    type: PageTransitionType.rightToLeft,
-                                    child: SearchAddressMapsResto(latitude,longitude)));
-                            if(result != ""){
-                              SharedPreferences pref = await SharedPreferences.getInstance();
-                              _Address = TextEditingController(text: pref.getString('address'));
-                              setState(() {});
-                            }
-                          },
-                          child: Stack(
-                            children: [
-                              Container(
-                                width: CustomSize.sizeWidth(context) / 4,
-                                decoration: BoxDecoration(
-                                  borderRadius: BorderRadius.circular(25),
-                                  border: Border.all(color: CustomColor.accent, width: 1),
-                                  // color: CustomColor.accentLight
-                                ),
-                                child: Padding(
-                                  padding: const EdgeInsets.all(2.0),
-                                  child: Center(
-                                    child: CustomText.textTitle8(
-                                        text: "Buka maps",
-                                        color: CustomColor.accent
-                                    ),
-                                  ),
-                                ),
-                              ),
-                            ],
-                          ),
-                        ):GestureDetector(
-                          onTap: () async{
-                            SharedPreferences pref = await SharedPreferences.getInstance();
-                            if (btnAddress == false) {
-                              btnAddress = true;
-                            } else {
-                              btnAddress = false;
-                              List<Placemark> placemark = await Geolocator().placemarkFromAddress(_Address.text);
-                              print(placemark[0].position.latitude);
-                              print(placemark[0].position.longitude);
-                              pref.setString("latitudeResto", placemark[0].position.latitude.toString());
-                              pref.setString("longitudeResto", placemark[0].position.longitude.toString());
-                              FocusScope.of(context).unfocus();
-                              // FocusScope.of(context).requestFocus(FocusNode())
-                              // print(latitude);
-                              // print(longitude);
-                            }
-                            setState(() {});
-                            //search alamat menggunakan text
-                          },
-                          child: Stack(
-                            children: [
-                              Container(
-                                width: CustomSize.sizeWidth(context) / 4,
-                                decoration: BoxDecoration(
-                                  borderRadius: BorderRadius.circular(25),
-                                  border: Border.all(color: CustomColor.accent, width: 1),
-                                  // color: CustomColor.accentLight
-                                ),
-                                child: Padding(
-                                  padding: const EdgeInsets.all(2.0),
-                                  child: Center(
-                                    child: CustomText.textTitle8(
-                                        text: "Simpan",
-                                        color: CustomColor.accent
-                                    ),
-                                  ),
-                                ),
-                              ),
-                            ],
-                          ),
+                        // suffixIcon: GestureDetector(
+                        //   // onTap: () async{
+                        //   //   var result = await Navigator.push(
+                        //   //       context,
+                        //   //       PageTransition(
+                        //   //           type: PageTransitionType.rightToLeft,
+                        //   //           child: SearchAddressMapsResto(latitude!,longitude!)));
+                        //   //   if(result != ""){
+                        //   //     SharedPreferences pref = await SharedPreferences.getInstance();
+                        //   //     _Address = TextEditingController(text: pref.getString('address'));
+                        //   //     setState(() {});
+                        //   //   }
+                        //   // },
+                        //   child: Stack(
+                        //     children: [
+                        //       Container(
+                        //         width: CustomSize.sizeWidth(context) / 4,
+                        //         decoration: BoxDecoration(
+                        //           borderRadius: BorderRadius.circular(25),
+                        //           border: Border.all(color: CustomColor.accent, width: 1),
+                        //           // color: CustomColor.accentLight
+                        //         ),
+                        //         child: Padding(
+                        //           padding: const EdgeInsets.all(2.0),
+                        //           child: Center(
+                        //             child: CustomText.textTitle8(
+                        //                 text: "Buka maps",
+                        //                 color: CustomColor.accent
+                        //             ),
+                        //           ),
+                        //         ),
+                        //       ),
+                        //     ],
+                        //   ),
+                        // )
+                      ),
+                    ),
+                    SizedBox(height: CustomSize.sizeHeight(context) / 48,),
+                    CustomText.bodyLight12(text: "Email"),
+                    SizedBox(
+                      height: CustomSize.sizeHeight(context) * 0.005,
+                    ),
+                    TextField(
+                      // readOnly: (btnAddress == true)?true:false,
+                      controller: _Email,
+                      keyboardType: TextInputType.emailAddress,
+                      cursorColor: Colors.black,
+                      style: GoogleFonts.poppins(
+                          textStyle:
+                          TextStyle(fontSize: 18, color: Colors.black, fontWeight: FontWeight.w600)),
+                      decoration: InputDecoration(
+                        isDense: true,
+                        contentPadding: EdgeInsets.only(bottom: CustomSize.sizeHeight(context) / 86),
+                        hintStyle: GoogleFonts.poppins(
+                            textStyle:
+                            TextStyle(fontSize: 14, color: Colors.grey)),
+                        helperStyle: GoogleFonts.poppins(
+                            textStyle: TextStyle(fontSize: 14)),
+                        enabledBorder: UnderlineInputBorder(
+
+                        ),
+                        focusedBorder: UnderlineInputBorder(
+
                         ),
                       ),
                     ),
@@ -376,29 +418,88 @@ class _EditViewRestoState extends State<EditViewResto> {
           ),
         ),
       ),
+      floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
       floatingActionButton:
-      GestureDetector(
+      (karyawan == '1')?GestureDetector(
         onTap: () async{
           setState(() {
             isLoading = false;
           });
+          List<Location> locations = await locationFromAddress(_Address.text.toString());
           SharedPreferences pref = await SharedPreferences.getInstance();
-          pref.setString("imgResto", (image != null)?'data:image/$extension;base64,'+base64Encode(image.readAsBytesSync()).toString():'');
+          pref.setString("latitudeResto", (locations[0].toString().split(': ')[1].split(',')[0]).toString());
+          pref.setString("longitudeResto", (locations[0].toString().split(',')[1].split(': ')[1]).toString());
+          // lat = locations[0].toString().split(': ')[1].split(',')[0];
+          // long = locations[0].toString().split(',')[1].split(': ')[1];
+          print(locations[0].toString().split(': ')[1].split(',')[0]);
+          print(locations[0].toString().split(',')[1].split(': ')[1]);
+          pref.setString("imgResto", (image != null)?'data:image/$extension;base64,'+base64Encode(image!.readAsBytesSync()).toString():'');
           pref.setString("nameResto", _Name.text.toString());
+          pref.setString("emailResto", _Email.text.toString());
           pref.setString("notelpResto", _NoTelp.text.toString());
           pref.setString("descResto", _Desc.text.toString());
           pref.setString("addressResto", _Address.text.toString());
-          pref.setString("latitudeResto", lat);
-          pref.setString("longitudeResto", long);
+          // pref.setString("latitudeResto", lat);
+          // pref.setString("longitudeResto", long);
+          print(lat);
+          print(long);
           print(pref.getString("imgResto"));
           print(pref.getString("nameResto"));
+          print(pref.getString("emailResto"));
           print(pref.getString("notelpResto"));
           print(pref.getString("latitudeResto"));
           print(pref.getString("longitudeResto"));
-          print(pref.getString("notelpResto"));
           print(pref.getString("descResto"));
 
-          Navigator.push(context, PageTransition(type: PageTransitionType.fade, child: new EditDetailResto(facility, cuisine, can_delivery, can_takeaway, ongkir, reservation_fee, idResto)));
+          Navigator.push(context, PageTransition(type: PageTransitionType.fade, child: new EditDataUsaha(facility, cuisine, can_delivery, can_takeaway, ongkir, reservation_fee, idResto, email, badanU, pemilikU, penanggungJwb, nameRekening, nameBank, nomorRekening, foto_pj, ktp)));
+
+        },
+        child: Container(
+          width: CustomSize.sizeWidth(context) / 1.1,
+          height: CustomSize.sizeHeight(context) / 14,
+          decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(30),
+              color: CustomColor.accent
+          ),
+          child: Center(child: CustomText.bodyRegular16(text: "Lanjut", color: Colors.white,)),
+        ),
+      ):GestureDetector(
+        onTap: () async{
+          setState(() {
+            isLoading = false;
+          });
+          List<Location> locations = await locationFromAddress(_Address.text.toString());
+          // print('s '+locations.toString());
+          // print(lat);
+          // print(long);
+          SharedPreferences pref = await SharedPreferences.getInstance();
+          pref.setString("latitudeResto", (locations[0].toString().split(': ')[1].split(',')[0]).toString());
+          pref.setString("longitudeResto", (locations[0].toString().split(',')[1].split(': ')[1]).toString());
+          // lat = locations[0].toString().split(': ')[1].split(',')[0];
+          // long = locations[0].toString().split(',')[1].split(': ')[1];
+          print(locations[0].toString().split(': ')[1].split(',')[0]);
+          print(locations[0].toString().split(',')[1].split(': ')[1]);
+          pref.setString("imgResto", (image != null)?'data:image/$extension;base64,'+base64Encode(image!.readAsBytesSync()).toString():'');
+          pref.setString("nameResto", _Name.text.toString());
+          pref.setString("emailResto", _Email.text.toString());
+          pref.setString("notelpResto", _NoTelp.text.toString());
+          pref.setString("descResto", _Desc.text.toString());
+          pref.setString("addressResto", _Address.text.toString());
+          // pref.setString("latitudeResto", lat);
+          // pref.setString("longitudeResto", long);
+
+          print(lat);
+          print(long);
+          print(pref.getString("imgResto"));
+          print(pref.getString("nameResto"));
+          print(pref.getString("emailResto"));
+          print(pref.getString("notelpResto"));
+          print(pref.getString("latitudeResto"));
+          print(pref.getString("longitudeResto"));
+          print(pref.getString("descResto"));
+
+          Navigator.push(context, PageTransition(type: PageTransitionType.fade, child: new EditDataUsaha(facility, cuisine, can_delivery, can_takeaway, ongkir, reservation_fee, idResto, email, badanU, pemilikU, penanggungJwb, nameRekening, nameBank, nomorRekening, foto_pj, ktp)));
+
         },
         child: Container(
           width: CustomSize.sizeWidth(context) / 1.1,

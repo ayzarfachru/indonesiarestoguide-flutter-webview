@@ -4,5 +4,5 @@ class PrefCart{
   int id;
   String qty;
 
-  PrefCart({this.id, this.qty});
+  PrefCart({required this.id, required this.qty});
 }

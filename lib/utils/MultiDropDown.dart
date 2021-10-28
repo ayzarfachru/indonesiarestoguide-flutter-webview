@@ -1,6 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:indonesiarestoguide/utils/MultiExtended.dart';
+import 'package:kam5ia/utils/MultiExtended.dart';
 
 typedef OnConfirm(List selectedValues);
 
@@ -13,10 +13,10 @@ class MultipleDropDown extends StatefulWidget {
   final bool disabled;
 
   MultipleDropDown({
-    Key key,
-    @required this.values,
-    @required this.elements,
-    this.placeholder,
+    required Key key,
+    required this.values,
+    required this.elements,
+    required this.placeholder,
     this.disabled = false,
   })  : assert(values != null),
         super(key: key);
@@ -51,7 +51,7 @@ class MultipleDropDownState extends State<MultipleDropDown> {
                 decoration: BoxDecoration(
                     border: Border(
                         bottom:
-                        BorderSide(width: 0.5, color: Colors.grey[350]))),
+                        BorderSide(width: 0.5, color: (Colors.grey[350])!))),
               ),
             ),
           ),

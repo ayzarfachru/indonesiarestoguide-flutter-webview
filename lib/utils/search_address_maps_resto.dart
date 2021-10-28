@@ -4,9 +4,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:geocoder/geocoder.dart';
 import 'package:geolocator/geolocator.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
-import 'package:indonesiarestoguide/ui/cart/cart_activity.dart';
-import 'package:indonesiarestoguide/utils/utils.dart';
+import 'package:kam5ia/ui/cart/cart_activity.dart';
+import 'package:kam5ia/utils/utils.dart';
 import 'package:page_transition/page_transition.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -25,12 +26,14 @@ class _SearchAddressMapsRestoState extends State<SearchAddressMapsResto> {
   double longitude;
   String address = "";
 
+  TextEditingController _textSearch = TextEditingController(text: "");
+
   _SearchAddressMapsRestoState(this.latitude, this.longitude);
 
   var geolocator = Geolocator();
-  double _lat;
-  double _long;
-  GoogleMapController mapController;
+  double? _lat;
+  double? _long;
+  GoogleMapController? mapController;
   Completer<GoogleMapController> _controller = Completer();
   bool isMove = false;
 
@@ -134,13 +137,14 @@ class _SearchAddressMapsRestoState extends State<SearchAddressMapsResto> {
                               SharedPreferences pref = await SharedPreferences.getInstance();
                               // latitude = double.parse(pref.getString('latResto'));
                               // longitude = double.parse(pref.getString('longResto'));
-                              double distan = await Geolocator().distanceBetween( latitude, longitude, -7.3382452, 112.7271302);
+                              double distan = await Geolocator.distanceBetween( latitude, longitude, -7.3382452, 112.7271302);
                               print(distan.toInt().toString());
                               pref.setString("address", address);
-                              pref.setString("lat", latitude.toString());
-                              pref.setString("long", longitude.toString());
+                              pref.setString("latitudeResto", _lat.toString());
+                              pref.setString("longitudeResto", _long.toString());
                               pref.setString("distan", distan.toInt().toString());
-                              print(address);
+                              print(_lat);
+                              print(_long);
                               print(latitude.toString() +" "+ longitude.toString() +" "+ _lat.toString() +" "+ _long.toString() );
                               Navigator.pop(context, "v");
                               // Navigator.pushReplacement(context, PageTransition(type: PageTransitionType.fade,
@@ -159,6 +163,65 @@ class _SearchAddressMapsRestoState extends State<SearchAddressMapsResto> {
                           )
                       ),
                     )
+                ),
+              ),
+              Align(
+                alignment: Alignment.topLeft,
+                child: Padding(
+                  padding: EdgeInsets.all(8.0),
+                  child: Container(
+                    width: CustomSize.sizeWidth(context) / 1.3,
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(10),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withOpacity(.6),
+                          spreadRadius: 0,
+                          blurRadius: 6,
+                          offset: Offset(0, 2), // changes position of shadow
+                        ),
+                      ],
+                    ),
+                    child: Padding(
+                      padding: EdgeInsets.all(10),
+                      child: TextField(
+                        controller: _textSearch,
+                        keyboardType: TextInputType.text,
+                        cursorColor: Colors.black,
+                        textInputAction: TextInputAction.search,
+                        onSubmitted: (v)async{
+                          var addresses = await Geocoder.local.findAddressesFromQuery(v);
+
+                          CameraPosition cPosition = CameraPosition(
+                            zoom: 18,
+                            // tilt: 80,
+                            // bearing: 30,
+                            target: LatLng(addresses[0].coordinates.latitude,
+                                addresses[0].coordinates.longitude),
+                          );
+
+                          final GoogleMapController controller = await _controller.future;
+                          controller.animateCamera(CameraUpdate.newCameraPosition(cPosition));
+                        },
+                        style: GoogleFonts.poppins(
+                            textStyle:
+                            TextStyle(fontSize: 14, color: Colors.black, fontWeight: FontWeight.w400)),
+                        decoration: InputDecoration(
+                          isDense: true,
+                          contentPadding: EdgeInsets.all(0),
+                          hintText: "Cari alamat",
+                          hintStyle: GoogleFonts.poppins(
+                              textStyle:
+                              TextStyle(fontSize: 14, color: Colors.grey, fontWeight: FontWeight.w400)),
+                          helperStyle: GoogleFonts.poppins(
+                              textStyle: TextStyle(fontSize: 16)),
+                          enabledBorder: InputBorder.none,
+                          focusedBorder: InputBorder.none,
+                        ),
+                      ),
+                    ),
+                  ),
                 ),
               ),
             ],

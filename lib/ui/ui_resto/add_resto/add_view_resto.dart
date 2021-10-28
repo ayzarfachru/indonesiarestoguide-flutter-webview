@@ -7,13 +7,14 @@ import 'package:flutter_datetime_picker/flutter_datetime_picker.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:indonesiarestoguide/utils/search_address_maps_resto.dart';
-import 'package:indonesiarestoguide/utils/utils.dart';
-import 'package:indonesiarestoguide/ui/home/home_activity.dart';
+import 'package:kam5ia/ui/ui_resto/add_resto/add_data_usaha.dart';
+import 'package:kam5ia/utils/search_address_maps_resto.dart';
+import 'package:kam5ia/utils/utils.dart';
+import 'package:kam5ia/ui/home/home_activity.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:page_transition/page_transition.dart';
-import 'package:indonesiarestoguide/ui/ui_resto/add_resto/add_detail_resto.dart';
+import 'package:kam5ia/ui/ui_resto/add_resto/add_detail_resto.dart';
 
 import 'package:http/http.dart' as http;
 
@@ -24,18 +25,21 @@ class AddViewResto extends StatefulWidget {
 
 class _AddViewRestoState extends State<AddViewResto> {
   TextEditingController _Name = TextEditingController(text: "");
+  TextEditingController _Email = TextEditingController(text: "");
   TextEditingController _Address = TextEditingController(text: "");
   TextEditingController _NoTelp = TextEditingController(text: "");
   TextEditingController _Desc = TextEditingController(text: "");
 
   String initial = "";
   String img = "";
+  String cekLat = "";
+  String cekLong = "";
 
   bool isLoading = true;
   bool btnAddress = false;
 
-  double latitude;
-  double longitude;
+  String? latitude;
+  String? longitude;
 
   getInitial() async {
     SharedPreferences pref = await SharedPreferences.getInstance();
@@ -47,8 +51,8 @@ class _AddViewRestoState extends State<AddViewResto> {
 
 
   //------------------------------= IMAGE PICKER =----------------------------------
-  File image;
-  String extension;
+  File? image;
+  String? extension;
   final picker = ImagePicker();
 
   Future getImage() async {
@@ -66,8 +70,8 @@ class _AddViewRestoState extends State<AddViewResto> {
     getInitial();
     Location.instance.getLocation().then((value) {
       setState(() {
-        latitude = value.latitude;
-        longitude = value.longitude;
+        latitude = value.latitude.toString();
+        longitude = value.longitude.toString();
       });
     });
     // Future.delayed(Duration.zero, () async {
@@ -123,7 +127,7 @@ class _AddViewRestoState extends State<AddViewResto> {
                             ): BoxDecoration(
                               shape: BoxShape.circle,
                               image: new DecorationImage(
-                                  image: new FileImage(image),
+                                  image: new FileImage(image!),
                                   fit: BoxFit.cover
                               ),
                             ),
@@ -165,7 +169,7 @@ class _AddViewRestoState extends State<AddViewResto> {
                           textStyle:
                           TextStyle(fontSize: 18, color: Colors.black, fontWeight: FontWeight.w600)),
                       decoration: InputDecoration(
-                        hintText: 'Nama resto',
+                        hintText: 'Nama Resto',
                         isDense: true,
                         contentPadding: EdgeInsets.only(bottom: CustomSize.sizeHeight(context) / 86),
                         hintStyle: GoogleFonts.poppins(
@@ -173,12 +177,8 @@ class _AddViewRestoState extends State<AddViewResto> {
                             TextStyle(fontSize: 14, color: Colors.grey)),
                         helperStyle: GoogleFonts.poppins(
                             textStyle: TextStyle(fontSize: 14)),
-                        enabledBorder: UnderlineInputBorder(
-
-                        ),
-                        focusedBorder: UnderlineInputBorder(
-
-                        ),
+                        enabledBorder: UnderlineInputBorder(),
+                        focusedBorder: UnderlineInputBorder(),
                       ),
                     ),
                     SizedBox(height: CustomSize.sizeHeight(context) / 48,),
@@ -190,6 +190,7 @@ class _AddViewRestoState extends State<AddViewResto> {
                       onTap: () {
                         btnAddress = true;
                       },
+                      readOnly: true,
                       controller: _Address,
                       keyboardType: TextInputType.text,
                       cursorColor: Colors.black,
@@ -212,7 +213,7 @@ class _AddViewRestoState extends State<AddViewResto> {
                                 context,
                                 PageTransition(
                                     type: PageTransitionType.rightToLeft,
-                                    child: SearchAddressMapsResto(latitude,longitude)));
+                                    child: SearchAddressMapsResto(double.parse(latitude!),double.parse(longitude!))));
                             if(result != ""){
                               SharedPreferences pref = await SharedPreferences.getInstance();
                               _Address = TextEditingController(text: pref.getString('address'));
@@ -247,12 +248,12 @@ class _AddViewRestoState extends State<AddViewResto> {
                               btnAddress = true;
                             } else {
                               btnAddress = false;
-                              List<Placemark> placemark = await Geolocator().placemarkFromAddress(_Address.text);
-                              print(placemark[0].position.latitude);
-                              print(placemark[0].position.longitude);
-                              pref.setString("latitudeResto", placemark[0].position.latitude.toString());
-                              pref.setString("longitudeResto", placemark[0].position.longitude.toString());
-                              FocusScope.of(context).unfocus();
+                              // List<Placemark> placemark = await Geolocator.getCurrentPosition(). .placemarkFromAddress();
+                              // print(placemark[0].position.latitude);
+                              // print(placemark[0].position.longitude);
+                              // pref.setString("latitudeResto", placemark[0].position.latitude.toString());
+                              // pref.setString("longitudeResto", placemark[0].position.longitude.toString());
+                              // FocusScope.of(context).unfocus();
                               // FocusScope.of(context).requestFocus(FocusNode())
                               // print(latitude);
                               // print(longitude);
@@ -285,6 +286,32 @@ class _AddViewRestoState extends State<AddViewResto> {
                       ),
                     ),
                     SizedBox(height: CustomSize.sizeHeight(context) / 48,),
+                    CustomText.bodyLight12(text: "Email"),
+                    SizedBox(
+                      height: CustomSize.sizeHeight(context) * 0.005,
+                    ),
+                    TextField(
+                      // readOnly: (btnAddress == true)?true:false,
+                      controller: _Email,
+                      keyboardType: TextInputType.emailAddress,
+                      cursorColor: Colors.black,
+                      style: GoogleFonts.poppins(
+                          textStyle:
+                          TextStyle(fontSize: 18, color: Colors.black, fontWeight: FontWeight.w600)),
+                      decoration: InputDecoration(
+                        hintText: 'Email Resto',
+                        isDense: true,
+                        contentPadding: EdgeInsets.only(bottom: CustomSize.sizeHeight(context) / 86),
+                        hintStyle: GoogleFonts.poppins(
+                            textStyle:
+                            TextStyle(fontSize: 14, color: Colors.grey)),
+                        helperStyle: GoogleFonts.poppins(
+                            textStyle: TextStyle(fontSize: 14)),
+                        enabledBorder: UnderlineInputBorder(),
+                        focusedBorder: UnderlineInputBorder(),
+                      ),
+                    ),
+                    SizedBox(height: CustomSize.sizeHeight(context) / 48,),
                     CustomText.bodyLight12(text: "No Telp"),
                     SizedBox(
                       height: CustomSize.sizeHeight(context) * 0.005,
@@ -299,7 +326,7 @@ class _AddViewRestoState extends State<AddViewResto> {
                           textStyle:
                           TextStyle(fontSize: 18, color: Colors.black, fontWeight: FontWeight.w600)),
                       decoration: InputDecoration(
-                        hintText: 'Nomor telpon resto',
+                        hintText: 'Nomor Telpon Resto',
                         isDense: true,
                         contentPadding: EdgeInsets.only(bottom: CustomSize.sizeHeight(context) / 86),
                         hintStyle: GoogleFonts.poppins(
@@ -325,7 +352,7 @@ class _AddViewRestoState extends State<AddViewResto> {
                           textStyle:
                           TextStyle(fontSize: 18, color: Colors.black, fontWeight: FontWeight.w600)),
                       decoration: InputDecoration(
-                        hintText: 'Deskripsi resto',
+                        hintText: 'Deskripsi Resto',
                         isDense: true,
                         contentPadding: EdgeInsets.only(bottom: CustomSize.sizeHeight(context) / 86),
                         hintStyle: GoogleFonts.poppins(
@@ -338,34 +365,61 @@ class _AddViewRestoState extends State<AddViewResto> {
                       ),
                     ),
                     SizedBox(height: CustomSize.sizeHeight(context) / 48,),
-                    (btnAddress == true)?Container():GestureDetector(
-                      onTap: () async{
-                        setState(() {
-                          isLoading = false;
-                        });
-                        SharedPreferences pref = await SharedPreferences.getInstance();
-                        pref.setString("imgResto", 'data:image/$extension;base64,'+base64Encode(image.readAsBytesSync()).toString());
-                        pref.setString("nameResto", _Name.text.toString());
-                        pref.setString("notelpResto", _NoTelp.text.toString());
-                        pref.setString("descResto", _Desc.text.toString());
-                        pref.setString("addressResto", _Address.text.toString());
-                        print(pref.getString("imgResto"));
-                        print(pref.getString("nameResto"));
-                        print(pref.getString("latitudeResto"));
-                        print(pref.getString("longitudeResto"));
-                        print(pref.getString("notelpResto"));
-                        print(pref.getString("descResto"));
+                    (btnAddress == true)?Container():Container(
+                      width: CustomSize.sizeWidth(context),
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          GestureDetector(
+                            onTap: () async{
+                              setState(() {
+                                isLoading = false;
+                              });
+                              SharedPreferences pref = await SharedPreferences.getInstance();
+                              cekLat = pref.getString("latitudeResto")??'';
+                              cekLong = pref.getString("longitudeResto")??'';
+                              if (image.toString() == 'null') {
+                                Fluttertoast.showToast(msg: "Lengkapi data terlebih dahulu!");
+                              } else if (_Name.text.toString() == '') {
+                                Fluttertoast.showToast(msg: "Lengkapi data terlebih dahulu!");
+                              } else if (_Email.text.toString() == '') {
+                                Fluttertoast.showToast(msg: "Lengkapi data terlebih dahulu!");
+                              } else if (_NoTelp.text.toString() == '') {
+                                Fluttertoast.showToast(msg: "Lengkapi data terlebih dahulu!");
+                              } else if (_Desc.text.toString() == '') {
+                                Fluttertoast.showToast(msg: "Lengkapi data terlebih dahulu!");
+                              } else if (_Address.text.toString() == '' && cekLat == '' && cekLong == '') {
+                                Fluttertoast.showToast(msg: "Lengkapi data terlebih dahulu!");
+                              } else {
+                                pref.setString("imgResto", 'data:image/$extension;base64,'+base64Encode(image!.readAsBytesSync()).toString());
+                                pref.setString("nameResto", _Name.text.toString());
+                                pref.setString("emailResto", _Email.text.toString());
+                                pref.setString("notelpResto", _NoTelp.text.toString());
+                                pref.setString("descResto", _Desc.text.toString());
+                                pref.setString("addressResto", _Address.text.toString());
+                                print(pref.getString("imgResto"));
+                                print(pref.getString("nameResto"));
+                                print('ini loh email '+pref.getString("emailResto"));
+                                print(pref.getString("latitudeResto"));
+                                print(pref.getString("longitudeResto"));
+                                print(pref.getString("notelpResto"));
+                                print(pref.getString("descResto"));
 
-                        Navigator.push(context, PageTransition(type: PageTransitionType.fade, child: new AddDetailResto()));
-                      },
-                      child: Container(
-                        width: CustomSize.sizeWidth(context) / 1.1,
-                        height: CustomSize.sizeHeight(context) / 14,
-                        decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(30),
-                            color: CustomColor.accent
-                        ),
-                        child: Center(child: CustomText.bodyRegular16(text: "Lanjut", color: Colors.white,)),
+                                Navigator.push(context, PageTransition(type: PageTransitionType.fade, child: new AddDataUsaha()));
+                              }
+                            },
+                            child: Container(
+                              alignment: Alignment.center,
+                              width: CustomSize.sizeWidth(context) / 1.1,
+                              height: CustomSize.sizeHeight(context) / 14,
+                              decoration: BoxDecoration(
+                                  borderRadius: BorderRadius.circular(30),
+                                  color: CustomColor.accent
+                              ),
+                              child: Center(child: CustomText.bodyRegular16(text: "Lanjut", color: Colors.white,)),
+                            ),
+                          ),
+                        ],
                       ),
                     ),
                   ],
@@ -375,6 +429,7 @@ class _AddViewRestoState extends State<AddViewResto> {
           ),
         ),
       ),
+      floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
     );
   }
 }

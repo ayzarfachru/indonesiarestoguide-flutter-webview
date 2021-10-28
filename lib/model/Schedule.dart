@@ -4,5 +4,5 @@ class Schedule{
   String open_at;
   String closed_at;
 
-  Schedule({this.id, this.day, this.open_at, this.closed_at});
+  Schedule({required this.id, required this.day, required this.open_at, required this.closed_at});
 }

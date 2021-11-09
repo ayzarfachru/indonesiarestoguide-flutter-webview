@@ -478,266 +478,188 @@ class _AddPromoState extends State<AddPromo> {
   }
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: SafeArea(
-        child: SingleChildScrollView(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              SizedBox(height: CustomSize.sizeHeight(context) / 38,),
-              Padding(
-                padding: EdgeInsets.symmetric(horizontal: CustomSize.sizeWidth(context) / 32),
-                child: CustomText.textHeading4(
-                    text: "Add promo",
-                    minSize: 18,
-                    maxLines: 1
+    return MediaQuery(
+      child: Scaffold(
+        body: SafeArea(
+          child: SingleChildScrollView(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                SizedBox(height: CustomSize.sizeHeight(context) / 38,),
+                Padding(
+                  padding: EdgeInsets.symmetric(horizontal: CustomSize.sizeWidth(context) / 32),
+                  child: CustomText.textHeading4(
+                      text: "Add promo",
+                      sizeNew: double.parse(((MediaQuery.of(context).size.width*0.045).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.045)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.045)).toString()),
+                      maxLines: 1
+                  ),
                 ),
-              ),
-              SizedBox(height: CustomSize.sizeHeight(context) / 86,),
-              Divider(
-                thickness: 8,
-                color: CustomColor.secondary,
-              ),
-              Padding(
-                padding: EdgeInsets.symmetric(horizontal: CustomSize.sizeWidth(context) / 32),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    SizedBox(height: CustomSize.sizeHeight(context) / 48,),
-                    CustomText.bodyLight12(text: "Menu"),
-                    SizedBox(
-                      height: CustomSize.sizeHeight(context) * 0.005,
-                    ),
-                    TextField(
-                      readOnly: true,
-                      controller: tipeMenu,
-                      keyboardType: TextInputType.text,
-                      cursorColor: Colors.black,
-                      style: GoogleFonts.poppins(
-                          textStyle:
-                          TextStyle(fontSize: 18, color: Colors.black, fontWeight: FontWeight.w600)),
-                      decoration: InputDecoration(
-                        isDense: true,
-                        hintText: "Pilih menu",
-                        contentPadding: EdgeInsets.only(bottom: CustomSize.sizeHeight(context) / 86),
-                        hintStyle: GoogleFonts.poppins(
+                SizedBox(height: CustomSize.sizeHeight(context) / 86,),
+                Divider(
+                  thickness: 8,
+                  color: CustomColor.secondary,
+                ),
+                Padding(
+                  padding: EdgeInsets.symmetric(horizontal: CustomSize.sizeWidth(context) / 32),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      SizedBox(height: CustomSize.sizeHeight(context) / 48,),
+                      CustomText.bodyLight12(text: "Menu", sizeNew: double.parse(((MediaQuery.of(context).size.width*0.03).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.03)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.03)).toString())),
+                      SizedBox(
+                        height: CustomSize.sizeHeight(context) * 0.005,
+                      ),
+                      TextField(
+                        readOnly: true,
+                        controller: tipeMenu,
+                        keyboardType: TextInputType.text,
+                        cursorColor: Colors.black,
+                        style: GoogleFonts.poppins(
                             textStyle:
-                            TextStyle(fontSize: 14, color: Colors.grey)),
-                        helperStyle: GoogleFonts.poppins(
-                            textStyle: TextStyle(fontSize: 14)),
-                        enabledBorder: UnderlineInputBorder(),
-                        focusedBorder: UnderlineInputBorder(),
-                        suffixIcon: Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 8.0),
-                          child: GestureDetector(
-                            onTap: () async{
-                              Navigator.pushReplacement(
-                                  context,
-                                  PageTransition(
-                                      type: PageTransitionType.fade,
-                                      child: PilihMenuActivity()));
-                            },
-                            child: Stack(
-                              children: [
-                                Container(
-                                  width: CustomSize.sizeWidth(context) / 6,
-                                  decoration: BoxDecoration(
-                                    borderRadius: BorderRadius.circular(25),
-                                    border: Border.all(color: CustomColor.accent, width: 1),
-                                    // color: CustomColor.accentLight
-                                  ),
-                                  child: Padding(
-                                    padding: const EdgeInsets.all(2.0),
-                                    child: Center(
-                                      child: CustomText.textTitle8(
-                                          text: "Pilih",
-                                          color: CustomColor.accent
+                            TextStyle(fontSize: 18, color: Colors.black, fontWeight: FontWeight.w600)),
+                        decoration: InputDecoration(
+                          isDense: true,
+                          hintText: "Pilih menu",
+                          contentPadding: EdgeInsets.only(bottom: CustomSize.sizeHeight(context) / 86),
+                          hintStyle: GoogleFonts.poppins(
+                              textStyle:
+                              TextStyle(fontSize: 14, color: Colors.grey)),
+                          helperStyle: GoogleFonts.poppins(
+                              textStyle: TextStyle(fontSize: 14)),
+                          enabledBorder: UnderlineInputBorder(),
+                          focusedBorder: UnderlineInputBorder(),
+                          suffixIcon: Padding(
+                            padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                            child: GestureDetector(
+                              onTap: () async{
+                                Navigator.pushReplacement(
+                                    context,
+                                    PageTransition(
+                                        type: PageTransitionType.fade,
+                                        child: PilihMenuActivity()));
+                              },
+                              child: Stack(
+                                children: [
+                                  Container(
+                                    width: CustomSize.sizeWidth(context) / 6,
+                                    decoration: BoxDecoration(
+                                      borderRadius: BorderRadius.circular(25),
+                                      border: Border.all(color: CustomColor.accent, width: 1),
+                                      // color: CustomColor.accentLight
+                                    ),
+                                    child: Padding(
+                                      padding: const EdgeInsets.all(2.0),
+                                      child: Center(
+                                        child: CustomText.textTitle8(
+                                            text: "Pilih",
+                                            color: CustomColor.accent,
+                                            sizeNew: double.parse(((MediaQuery.of(context).size.width*0.035).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.035)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.035)).toString())
+                                        ),
                                       ),
                                     ),
                                   ),
-                                ),
-                              ],
+                                ],
+                              ),
                             ),
                           ),
                         ),
                       ),
-                    ),
-                    SizedBox(height: CustomSize.sizeHeight(context) / 48,),
-                    CustomText.bodyLight12(text: "Deskripsi Promo"),
-                    SizedBox(
-                      height: CustomSize.sizeHeight(context) * 0.005,
-                    ),
-                    TextField(
-                      controller: descPromo,
-                      keyboardType: TextInputType.text,
-                      cursorColor: Colors.black,
-                      style: GoogleFonts.poppins(
-                          textStyle:
-                          TextStyle(fontSize: 18, color: Colors.black, fontWeight: FontWeight.w600)),
-                      decoration: InputDecoration(
-                        isDense: true,
-                        hintText: "Isi deskripsi",
-                        contentPadding: EdgeInsets.only(bottom: CustomSize.sizeHeight(context) / 86),
-                        hintStyle: GoogleFonts.poppins(
-                            textStyle:
-                            TextStyle(fontSize: 14, color: Colors.grey)),
-                        helperStyle: GoogleFonts.poppins(
-                            textStyle: TextStyle(fontSize: 14)),
-                        enabledBorder: UnderlineInputBorder(),
-                        focusedBorder: UnderlineInputBorder(),
+                      SizedBox(height: CustomSize.sizeHeight(context) / 48,),
+                      CustomText.bodyLight12(text: "Deskripsi Promo", sizeNew: double.parse(((MediaQuery.of(context).size.width*0.03).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.03)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.03)).toString())),
+                      SizedBox(
+                        height: CustomSize.sizeHeight(context) * 0.005,
                       ),
-                    ),
-                    SizedBox(height: CustomSize.sizeHeight(context) / 48,),
-                    CustomText.bodyLight12(text: "Tipe Promo"),
-                    SizedBox(
-                      height: CustomSize.sizeHeight(context) * 0.005,
-                    ),
-                    TextField(
-                      readOnly: true,
-                      controller: typePromo,
-                      keyboardType: TextInputType.text,
-                      cursorColor: Colors.black,
-                      style: GoogleFonts.poppins(
-                          textStyle:
-                          TextStyle(fontSize: 18, color: Colors.black, fontWeight: FontWeight.w600)),
-                      decoration: InputDecoration(
-                        isDense: true,
-                        hintText: "Pilih tipe",
-                        contentPadding: EdgeInsets.only(bottom: CustomSize.sizeHeight(context) / 86),
-                        hintStyle: GoogleFonts.poppins(
+                      TextField(
+                        controller: descPromo,
+                        keyboardType: TextInputType.text,
+                        cursorColor: Colors.black,
+                        style: GoogleFonts.poppins(
                             textStyle:
-                            TextStyle(fontSize: 14, color: Colors.grey)),
-                        helperStyle: GoogleFonts.poppins(
-                            textStyle: TextStyle(fontSize: 14)),
-                        enabledBorder: UnderlineInputBorder(),
-                        focusedBorder: UnderlineInputBorder(),
-                        suffixIcon: Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 8.0),
-                          child: GestureDetector(
-                            onTap: () async{
-                              _showCuisineDialog();
-                            },
-                            child: Stack(
-                              children: [
-                                Container(
-                                  width: CustomSize.sizeWidth(context) / 6,
-                                  decoration: BoxDecoration(
-                                    borderRadius: BorderRadius.circular(25),
-                                    border: Border.all(color: CustomColor.accent, width: 1),
-                                    // color: CustomColor.accentLight
-                                  ),
-                                  child: Padding(
-                                    padding: const EdgeInsets.all(2.0),
-                                    child: Center(
-                                      child: CustomText.textTitle8(
-                                          text: "Pilih",
-                                          color: CustomColor.accent
+                            TextStyle(fontSize: 18, color: Colors.black, fontWeight: FontWeight.w600)),
+                        decoration: InputDecoration(
+                          isDense: true,
+                          hintText: "Isi deskripsi",
+                          contentPadding: EdgeInsets.only(bottom: CustomSize.sizeHeight(context) / 86),
+                          hintStyle: GoogleFonts.poppins(
+                              textStyle:
+                              TextStyle(fontSize: 14, color: Colors.grey)),
+                          helperStyle: GoogleFonts.poppins(
+                              textStyle: TextStyle(fontSize: 14)),
+                          enabledBorder: UnderlineInputBorder(),
+                          focusedBorder: UnderlineInputBorder(),
+                        ),
+                      ),
+                      SizedBox(height: CustomSize.sizeHeight(context) / 48,),
+                      CustomText.bodyLight12(text: "Tipe Promo", sizeNew: double.parse(((MediaQuery.of(context).size.width*0.03).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.03)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.03)).toString())),
+                      SizedBox(
+                        height: CustomSize.sizeHeight(context) * 0.005,
+                      ),
+                      TextField(
+                        readOnly: true,
+                        controller: typePromo,
+                        keyboardType: TextInputType.text,
+                        cursorColor: Colors.black,
+                        style: GoogleFonts.poppins(
+                            textStyle:
+                            TextStyle(fontSize: 18, color: Colors.black, fontWeight: FontWeight.w600)),
+                        decoration: InputDecoration(
+                          isDense: true,
+                          hintText: "Pilih tipe",
+                          contentPadding: EdgeInsets.only(bottom: CustomSize.sizeHeight(context) / 86),
+                          hintStyle: GoogleFonts.poppins(
+                              textStyle:
+                              TextStyle(fontSize: 14, color: Colors.grey)),
+                          helperStyle: GoogleFonts.poppins(
+                              textStyle: TextStyle(fontSize: 14)),
+                          enabledBorder: UnderlineInputBorder(),
+                          focusedBorder: UnderlineInputBorder(),
+                          suffixIcon: Padding(
+                            padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                            child: GestureDetector(
+                              onTap: () async{
+                                _showCuisineDialog();
+                              },
+                              child: Stack(
+                                children: [
+                                  Container(
+                                    width: CustomSize.sizeWidth(context) / 6,
+                                    decoration: BoxDecoration(
+                                      borderRadius: BorderRadius.circular(25),
+                                      border: Border.all(color: CustomColor.accent, width: 1),
+                                      // color: CustomColor.accentLight
+                                    ),
+                                    child: Padding(
+                                      padding: const EdgeInsets.all(2.0),
+                                      child: Center(
+                                        child: CustomText.textTitle8(
+                                            text: "Pilih",
+                                            color: CustomColor.accent,
+                                            sizeNew: double.parse(((MediaQuery.of(context).size.width*0.035).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.035)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.035)).toString())
+                                        ),
                                       ),
                                     ),
                                   ),
-                                ),
-                              ],
+                                ],
+                              ),
                             ),
                           ),
                         ),
                       ),
-                    ),
-                    SizedBox(height: CustomSize.sizeHeight(context) / 48,),
-                    CustomText.bodyLight12(text: (typePromo.text == 'diskon')?"Diskon Harga (sudah dalam bentuk %)":(typePromo.text == 'potongan')?"Potongan Harga (sudah dalam bentuk Rupiah)":"Potongan Ongkir (sudah dalam bentuk %)"),
-                    SizedBox(
-                      height: CustomSize.sizeHeight(context) * 0.005,
-                    ),
-                    TextField(
-                      inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-                      controller: percentPromo,
-                      keyboardType: TextInputType.number,
-                      cursorColor: Colors.black,
-                      style: GoogleFonts.poppins(
-                          textStyle:
-                          TextStyle(fontSize: 18, color: Colors.black, fontWeight: FontWeight.w600)),
-                      decoration: InputDecoration(
-                        hintText: (typePromo.text == 'diskon')?"Diskon 10 - 100 %":(typePromo.text == 'potongan')?"":"",
-                        isDense: true,
-                        contentPadding: EdgeInsets.only(bottom: CustomSize.sizeHeight(context) / 86),
-                        hintStyle: GoogleFonts.poppins(
-                            textStyle:
-                            TextStyle(fontSize: 14, color: Colors.grey)),
-                        helperStyle: GoogleFonts.poppins(
-                            textStyle: TextStyle(fontSize: 14)),
-                        enabledBorder: UnderlineInputBorder(),
-                        focusedBorder: UnderlineInputBorder(),
+                      SizedBox(height: CustomSize.sizeHeight(context) / 48,),
+                      CustomText.bodyLight12(text: (typePromo.text == 'diskon')?"Diskon Harga (sudah dalam bentuk %)":(typePromo.text == 'potongan')?"Potongan Harga (sudah dalam bentuk Rupiah)":"Potongan Ongkir (sudah dalam bentuk %)", sizeNew: double.parse(((MediaQuery.of(context).size.width*0.03).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.03)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.03)).toString())),
+                      SizedBox(
+                        height: CustomSize.sizeHeight(context) * 0.005,
                       ),
-                    ),
-                    SizedBox(height: CustomSize.sizeHeight(context) / 48,),
-                    CustomText.bodyLight12(text: "Tanggal Berakhir"),
-                    SizedBox(
-                      height: CustomSize.sizeHeight(context) * 0.005,
-                    ),
-                    TextField(
-                      readOnly: true,
-                      controller: _dateController,
-                      keyboardType: TextInputType.number,
-                      cursorColor: Colors.black,
-                      style: GoogleFonts.poppins(
-                          textStyle:
-                          TextStyle(fontSize: 18, color: Colors.black, fontWeight: FontWeight.w600)),
-                      decoration: InputDecoration(
-                        hintText: "Atur tanggal berakhir",
-                        isDense: true,
-                        contentPadding: EdgeInsets.only(bottom: CustomSize.sizeHeight(context) / 86),
-                        hintStyle: GoogleFonts.poppins(
+                      TextField(
+                        inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+                        controller: percentPromo,
+                        keyboardType: TextInputType.number,
+                        cursorColor: Colors.black,
+                        style: GoogleFonts.poppins(
                             textStyle:
-                            TextStyle(fontSize: 14, color: Colors.grey)),
-                        helperStyle: GoogleFonts.poppins(
-                            textStyle: TextStyle(fontSize: 14)),
-                        enabledBorder: UnderlineInputBorder(),
-                        focusedBorder: UnderlineInputBorder(),
-                        suffixIcon: Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 8.0),
-                          child: GestureDetector(
-                            onTap: () async{
-                              _selectDate(context);
-                            },
-                            child: Stack(
-                              children: [
-                                Container(
-                                  width: CustomSize.sizeWidth(context) / 4,
-                                  decoration: BoxDecoration(
-                                    borderRadius: BorderRadius.circular(25),
-                                    border: Border.all(color: CustomColor.accent, width: 1),
-                                    // color: CustomColor.accentLight
-                                  ),
-                                  child: Padding(
-                                    padding: const EdgeInsets.all(2.0),
-                                    child: Center(
-                                      child: CustomText.textTitle8(
-                                          text: "Pilih Tanggal",
-                                          color: CustomColor.accent
-                                      ),
-                                    ),
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                        ),
-                      ),
-                    ),
-                    SizedBox(height: CustomSize.sizeHeight(context) / 48,),
-                    CustomText.bodyLight12(text: "Jam Berakhir"),
-                    SizedBox(
-                      height: CustomSize.sizeHeight(context) * 0.005,
-                    ),
-                    TextField(
-                      readOnly: true,
-                      controller: _Jam,
-                      keyboardType: TextInputType.text,
-                      cursorColor: Colors.black,
-                      style: GoogleFonts.poppins(
-                          textStyle:
-                          TextStyle(fontSize: 18, color: Colors.black, fontWeight: FontWeight.w600)),
-                      decoration: InputDecoration(
-                          hintText: "Atur jam berakhir",
+                            TextStyle(fontSize: 18, color: Colors.black, fontWeight: FontWeight.w600)),
+                        decoration: InputDecoration(
+                          hintText: (typePromo.text == 'diskon')?"Diskon 10 - 100 %":(typePromo.text == 'potongan')?"":"",
                           isDense: true,
                           contentPadding: EdgeInsets.only(bottom: CustomSize.sizeHeight(context) / 86),
                           hintStyle: GoogleFonts.poppins(
@@ -747,110 +669,195 @@ class _AddPromoState extends State<AddPromo> {
                               textStyle: TextStyle(fontSize: 14)),
                           enabledBorder: UnderlineInputBorder(),
                           focusedBorder: UnderlineInputBorder(),
-                          suffixIcon: GestureDetector(
-                            onTap: () {
-                              setState(() {
-                                jam = TimeOfDay.now().replacing(minute: 30);
-                                print(_Jam);
-                                // print(cuisine.split(",")[0]);
-                              });
-                              Navigator.of(context).push(
-                                  showPicker(
-                                    is24HrFormat: true,
-                                    blurredBackground: true,
-                                    accentColor: Colors.blue[400],
-                                    context: context,
-                                    value: (jam != null)?jam:null,
-                                    onChange: onTimeOpenChanged,
-                                    minuteInterval: MinuteInterval.ONE,
-                                    disableHour: false,
-                                    disableMinute: false,
-                                    minMinute: 0,
-                                    maxMinute: 59,
-                                    cancelText: 'batal',
-                                    okText: 'simpan',
-                                    // Optional onChange to receive value as DateTime
-                                    onChangeDateTime: (DateTime dateTime) {
-                                      print(jam.hour.toString() + '.' + jam.minute.toString());
-                                      getBuka();
-                                    },
-                                  ));
-                            },
-                            // onTap: () async{
-                            //   Navigator.pushReplacement(context, PageTransition(type: PageTransitionType.fade, child: new AddViewResto()));
-                            // },
-                            child: Stack(
-                              children: [
-                                Container(
-                                  width: CustomSize.sizeWidth(context) / 6,
-                                  decoration: BoxDecoration(
-                                    borderRadius: BorderRadius.circular(25),
-                                    border: Border.all(color: CustomColor.accent, width: 1),
-                                    // color: CustomColor.accentLight
-                                  ),
-                                  child: Padding(
-                                    padding: const EdgeInsets.all(2.0),
-                                    child: Center(
-                                      child: CustomText.textTitle8(
-                                          text: "Atur",
-                                          color: CustomColor.accent
+                        ),
+                      ),
+                      SizedBox(height: CustomSize.sizeHeight(context) / 48,),
+                      CustomText.bodyLight12(text: "Tanggal Berakhir", sizeNew: double.parse(((MediaQuery.of(context).size.width*0.03).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.03)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.03)).toString())),
+                      SizedBox(
+                        height: CustomSize.sizeHeight(context) * 0.005,
+                      ),
+                      TextField(
+                        readOnly: true,
+                        controller: _dateController,
+                        keyboardType: TextInputType.number,
+                        cursorColor: Colors.black,
+                        style: GoogleFonts.poppins(
+                            textStyle:
+                            TextStyle(fontSize: 18, color: Colors.black, fontWeight: FontWeight.w600)),
+                        decoration: InputDecoration(
+                          hintText: "Atur tanggal berakhir",
+                          isDense: true,
+                          contentPadding: EdgeInsets.only(bottom: CustomSize.sizeHeight(context) / 86),
+                          hintStyle: GoogleFonts.poppins(
+                              textStyle:
+                              TextStyle(fontSize: 14, color: Colors.grey)),
+                          helperStyle: GoogleFonts.poppins(
+                              textStyle: TextStyle(fontSize: 14)),
+                          enabledBorder: UnderlineInputBorder(),
+                          focusedBorder: UnderlineInputBorder(),
+                          suffixIcon: Padding(
+                            padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                            child: GestureDetector(
+                              onTap: () async{
+                                _selectDate(context);
+                              },
+                              child: Stack(
+                                children: [
+                                  Container(
+                                    width: CustomSize.sizeWidth(context) / 4,
+                                    decoration: BoxDecoration(
+                                      borderRadius: BorderRadius.circular(25),
+                                      border: Border.all(color: CustomColor.accent, width: 1),
+                                      // color: CustomColor.accentLight
+                                    ),
+                                    child: Padding(
+                                      padding: const EdgeInsets.all(2.0),
+                                      child: Center(
+                                        child: CustomText.textTitle8(
+                                            text: "Pilih Tanggal",
+                                            color: CustomColor.accent,
+                                            sizeNew: double.parse(((MediaQuery.of(context).size.width*0.035).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.035)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.035)).toString())
+                                        ),
                                       ),
                                     ),
                                   ),
-                                ),
-                              ],
+                                ],
+                              ),
                             ),
-                          )
+                          ),
+                        ),
                       ),
-                    ),
-                  ],
+                      SizedBox(height: CustomSize.sizeHeight(context) / 48,),
+                      CustomText.bodyLight12(text: "Jam Berakhir", sizeNew: double.parse(((MediaQuery.of(context).size.width*0.03).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.03)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.03)).toString())),
+                      SizedBox(
+                        height: CustomSize.sizeHeight(context) * 0.005,
+                      ),
+                      TextField(
+                        readOnly: true,
+                        controller: _Jam,
+                        keyboardType: TextInputType.text,
+                        cursorColor: Colors.black,
+                        style: GoogleFonts.poppins(
+                            textStyle:
+                            TextStyle(fontSize: 18, color: Colors.black, fontWeight: FontWeight.w600)),
+                        decoration: InputDecoration(
+                            hintText: "Atur jam berakhir",
+                            isDense: true,
+                            contentPadding: EdgeInsets.only(bottom: CustomSize.sizeHeight(context) / 86),
+                            hintStyle: GoogleFonts.poppins(
+                                textStyle:
+                                TextStyle(fontSize: 14, color: Colors.grey)),
+                            helperStyle: GoogleFonts.poppins(
+                                textStyle: TextStyle(fontSize: 14)),
+                            enabledBorder: UnderlineInputBorder(),
+                            focusedBorder: UnderlineInputBorder(),
+                            suffixIcon: GestureDetector(
+                              onTap: () {
+                                setState(() {
+                                  jam = TimeOfDay.now().replacing(minute: 30);
+                                  print(_Jam);
+                                  // print(cuisine.split(",")[0]);
+                                });
+                                Navigator.of(context).push(
+                                    showPicker(
+                                      is24HrFormat: true,
+                                      blurredBackground: true,
+                                      accentColor: Colors.blue[400],
+                                      context: context,
+                                      value: (jam != null)?jam:null,
+                                      onChange: onTimeOpenChanged,
+                                      minuteInterval: MinuteInterval.ONE,
+                                      disableHour: false,
+                                      disableMinute: false,
+                                      minMinute: 0,
+                                      maxMinute: 59,
+                                      cancelText: 'batal',
+                                      okText: 'simpan',
+                                      // Optional onChange to receive value as DateTime
+                                      onChangeDateTime: (DateTime dateTime) {
+                                        print(jam.hour.toString() + '.' + jam.minute.toString());
+                                        getBuka();
+                                      },
+                                    ));
+                              },
+                              // onTap: () async{
+                              //   Navigator.pushReplacement(context, PageTransition(type: PageTransitionType.fade, child: new AddViewResto()));
+                              // },
+                              child: Stack(
+                                children: [
+                                  Container(
+                                    width: CustomSize.sizeWidth(context) / 6,
+                                    decoration: BoxDecoration(
+                                      borderRadius: BorderRadius.circular(25),
+                                      border: Border.all(color: CustomColor.accent, width: 1),
+                                      // color: CustomColor.accentLight
+                                    ),
+                                    child: Padding(
+                                      padding: const EdgeInsets.all(2.0),
+                                      child: Center(
+                                        child: CustomText.textTitle8(
+                                            text: "Atur",
+                                            color: CustomColor.accent,
+                                            sizeNew: double.parse(((MediaQuery.of(context).size.width*0.035).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.035)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.035)).toString())
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            )
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
-              ),
-              SizedBox(height: CustomSize.sizeHeight(context) / 8,),
-            ],
+                SizedBox(height: CustomSize.sizeHeight(context) / 8,),
+              ],
+            ),
           ),
         ),
-      ),
-      floatingActionButton:
-      GestureDetector(
-        onTap: () async{
-          setState(() {
-            isLoading = false;
-          });
-          if (tipeMenu.text != '' && descPromo.text != '' && percentPromo.text != '' && _dateController.text != '' && _Jam.text != '') {
-            AddPromo().whenComplete((){
-              _getKaryawan();
-              Navigator.pop(context);
-              Navigator.pushReplacement(context, PageTransition(type: PageTransitionType.fade, child: new PromoActivity()));
+        floatingActionButton:
+        GestureDetector(
+          onTap: () async{
+            setState(() {
+              isLoading = false;
             });
-          } else {
-            Fluttertoast.showToast(msg: 'Lengkapi data promo terlebih dahulu!');
-          }
-          // SharedPreferences pref = await SharedPreferences.getInstance();
-          // pref.setString("name", descPromo.text.toString());
-          // pref.setString("email", endPromo.text.toString());
-          // pref.setString("img", (image == null)?img:base64Encode(image.readAsBytesSync()).toString());
-          // pref.setString("gender", gender);
-          // pref.setString("tgl", tgl);
-          // pref.setString("notelp", percentPromo.text.toString());
-          // print(descPromo);
-          // print(percentPromo);
-          // print(endPromo);
-          // print(tipeMenu);
-          // print(deskMenu);
-          // print(base64Encode(image.readAsBytesSync()).toString());
-          // print(favorite);
-        },
-        child: Container(
-          width: CustomSize.sizeWidth(context) / 1.1,
-          height: CustomSize.sizeHeight(context) / 14,
-          decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(30),
-              color: CustomColor.accent
+            if (tipeMenu.text != '' && descPromo.text != '' && percentPromo.text != '' && _dateController.text != '' && _Jam.text != '') {
+              AddPromo().whenComplete((){
+                _getKaryawan();
+                Navigator.pop(context);
+                Navigator.pushReplacement(context, PageTransition(type: PageTransitionType.fade, child: new PromoActivity()));
+              });
+            } else {
+              Fluttertoast.showToast(msg: 'Lengkapi data promo terlebih dahulu!');
+            }
+            // SharedPreferences pref = await SharedPreferences.getInstance();
+            // pref.setString("name", descPromo.text.toString());
+            // pref.setString("email", endPromo.text.toString());
+            // pref.setString("img", (image == null)?img:base64Encode(image.readAsBytesSync()).toString());
+            // pref.setString("gender", gender);
+            // pref.setString("tgl", tgl);
+            // pref.setString("notelp", percentPromo.text.toString());
+            // print(descPromo);
+            // print(percentPromo);
+            // print(endPromo);
+            // print(tipeMenu);
+            // print(deskMenu);
+            // print(base64Encode(image.readAsBytesSync()).toString());
+            // print(favorite);
+          },
+          child: Container(
+            width: CustomSize.sizeWidth(context) / 1.1,
+            height: CustomSize.sizeHeight(context) / 14,
+            decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(30),
+                color: CustomColor.accent
+            ),
+            child: Center(child: CustomText.bodyRegular16(text: "Simpan", color: Colors.white, sizeNew: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.04)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.04)).toString()))),
           ),
-          child: Center(child: CustomText.bodyRegular16(text: "Simpan", color: Colors.white,)),
         ),
       ),
+      data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0),
     );
   }
 }

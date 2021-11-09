@@ -204,256 +204,259 @@ class _MejaActivityState extends State<MejaActivity> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-        body: SafeArea(
-          child: SingleChildScrollView(
-            controller: _scrollController,
-            child: Padding(
-              padding: EdgeInsets.symmetric(horizontal: CustomSize.sizeWidth(context) / 24),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  SizedBox(
-                    height: CustomSize.sizeHeight(context) / 32,
-                  ),
-                  CustomText.textHeading3(
-                      text: "Qr Code",
-                      color: CustomColor.primary,
-                      minSize: 18,
-                      maxLines: 1
-                  ),
-                  ListView.builder(
-                      shrinkWrap: true,
-                      controller: _scrollController,
-                      physics: NeverScrollableScrollPhysics(),
-                      itemCount: meja.length,
-                      itemBuilder: (_, index){
-                        // print(meja.length);
-                        return Padding(
-                          padding: EdgeInsets.only(top: CustomSize.sizeHeight(context) / 48),
-                          child: GestureDetector(
-                            onTap: () async{
-                              print(meja[index]);
-                              print(meja.length);
-                              showModalBottomSheet(
-                                  isScrollControlled: true,
-                                  shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.only(topLeft: Radius.circular(20), topRight: Radius.circular(20))
-                                  ),
-                                  context: context,
-                                  builder: (_){
-                                    return Column(
-                                      crossAxisAlignment: CrossAxisAlignment.start,
-                                      mainAxisSize: MainAxisSize.min,
-                                      children: [
-                                        SizedBox(height: CustomSize.sizeHeight(context) / 86,),
-                                        Padding(
-                                          padding: EdgeInsets.symmetric(horizontal: CustomSize.sizeWidth(context) / 2.4),
-                                          child: Divider(thickness: 4,),
-                                        ),
-                                        SizedBox(height: CustomSize.sizeHeight(context) / 52,),
-                                        Center(
-                                          child: Container(
-                                            width: CustomSize.sizeWidth(context) / 1.2,
-                                            height: CustomSize.sizeWidth(context) / 1.2,
-                                            child: QrImage(
-                                              data: meja[index].qr.toString(),
-                                              version: QrVersions.auto,
-                                              // size: 200.0,
-                                            ),
-                                            // decoration: BoxDecoration(
-                                            //   image: DecorationImage(
-                                            //       image: NetworkImage(Links.subUrl + categoryMenu[categoryMenu.indexWhere((v) => v.name == nameCategory)].menu[index].urlImg),
-                                            //       fit: BoxFit.cover
-                                            //   ),
-                                            //   borderRadius: BorderRadius.circular(10),
-                                            // ),
+    return MediaQuery(
+      child: Scaffold(
+          body: SafeArea(
+            child: SingleChildScrollView(
+              controller: _scrollController,
+              child: Padding(
+                padding: EdgeInsets.symmetric(horizontal: CustomSize.sizeWidth(context) / 24),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    SizedBox(
+                      height: CustomSize.sizeHeight(context) / 32,
+                    ),
+                    CustomText.textHeading3(
+                        text: "Qr Code",
+                        color: CustomColor.primary,
+                        sizeNew: double.parse(((MediaQuery.of(context).size.width*0.045).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.045)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.045)).toString()),
+                        maxLines: 1
+                    ),
+                    ListView.builder(
+                        shrinkWrap: true,
+                        controller: _scrollController,
+                        physics: NeverScrollableScrollPhysics(),
+                        itemCount: meja.length,
+                        itemBuilder: (_, index){
+                          // print(meja.length);
+                          return Padding(
+                            padding: EdgeInsets.only(top: CustomSize.sizeHeight(context) / 48),
+                            child: GestureDetector(
+                              onTap: () async{
+                                print(meja[index]);
+                                print(meja.length);
+                                showModalBottomSheet(
+                                    isScrollControlled: true,
+                                    shape: RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.only(topLeft: Radius.circular(20), topRight: Radius.circular(20))
+                                    ),
+                                    context: context,
+                                    builder: (_){
+                                      return Column(
+                                        crossAxisAlignment: CrossAxisAlignment.start,
+                                        mainAxisSize: MainAxisSize.min,
+                                        children: [
+                                          SizedBox(height: CustomSize.sizeHeight(context) / 86,),
+                                          Padding(
+                                            padding: EdgeInsets.symmetric(horizontal: CustomSize.sizeWidth(context) / 2.4),
+                                            child: Divider(thickness: 4,),
                                           ),
-                                        ),
-                                        // SizedBox(height: CustomSize.sizeHeight(context) / 32,),
-                                        // Padding(
-                                        //   padding: EdgeInsets.symmetric(horizontal: CustomSize.sizeHeight(context) / 20),
-                                        //   child: Column(
-                                        //     crossAxisAlignment: CrossAxisAlignment.start,
-                                        //     children: [
-                                        //       CustomText.textHeading5(
-                                        //           text: "Meja "+meja[index].name,
-                                        //           minSize: 18,
-                                        //           maxLines: 1
-                                        //       ),
-                                        //     ],
-                                        //   ),
-                                        // ),
-                                        SizedBox(height: CustomSize.sizeHeight(context) / 52,),
-                                        (int.parse(meja[index].name) == meja.length)?Center(
-                                          child: Container(
-                                            width: CustomSize.sizeWidth(context) / 1.1,
-                                            height: CustomSize.sizeHeight(context) / 14,
-                                            child: Row(
-                                              mainAxisAlignment: MainAxisAlignment.spaceAround,
-                                              children: [
-                                                GestureDetector(
-                                                  onTap: (){
-                                                    _delMeja(meja[index].id.toString());
-                                                    // Navigator.pop(context);
-                                                    // Navigator.pushReplacement(context, PageTransition(type: PageTransitionType.fade, child: new MejaActivity()));
-                                                  },
-                                                  child: Center(
-                                                    child: Container(
-                                                      width: CustomSize.sizeWidth(context) / 1.1,
-                                                      height: CustomSize.sizeHeight(context) / 14,
-                                                      decoration: BoxDecoration(
-                                                          color: CustomColor.redBtn,
-                                                          borderRadius: BorderRadius.circular(50)
-                                                      ),
-                                                      child: Center(
-                                                        child: Padding(
-                                                          padding: const EdgeInsets.symmetric(horizontal: 20.0),
-                                                          child: Column(
-                                                            mainAxisAlignment: MainAxisAlignment.center,
-                                                            crossAxisAlignment: CrossAxisAlignment.center,
-                                                            children: [
-                                                              CustomText.textHeading7(text: "Hapus Meja", color: Colors.white),
-                                                              // CustomText.textHeading7(text: "Meja", color: Colors.white),
-                                                            ],
+                                          SizedBox(height: CustomSize.sizeHeight(context) / 52,),
+                                          Center(
+                                            child: Container(
+                                              width: CustomSize.sizeWidth(context) / 1.2,
+                                              height: CustomSize.sizeWidth(context) / 1.2,
+                                              child: QrImage(
+                                                data: meja[index].qr.toString(),
+                                                version: QrVersions.auto,
+                                                // size: 200.0,
+                                              ),
+                                              // decoration: BoxDecoration(
+                                              //   image: DecorationImage(
+                                              //       image: NetworkImage(Links.subUrl + categoryMenu[categoryMenu.indexWhere((v) => v.name == nameCategory)].menu[index].urlImg),
+                                              //       fit: BoxFit.cover
+                                              //   ),
+                                              //   borderRadius: BorderRadius.circular(10),
+                                              // ),
+                                            ),
+                                          ),
+                                          // SizedBox(height: CustomSize.sizeHeight(context) / 32,),
+                                          // Padding(
+                                          //   padding: EdgeInsets.symmetric(horizontal: CustomSize.sizeHeight(context) / 20),
+                                          //   child: Column(
+                                          //     crossAxisAlignment: CrossAxisAlignment.start,
+                                          //     children: [
+                                          //       CustomText.textHeading5(
+                                          //           text: "Meja "+meja[index].name,
+                                          //           minSize: 18,
+                                          //           maxLines: 1
+                                          //       ),
+                                          //     ],
+                                          //   ),
+                                          // ),
+                                          SizedBox(height: CustomSize.sizeHeight(context) / 52,),
+                                          (int.parse(meja[index].name) == meja.length)?Center(
+                                            child: Container(
+                                              width: CustomSize.sizeWidth(context) / 1.1,
+                                              height: CustomSize.sizeHeight(context) / 14,
+                                              child: Row(
+                                                mainAxisAlignment: MainAxisAlignment.spaceAround,
+                                                children: [
+                                                  GestureDetector(
+                                                    onTap: (){
+                                                      _delMeja(meja[index].id.toString());
+                                                      // Navigator.pop(context);
+                                                      // Navigator.pushReplacement(context, PageTransition(type: PageTransitionType.fade, child: new MejaActivity()));
+                                                    },
+                                                    child: Center(
+                                                      child: Container(
+                                                        width: CustomSize.sizeWidth(context) / 1.1,
+                                                        height: CustomSize.sizeHeight(context) / 14,
+                                                        decoration: BoxDecoration(
+                                                            color: CustomColor.redBtn,
+                                                            borderRadius: BorderRadius.circular(50)
+                                                        ),
+                                                        child: Center(
+                                                          child: Padding(
+                                                            padding: const EdgeInsets.symmetric(horizontal: 20.0),
+                                                            child: Column(
+                                                              mainAxisAlignment: MainAxisAlignment.center,
+                                                              crossAxisAlignment: CrossAxisAlignment.center,
+                                                              children: [
+                                                                CustomText.textHeading7(text: "Hapus Meja", color: Colors.white, sizeNew: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.04)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.04)).toString())),
+                                                                // CustomText.textHeading7(text: "Meja", color: Colors.white),
+                                                              ],
+                                                            ),
                                                           ),
                                                         ),
                                                       ),
                                                     ),
                                                   ),
-                                                ),
-                                              ],
+                                                ],
+                                              ),
                                             ),
-                                          ),
-                                        ):Container(),
-                                        SizedBox(height: CustomSize.sizeHeight(context) / 86,),
-                                      ],
-                                    );
-                                  }
-                              );
-                            },
-                            child: Container(
-                              width: CustomSize.sizeWidth(context),
-                              height: CustomSize.sizeWidth(context) / 5.4,
-                              decoration: BoxDecoration(
-                                color: Colors.white,
-                                borderRadius: BorderRadius.circular(20),
-                                boxShadow: [
-                                  BoxShadow(
-                                    color: Colors.grey.withOpacity(0.5),
-                                    spreadRadius: 0,
-                                    blurRadius: 7,
-                                    offset: Offset(0, 0), // changes position of shadow
-                                  ),
-                                ],
-                              ),
-                              child: Row(
-                                children: [
-                                  SizedBox(
-                                    width: CustomSize.sizeWidth(context) / 32,
-                                  ),
-                                  Container(
-                                    width: CustomSize.sizeWidth(context) / 1.2,
-                                    child: Column(
-                                      mainAxisAlignment: MainAxisAlignment.center,
-                                      crossAxisAlignment: CrossAxisAlignment.start,
-                                      children: [
-                                        Row(
-                                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                          children: [
-                                            CustomText.textHeading4(
-                                                text: "Meja "+meja[index].name.toString(),
-                                                minSize: 18,
-                                                maxLines: 1
-                                            ),
-                                            // Row(
-                                            //   children: [
-                                            //     GestureDetector(
-                                            //       onTap: () async{
-                                            //         showAlertDialog(meja[index].id.toString());
-                                            //         },
-                                            //         child: Icon(Icons.delete, color: CustomColor.redBtn, size: 20,)
-                                            //     ),
-                                            //     // GestureDetector(
-                                            //     //   onTap: () async{
-                                            //     //     await launch(meja[index].url);
-                                            //     //     },
-                                            //     //     child: Icon(FontAwesome.download, color: CustomColor.primary, size: 20,)
-                                            //     // ),
-                                            //   ],
-                                            // ),
-                                          ],
-                                        ),
-                                        SizedBox(
-                                          width: CustomSize.sizeWidth(context) / 32,
-                                        ),
-                                      ],
+                                          ):Container(),
+                                          SizedBox(height: CustomSize.sizeHeight(context) / 86,),
+                                        ],
+                                      );
+                                    }
+                                );
+                              },
+                              child: Container(
+                                width: CustomSize.sizeWidth(context),
+                                height: CustomSize.sizeWidth(context) / 5.4,
+                                decoration: BoxDecoration(
+                                  color: Colors.white,
+                                  borderRadius: BorderRadius.circular(20),
+                                  boxShadow: [
+                                    BoxShadow(
+                                      color: Colors.grey.withOpacity(0.5),
+                                      spreadRadius: 0,
+                                      blurRadius: 7,
+                                      offset: Offset(0, 0), // changes position of shadow
                                     ),
-                                  )
-                                ],
+                                  ],
+                                ),
+                                child: Row(
+                                  children: [
+                                    SizedBox(
+                                      width: CustomSize.sizeWidth(context) / 32,
+                                    ),
+                                    Container(
+                                      width: CustomSize.sizeWidth(context) / 1.2,
+                                      child: Column(
+                                        mainAxisAlignment: MainAxisAlignment.center,
+                                        crossAxisAlignment: CrossAxisAlignment.start,
+                                        children: [
+                                          Row(
+                                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                            children: [
+                                              CustomText.textHeading4(
+                                                  text: "Meja "+meja[index].name.toString(),
+                                                  sizeNew: double.parse(((MediaQuery.of(context).size.width*0.045).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.045)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.045)).toString()),
+                                                  maxLines: 1
+                                              ),
+                                              // Row(
+                                              //   children: [
+                                              //     GestureDetector(
+                                              //       onTap: () async{
+                                              //         showAlertDialog(meja[index].id.toString());
+                                              //         },
+                                              //         child: Icon(Icons.delete, color: CustomColor.redBtn, size: 20,)
+                                              //     ),
+                                              //     // GestureDetector(
+                                              //     //   onTap: () async{
+                                              //     //     await launch(meja[index].url);
+                                              //     //     },
+                                              //     //     child: Icon(FontAwesome.download, color: CustomColor.primary, size: 20,)
+                                              //     // ),
+                                              //   ],
+                                              // ),
+                                            ],
+                                          ),
+                                          SizedBox(
+                                            width: CustomSize.sizeWidth(context) / 32,
+                                          ),
+                                        ],
+                                      ),
+                                    )
+                                  ],
+                                ),
                               ),
                             ),
-                          ),
-                        );
-                      }
-                  ),
-                  SizedBox(height: CustomSize.sizeHeight(context) / 48,)
-                ],
+                          );
+                        }
+                    ),
+                    SizedBox(height: CustomSize.sizeHeight(context) / 48,)
+                  ],
+                ),
               ),
             ),
           ),
-        ),
-        floatingActionButton: Column(
-          crossAxisAlignment: CrossAxisAlignment.end,
-          mainAxisAlignment: MainAxisAlignment.end,
-          children: [
-            GestureDetector(
-              onTap: () async{
-                launch(downloadAll);
-              },
-              child: Container(
-                width: CustomSize.sizeWidth(context) / 6.6,
-                height: CustomSize.sizeWidth(context) / 6.6,
-                decoration: BoxDecoration(
-                    color: CustomColor.accent,
-                    shape: BoxShape.circle
+          floatingActionButton: Column(
+            crossAxisAlignment: CrossAxisAlignment.end,
+            mainAxisAlignment: MainAxisAlignment.end,
+            children: [
+              GestureDetector(
+                onTap: () async{
+                  launch(downloadAll);
+                },
+                child: Container(
+                  width: CustomSize.sizeWidth(context) / 6.6,
+                  height: CustomSize.sizeWidth(context) / 6.6,
+                  decoration: BoxDecoration(
+                      color: CustomColor.accent,
+                      shape: BoxShape.circle
+                  ),
+                  child: Center(child: Icon(FontAwesome.download, color: Colors.white, size: 29,)),
                 ),
-                child: Center(child: Icon(FontAwesome.download, color: Colors.white, size: 29,)),
               ),
-            ),
-            SizedBox(height: CustomSize.sizeHeight(context) / 72,),
-            GestureDetector(
-              onTap: (){
-                // Navigator.push(
-                //     context,
-                //     PageTransition(
-                //         type: PageTransitionType.rightToLeft,
-                //         child: AddMenu()));
-                if (meja.length == 100) {
-                  Fluttertoast.showToast(
-                      msg: "Meja terlalu banyak",
-                      backgroundColor: Colors.grey,
-                      textColor: Colors.black,
-                      fontSize: 16.0
-                  );
-                } else {
-                  AddMeja();
-                  Fluttertoast.showToast(
-                    msg: "Tunggu sebentar.",);
-                }
-              },
-              child: Container(
-                width: CustomSize.sizeWidth(context) / 6.6,
-                height: CustomSize.sizeWidth(context) / 6.6,
-                decoration: BoxDecoration(
-                    color: CustomColor.primaryLight,
-                    shape: BoxShape.circle
+              SizedBox(height: CustomSize.sizeHeight(context) / 72,),
+              GestureDetector(
+                onTap: (){
+                  // Navigator.push(
+                  //     context,
+                  //     PageTransition(
+                  //         type: PageTransitionType.rightToLeft,
+                  //         child: AddMenu()));
+                  if (meja.length == 100) {
+                    Fluttertoast.showToast(
+                        msg: "Meja terlalu banyak",
+                        backgroundColor: Colors.grey,
+                        textColor: Colors.black,
+                        fontSize: 16.0
+                    );
+                  } else {
+                    AddMeja();
+                    Fluttertoast.showToast(
+                      msg: "Tunggu sebentar.",);
+                  }
+                },
+                child: Container(
+                  width: CustomSize.sizeWidth(context) / 6.6,
+                  height: CustomSize.sizeWidth(context) / 6.6,
+                  decoration: BoxDecoration(
+                      color: CustomColor.primaryLight,
+                      shape: BoxShape.circle
+                  ),
+                  child: Center(child: Icon(FontAwesome.plus, color: Colors.white, size: 29,)),
                 ),
-                child: Center(child: Icon(FontAwesome.plus, color: Colors.white, size: 29,)),
               ),
-            ),
-          ],
-        ),
+            ],
+          ),
+      ),
+      data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0),
     );
   }
 }

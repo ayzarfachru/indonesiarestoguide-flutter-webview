@@ -436,117 +436,120 @@ class _TerdekatActivityState extends State<TerdekatActivity> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: SafeArea(
-        child: (isLoading)?Container(
-            width: CustomSize.sizeWidth(context),
-            height: CustomSize.sizeHeight(context),
-            child: Center(child: CircularProgressIndicator(
+    return MediaQuery(
+      child: Scaffold(
+        body: SafeArea(
+          child: (isLoading)?Container(
+              width: CustomSize.sizeWidth(context),
+              height: CustomSize.sizeHeight(context),
+              child: Center(child: CircularProgressIndicator(
+                color: CustomColor.primaryLight,
+              ))):SmartRefresher(
+            enablePullDown: true,
+            enablePullUp: false,
+            header: WaterDropMaterialHeader(
+              distance: 30,
+              backgroundColor: Colors.white,
               color: CustomColor.primaryLight,
-            ))):SmartRefresher(
-          enablePullDown: true,
-          enablePullUp: false,
-          header: WaterDropMaterialHeader(
-            distance: 30,
-            backgroundColor: Colors.white,
-            color: CustomColor.primaryLight,
-          ),
-          controller: _refreshController,
-          onRefresh: _onRefresh,
-          onLoading: _onLoading,
-          child: SingleChildScrollView(
-            controller: _scrollController,
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                SizedBox(
-                  height: CustomSize.sizeHeight(context) / 32,
-                ),
-                Padding(
-                  padding: EdgeInsets.symmetric(horizontal: CustomSize.sizeWidth(context) / 24),
-                  child: CustomText.textHeading3(
-                      text: "Resto Dekat Sini",
-                      color: CustomColor.primary,
-                      minSize: 18,
-                      maxLines: 1
+            ),
+            controller: _refreshController,
+            onRefresh: _onRefresh,
+            onLoading: _onLoading,
+            child: SingleChildScrollView(
+              controller: _scrollController,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  SizedBox(
+                    height: CustomSize.sizeHeight(context) / 32,
                   ),
-                ),
-                SizedBox(
-                  height: CustomSize.sizeHeight(context) / 62,
-                ),
-                StaggeredGridView.countBuilder(
-                  staggeredTileBuilder: (index) {
-                    return StaggeredTile.count(1, 1.2);
-                  },
-                  crossAxisCount: 2,
-                  controller: _scrollController,
-                  physics: NeverScrollableScrollPhysics(),
-                  shrinkWrap: true,
-                  itemCount: resto.length,
-                  itemBuilder: (_, index){
-                    return Padding(
-                      padding: EdgeInsets.all(CustomSize.sizeWidth(context) / 48),
-                      child: GestureDetector(
-                        onTap: (){
-                          Navigator.push(
-                              context,
-                              PageTransition(
-                                  type: PageTransitionType.rightToLeft,
-                                  child: new DetailResto(resto[index].id.toString())));
-                        },
-                        child: Container(
-                          width: CustomSize.sizeWidth(context) / 2.3,
-                          height: CustomSize.sizeHeight(context) / 3,
-                          decoration: BoxDecoration(
-                            color: Colors.white,
-                            borderRadius: BorderRadius.circular(20),
-                            boxShadow: [
-                              BoxShadow(
-                                color: Colors.grey.withOpacity(0.5),
-                                spreadRadius: 0,
-                                blurRadius: 4,
-                                offset: Offset(0, 3), // changes position of shadow
-                              ),
-                            ],
-                          ),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Container(
-                                width: CustomSize.sizeWidth(context),
-                                height: CustomSize.sizeHeight(context) / 5.8,
-                                decoration: (resto[index].img != null)?BoxDecoration(
-                                  image: DecorationImage(
-                                      image: NetworkImage(Links.subUrl + resto[index].img!),
-                                      fit: BoxFit.cover
-                                  ),
-                                  borderRadius: BorderRadius.circular(20),
-                                ):BoxDecoration(
-                                    color: CustomColor.primaryLight
+                  Padding(
+                    padding: EdgeInsets.symmetric(horizontal: CustomSize.sizeWidth(context) / 24),
+                    child: CustomText.textHeading3(
+                        text: "Resto Dekat Sini",
+                        color: CustomColor.primary,
+                        sizeNew: double.parse(((MediaQuery.of(context).size.width*0.045).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.045).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.045).toString()),
+                        maxLines: 1
+                    ),
+                  ),
+                  SizedBox(
+                    height: CustomSize.sizeHeight(context) / 62,
+                  ),
+                  StaggeredGridView.countBuilder(
+                    staggeredTileBuilder: (index) {
+                      return StaggeredTile.count(1, 1.2);
+                    },
+                    crossAxisCount: 2,
+                    controller: _scrollController,
+                    physics: NeverScrollableScrollPhysics(),
+                    shrinkWrap: true,
+                    itemCount: resto.length,
+                    itemBuilder: (_, index){
+                      return Padding(
+                        padding: EdgeInsets.all(CustomSize.sizeWidth(context) / 48),
+                        child: GestureDetector(
+                          onTap: (){
+                            Navigator.push(
+                                context,
+                                PageTransition(
+                                    type: PageTransitionType.rightToLeft,
+                                    child: new DetailResto(resto[index].id.toString())));
+                          },
+                          child: Container(
+                            width: CustomSize.sizeWidth(context) / 2.3,
+                            height: CustomSize.sizeHeight(context) / 3,
+                            decoration: BoxDecoration(
+                              color: Colors.white,
+                              borderRadius: BorderRadius.circular(20),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: Colors.grey.withOpacity(0.5),
+                                  spreadRadius: 0,
+                                  blurRadius: 4,
+                                  offset: Offset(0, 3), // changes position of shadow
                                 ),
-                              ),
-                              SizedBox(height: CustomSize.sizeHeight(context) / 86,),
-                              Padding(
-                                padding: EdgeInsets.only(left: CustomSize.sizeWidth(context) / 24),
-                                child: CustomText.bodyRegular14(text: resto[index].distance.toString() + " Km"),
-                              ),
-                              Padding(
-                                padding: EdgeInsets.only(left: CustomSize.sizeWidth(context) / 24),
-                                child: CustomText.bodyMedium16(text: resto[index].name),
-                              ),
-                            ],
+                              ],
+                            ),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Container(
+                                  width: CustomSize.sizeWidth(context),
+                                  height: CustomSize.sizeHeight(context) / 5.8,
+                                  decoration: (resto[index].img != null)?BoxDecoration(
+                                    image: DecorationImage(
+                                        image: NetworkImage(Links.subUrl + resto[index].img!),
+                                        fit: BoxFit.cover
+                                    ),
+                                    borderRadius: BorderRadius.circular(20),
+                                  ):BoxDecoration(
+                                      color: CustomColor.primaryLight
+                                  ),
+                                ),
+                                SizedBox(height: CustomSize.sizeHeight(context) / 86,),
+                                Padding(
+                                  padding: EdgeInsets.only(left: CustomSize.sizeWidth(context) / 24),
+                                  child: CustomText.bodyRegular14(text: resto[index].distance.toString() + " Km"),
+                                ),
+                                Padding(
+                                  padding: EdgeInsets.only(left: CustomSize.sizeWidth(context) / 24),
+                                  child: CustomText.bodyMedium16(text: resto[index].name),
+                                ),
+                              ],
+                            ),
                           ),
                         ),
-                      ),
-                    );
-                  },
-                )
-              ],
+                      );
+                    },
+                  )
+                ],
+              ),
             ),
           ),
         ),
       ),
+      data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0),
     );
   }
 }

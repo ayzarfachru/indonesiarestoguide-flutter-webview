@@ -144,8 +144,8 @@ class _EmployeesActivityState extends State<EmployeesActivity> {
 
     // set up the AlertDialog
     AlertDialog alert = AlertDialog(
-      title: Text("Hapus Pegawai"),
-      content: Text("Apakah anda yakin ingin menghapus data ini?"),
+      title: MediaQuery(child: Text("Hapus Pegawai"), data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0),),
+      content: MediaQuery(child: Text("Apakah anda yakin ingin menghapus data ini?"), data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0),),
       actions: [
         cancelButton,
         continueButton,
@@ -176,196 +176,199 @@ class _EmployeesActivityState extends State<EmployeesActivity> {
   }
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Colors.white,
-      body: SafeArea(
-        child: (isLoading)?Container(
-            width: CustomSize.sizeWidth(context),
-            height: CustomSize.sizeHeight(context),
-            child: Center(child: CircularProgressIndicator(
+    return MediaQuery(
+      child: Scaffold(
+        backgroundColor: Colors.white,
+        body: SafeArea(
+          child: (isLoading)?Container(
+              width: CustomSize.sizeWidth(context),
+              height: CustomSize.sizeHeight(context),
+              child: Center(child: CircularProgressIndicator(
+                color: CustomColor.primaryLight,
+              ))):SmartRefresher(
+            enablePullDown: true,
+            enablePullUp: false,
+            header: WaterDropMaterialHeader(
+              distance: 30,
+              backgroundColor: Colors.white,
               color: CustomColor.primaryLight,
-            ))):SmartRefresher(
-          enablePullDown: true,
-          enablePullUp: false,
-          header: WaterDropMaterialHeader(
-            distance: 30,
-            backgroundColor: Colors.white,
-            color: CustomColor.primaryLight,
-          ),
-          controller: _refreshController,
-          onRefresh: _onRefresh,
-          onLoading: _onLoading,
-          child: SingleChildScrollView(
-            controller: _scrollController,
-            child: (kosong.toString() != 'true')?Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                SizedBox(
-                  height: CustomSize.sizeHeight(context) / 32,
-                  child: Container(
-                    color: Colors.white,
-                  ),
-                ),
-                Container(
-                  width: CustomSize.sizeWidth(context),
-                  color: Colors.white,
-                  child: Padding(
-                    padding: EdgeInsets.symmetric(horizontal: CustomSize.sizeWidth(context) / 24),
-                    child: (homepg != "1")?CustomText.textHeading3(
-                        text: "Riwayat",
-                        minSize: 18,
-                        maxLines: 1
-                    ):CustomText.textHeading3(
-                        text: "Data Pegawai",
-                        color: CustomColor.primary,
-                        minSize: 18,
-                        maxLines: 1
-                    ),
-                  ),
-                ),
-                SizedBox(height: CustomSize.sizeHeight(context) / 54,),
-                ListView.builder(
-                    shrinkWrap: true,
-                    controller: _scrollController,
-                    physics: NeverScrollableScrollPhysics(),
-                    itemCount: user.length,
-                    itemBuilder: (_, index){
-                      return Padding(
-                        padding: EdgeInsets.symmetric(horizontal: CustomSize.sizeWidth(context) / 28),
-                        child: GestureDetector(
-                          // onTap: (){
-                          //   Navigator.push(context, PageTransition(type: PageTransitionType.rightToLeft, child: new DetailHistory(history[index].id)));
-                          // },
-                          child: Container(
-                            width: CustomSize.sizeWidth(context),
-                            height: CustomSize.sizeHeight(context) / 7.5,
-                            color: Colors.white,
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              crossAxisAlignment: CrossAxisAlignment.center,
-                              children: [
-                                Row(
-                                  children: [
-                                    Container(
-                                      width: CustomSize.sizeWidth(context) / 6,
-                                      height: CustomSize.sizeWidth(context) / 6,
-                                      decoration: (user[index].img == "/".substring(0, 1))?BoxDecoration(
-                                          color: CustomColor.primaryLight,
-                                          shape: BoxShape.circle
-                                      ):BoxDecoration(
-                                        shape: BoxShape.circle,
-                                        image: new DecorationImage(
-                                            image: (user[index].img != null)?NetworkImage(Links.subUrl +
-                                                user[index].img!):AssetImage('assets/default.png') as ImageProvider,
-                                            fit: BoxFit.cover
-                                        ),
-                                      ),
-                                      child: (user[index].img == "/".substring(0, 1))?Center(
-                                        child: CustomText.text(
-                                            size: 38,
-                                            weight: FontWeight.w800,
-                                            // text: initial,
-                                            color: Colors.white
-                                        ),
-                                      ):Container(),
-                                    ),
-                                    SizedBox(width: CustomSize.sizeWidth(context) / 32,),
-                                    Container(
-                                      width: CustomSize.sizeWidth(context) / 1.6,
-                                      child: Column(
-                                        crossAxisAlignment: CrossAxisAlignment.start,
-                                        mainAxisAlignment: MainAxisAlignment.center,
-                                        children: [
-                                          CustomText.textHeading4(
-                                              text: user[index].name,
-                                              maxLines: 1,
-                                              minSize: 18
-                                          ),
-                                          CustomText.bodyLight16(text: user[index].email, maxLines: 1, minSize: 12),
-                                        ],
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                                Padding(
-                                  padding: const EdgeInsets.only(right: 8.0),
-                                  child: GestureDetector(
-                                      onTap: () async{
-                                        setState(() {
-                                          showAlertDialog(user[index].id.toString());
-                                        });
-                                      },
-                                      child: Icon(Icons.delete, color: CustomColor.redBtn,)
-                                  ),
-                                )
-                              ],
-                            ),
-                          ),
-                        ),
-                      );
-                    }
-                ),
-                SizedBox(height: CustomSize.sizeHeight(context) / 48,)
-              ],
-            ):Stack(
-              children: [
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    SizedBox(
-                      height: CustomSize.sizeHeight(context) / 32,
-                    ),
-                    Container(
-                      width: CustomSize.sizeWidth(context),
+            ),
+            controller: _refreshController,
+            onRefresh: _onRefresh,
+            onLoading: _onLoading,
+            child: SingleChildScrollView(
+              controller: _scrollController,
+              child: (kosong.toString() != 'true')?Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  SizedBox(
+                    height: CustomSize.sizeHeight(context) / 32,
+                    child: Container(
                       color: Colors.white,
-                      child: Padding(
-                        padding: EdgeInsets.symmetric(horizontal: CustomSize.sizeWidth(context) / 24),
-                        child: (homepg != "1")?CustomText.textHeading3(
-                            text: "Riwayat",
-                            minSize: 18,
-                            maxLines: 1
-                        ):CustomText.textHeading3(
-                            text: "Data Pegawai",
-                            color: CustomColor.primary,
-                            minSize: 18,
-                            maxLines: 1
-                        ),
+                    ),
+                  ),
+                  Container(
+                    width: CustomSize.sizeWidth(context),
+                    color: Colors.white,
+                    child: Padding(
+                      padding: EdgeInsets.symmetric(horizontal: CustomSize.sizeWidth(context) / 24),
+                      child: (homepg != "1")?CustomText.textHeading3(
+                          text: "Riwayat",
+                          sizeNew: double.parse(((MediaQuery.of(context).size.width*0.06).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.06).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.06).toString()),
+                          maxLines: 1
+                      ):CustomText.textHeading3(
+                          text: "Data Pegawai",
+                          color: CustomColor.primary,
+                          sizeNew: double.parse(((MediaQuery.of(context).size.width*0.045).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.045)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.045)).toString()),
+                          maxLines: 1
                       ),
                     ),
-                    (user.toString() != '[]')?SizedBox(height: CustomSize.sizeHeight(context) / 48,):Container()
-                  ],
-                ),
-                Container(height: CustomSize.sizeHeight(context), child: Center(
-                  child: CustomText.bodyRegular14(
-                      text: 'Pegawai kosong.',
-                      maxLines: 1,
-                      minSize: 12,
-                      color: Colors.grey
                   ),
-                ),),
-              ],
+                  SizedBox(height: CustomSize.sizeHeight(context) / 54,),
+                  ListView.builder(
+                      shrinkWrap: true,
+                      controller: _scrollController,
+                      physics: NeverScrollableScrollPhysics(),
+                      itemCount: user.length,
+                      itemBuilder: (_, index){
+                        return Padding(
+                          padding: EdgeInsets.symmetric(horizontal: CustomSize.sizeWidth(context) / 28),
+                          child: GestureDetector(
+                            // onTap: (){
+                            //   Navigator.push(context, PageTransition(type: PageTransitionType.rightToLeft, child: new DetailHistory(history[index].id)));
+                            // },
+                            child: Container(
+                              width: CustomSize.sizeWidth(context),
+                              height: CustomSize.sizeHeight(context) / 7.5,
+                              color: Colors.white,
+                              child: Row(
+                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                crossAxisAlignment: CrossAxisAlignment.center,
+                                children: [
+                                  Row(
+                                    children: [
+                                      Container(
+                                        width: CustomSize.sizeWidth(context) / 6,
+                                        height: CustomSize.sizeWidth(context) / 6,
+                                        decoration: (user[index].img == "/".substring(0, 1))?BoxDecoration(
+                                            color: CustomColor.primaryLight,
+                                            shape: BoxShape.circle
+                                        ):BoxDecoration(
+                                          shape: BoxShape.circle,
+                                          image: new DecorationImage(
+                                              image: (user[index].img != null)?NetworkImage(Links.subUrl +
+                                                  user[index].img!):AssetImage('assets/default.png') as ImageProvider,
+                                              fit: BoxFit.cover
+                                          ),
+                                        ),
+                                        child: (user[index].img == "/".substring(0, 1))?Center(
+                                          child: CustomText.text(
+                                              size: double.parse(((MediaQuery.of(context).size.width*0.094).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.094)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.094)).toString()),
+                                              weight: FontWeight.w800,
+                                              // text: initial,
+                                              color: Colors.white
+                                          ),
+                                        ):Container(),
+                                      ),
+                                      SizedBox(width: CustomSize.sizeWidth(context) / 32,),
+                                      Container(
+                                        width: CustomSize.sizeWidth(context) / 1.6,
+                                        child: Column(
+                                          crossAxisAlignment: CrossAxisAlignment.start,
+                                          mainAxisAlignment: MainAxisAlignment.center,
+                                          children: [
+                                            CustomText.textHeading4(
+                                                text: user[index].name,
+                                                maxLines: 1,
+                                                sizeNew: double.parse(((MediaQuery.of(context).size.width*0.045).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.045).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.045).toString())
+                                            ),
+                                            CustomText.bodyLight16(text: user[index].email, maxLines: 1, sizeNew: double.parse(((MediaQuery.of(context).size.width*0.03).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.03).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.03).toString())),
+                                          ],
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                  Padding(
+                                    padding: const EdgeInsets.only(right: 8.0),
+                                    child: GestureDetector(
+                                        onTap: () async{
+                                          setState(() {
+                                            showAlertDialog(user[index].id.toString());
+                                          });
+                                        },
+                                        child: Icon(Icons.delete, color: CustomColor.redBtn,)
+                                    ),
+                                  )
+                                ],
+                              ),
+                            ),
+                          ),
+                        );
+                      }
+                  ),
+                  SizedBox(height: CustomSize.sizeHeight(context) / 48,)
+                ],
+              ):Stack(
+                children: [
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      SizedBox(
+                        height: CustomSize.sizeHeight(context) / 32,
+                      ),
+                      Container(
+                        width: CustomSize.sizeWidth(context),
+                        color: Colors.white,
+                        child: Padding(
+                          padding: EdgeInsets.symmetric(horizontal: CustomSize.sizeWidth(context) / 24),
+                          child: (homepg != "1")?CustomText.textHeading3(
+                              text: "Riwayat",
+                              sizeNew: double.parse(((MediaQuery.of(context).size.width*0.06).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.06).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.06).toString()),
+                              maxLines: 1
+                          ):CustomText.textHeading3(
+                              text: "Data Pegawai",
+                              color: CustomColor.primary,
+                              sizeNew: double.parse(((MediaQuery.of(context).size.width*0.045).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.045)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.045)).toString()),
+                              maxLines: 1
+                          ),
+                        ),
+                      ),
+                      (user.toString() != '[]')?SizedBox(height: CustomSize.sizeHeight(context) / 48,):Container()
+                    ],
+                  ),
+                  Container(height: CustomSize.sizeHeight(context), child: Center(
+                    child: CustomText.bodyRegular14(
+                        text: 'Pegawai kosong.',
+                        maxLines: 1,
+                        sizeNew: double.parse(((MediaQuery.of(context).size.width*0.03).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.03).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.03).toString()),
+                        color: Colors.grey
+                    ),
+                  ),),
+                ],
+              ),
             ),
           ),
         ),
-      ),
-        floatingActionButton: (homepg != '1')?Container():GestureDetector(
-          onTap: (){
-            Navigator.push(
-                context,
-                PageTransition(
-                    type: PageTransitionType.rightToLeft,
-                    child: AddEmployeesActivity()));
-          },
-          child: Container(
-            width: CustomSize.sizeWidth(context) / 6.6,
-            height: CustomSize.sizeWidth(context) / 6.6,
-            decoration: BoxDecoration(
-                color: CustomColor.primaryLight,
-                shape: BoxShape.circle
+          floatingActionButton: (homepg != '1')?Container():GestureDetector(
+            onTap: (){
+              Navigator.push(
+                  context,
+                  PageTransition(
+                      type: PageTransitionType.rightToLeft,
+                      child: AddEmployeesActivity()));
+            },
+            child: Container(
+              width: CustomSize.sizeWidth(context) / 6.6,
+              height: CustomSize.sizeWidth(context) / 6.6,
+              decoration: BoxDecoration(
+                  color: CustomColor.primaryLight,
+                  shape: BoxShape.circle
+              ),
+              child: Center(child: Icon(FontAwesome.plus, color: Colors.white, size: 29,)),
             ),
-            child: Center(child: Icon(FontAwesome.plus, color: Colors.white, size: 29,)),
-          ),
-        )
+          )
+      ),
+      data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0),
     );
   }
 }

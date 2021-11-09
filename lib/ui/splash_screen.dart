@@ -44,43 +44,48 @@ class _SplashScreenState extends State<SplashScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      // backgroundColor: CustomColor.primaryLight,
-      body: Padding(
-        padding: EdgeInsets.symmetric(horizontal: CustomSize.sizeWidth(context) / 86),
-        child: Center(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              Image.asset(
-                  "assets/irgLogo.png",
-                width: CustomSize.sizeWidth(context) / 1.4,
-                height: CustomSize.sizeWidth(context) / 1.4,
-              ),
-              SizedBox(
-                height: CustomSize.sizeHeight(context) / 24,
-              ),
-              Container(
-                alignment: Alignment.center,
-                width: CustomSize.sizeWidth(context) / 1.1,
-                child: CustomText.textHeading9(text: "Indonesia Resto Guide"),
-              ),
-              SizedBox(
-                height: CustomSize.sizeHeight(context) / 48,
-              ),
-              CustomText.bodyMedium16(
-                  text: "Get your favourite food from your",
-                  maxLines: 1
-              ),
-              CustomText.bodyMedium16(
-                  text: "favourite restaurant the fastest way",
-                  maxLines: 1
-              ),
-            ],
+    return MediaQuery(
+      child: Scaffold(
+        // backgroundColor: CustomColor.primaryLight,
+        body: Padding(
+          padding: EdgeInsets.symmetric(horizontal: CustomSize.sizeWidth(context) / 86),
+          child: Center(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                Image.asset(
+                    "assets/irgLogo.png",
+                  width: CustomSize.sizeWidth(context) / 1.4,
+                  height: CustomSize.sizeWidth(context) / 1.4,
+                ),
+                SizedBox(
+                  height: CustomSize.sizeHeight(context) / 24,
+                ),
+                Container(
+                  alignment: Alignment.center,
+                  width: CustomSize.sizeWidth(context) / 1.1,
+                  child: CustomText.textHeading9(text: "Indonesia Resto Guide", sizeNew: double.parse(((MediaQuery.of(context).size.width*0.075).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.075).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.075).toString())),
+                ),
+                SizedBox(
+                  height: CustomSize.sizeHeight(context) / 48,
+                ),
+                CustomText.bodyMedium16(
+                    text: "Get your favourite food from your",
+                    maxLines: 1,
+                    sizeNew: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.04).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.04).toString())
+                ),
+                CustomText.bodyMedium16(
+                    text: "favourite restaurant the fastest way",
+                    maxLines: 1,
+                    sizeNew: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.04).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.04).toString())
+                ),
+              ],
+            ),
           ),
         ),
       ),
+      data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0),
     );
   }
 }

@@ -888,319 +888,324 @@ class _EditDetailRestoState extends State<EditDetailResto> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: SafeArea(
-        child: SingleChildScrollView(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              SizedBox(height: CustomSize.sizeHeight(context) / 38,),
-              Padding(
-                padding: EdgeInsets.symmetric(horizontal: CustomSize.sizeWidth(context) / 32),
-                child: CustomText.textHeading4(
-                    text: "Edit data restomu",
-                    minSize: 18,
-                    maxLines: 1
+    return MediaQuery(
+      child: Scaffold(
+        body: SafeArea(
+          child: SingleChildScrollView(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                SizedBox(height: CustomSize.sizeHeight(context) / 38,),
+                Padding(
+                  padding: EdgeInsets.symmetric(horizontal: CustomSize.sizeWidth(context) / 32),
+                  child: CustomText.textHeading4(
+                      text: "Edit data restomu",
+                      sizeNew: double.parse(((MediaQuery.of(context).size.width*0.045).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.045).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.045).toString()),
+                      maxLines: 1
+                  ),
                 ),
-              ),
-              SizedBox(height: CustomSize.sizeHeight(context) / 86,),
-              Divider(
-                thickness: 8,
-                color: CustomColor.secondary,
-              ),
-              Padding(
-                padding: EdgeInsets.symmetric(horizontal: CustomSize.sizeWidth(context) / 32),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    SizedBox(height: CustomSize.sizeHeight(context) / 48,),
-                    CustomText.bodyLight12(text: "Tipe Resto"),
-                    SizedBox(
-                      height: CustomSize.sizeHeight(context) * 0.005,
-                    ),
-                    TextField(
-                      readOnly: true,
-                      controller: _Tipe,
-                      keyboardType: TextInputType.name,
-                      cursorColor: Colors.black,
-                      style: GoogleFonts.poppins(
-                          textStyle:
-                          TextStyle(fontSize: 18, color: Colors.black, fontWeight: FontWeight.w600)),
-                      decoration: InputDecoration(
-                        isDense: true,
-                        contentPadding: EdgeInsets.only(bottom: CustomSize.sizeHeight(context) / 86),
-                        hintStyle: GoogleFonts.poppins(
+                SizedBox(height: CustomSize.sizeHeight(context) / 86,),
+                Divider(
+                  thickness: 8,
+                  color: CustomColor.secondary,
+                ),
+                Padding(
+                  padding: EdgeInsets.symmetric(horizontal: CustomSize.sizeWidth(context) / 32),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      SizedBox(height: CustomSize.sizeHeight(context) / 48,),
+                      CustomText.bodyLight12(text: "Tipe Resto", sizeNew: double.parse(((MediaQuery.of(context).size.width*0.03).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.03).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.03).toString())),
+                      SizedBox(
+                        height: CustomSize.sizeHeight(context) * 0.005,
+                      ),
+                      TextField(
+                        readOnly: true,
+                        controller: _Tipe,
+                        keyboardType: TextInputType.name,
+                        cursorColor: Colors.black,
+                        style: GoogleFonts.poppins(
                             textStyle:
-                            TextStyle(fontSize: 14, color: Colors.grey)),
-                        helperStyle: GoogleFonts.poppins(
-                            textStyle: TextStyle(fontSize: 14)),
-                        enabledBorder: UnderlineInputBorder(),
-                        focusedBorder: UnderlineInputBorder(),
-                        suffixIcon: GestureDetector(
-                          onTap: () {
-                            setState(() {
-                              print(cuisine);
-                              // print(cuisine.split(",")[0]);
-                            });
-                            _showCuisineDialog();
-                          },
-                          child: Stack(
-                            children: [
-                              Container(
-                                width: CustomSize.sizeWidth(context) / 4,
-                                decoration: BoxDecoration(
-                                  borderRadius: BorderRadius.circular(25),
-                                  border: Border.all(color: CustomColor.accent, width: 1),
-                                  // color: CustomColor.accentLight
-                                ),
-                                child: Padding(
-                                  padding: const EdgeInsets.all(2.0),
-                                  child: Center(
-                                    child: CustomText.textTitle8(
-                                        text: (_Tipe.text == null || _Tipe.text == '')?"Pilih":"Ganti",
-                                        color: CustomColor.accent
+                            TextStyle(fontSize: 18, color: Colors.black, fontWeight: FontWeight.w600)),
+                        decoration: InputDecoration(
+                          isDense: true,
+                          contentPadding: EdgeInsets.only(bottom: CustomSize.sizeHeight(context) / 86),
+                          hintStyle: GoogleFonts.poppins(
+                              textStyle:
+                              TextStyle(fontSize: 14, color: Colors.grey)),
+                          helperStyle: GoogleFonts.poppins(
+                              textStyle: TextStyle(fontSize: 14)),
+                          enabledBorder: UnderlineInputBorder(),
+                          focusedBorder: UnderlineInputBorder(),
+                          suffixIcon: GestureDetector(
+                            onTap: () {
+                              setState(() {
+                                print(cuisine);
+                                // print(cuisine.split(",")[0]);
+                              });
+                              _showCuisineDialog();
+                            },
+                            child: Stack(
+                              children: [
+                                Container(
+                                  width: CustomSize.sizeWidth(context) / 4,
+                                  decoration: BoxDecoration(
+                                    borderRadius: BorderRadius.circular(25),
+                                    border: Border.all(color: CustomColor.accent, width: 1),
+                                    // color: CustomColor.accentLight
+                                  ),
+                                  child: Padding(
+                                    padding: const EdgeInsets.all(2.0),
+                                    child: Center(
+                                      child: CustomText.textTitle8(
+                                          text: (_Tipe.text == null || _Tipe.text == '')?"Pilih":"Ganti",
+                                          color: CustomColor.accent,
+                                          sizeNew: double.parse(((MediaQuery.of(context).size.width*0.035).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.035).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.035).toString())
+                                      ),
                                     ),
                                   ),
                                 ),
-                              ),
-                            ],
+                              ],
+                            ),
                           ),
                         ),
                       ),
-                    ),
-                    SizedBox(height: CustomSize.sizeHeight(context) / 48,),
-                    CustomText.bodyLight12(text: "Fasilitas Resto"),
-                    SizedBox(
-                      height: CustomSize.sizeHeight(context) * 0.005,
-                    ),
-                    TextField(
-                      readOnly: true,
-                      controller: _Fasilitas,
-                      keyboardType: TextInputType.text,
-                      cursorColor: Colors.black,
-                      style: GoogleFonts.poppins(
-                          textStyle:
-                          TextStyle(fontSize: 18, color: Colors.black, fontWeight: FontWeight.w600)),
-                      decoration: InputDecoration(
-                        isDense: true,
-                        contentPadding: EdgeInsets.only(bottom: CustomSize.sizeHeight(context) / 86),
-                        hintStyle: GoogleFonts.poppins(
+                      SizedBox(height: CustomSize.sizeHeight(context) / 48,),
+                      CustomText.bodyLight12(text: "Fasilitas Resto", sizeNew: double.parse(((MediaQuery.of(context).size.width*0.03).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.03).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.03).toString())),
+                      SizedBox(
+                        height: CustomSize.sizeHeight(context) * 0.005,
+                      ),
+                      TextField(
+                        readOnly: true,
+                        controller: _Fasilitas,
+                        keyboardType: TextInputType.text,
+                        cursorColor: Colors.black,
+                        style: GoogleFonts.poppins(
                             textStyle:
-                            TextStyle(fontSize: 14, color: Colors.grey)),
-                        helperStyle: GoogleFonts.poppins(
-                            textStyle: TextStyle(fontSize: 14)),
-                        enabledBorder: UnderlineInputBorder(),
-                        focusedBorder: UnderlineInputBorder(),
-                        suffixIcon: GestureDetector(
-                          onTap: () {
-                            setState(() {
-                              print(facility);
-                              // print(cuisine.split(",")[0]);
-                            });
-                            _showFacilityDialog();
-                          },
-                          child: Stack(
-                            children: [
-                              Container(
-                                width: CustomSize.sizeWidth(context) / 4,
-                                decoration: BoxDecoration(
-                                  borderRadius: BorderRadius.circular(25),
-                                  border: Border.all(color: CustomColor.accent, width: 1),
-                                  // color: CustomColor.accentLight
-                                ),
-                                child: Padding(
-                                  padding: const EdgeInsets.all(2.0),
-                                  child: Center(
-                                    child: CustomText.textTitle8(
-                                        text: (_Fasilitas.text == null || _Fasilitas.text == "")?"Pilih":"Ganti",
-                                        color: CustomColor.accent
+                            TextStyle(fontSize: 18, color: Colors.black, fontWeight: FontWeight.w600)),
+                        decoration: InputDecoration(
+                          isDense: true,
+                          contentPadding: EdgeInsets.only(bottom: CustomSize.sizeHeight(context) / 86),
+                          hintStyle: GoogleFonts.poppins(
+                              textStyle:
+                              TextStyle(fontSize: 14, color: Colors.grey)),
+                          helperStyle: GoogleFonts.poppins(
+                              textStyle: TextStyle(fontSize: 14)),
+                          enabledBorder: UnderlineInputBorder(),
+                          focusedBorder: UnderlineInputBorder(),
+                          suffixIcon: GestureDetector(
+                            onTap: () {
+                              setState(() {
+                                print(facility);
+                                // print(cuisine.split(",")[0]);
+                              });
+                              _showFacilityDialog();
+                            },
+                            child: Stack(
+                              children: [
+                                Container(
+                                  width: CustomSize.sizeWidth(context) / 4,
+                                  decoration: BoxDecoration(
+                                    borderRadius: BorderRadius.circular(25),
+                                    border: Border.all(color: CustomColor.accent, width: 1),
+                                    // color: CustomColor.accentLight
+                                  ),
+                                  child: Padding(
+                                    padding: const EdgeInsets.all(2.0),
+                                    child: Center(
+                                      child: CustomText.textTitle8(
+                                          text: (_Fasilitas.text == null || _Fasilitas.text == "")?"Pilih":"Ganti",
+                                          color: CustomColor.accent,
+                                          sizeNew: double.parse(((MediaQuery.of(context).size.width*0.035).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.035).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.035).toString())
+                                      ),
                                     ),
                                   ),
                                 ),
-                              ),
-                            ],
+                              ],
+                            ),
                           ),
                         ),
                       ),
-                    ),
-                    SizedBox(height: CustomSize.sizeHeight(context) / 48,),
-                    CustomText.bodyLight12(text: "Layanan Restomu"),
-                    SizedBox(
-                      height: CustomSize.sizeHeight(context) * 0.005,
-                    ),
-                    //------------------------------------ checkbox delivery -------------------------------------
-                    Row(
-                      mainAxisSize: MainAxisSize.max,
-                      mainAxisAlignment: MainAxisAlignment.start,
-                      children: [
-                        Checkbox(
-                          value: delivery,
-                          onChanged: (bool? value) {
-                            setState(() {
-                              delivery = value!;
-                              print(delivery);
-                            });
-                          },
-                        ),
-                        // Text('Apakah Restomu melayani pesan antar ?', style: TextStyle(fontWeight: FontWeight.bold))
-                        Text('Apakah Restomu melayani pesan antar ?', style: GoogleFonts.poppins(
-                            textStyle: TextStyle(
-                                fontWeight: FontWeight.bold, fontSize: 12)),),
-                      ],
-                    ),
-                    //------------------------------------- biaya kirim ----------------------------------------
-                    (delivery)?CustomText.bodyLight12(text: "Ongkir per 1 km"):Container(),
-                    (delivery)?TextField(
-                      controller: _Ongkir,
-                      keyboardType: TextInputType.number,
-                      cursorColor: Colors.black,
-                      style: GoogleFonts.poppins(
-                          textStyle:
-                          TextStyle(fontSize: 18, color: Colors.black, fontWeight: FontWeight.w600)),
-                      decoration: InputDecoration(
-                        isDense: true,
-                        contentPadding: EdgeInsets.only(bottom: CustomSize.sizeHeight(context) / 86),
-                        hintStyle: GoogleFonts.poppins(
-                            textStyle:
-                            TextStyle(fontSize: 14, color: Colors.grey)),
-                        helperStyle: GoogleFonts.poppins(
-                            textStyle: TextStyle(fontSize: 14)),
-                        enabledBorder: UnderlineInputBorder(),
-                        focusedBorder: UnderlineInputBorder(),
+                      SizedBox(height: CustomSize.sizeHeight(context) / 48,),
+                      CustomText.bodyLight12(text: "Layanan Restomu", sizeNew: double.parse(((MediaQuery.of(context).size.width*0.03).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.03).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.03).toString())),
+                      SizedBox(
+                        height: CustomSize.sizeHeight(context) * 0.005,
                       ),
-                    ):Container(),
-                    //------------------------------------ checkbox reservation -------------------------------------
-                    Row(
-                      mainAxisSize: MainAxisSize.max,
-                      mainAxisAlignment: MainAxisAlignment.start,
-                      children: [
-                        Checkbox(
-                          value: reservation,
-                          onChanged: (bool? value) {
-                            setState(() {
-                              reservation = value!;
-                            });
-                          },
-                        ),
-                        // Text('Apakah Restomu melayani reservasi ?', style: TextStyle(fontWeight: FontWeight.bold))
-                        Text('Apakah Restomu melayani reservasi ?', style: GoogleFonts.poppins(
-                            textStyle: TextStyle(
-                                fontWeight: FontWeight.bold, fontSize: 12)),),
-                      ],
-                    ),
-                    //------------------------------------- harga pesan ----------------------------------------
-                    (reservation)?CustomText.bodyLight12(text: "Harga pesan per meja (1 meja 4 kursi)"):Container(),
-                    (reservation)?TextField(
-                      controller: _HargaPerMeja,
-                      keyboardType: TextInputType.number,
-                      cursorColor: Colors.black,
-                      style: GoogleFonts.poppins(
-                          textStyle:
-                          TextStyle(fontSize: 18, color: Colors.black, fontWeight: FontWeight.w600)),
-                      decoration: InputDecoration(
-                        isDense: true,
-                        contentPadding: EdgeInsets.only(bottom: CustomSize.sizeHeight(context) / 86),
-                        hintStyle: GoogleFonts.poppins(
-                            textStyle:
-                            TextStyle(fontSize: 14, color: Colors.grey)),
-                        helperStyle: GoogleFonts.poppins(
-                            textStyle: TextStyle(fontSize: 14)),
-                        enabledBorder: UnderlineInputBorder(),
-                        focusedBorder: UnderlineInputBorder(),
+                      //------------------------------------ checkbox delivery -------------------------------------
+                      Row(
+                        mainAxisSize: MainAxisSize.max,
+                        mainAxisAlignment: MainAxisAlignment.start,
+                        children: [
+                          Checkbox(
+                            value: delivery,
+                            onChanged: (bool? value) {
+                              setState(() {
+                                delivery = value!;
+                                print(delivery);
+                              });
+                            },
+                          ),
+                          // Text('Apakah Restomu melayani pesan antar ?', style: TextStyle(fontWeight: FontWeight.bold))
+                          Text('Apakah Restomu melayani pesan antar ?', style: GoogleFonts.poppins(
+                              textStyle: TextStyle(
+                                  fontWeight: FontWeight.bold, fontSize: 12)),),
+                        ],
                       ),
-                    ):Container(),
-                    (reservation)?SizedBox(height: CustomSize.sizeHeight(context) / 48,):Container(),
-                    // ------------------------------------ checkbox takeaway -------------------------------------
-                    Row(
-                      mainAxisSize: MainAxisSize.max,
-                      mainAxisAlignment: MainAxisAlignment.start,
-                      children: [
-                        Checkbox(
-                          value: takeaway,
-                          onChanged: (bool? value) {
-                            setState(() {
-                              takeaway = value!;
-                            });
-                          },
+                      //------------------------------------- biaya kirim ----------------------------------------
+                      (delivery)?CustomText.bodyLight12(text: "Ongkir per 1 km", sizeNew: double.parse(((MediaQuery.of(context).size.width*0.03).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.03).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.03).toString())):Container(),
+                      (delivery)?TextField(
+                        controller: _Ongkir,
+                        keyboardType: TextInputType.number,
+                        cursorColor: Colors.black,
+                        style: GoogleFonts.poppins(
+                            textStyle:
+                            TextStyle(fontSize: 18, color: Colors.black, fontWeight: FontWeight.w600)),
+                        decoration: InputDecoration(
+                          isDense: true,
+                          contentPadding: EdgeInsets.only(bottom: CustomSize.sizeHeight(context) / 86),
+                          hintStyle: GoogleFonts.poppins(
+                              textStyle:
+                              TextStyle(fontSize: 14, color: Colors.grey)),
+                          helperStyle: GoogleFonts.poppins(
+                              textStyle: TextStyle(fontSize: 14)),
+                          enabledBorder: UnderlineInputBorder(),
+                          focusedBorder: UnderlineInputBorder(),
                         ),
-                        // Text('Apakah Restomu melayani ambil ditempat ?', style: TextStyle(fontWeight: FontWeight.bold))
-                        Text('Apakah Restomu melayani ambil ditempat ?', style: GoogleFonts.poppins(
-                            textStyle: TextStyle(
-                                fontWeight: FontWeight.bold, fontSize: 12)),),
-                      ],
-                    ),
-                  ],
+                      ):Container(),
+                      //------------------------------------ checkbox reservation -------------------------------------
+                      Row(
+                        mainAxisSize: MainAxisSize.max,
+                        mainAxisAlignment: MainAxisAlignment.start,
+                        children: [
+                          Checkbox(
+                            value: reservation,
+                            onChanged: (bool? value) {
+                              setState(() {
+                                reservation = value!;
+                              });
+                            },
+                          ),
+                          // Text('Apakah Restomu melayani reservasi ?', style: TextStyle(fontWeight: FontWeight.bold))
+                          Text('Apakah Restomu melayani reservasi ?', style: GoogleFonts.poppins(
+                              textStyle: TextStyle(
+                                  fontWeight: FontWeight.bold, fontSize: 12)),),
+                        ],
+                      ),
+                      //------------------------------------- harga pesan ----------------------------------------
+                      (reservation)?CustomText.bodyLight12(text: "Harga pesan per meja (1 meja 4 kursi)", sizeNew: double.parse(((MediaQuery.of(context).size.width*0.03).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.03).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.03).toString())):Container(),
+                      (reservation)?TextField(
+                        controller: _HargaPerMeja,
+                        keyboardType: TextInputType.number,
+                        cursorColor: Colors.black,
+                        style: GoogleFonts.poppins(
+                            textStyle:
+                            TextStyle(fontSize: 18, color: Colors.black, fontWeight: FontWeight.w600)),
+                        decoration: InputDecoration(
+                          isDense: true,
+                          contentPadding: EdgeInsets.only(bottom: CustomSize.sizeHeight(context) / 86),
+                          hintStyle: GoogleFonts.poppins(
+                              textStyle:
+                              TextStyle(fontSize: 14, color: Colors.grey)),
+                          helperStyle: GoogleFonts.poppins(
+                              textStyle: TextStyle(fontSize: 14)),
+                          enabledBorder: UnderlineInputBorder(),
+                          focusedBorder: UnderlineInputBorder(),
+                        ),
+                      ):Container(),
+                      (reservation)?SizedBox(height: CustomSize.sizeHeight(context) / 48,):Container(),
+                      // ------------------------------------ checkbox takeaway -------------------------------------
+                      Row(
+                        mainAxisSize: MainAxisSize.max,
+                        mainAxisAlignment: MainAxisAlignment.start,
+                        children: [
+                          Checkbox(
+                            value: takeaway,
+                            onChanged: (bool? value) {
+                              setState(() {
+                                takeaway = value!;
+                              });
+                            },
+                          ),
+                          // Text('Apakah Restomu melayani ambil ditempat ?', style: TextStyle(fontWeight: FontWeight.bold))
+                          Text('Apakah Restomu melayani ambil ditempat ?', style: GoogleFonts.poppins(
+                              textStyle: TextStyle(
+                                  fontWeight: FontWeight.bold, fontSize: 12)),),
+                        ],
+                      ),
+                    ],
+                  ),
                 ),
-              ),
-              SizedBox(height: CustomSize.sizeHeight(context) / 8,),
-            ],
+                SizedBox(height: CustomSize.sizeHeight(context) / 8,),
+              ],
+            ),
           ),
         ),
-      ),
-      floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
-      floatingActionButton:
-      (isLoading != true)?GestureDetector(
-        onTap: () async{
-          setState(() {
-            isLoading = false;
-          });
-          SharedPreferences pref = await SharedPreferences.getInstance();
-          pref.getString("imgSelfie");
-          pref.getString("imgKtp");
-          if (karyawan != '0') {
-            if (delivery == true) {
-              editUserUsaha(idResto);
-              editResto(idResto);
+        floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
+        floatingActionButton:
+        (isLoading != true)?GestureDetector(
+          onTap: () async{
+            setState(() {
+              isLoading = false;
+            });
+            SharedPreferences pref = await SharedPreferences.getInstance();
+            pref.getString("imgSelfie");
+            pref.getString("imgKtp");
+            if (karyawan != '0') {
+              if (delivery == true) {
+                editUserUsaha(idResto);
+                editResto(idResto);
+              } else {
+                editUserUsaha(idResto);
+                editResto2(idResto);
+              }
             } else {
-              editUserUsaha(idResto);
-              editResto2(idResto);
+              if (delivery == true) {
+                editUserUsaha(idResto);
+                editResto(idResto);
+              } else {
+                editUserUsaha(idResto);
+                editResto2(idResto);
+              }
             }
-          } else {
-            if (delivery == true) {
-              editUserUsaha(idResto);
-              editResto(idResto);
-            } else {
-              editUserUsaha(idResto);
-              editResto2(idResto);
-            }
-          }
 
-          // Navigator.pushReplacement(
-          //     context,
-          //     PageTransition(
-          //         type: PageTransitionType.leftToRight,
-          //         child: HomeActivityResto()));
-          // SharedPreferences pref = await SharedPreferences.getInstance();
-          // pref.setString("name", _loginTextName.text.toString());
-          // pref.setString("email", _loginEmailName.text.toString());
-          // pref.setString("img", (image == null)?img:base64Encode(image.readAsBytesSync()).toString());
-          // pref.setString("gender", gender);
-          // pref.setString("tgl", tgl);
-          // pref.setString("notelp", _loginNotelpName.text.toString());
-        },
-        child: Container(
-          alignment: Alignment.center,
+            // Navigator.pushReplacement(
+            //     context,
+            //     PageTransition(
+            //         type: PageTransitionType.leftToRight,
+            //         child: HomeActivityResto()));
+            // SharedPreferences pref = await SharedPreferences.getInstance();
+            // pref.setString("name", _loginTextName.text.toString());
+            // pref.setString("email", _loginEmailName.text.toString());
+            // pref.setString("img", (image == null)?img:base64Encode(image.readAsBytesSync()).toString());
+            // pref.setString("gender", gender);
+            // pref.setString("tgl", tgl);
+            // pref.setString("notelp", _loginNotelpName.text.toString());
+          },
+          child: Container(
+            alignment: Alignment.center,
+            width: CustomSize.sizeWidth(context) / 1.1,
+            height: CustomSize.sizeHeight(context) / 14,
+            decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(30),
+                color: CustomColor.accent
+            ),
+            child: Center(child: CustomText.bodyRegular16(text: "Simpan", color: Colors.white, sizeNew: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.04).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.04).toString()))),
+          ),
+        ):Container(
           width: CustomSize.sizeWidth(context) / 1.1,
           height: CustomSize.sizeHeight(context) / 14,
           decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(30),
               color: CustomColor.accent
           ),
-          child: Center(child: CustomText.bodyRegular16(text: "Simpan", color: Colors.white,)),
-        ),
-      ):Container(
-        width: CustomSize.sizeWidth(context) / 1.1,
-        height: CustomSize.sizeHeight(context) / 14,
-        decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(30),
-            color: CustomColor.accent
-        ),
-        child: Center(
-          child: CircularProgressIndicator(
-            valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+          child: Center(
+            child: CircularProgressIndicator(
+              valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+            ),
           ),
         ),
       ),
+      data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0),
     );
   }
 }

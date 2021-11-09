@@ -376,458 +376,461 @@ class _EditProfileState extends State<EditProfile> {
   }
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: SafeArea(
-        child: SingleChildScrollView(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              SizedBox(height: CustomSize.sizeHeight(context) / 38,),
-              Padding(
-                padding: EdgeInsets.symmetric(horizontal: CustomSize.sizeWidth(context) / 32),
-                child: CustomText.textHeading4(
-                    text: "Edit Profile",
-                    minSize: 18,
-                    maxLines: 1
+    return MediaQuery(
+      child: Scaffold(
+        body: SafeArea(
+          child: SingleChildScrollView(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                SizedBox(height: CustomSize.sizeHeight(context) / 38,),
+                Padding(
+                  padding: EdgeInsets.symmetric(horizontal: CustomSize.sizeWidth(context) / 32),
+                  child: CustomText.textHeading4(
+                      text: "Edit Profile",
+                      sizeNew: double.parse(((MediaQuery.of(context).size.width*0.045).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.045)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.045)).toString()),
+                      maxLines: 1
+                  ),
                 ),
-              ),
-              SizedBox(height: CustomSize.sizeHeight(context) / 86,),
-              Divider(
-                thickness: 8,
-                color: CustomColor.secondary,
-              ),
-              Padding(
-                padding: EdgeInsets.symmetric(horizontal: CustomSize.sizeWidth(context) / 32),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    SizedBox(height: CustomSize.sizeHeight(context) / 48,),
-                    CustomText.bodyLight12(text: "Foto Profile"),
-                    SizedBox(height: CustomSize.sizeHeight(context) / 48,),
-                    Row(
-                      children: [
-                        GestureDetector(
-                          onTap: () async{
-                            getImage();
-                          },
-                          child: Container(
-                            width: CustomSize.sizeWidth(context) / 6,
-                            height: CustomSize.sizeWidth(context) / 6,
-                            decoration: (image==null)?(img == "" || img == null)?BoxDecoration(
-                                color: CustomColor.primary,
-                                shape: BoxShape.circle
-                            ):BoxDecoration(
-                              shape: BoxShape.circle,
-                              image: ("$img".substring(0, 8) == '/storage')?DecorationImage(
-                                image: NetworkImage(Links.subUrl +
-                                    "$img"),
-                                fit: BoxFit.cover
-                              ):DecorationImage(
-                                  image: Image.memory(Base64Decoder().convert(img)).image,
+                SizedBox(height: CustomSize.sizeHeight(context) / 86,),
+                Divider(
+                  thickness: 8,
+                  color: CustomColor.secondary,
+                ),
+                Padding(
+                  padding: EdgeInsets.symmetric(horizontal: CustomSize.sizeWidth(context) / 32),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      SizedBox(height: CustomSize.sizeHeight(context) / 48,),
+                      CustomText.bodyLight12(text: "Foto Profile", sizeNew: double.parse(((MediaQuery.of(context).size.width*0.03).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.03)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.03)).toString())),
+                      SizedBox(height: CustomSize.sizeHeight(context) / 48,),
+                      Row(
+                        children: [
+                          GestureDetector(
+                            onTap: () async{
+                              getImage();
+                            },
+                            child: Container(
+                              width: CustomSize.sizeWidth(context) / 6,
+                              height: CustomSize.sizeWidth(context) / 6,
+                              decoration: (image==null)?(img == "" || img == null)?BoxDecoration(
+                                  color: CustomColor.primary,
+                                  shape: BoxShape.circle
+                              ):BoxDecoration(
+                                shape: BoxShape.circle,
+                                image: ("$img".substring(0, 8) == '/storage')?DecorationImage(
+                                  image: NetworkImage(Links.subUrl +
+                                      "$img"),
                                   fit: BoxFit.cover
+                                ):DecorationImage(
+                                    image: Image.memory(Base64Decoder().convert(img)).image,
+                                    fit: BoxFit.cover
+                                ),
+                              ): BoxDecoration(
+                                shape: BoxShape.circle,
+                                image: new DecorationImage(
+                                  image: new FileImage(image!),
+                                    fit: BoxFit.cover
+                                ),
                               ),
-                            ): BoxDecoration(
-                              shape: BoxShape.circle,
-                              image: new DecorationImage(
-                                image: new FileImage(image!),
-                                  fit: BoxFit.cover
-                              ),
+                              child: (img == "" || img == null && image == null || image.toString() == '')?Center(
+                                child: CustomText.text(
+                                    size: double.parse(((MediaQuery.of(context).size.width*0.094).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.094)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.094)).toString()),
+                                    weight: FontWeight.w800,
+                                    text: initial,
+                                    color: Colors.white
+                                ),
+                              ):Container(),
                             ),
-                            child: (img == "" || img == null && image == null || image.toString() == '')?Center(
-                              child: CustomText.text(
-                                  size: 38,
-                                  weight: FontWeight.w800,
-                                  text: initial,
-                                  color: Colors.white
-                              ),
-                            ):Container(),
+                          ),
+                          SizedBox(width: CustomSize.sizeWidth(context) / 32,),
+                          CustomText.bodyLight12(text: "Upload foto profile", sizeNew: double.parse(((MediaQuery.of(context).size.width*0.03).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.03)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.03)).toString())),
+                        ],
+                      ),
+                      SizedBox(height: CustomSize.sizeHeight(context) / 48,),
+                      CustomText.bodyLight12(text: "Nama Lengkap", sizeNew: double.parse(((MediaQuery.of(context).size.width*0.03).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.03)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.03)).toString())),
+                      SizedBox(
+                        height: CustomSize.sizeHeight(context) * 0.005,
+                      ),
+                      TextField(
+                        controller: _loginTextName,
+                        keyboardType: TextInputType.name,
+                        cursorColor: Colors.black,
+                        style: GoogleFonts.poppins(
+                            textStyle:
+                            TextStyle(fontSize: 18, color: Colors.black, fontWeight: FontWeight.w600)),
+                        decoration: InputDecoration(
+                          isDense: true,
+                          contentPadding: EdgeInsets.only(bottom: CustomSize.sizeHeight(context) / 86),
+                          hintStyle: GoogleFonts.poppins(
+                              textStyle:
+                              TextStyle(fontSize: 14, color: Colors.grey)),
+                          helperStyle: GoogleFonts.poppins(
+                              textStyle: TextStyle(fontSize: 14)),
+                          enabledBorder: UnderlineInputBorder(
+
+                          ),
+                          focusedBorder: UnderlineInputBorder(
+
                           ),
                         ),
-                        SizedBox(width: CustomSize.sizeWidth(context) / 32,),
-                        CustomText.bodyLight12(text: "Upload foto profile"),
-                      ],
-                    ),
-                    SizedBox(height: CustomSize.sizeHeight(context) / 48,),
-                    CustomText.bodyLight12(text: "Nama Lengkap"),
-                    SizedBox(
-                      height: CustomSize.sizeHeight(context) * 0.005,
-                    ),
-                    TextField(
-                      controller: _loginTextName,
-                      keyboardType: TextInputType.name,
-                      cursorColor: Colors.black,
-                      style: GoogleFonts.poppins(
-                          textStyle:
-                          TextStyle(fontSize: 18, color: Colors.black, fontWeight: FontWeight.w600)),
-                      decoration: InputDecoration(
-                        isDense: true,
-                        contentPadding: EdgeInsets.only(bottom: CustomSize.sizeHeight(context) / 86),
-                        hintStyle: GoogleFonts.poppins(
+                      ),
+                      SizedBox(height: CustomSize.sizeHeight(context) / 48,),
+                      CustomText.bodyLight12(text: "No Telepon", sizeNew: double.parse(((MediaQuery.of(context).size.width*0.03).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.03)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.03)).toString())),
+                      SizedBox(
+                        height: CustomSize.sizeHeight(context) * 0.005,
+                      ),
+                      TextField(
+                        inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+                        controller: _loginNotelpName,
+                        keyboardType: TextInputType.numberWithOptions(),
+                        cursorColor: Colors.black,
+                        style: GoogleFonts.poppins(
                             textStyle:
-                            TextStyle(fontSize: 14, color: Colors.grey)),
-                        helperStyle: GoogleFonts.poppins(
-                            textStyle: TextStyle(fontSize: 14)),
-                        enabledBorder: UnderlineInputBorder(
-
-                        ),
-                        focusedBorder: UnderlineInputBorder(
-
+                            TextStyle(fontSize: 18, color: Colors.black, fontWeight: FontWeight.w600)),
+                        decoration: InputDecoration(
+                          isDense: true,
+                          contentPadding: EdgeInsets.only(bottom: CustomSize.sizeHeight(context) / 86),
+                          hintStyle: GoogleFonts.poppins(
+                              textStyle:
+                              TextStyle(fontSize: 14, color: Colors.grey)),
+                          helperStyle: GoogleFonts.poppins(
+                              textStyle: TextStyle(fontSize: 14)),
+                          enabledBorder: UnderlineInputBorder(),
+                          focusedBorder: UnderlineInputBorder(),
                         ),
                       ),
-                    ),
-                    SizedBox(height: CustomSize.sizeHeight(context) / 48,),
-                    CustomText.bodyLight12(text: "No Telepon"),
-                    SizedBox(
-                      height: CustomSize.sizeHeight(context) * 0.005,
-                    ),
-                    TextField(
-                      inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-                      controller: _loginNotelpName,
-                      keyboardType: TextInputType.numberWithOptions(),
-                      cursorColor: Colors.black,
-                      style: GoogleFonts.poppins(
-                          textStyle:
-                          TextStyle(fontSize: 18, color: Colors.black, fontWeight: FontWeight.w600)),
-                      decoration: InputDecoration(
-                        isDense: true,
-                        contentPadding: EdgeInsets.only(bottom: CustomSize.sizeHeight(context) / 86),
-                        hintStyle: GoogleFonts.poppins(
-                            textStyle:
-                            TextStyle(fontSize: 14, color: Colors.grey)),
-                        helperStyle: GoogleFonts.poppins(
-                            textStyle: TextStyle(fontSize: 14)),
-                        enabledBorder: UnderlineInputBorder(),
-                        focusedBorder: UnderlineInputBorder(),
+                      SizedBox(height: CustomSize.sizeHeight(context) / 48,),
+                      CustomText.bodyLight12(text: "Email", sizeNew: double.parse(((MediaQuery.of(context).size.width*0.03).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.03)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.03)).toString())),
+                      SizedBox(
+                        height: CustomSize.sizeHeight(context) * 0.005,
                       ),
-                    ),
-                    SizedBox(height: CustomSize.sizeHeight(context) / 48,),
-                    CustomText.bodyLight12(text: "Email"),
-                    SizedBox(
-                      height: CustomSize.sizeHeight(context) * 0.005,
-                    ),
-                    TextField(
-                      controller: _loginEmailName,
-                      keyboardType: TextInputType.emailAddress,
-                      cursorColor: Colors.black,
-                      style: GoogleFonts.poppins(
-                          textStyle:
-                          TextStyle(fontSize: 18, color: Colors.black, fontWeight: FontWeight.w600)),
-                      decoration: InputDecoration(
-                        isDense: true,
-                        contentPadding: EdgeInsets.only(bottom: CustomSize.sizeHeight(context) / 86),
-                        hintStyle: GoogleFonts.poppins(
+                      TextField(
+                        controller: _loginEmailName,
+                        keyboardType: TextInputType.emailAddress,
+                        cursorColor: Colors.black,
+                        style: GoogleFonts.poppins(
                             textStyle:
-                            TextStyle(fontSize: 14, color: Colors.grey)),
-                        helperStyle: GoogleFonts.poppins(
-                            textStyle: TextStyle(fontSize: 14)),
-                        enabledBorder: UnderlineInputBorder(),
-                        focusedBorder: UnderlineInputBorder(),
+                            TextStyle(fontSize: 18, color: Colors.black, fontWeight: FontWeight.w600)),
+                        decoration: InputDecoration(
+                          isDense: true,
+                          contentPadding: EdgeInsets.only(bottom: CustomSize.sizeHeight(context) / 86),
+                          hintStyle: GoogleFonts.poppins(
+                              textStyle:
+                              TextStyle(fontSize: 14, color: Colors.grey)),
+                          helperStyle: GoogleFonts.poppins(
+                              textStyle: TextStyle(fontSize: 14)),
+                          enabledBorder: UnderlineInputBorder(),
+                          focusedBorder: UnderlineInputBorder(),
+                        ),
                       ),
-                    ),
-                    SizedBox(height: CustomSize.sizeHeight(context) / 48,),
-                    CustomText.bodyLight12(text: "Jenis Kelamin"),
-                    SizedBox(
-                      height: CustomSize.sizeHeight(context) * 0.005,
-                    ),
-                    GestureDetector(
-                        onTap: (){
-                          showModalBottomSheet(
-                              isScrollControlled: true,
-                              shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.only(topLeft: Radius.circular(20), topRight: Radius.circular(20))
-                              ),
-                              context: context,
-                              builder: (_){
-                                return Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  mainAxisSize: MainAxisSize.min,
-                                  children: [
-                                    SizedBox(height: CustomSize.sizeHeight(context) / 86,),
-                                    Padding(
-                                      padding: EdgeInsets.symmetric(horizontal: CustomSize.sizeWidth(context) / 2.4),
-                                      child: Divider(thickness: 4,),
-                                    ),
-                                    SizedBox(height: CustomSize.sizeHeight(context) / 106,),
-                                    Padding(
-                                      padding: EdgeInsets.symmetric(horizontal: CustomSize.sizeHeight(context) / 20),
-                                      child: Row(
-                                        crossAxisAlignment: CrossAxisAlignment.center,
-                                        mainAxisAlignment: MainAxisAlignment.spaceAround,
-                                        children: [
-                                          GestureDetector(
-                                            onTap: (){
-                                              pria();
-                                              Navigator.pop(context);
-                                            },
-                                            child: Padding(
-                                              padding: const EdgeInsets.symmetric(vertical: 8.0),
-                                              child: CustomText.textHeading5(
-                                                  text: "Pria",
-                                                  minSize: 17,
-                                                  maxLines: 1,
-                                                  color: Colors.blue
-                                              ),
-                                            ),
-                                          ),
-                                          GestureDetector(
-                                            onTap: (){
-                                              wanita();
-                                              Navigator.pop(context);
-                                            },
-                                            child: Padding(
-                                              padding: const EdgeInsets.symmetric(vertical: 8.0),
-                                              child: Row(
-                                                children: [
-                                                  CustomText.textHeading5(
-                                                      text: "Wanita",
-                                                      minSize: 17,
-                                                      maxLines: 1,
-                                                      color: Colors.pink
-                                                  ),
-                                                ],
-                                              ),
-                                            ),
-                                          ),
-                                        ],
+                      SizedBox(height: CustomSize.sizeHeight(context) / 48,),
+                      CustomText.bodyLight12(text: "Jenis Kelamin", sizeNew: double.parse(((MediaQuery.of(context).size.width*0.03).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.03)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.03)).toString())),
+                      SizedBox(
+                        height: CustomSize.sizeHeight(context) * 0.005,
+                      ),
+                      GestureDetector(
+                          onTap: (){
+                            showModalBottomSheet(
+                                isScrollControlled: true,
+                                shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.only(topLeft: Radius.circular(20), topRight: Radius.circular(20))
+                                ),
+                                context: context,
+                                builder: (_){
+                                  return Column(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      SizedBox(height: CustomSize.sizeHeight(context) / 86,),
+                                      Padding(
+                                        padding: EdgeInsets.symmetric(horizontal: CustomSize.sizeWidth(context) / 2.4),
+                                        child: Divider(thickness: 4,),
                                       ),
-                                    ),
-                                    SizedBox(height: CustomSize.sizeHeight(context) / 72,),
-                                  ],
-                                );
-                              }
-                            );
-                          },
-                        child: CustomText.textHeading4(
-                            text: (gender.toString() != '' && gender.toString() != 'null')?gender.toString().substring(0, 1).toUpperCase()+gender.toString().substring(1):'Pria',
-                            minSize: 18,
-                            maxLines: 1
-                        )
-                    ),
-                    Divider(
-                      color: Colors.black,
-                      thickness: 1,
-                    ),
-                    SizedBox(height: CustomSize.sizeHeight(context) / 48,),
-                    CustomText.bodyLight12(text: "Tanggal Lahir"),
-                    SizedBox(
-                      height: CustomSize.sizeHeight(context) * 0.005,
-                    ),
-                    GestureDetector(
-                      onTap: (){
-                        DatePicker.showDatePicker(context, showTitleActions: true,
-                            onConfirm: (date) {
-                              setState(() {
-                                tgl = DateFormat('dd-MM-y').format(date);
-                              });
+                                      SizedBox(height: CustomSize.sizeHeight(context) / 106,),
+                                      Padding(
+                                        padding: EdgeInsets.symmetric(horizontal: CustomSize.sizeHeight(context) / 20),
+                                        child: Row(
+                                          crossAxisAlignment: CrossAxisAlignment.center,
+                                          mainAxisAlignment: MainAxisAlignment.spaceAround,
+                                          children: [
+                                            GestureDetector(
+                                              onTap: (){
+                                                pria();
+                                                Navigator.pop(context);
+                                              },
+                                              child: Padding(
+                                                padding: const EdgeInsets.symmetric(vertical: 8.0),
+                                                child: CustomText.textHeading5(
+                                                    text: "Pria",
+                                                    sizeNew: double.parse(((MediaQuery.of(context).size.width*0.06).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.06)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.06)).toString()),
+                                                    maxLines: 1,
+                                                    color: Colors.blue
+                                                ),
+                                              ),
+                                            ),
+                                            GestureDetector(
+                                              onTap: (){
+                                                wanita();
+                                                Navigator.pop(context);
+                                              },
+                                              child: Padding(
+                                                padding: const EdgeInsets.symmetric(vertical: 8.0),
+                                                child: Row(
+                                                  children: [
+                                                    CustomText.textHeading5(
+                                                        text: "Wanita",
+                                                        sizeNew: double.parse(((MediaQuery.of(context).size.width*0.06).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.06)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.06)).toString()),
+                                                        maxLines: 1,
+                                                        color: Colors.pink
+                                                    ),
+                                                  ],
+                                                ),
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                      SizedBox(height: CustomSize.sizeHeight(context) / 72,),
+                                    ],
+                                  );
+                                }
+                              );
                             },
-                            currentTime: DateTime(DateTime.now().year, DateTime.now().month,
-                                DateTime.now().day),
-                            locale: LocaleType.id,
-                            maxTime: DateTime(DateTime.now().year, 12, 31)
-                        );
-                      },
-                      child: CustomText.textHeading4(
-                          // text: (tgl.toString() != 'null')?tgl.toString():DateFormat('dd-MM-y').format(DateTime.now()).toString(),
-                          text: (tgl.toString() != 'null')?tgl.toString():DateFormat('dd-MM-y').format(DateTime.now()).toString(),
-                          minSize: 18,
-                          maxLines: 1
+                          child: CustomText.textHeading4(
+                              text: (gender.toString() != '' && gender.toString() != 'null')?gender.toString().substring(0, 1).toUpperCase()+gender.toString().substring(1):'Pria',
+                              sizeNew: double.parse(((MediaQuery.of(context).size.width*0.045).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.045)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.045)).toString()),
+                              maxLines: 1
+                          )
                       ),
-                    ),
-                    Divider(
-                      color: Colors.black,
-                      thickness: 1,
-                    ),
-                    // // SizedBox(height: CustomSize.sizeHeight(context) / 48,),
-                    // //------------------------------------ checkbox pass -------------------------------------
-                    // Row(
-                    //   mainAxisSize: MainAxisSize.max,
-                    //   mainAxisAlignment: MainAxisAlignment.start,
-                    //   children: [
-                    //     Checkbox(
-                    //       value: Pass,
-                    //       onChanged: (bool? value) {
-                    //         setState(() {
-                    //           print(value);
-                    //           Pass = value!;
-                    //         });
-                    //       },
-                    //     ),
-                    //     // Text('Apakah Restomu melayani reservasi ?', style: TextStyle(fontWeight: FontWeight.bold))
-                    //     Text('Apakah anda ingin mengganti password ?', style: GoogleFonts.poppins(
-                    //         textStyle: TextStyle(
-                    //             fontWeight: FontWeight.bold, fontSize: 12)),),
-                    //   ],
-                    // ),
-                    // //------------------------------------- new pass ----------------------------------------
-                    // (Pass)?CustomText.bodyLight12(text: "Masukkan password baru"):Container(),
-                    // (Pass)?TextField(
-                    //   maxLines: 1,
-                    //   controller: newPass,
-                    //   obscureText: _obscureText,
-                    //   keyboardType: TextInputType.text,
-                    //   cursorColor: Colors.black,
-                    //   style: GoogleFonts.poppins(
-                    //       textStyle:
-                    //       TextStyle(fontSize: 18, color: Colors.black, fontWeight: FontWeight.w600)),
-                    //   decoration: InputDecoration(
-                    //     suffixIcon: IconButton(
-                    //       highlightColor: Colors.transparent,
-                    //       onPressed: _toggle,
-                    //       icon: Icon(
-                    //           _obscureText
-                    //               ? MaterialCommunityIcons.eye
-                    //               : MaterialCommunityIcons.eye_off,
-                    //           color: Colors.black),
-                    //     ),
-                    //     isDense: true,
-                    //     contentPadding: EdgeInsets.symmetric(vertical: 10.0),
-                    //     hintStyle: GoogleFonts.poppins(
-                    //         textStyle:
-                    //         TextStyle(fontSize: 14, color: Colors.grey)),
-                    //     helperStyle: GoogleFonts.poppins(
-                    //         textStyle: TextStyle(fontSize: 14)),
-                    //     enabledBorder: UnderlineInputBorder(),
-                    //     focusedBorder: UnderlineInputBorder(),
-                    //   ),
-                    // ):Container(),
-                    // (Pass)?SizedBox(height: CustomSize.sizeHeight(context) / 48,):Container(),
-                    // //------------------------------------- confirm pass ----------------------------------------
-                    // (Pass)?CustomText.bodyLight12(text: "Konfirmasi password baru"):Container(),
-                    // (Pass)?TextField(
-                    //   maxLines: 1,
-                    //   controller: _newPass,
-                    //   obscureText: _obscureText2,
-                    //   keyboardType: TextInputType.text,
-                    //   cursorColor: Colors.black,
-                    //   style: GoogleFonts.poppins(
-                    //       textStyle:
-                    //       TextStyle(fontSize: 18, color: Colors.black, fontWeight: FontWeight.w600)),
-                    //   decoration: InputDecoration(
-                    //     suffixIcon: IconButton(
-                    //       highlightColor: Colors.transparent,
-                    //       onPressed: _toggle2,
-                    //       icon: Icon(
-                    //           _obscureText2
-                    //               ? MaterialCommunityIcons.eye
-                    //               : MaterialCommunityIcons.eye_off,
-                    //           color: Colors.black),
-                    //     ),
-                    //     isDense: true,
-                    //     contentPadding: EdgeInsets.symmetric(vertical: 10.0),
-                    //     hintStyle: GoogleFonts.poppins(
-                    //         textStyle:
-                    //         TextStyle(fontSize: 14, color: Colors.grey)),
-                    //     helperStyle: GoogleFonts.poppins(
-                    //         textStyle: TextStyle(fontSize: 14)),
-                    //     enabledBorder: UnderlineInputBorder(),
-                    //     focusedBorder: UnderlineInputBorder(),
-                    //   ),
-                    // ):Container(),
-                    // (Pass)?SizedBox(height: CustomSize.sizeHeight(context) / 68,):Container(),
-                    // SizedBox(height: CustomSize.sizeHeight(context) / 88,),
-                    // Padding(
-                    //   padding: EdgeInsets.only(
-                    //     left: CustomSize.sizeWidth(context) / 32,
-                    //     right: CustomSize.sizeWidth(context) / 32,
-                    //   ),
-                    //   child: CustomText.bodyRegular18(text: "*Jika ingin menggunakan login tanpa google tolong ganti password dan isi semua data anda terlebih dahulu!", color: CustomColor.redBtn, minSize: 15, maxLines: 3),
-                    // ),
-                    SizedBox(height: CustomSize.sizeHeight(context) / 48,),
-                    (isLoading != true)?GestureDetector(
-                      onTap: () async{
-                        setState(() {
-                          isLoading = false;
-                        });
-
-                        SharedPreferences pref = await SharedPreferences.getInstance();
-                        pref.setString('name',_loginTextName.text.toString());
-                        print(image.toString() + 'Ini Image');
-                        if (_loginEmailName.text == '') {
-                          Fluttertoast.showToast(msg: 'Email wajib diisi!');
-                        } else {
-                          if (Pass == false) {
-                            if (image != null) {
-                              editProfile(_loginTextName.text.toString(), _loginEmailName.text.toString(), tgl.toString(), gender.toString(), _loginNotelpName.text.toString(), image!, img.toString());
-                            } else if (image == null) {
-                              editProfile2(_loginTextName.text.toString(), _loginEmailName.text.toString(), tgl.toString(), gender.toString(), _loginNotelpName.text.toString());
-                            }
-                          } else if (Pass == true) {
-                            if (newPass.text.toString() == _newPass.text.toString()) {
-                              if (image != null) {
-                                editProfile(_loginTextName.text.toString(), _loginEmailName.text.toString(), tgl.toString(), gender.toString(), _loginNotelpName.text.toString(), image!, img.toString()).whenComplete(() {
-                                  _editPass();
+                      Divider(
+                        color: Colors.black,
+                        thickness: 1,
+                      ),
+                      SizedBox(height: CustomSize.sizeHeight(context) / 48,),
+                      CustomText.bodyLight12(text: "Tanggal Lahir", sizeNew: double.parse(((MediaQuery.of(context).size.width*0.03).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.03)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.03)).toString())),
+                      SizedBox(
+                        height: CustomSize.sizeHeight(context) * 0.005,
+                      ),
+                      GestureDetector(
+                        onTap: (){
+                          DatePicker.showDatePicker(context, showTitleActions: true,
+                              onConfirm: (date) {
+                                setState(() {
+                                  tgl = DateFormat('dd-MM-y').format(date);
                                 });
+                              },
+                              currentTime: DateTime(DateTime.now().year, DateTime.now().month,
+                                  DateTime.now().day),
+                              locale: LocaleType.id,
+                              maxTime: DateTime(DateTime.now().year, 12, 31)
+                          );
+                        },
+                        child: CustomText.textHeading4(
+                            // text: (tgl.toString() != 'null')?tgl.toString():DateFormat('dd-MM-y').format(DateTime.now()).toString(),
+                            text: (tgl.toString() != 'null')?tgl.toString():DateFormat('dd-MM-y').format(DateTime.now()).toString(),
+                            sizeNew: double.parse(((MediaQuery.of(context).size.width*0.045).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.045)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.045)).toString()),
+                            maxLines: 1
+                        ),
+                      ),
+                      Divider(
+                        color: Colors.black,
+                        thickness: 1,
+                      ),
+                      // // SizedBox(height: CustomSize.sizeHeight(context) / 48,),
+                      // //------------------------------------ checkbox pass -------------------------------------
+                      // Row(
+                      //   mainAxisSize: MainAxisSize.max,
+                      //   mainAxisAlignment: MainAxisAlignment.start,
+                      //   children: [
+                      //     Checkbox(
+                      //       value: Pass,
+                      //       onChanged: (bool? value) {
+                      //         setState(() {
+                      //           print(value);
+                      //           Pass = value!;
+                      //         });
+                      //       },
+                      //     ),
+                      //     // Text('Apakah Restomu melayani reservasi ?', style: TextStyle(fontWeight: FontWeight.bold))
+                      //     Text('Apakah anda ingin mengganti password ?', style: GoogleFonts.poppins(
+                      //         textStyle: TextStyle(
+                      //             fontWeight: FontWeight.bold, fontSize: 12)),),
+                      //   ],
+                      // ),
+                      // //------------------------------------- new pass ----------------------------------------
+                      // (Pass)?CustomText.bodyLight12(text: "Masukkan password baru"):Container(),
+                      // (Pass)?TextField(
+                      //   maxLines: 1,
+                      //   controller: newPass,
+                      //   obscureText: _obscureText,
+                      //   keyboardType: TextInputType.text,
+                      //   cursorColor: Colors.black,
+                      //   style: GoogleFonts.poppins(
+                      //       textStyle:
+                      //       TextStyle(fontSize: 18, color: Colors.black, fontWeight: FontWeight.w600)),
+                      //   decoration: InputDecoration(
+                      //     suffixIcon: IconButton(
+                      //       highlightColor: Colors.transparent,
+                      //       onPressed: _toggle,
+                      //       icon: Icon(
+                      //           _obscureText
+                      //               ? MaterialCommunityIcons.eye
+                      //               : MaterialCommunityIcons.eye_off,
+                      //           color: Colors.black),
+                      //     ),
+                      //     isDense: true,
+                      //     contentPadding: EdgeInsets.symmetric(vertical: 10.0),
+                      //     hintStyle: GoogleFonts.poppins(
+                      //         textStyle:
+                      //         TextStyle(fontSize: 14, color: Colors.grey)),
+                      //     helperStyle: GoogleFonts.poppins(
+                      //         textStyle: TextStyle(fontSize: 14)),
+                      //     enabledBorder: UnderlineInputBorder(),
+                      //     focusedBorder: UnderlineInputBorder(),
+                      //   ),
+                      // ):Container(),
+                      // (Pass)?SizedBox(height: CustomSize.sizeHeight(context) / 48,):Container(),
+                      // //------------------------------------- confirm pass ----------------------------------------
+                      // (Pass)?CustomText.bodyLight12(text: "Konfirmasi password baru"):Container(),
+                      // (Pass)?TextField(
+                      //   maxLines: 1,
+                      //   controller: _newPass,
+                      //   obscureText: _obscureText2,
+                      //   keyboardType: TextInputType.text,
+                      //   cursorColor: Colors.black,
+                      //   style: GoogleFonts.poppins(
+                      //       textStyle:
+                      //       TextStyle(fontSize: 18, color: Colors.black, fontWeight: FontWeight.w600)),
+                      //   decoration: InputDecoration(
+                      //     suffixIcon: IconButton(
+                      //       highlightColor: Colors.transparent,
+                      //       onPressed: _toggle2,
+                      //       icon: Icon(
+                      //           _obscureText2
+                      //               ? MaterialCommunityIcons.eye
+                      //               : MaterialCommunityIcons.eye_off,
+                      //           color: Colors.black),
+                      //     ),
+                      //     isDense: true,
+                      //     contentPadding: EdgeInsets.symmetric(vertical: 10.0),
+                      //     hintStyle: GoogleFonts.poppins(
+                      //         textStyle:
+                      //         TextStyle(fontSize: 14, color: Colors.grey)),
+                      //     helperStyle: GoogleFonts.poppins(
+                      //         textStyle: TextStyle(fontSize: 14)),
+                      //     enabledBorder: UnderlineInputBorder(),
+                      //     focusedBorder: UnderlineInputBorder(),
+                      //   ),
+                      // ):Container(),
+                      // (Pass)?SizedBox(height: CustomSize.sizeHeight(context) / 68,):Container(),
+                      // SizedBox(height: CustomSize.sizeHeight(context) / 88,),
+                      // Padding(
+                      //   padding: EdgeInsets.only(
+                      //     left: CustomSize.sizeWidth(context) / 32,
+                      //     right: CustomSize.sizeWidth(context) / 32,
+                      //   ),
+                      //   child: CustomText.bodyRegular18(text: "*Jika ingin menggunakan login tanpa google tolong ganti password dan isi semua data anda terlebih dahulu!", color: CustomColor.redBtn, minSize: 15, maxLines: 3),
+                      // ),
+                      SizedBox(height: CustomSize.sizeHeight(context) / 48,),
+                      (isLoading != true)?GestureDetector(
+                        onTap: () async{
+                          setState(() {
+                            isLoading = false;
+                          });
+
+                          SharedPreferences pref = await SharedPreferences.getInstance();
+                          pref.setString('name',_loginTextName.text.toString());
+                          print(image.toString() + 'Ini Image');
+                          if (_loginEmailName.text == '') {
+                            Fluttertoast.showToast(msg: 'Email wajib diisi!');
+                          } else {
+                            if (Pass == false) {
+                              if (image != null) {
+                                editProfile(_loginTextName.text.toString(), _loginEmailName.text.toString(), tgl.toString(), gender.toString(), _loginNotelpName.text.toString(), image!, img.toString());
                               } else if (image == null) {
-                                editProfile2(_loginTextName.text.toString(), _loginEmailName.text.toString(), tgl.toString(), gender.toString(), _loginNotelpName.text.toString()).whenComplete(() {
-                                  _editPass();
+                                editProfile2(_loginTextName.text.toString(), _loginEmailName.text.toString(), tgl.toString(), gender.toString(), _loginNotelpName.text.toString());
+                              }
+                            } else if (Pass == true) {
+                              if (newPass.text.toString() == _newPass.text.toString()) {
+                                if (image != null) {
+                                  editProfile(_loginTextName.text.toString(), _loginEmailName.text.toString(), tgl.toString(), gender.toString(), _loginNotelpName.text.toString(), image!, img.toString()).whenComplete(() {
+                                    _editPass();
+                                  });
+                                } else if (image == null) {
+                                  editProfile2(_loginTextName.text.toString(), _loginEmailName.text.toString(), tgl.toString(), gender.toString(), _loginNotelpName.text.toString()).whenComplete(() {
+                                    _editPass();
+                                  });
+                                }
+                              } else {
+                                Future.delayed(Duration(seconds: 1)).then((_) {
+                                  Fluttertoast.showToast(msg: 'Konfirmasi password gagal!');
+                                  // setState(() {
+                                  //   isLoading = true;
+                                  // });
                                 });
                               }
-                            } else {
-                              Future.delayed(Duration(seconds: 1)).then((_) {
-                                Fluttertoast.showToast(msg: 'Konfirmasi password gagal!');
-                                // setState(() {
-                                //   isLoading = true;
-                                // });
-                              });
                             }
                           }
-                        }
 
 
-                        // if (image != null || image.toString() != '' && Pass == false) {
-                        //   editProfile(_loginTextName.text.toString(), _loginEmailName.text.toString(), tgl.toString(), gender.toString(), _loginNotelpName.text.toString(), image, img.toString());
-                        // } else if (image == null || image.toString() == '' && Pass == false){
-                        //   editProfile2(_loginTextName.text.toString(), _loginEmailName.text.toString(), tgl.toString(), gender.toString(), _loginNotelpName.text.toString(), image, img.toString());
-                        // } else if (image != null || image.toString() != '' && Pass == true) {
-                        //   if (newPass.text.toString() == _newPass.text.toString()) {
-                        //     print(newPass.text.toString() == _newPass.text.toString());
-                        //     editProfile(_loginTextName.text.toString(), _loginEmailName.text.toString(), tgl.toString(), gender.toString(), _loginNotelpName.text.toString(), image, img.toString());
-                        //     _editPass();
-                        //   } else if (newPass.text.toString() != _newPass.text.toString()){
-                        //     Fluttertoast.showToast(msg: 'Konfirmasi password gagal!');
-                        //   }
-                        // } else if (image == null || image.toString() == '' && Pass == true) {
-                        //   if (newPass.text.toString() == _newPass.text.toString()) {
-                        //     print(newPass.text.toString() == _newPass.text.toString());
-                        //     editProfile2(_loginTextName.text.toString(), _loginEmailName.text.toString(), tgl.toString(), gender.toString(), _loginNotelpName.text.toString(), image, img.toString());
-                        //     _editPass();
-                        //   } else if (newPass.text.toString() != _newPass.text.toString()){
-                        //     Fluttertoast.showToast(msg: 'Konfirmasi password gagal!');
-                        //   }
-                        // }
+                          // if (image != null || image.toString() != '' && Pass == false) {
+                          //   editProfile(_loginTextName.text.toString(), _loginEmailName.text.toString(), tgl.toString(), gender.toString(), _loginNotelpName.text.toString(), image, img.toString());
+                          // } else if (image == null || image.toString() == '' && Pass == false){
+                          //   editProfile2(_loginTextName.text.toString(), _loginEmailName.text.toString(), tgl.toString(), gender.toString(), _loginNotelpName.text.toString(), image, img.toString());
+                          // } else if (image != null || image.toString() != '' && Pass == true) {
+                          //   if (newPass.text.toString() == _newPass.text.toString()) {
+                          //     print(newPass.text.toString() == _newPass.text.toString());
+                          //     editProfile(_loginTextName.text.toString(), _loginEmailName.text.toString(), tgl.toString(), gender.toString(), _loginNotelpName.text.toString(), image, img.toString());
+                          //     _editPass();
+                          //   } else if (newPass.text.toString() != _newPass.text.toString()){
+                          //     Fluttertoast.showToast(msg: 'Konfirmasi password gagal!');
+                          //   }
+                          // } else if (image == null || image.toString() == '' && Pass == true) {
+                          //   if (newPass.text.toString() == _newPass.text.toString()) {
+                          //     print(newPass.text.toString() == _newPass.text.toString());
+                          //     editProfile2(_loginTextName.text.toString(), _loginEmailName.text.toString(), tgl.toString(), gender.toString(), _loginNotelpName.text.toString(), image, img.toString());
+                          //     _editPass();
+                          //   } else if (newPass.text.toString() != _newPass.text.toString()){
+                          //     Fluttertoast.showToast(msg: 'Konfirmasi password gagal!');
+                          //   }
+                          // }
 
 
-                      },
-                      child: Container(
+                        },
+                        child: Container(
+                          width: CustomSize.sizeWidth(context),
+                          height: CustomSize.sizeHeight(context) / 14,
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(30),
+                            color: CustomColor.accent
+                          ),
+                          child: Center(child: CustomText.bodyRegular16(text: "Simpan", color: Colors.white, sizeNew: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.04)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.04)).toString()))),
+                        ),
+                      ):Container(
                         width: CustomSize.sizeWidth(context),
                         height: CustomSize.sizeHeight(context) / 14,
                         decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(30),
-                          color: CustomColor.accent
+                            borderRadius: BorderRadius.circular(30),
+                            color: CustomColor.accent
                         ),
-                        child: Center(child: CustomText.bodyRegular16(text: "Simpan", color: Colors.white,)),
-                      ),
-                    ):Container(
-                      width: CustomSize.sizeWidth(context),
-                      height: CustomSize.sizeHeight(context) / 14,
-                      decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(30),
-                          color: CustomColor.accent
-                      ),
-                      child: Center(
-                        child: CircularProgressIndicator(
-                          valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                        child: Center(
+                          child: CircularProgressIndicator(
+                            valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                          ),
                         ),
                       ),
-                    ),
-                    SizedBox(height: CustomSize.sizeHeight(context) / 48,)
-                  ],
-                ),
-              )
-            ],
+                      SizedBox(height: CustomSize.sizeHeight(context) / 48,)
+                    ],
+                  ),
+                )
+              ],
+            ),
           ),
         ),
       ),
+      data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0),
     );
   }
 }

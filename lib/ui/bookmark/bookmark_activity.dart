@@ -214,11 +214,15 @@ class _BookmarkActivityState extends State<BookmarkActivity> {
                 ),
                 Padding(
                   padding: EdgeInsets.symmetric(horizontal: CustomSize.sizeWidth(context) / 24),
-                  child: CustomText.textHeading3(
-                      text: "Restoran Favoritmu nih !",
-                      color: CustomColor.primary,
-                      minSize: 18,
-                      maxLines: 1
+                  child: MediaQuery(
+                    child: CustomText.textHeading3(
+                        text: "Restoran Favoritmu nih !",
+                        color: CustomColor.primary,
+                        // minSize: 18,
+                        sizeNew: double.parse(((MediaQuery.of(context).size.width*0.06).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.06).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.06).toString()),
+                        maxLines: 1
+                    ),
+                    data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0),
                   ),
                 ),
                 SizedBox(
@@ -276,11 +280,17 @@ class _BookmarkActivityState extends State<BookmarkActivity> {
                               SizedBox(height: CustomSize.sizeHeight(context) / 86,),
                               Padding(
                                 padding: EdgeInsets.only(left: CustomSize.sizeWidth(context) / 24),
-                                child: CustomText.bodyRegular14(text: resto[index].distance.toString() + " Km"),
+                                child: MediaQuery(
+                                    child: CustomText.bodyRegular14(text: resto[index].distance.toString() + " Km", sizeNew: double.parse(((MediaQuery.of(context).size.width*0.035).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.035).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.035).toString()),),
+                                  data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0),
+                                ),
                               ),
                               Padding(
                                 padding: EdgeInsets.only(left: CustomSize.sizeWidth(context) / 24),
-                                child: CustomText.bodyMedium16(text: resto[index].name),
+                                child: MediaQuery(
+                                    child: CustomText.bodyMedium16(text: resto[index].name, sizeNew: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.04).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.04).toString()),),
+                                  data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0),
+                                ),
                               ),
                             ],
                           ),
@@ -302,11 +312,15 @@ class _BookmarkActivityState extends State<BookmarkActivity> {
                     ),
                     Padding(
                       padding: EdgeInsets.symmetric(horizontal: CustomSize.sizeWidth(context) / 24),
-                      child: CustomText.textHeading3(
-                          text: "Restoran Favoritmu nih !",
-                          color: CustomColor.primary,
-                          minSize: 18,
-                          maxLines: 1
+                      child: MediaQuery(
+                        child: CustomText.textHeading3(
+                            text: "Restoran Favoritmu nih !",
+                            color: CustomColor.primary,
+                            // minSize: 18,
+                            sizeNew: double.parse(((MediaQuery.of(context).size.width*0.06).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.06).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.06).toString()),
+                            maxLines: 1
+                        ),
+                        data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0),
                       ),
                     ),
                     SizedBox(
@@ -393,11 +407,14 @@ class _BookmarkActivityState extends State<BookmarkActivity> {
                                   SizedBox(height: CustomSize.sizeHeight(context) / 86,),
                                   Padding(
                                     padding: EdgeInsets.only(left: CustomSize.sizeWidth(context) / 24),
-                                    child: CustomText.bodyRegular14(text: resto[index].distance.toString() + " Km"),
+                                    child: MediaQuery(child: CustomText.bodyRegular14(text: resto[index].distance.toString() + " Km",sizeNew: double.parse(((MediaQuery.of(context).size.width*0.035).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.035).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.035).toString()),),
+                                      data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0),
+                                    ),
                                   ),
                                   Padding(
                                     padding: EdgeInsets.only(left: CustomSize.sizeWidth(context) / 24),
-                                    child: CustomText.bodyMedium16(text: resto[index].name),
+                                    child: MediaQuery(child: CustomText.bodyMedium16(text: resto[index].name, sizeNew: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.04).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.04).toString()),),
+                                      data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0),),
                                   ),
                                 ],
                               ),
@@ -408,7 +425,10 @@ class _BookmarkActivityState extends State<BookmarkActivity> {
                     )
                   ],
               ),
-              Container(child: CustomText.bodyMedium12(text: "kosong", minSize: 12), alignment: Alignment.center, height: CustomSize.sizeHeight(context),),
+              Container(child: MediaQuery(
+                child: CustomText.bodyMedium12(text: "kosong", sizeNew: double.parse(((MediaQuery.of(context).size.width*0.03).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.03)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.03)).toString())),
+                data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0),
+              ), alignment: Alignment.center, height: CustomSize.sizeHeight(context),),
             ],
           ),
         ),

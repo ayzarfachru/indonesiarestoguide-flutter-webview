@@ -236,301 +236,304 @@ class _ProfileActivityState extends State<ProfileActivity> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: SafeArea(
-        child: Padding(
-          padding: EdgeInsets.symmetric(horizontal: CustomSize.sizeWidth(context) / 32),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  SizedBox(height: CustomSize.sizeHeight(context) / 38,),
-                  CustomText.textHeading4(
-                      text: "Profile",
-                      minSize: 18,
-                      maxLines: 1
-                  ),
-                  SizedBox(height: CustomSize.sizeHeight(context) / 38,),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    children: [
-                      Row(
-                        children: [
-                          (img == "" || img == null)?Container(
-                            width: CustomSize.sizeWidth(context) / 6,
-                            height: CustomSize.sizeWidth(context) / 6,
-                            decoration: (image==null)?(img == "" || img == null)?BoxDecoration(
-                                color: CustomColor.primary,
-                                shape: BoxShape.circle
-                            ):BoxDecoration(
-                              shape: BoxShape.circle,
-                              image: ("$img".substring(0, 8) == '/storage')?DecorationImage(
-                                  image: NetworkImage(Links.subUrl +
-                                      "$img"),
-                                  fit: BoxFit.cover
-                              ):DecorationImage(
-                                  image: Image.memory(Base64Decoder().convert(img)).image,
-                                  fit: BoxFit.cover
-                              ),
-                            ): BoxDecoration(
-                              shape: BoxShape.circle,
-                              image: new DecorationImage(
-                                  image: new FileImage(image!),
-                                  fit: BoxFit.cover
-                              ),
-                            ),
-                            child: (img == "" || img == null)?Center(
-                              child: CustomText.text(
-                                  size: 38,
-                                  weight: FontWeight.w800,
-                                  text: initial,
-                                  color: Colors.white
-                              ),
-                            ):Container(),
-                          ):FullScreenWidget(
-                            child: Container(
-                              width: CustomSize.sizeWidth(context) / 6,
-                              height: CustomSize.sizeWidth(context) / 6,
-                              child: ClipRRect(
-                                borderRadius: BorderRadius.circular(50),
-                                child: (img == "" || img == null)?Image.network(Links.subUrl + "$img", fit: BoxFit.fitWidth):Container(decoration: BoxDecoration(
-                                  shape: BoxShape.circle,
-                                  image: ("$img".substring(0, 8) == '/storage')?DecorationImage(
-                                      image: NetworkImage(Links.subUrl +
-                                          "$img"),
-                                      fit: BoxFit.cover
-                                  ):DecorationImage(
-                                      image: Image.memory(Base64Decoder().convert(img)).image,
-                                      fit: BoxFit.cover
-                                  ),
-                                ),),
-                              ),
-                            ),
-                          ),
-                          SizedBox(width: CustomSize.sizeWidth(context) / 32,),
-                          Container(
-                            width: CustomSize.sizeWidth(context) / 1.6,
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                CustomText.textHeading4(
-                                    text: name,
-                                    maxLines: 1,
-                                    minSize: 18
-                                ),
-                                (notelp.toString() != "null" && notelp.toString() != '')?CustomText.bodyLight16(text: notelp, maxLines: 1, minSize: 12)
-                                    :CustomText.bodyLight16(text: "Nomor belum diisi.", maxLines: 1, minSize: 12),
-                                CustomText.bodyLight16(text: email, maxLines: 1, minSize: 12),
-                              ],
-                            ),
-                          ),
-                        ],
-                      ),
-                      GestureDetector(
-                          onTap: () async{
-                            setState(() {
-                              Navigator.push(context, PageTransition(type: PageTransitionType.fade, child: new EditProfile()));
-                            });
-                          },
-                          child: Icon(Octicons.pencil)
-                      )
-                    ],
-                  ),
-                  SizedBox(height: CustomSize.sizeHeight(context) / 32,),
-                  (homepg != "1")?Padding(
-                    padding: EdgeInsets.symmetric(horizontal: CustomSize.sizeWidth(context) / 48),
-                    child: CustomText.textHeading4(
-                        text: "Akun",
-                        minSize: 18,
+    return MediaQuery(
+      child: Scaffold(
+        body: SafeArea(
+          child: Padding(
+            padding: EdgeInsets.symmetric(horizontal: CustomSize.sizeWidth(context) / 32),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    SizedBox(height: CustomSize.sizeHeight(context) / 38,),
+                    CustomText.textHeading4(
+                        text: "Profile",
+                        sizeNew: double.parse(((MediaQuery.of(context).size.width*0.045).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.045)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.045)).toString()),
                         maxLines: 1
                     ),
-                  ):
-                  Padding(
-                    padding: EdgeInsets.symmetric(horizontal: CustomSize.sizeWidth(context) / 48),
-                    child: CustomText.textHeading4(
-                        text: "Info Lainnya",
-                        minSize: 18,
-                        maxLines: 1
-                    ),
-                  ),
-                  Divider(),
-                  (homepg != "1")?GestureDetector(
-                    onTap: (){
-                      Navigator.push(
-                          context,
-                          PageTransition(
-                              type: PageTransitionType.rightToLeft,
-                              child: new HistoryActivity()));
-                    },
-                    child: Padding(
-                      padding: EdgeInsets.symmetric(
-                          horizontal: CustomSize.sizeWidth(context) / 48,
-                          vertical: CustomSize.sizeHeight(context) / 86
-                      ),
-                      child: Row(
-                        children: [
-                          Icon(FontAwesome.history),
-                          SizedBox(width: CustomSize.sizeWidth(context) / 48,),
-                          CustomText.bodyRegular16(
-                              text: "Riwayat",
-                              minSize: 16,
-                              maxLines: 1
-                          ),
-                        ],
-                      ),
-                    ),
-                  ):Container(),
-                  (homepg != "1")?Divider():Container(),
-                  Padding(
-                    padding: EdgeInsets.symmetric(
-                        horizontal: CustomSize.sizeWidth(context) / 48,
-                        vertical: CustomSize.sizeHeight(context) / 86
-                    ),
-                    child: GestureDetector(
-                      onTap: (){
-                        // _launchURL();
-                        launch('mailto:info@irg.com');
-                      },
-                      child: Row(
-                        children: [
-                          Icon(MaterialCommunityIcons.inbox_arrow_down),
-                          SizedBox(width: CustomSize.sizeWidth(context) / 48,),
-                          CustomText.bodyRegular16(
-                              text: "Masukan",
-                              minSize: 16,
-                              maxLines: 1
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-                  (homepg != "1")?Divider():Container(),
-                  (homepg != "1")?(id == '')?GestureDetector(
-                    onTap: () async{
-                      // SharedPreferences pref = await SharedPreferences.getInstance();
-                      // pref.setString("homepg", "1");
-                      setState(() {
-                        (kosong == '1')?Navigator.pushReplacement(context, PageTransition(type: PageTransitionType.fade, child: AddViewResto())):Fluttertoast.showToast(msg: "Tunggu sebentar.");
-                      });
-                    },
-                    child: Padding(
-                      padding: EdgeInsets.symmetric(
-                          horizontal: CustomSize.sizeWidth(context) / 48,
-                          vertical: CustomSize.sizeHeight(context) / 86
-                      ),
-                      child: Row(
-                        children: [
-                          Icon(MaterialIcons.store),
-                          SizedBox(width: CustomSize.sizeWidth(context) / 48,),
-                          CustomText.bodyRegular16(
-                              text: "Kelola Restomu",
-                              minSize: 16,
-                              maxLines: 1
-                          ),
-                        ],
-                      ),
-                    ),
-                  ):GestureDetector(
-                    onTap: () async{
-                      SharedPreferences pref = await SharedPreferences.getInstance();
-                      pref.setString("homepg", "1");
-                      // pref.setString("homerestoname", restoName);
-                      setState(() {
-                        Navigator.pushReplacement(context, PageTransition(type: PageTransitionType.fade, child: HomeActivityResto()));
-                      });
-                    },
-                    child: Padding(
-                      padding: EdgeInsets.symmetric(
-                          horizontal: CustomSize.sizeWidth(context) / 48,
-                          vertical: CustomSize.sizeHeight(context) / 86
-                      ),
-                      child: Row(
-                        children: [
-                          Icon(MaterialIcons.store),
-                          SizedBox(width: CustomSize.sizeWidth(context) / 48,),
-                          CustomText.bodyRegular16(
-                              text: "Kelola Restomu",
-                              minSize: 16,
-                              maxLines: 1
-                          ),
-                        ],
-                      ),
-                    ),
-                  ):Container(),
-                  (homepg != "1")?Divider():Container(),
-                  (homepg != "1")?SizedBox(height: CustomSize.sizeHeight(context) / 32,):Container(),
-                  (homepg != "1")?Padding(
-                    padding: EdgeInsets.symmetric(horizontal: CustomSize.sizeWidth(context) / 48),
-                    child: CustomText.textHeading4(
-                        text: "Info Lainnya",
-                        minSize: 18,
-                        maxLines: 1
-                    ),
-                  ):Container(),
-                  (homepg != "1")?Divider():Container(),
-                  GestureDetector(
-                    onTap: (){
-                      Navigator.pushReplacement(context, PageTransition(type: PageTransitionType.fade, child: AboutActivity()));
-                    },
-                    child: Padding(
-                      padding: EdgeInsets.symmetric(
-                          horizontal: CustomSize.sizeWidth(context) / 48,
-                          vertical: CustomSize.sizeHeight(context) / 86
-                      ),
-                      child: Row(
-                        children: [
-                          Icon(Icons.info_rounded),
-                          SizedBox(width: CustomSize.sizeWidth(context) / 48,),
-                          CustomText.bodyRegular16(
-                              text: "Tentang Kami",
-                              minSize: 16,
-                              maxLines: 1
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-                  Divider(),
-                ],
-              ),
-              GestureDetector(
-                onTap: () async{
-                  logOut();
-                  SharedPreferences pref = await SharedPreferences.getInstance();
-                  pref.clear();
-                  setState(() {
-                    Navigator.pushReplacement(context, PageTransition(type: PageTransitionType.fade, child: new LoginActivity()));
-                  });
-                },
-                child: Padding(
-                  padding: EdgeInsets.only(bottom: CustomSize.sizeHeight(context) / 48),
-                  child: Container(
-                    width: CustomSize.sizeWidth(context),
-                    height: CustomSize.sizeHeight(context) / 14,
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(30),
-                      border: Border.all(color: CustomColor.primary),
-                    ),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
+                    SizedBox(height: CustomSize.sizeHeight(context) / 38,),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       crossAxisAlignment: CrossAxisAlignment.center,
                       children: [
-                        Icon(Icons.logout, color: CustomColor.primary,),
-                        SizedBox(width: CustomSize.sizeWidth(context) / 48,),
-                        CustomText.bodyRegular16(text: "Keluar", color: CustomColor.primary),
+                        Row(
+                          children: [
+                            (img == "" || img == null)?Container(
+                              width: CustomSize.sizeWidth(context) / 6,
+                              height: CustomSize.sizeWidth(context) / 6,
+                              decoration: (image==null)?(img == "" || img == null)?BoxDecoration(
+                                  color: CustomColor.primary,
+                                  shape: BoxShape.circle
+                              ):BoxDecoration(
+                                shape: BoxShape.circle,
+                                image: ("$img".substring(0, 8) == '/storage')?DecorationImage(
+                                    image: NetworkImage(Links.subUrl +
+                                        "$img"),
+                                    fit: BoxFit.cover
+                                ):DecorationImage(
+                                    image: Image.memory(Base64Decoder().convert(img)).image,
+                                    fit: BoxFit.cover
+                                ),
+                              ): BoxDecoration(
+                                shape: BoxShape.circle,
+                                image: new DecorationImage(
+                                    image: new FileImage(image!),
+                                    fit: BoxFit.cover
+                                ),
+                              ),
+                              child: (img == "" || img == null)?Center(
+                                child: CustomText.text(
+                                    size: double.parse(((MediaQuery.of(context).size.width*0.094).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.094)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.094)).toString()),
+                                    weight: FontWeight.w800,
+                                    text: initial,
+                                    color: Colors.white
+                                ),
+                              ):Container(),
+                            ):FullScreenWidget(
+                              child: Container(
+                                width: CustomSize.sizeWidth(context) / 6,
+                                height: CustomSize.sizeWidth(context) / 6,
+                                child: ClipRRect(
+                                  borderRadius: BorderRadius.circular(50),
+                                  child: (img == "" || img == null)?Image.network(Links.subUrl + "$img", fit: BoxFit.fitWidth):Container(decoration: BoxDecoration(
+                                    shape: BoxShape.circle,
+                                    image: ("$img".substring(0, 8) == '/storage')?DecorationImage(
+                                        image: NetworkImage(Links.subUrl +
+                                            "$img"),
+                                        fit: BoxFit.cover
+                                    ):DecorationImage(
+                                        image: Image.memory(Base64Decoder().convert(img)).image,
+                                        fit: BoxFit.cover
+                                    ),
+                                  ),),
+                                ),
+                              ),
+                            ),
+                            SizedBox(width: CustomSize.sizeWidth(context) / 32,),
+                            Container(
+                              width: CustomSize.sizeWidth(context) / 1.6,
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  CustomText.textHeading4(
+                                      text: name,
+                                      maxLines: 1,
+                                      sizeNew: double.parse(((MediaQuery.of(context).size.width*0.045).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.045)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.045)).toString())
+                                  ),
+                                  (notelp.toString() != "null" && notelp.toString() != '')?CustomText.bodyLight16(text: notelp, maxLines: 1, sizeNew: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.04)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.04)).toString()))
+                                      :CustomText.bodyLight16(text: "Nomor belum diisi.", maxLines: 1, sizeNew: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.04)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.04)).toString())),
+                                  CustomText.bodyLight16(text: email, maxLines: 1, sizeNew: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.04)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.04)).toString())),
+                                ],
+                              ),
+                            ),
+                          ],
+                        ),
+                        GestureDetector(
+                            onTap: () async{
+                              setState(() {
+                                Navigator.push(context, PageTransition(type: PageTransitionType.fade, child: new EditProfile()));
+                              });
+                            },
+                            child: Icon(Octicons.pencil)
+                        )
                       ],
                     ),
-                  ),
+                    SizedBox(height: CustomSize.sizeHeight(context) / 32,),
+                    (homepg != "1")?Padding(
+                      padding: EdgeInsets.symmetric(horizontal: CustomSize.sizeWidth(context) / 48),
+                      child: CustomText.textHeading4(
+                          text: "Akun",
+                          sizeNew: double.parse(((MediaQuery.of(context).size.width*0.045).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.045)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.045)).toString()),
+                          maxLines: 1
+                      ),
+                    ):
+                    Padding(
+                      padding: EdgeInsets.symmetric(horizontal: CustomSize.sizeWidth(context) / 48),
+                      child: CustomText.textHeading4(
+                          text: "Info Lainnya",
+                          sizeNew: double.parse(((MediaQuery.of(context).size.width*0.045).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.045)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.045)).toString()),
+                          maxLines: 1
+                      ),
+                    ),
+                    Divider(),
+                    (homepg != "1")?GestureDetector(
+                      onTap: (){
+                        Navigator.push(
+                            context,
+                            PageTransition(
+                                type: PageTransitionType.rightToLeft,
+                                child: new HistoryActivity()));
+                      },
+                      child: Padding(
+                        padding: EdgeInsets.symmetric(
+                            horizontal: CustomSize.sizeWidth(context) / 48,
+                            vertical: CustomSize.sizeHeight(context) / 86
+                        ),
+                        child: Row(
+                          children: [
+                            Icon(FontAwesome.history),
+                            SizedBox(width: CustomSize.sizeWidth(context) / 48,),
+                            CustomText.bodyRegular16(
+                                text: "Riwayat",
+                                sizeNew: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.04)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.04)).toString()),
+                                maxLines: 1
+                            ),
+                          ],
+                        ),
+                      ),
+                    ):Container(),
+                    (homepg != "1")?Divider():Container(),
+                    Padding(
+                      padding: EdgeInsets.symmetric(
+                          horizontal: CustomSize.sizeWidth(context) / 48,
+                          vertical: CustomSize.sizeHeight(context) / 86
+                      ),
+                      child: GestureDetector(
+                        onTap: (){
+                          // _launchURL();
+                          launch('mailto:info@irg.com');
+                        },
+                        child: Row(
+                          children: [
+                            Icon(MaterialCommunityIcons.inbox_arrow_down),
+                            SizedBox(width: CustomSize.sizeWidth(context) / 48,),
+                            CustomText.bodyRegular16(
+                                text: "Masukan",
+                                sizeNew: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.04)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.04)).toString()),
+                                maxLines: 1
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                    (homepg != "1")?Divider():Container(),
+                    (homepg != "1")?(id == '')?GestureDetector(
+                      onTap: () async{
+                        // SharedPreferences pref = await SharedPreferences.getInstance();
+                        // pref.setString("homepg", "1");
+                        setState(() {
+                          (kosong == '1')?Navigator.pushReplacement(context, PageTransition(type: PageTransitionType.fade, child: AddViewResto())):Fluttertoast.showToast(msg: "Tunggu sebentar.");
+                        });
+                      },
+                      child: Padding(
+                        padding: EdgeInsets.symmetric(
+                            horizontal: CustomSize.sizeWidth(context) / 48,
+                            vertical: CustomSize.sizeHeight(context) / 86
+                        ),
+                        child: Row(
+                          children: [
+                            Icon(MaterialIcons.store),
+                            SizedBox(width: CustomSize.sizeWidth(context) / 48,),
+                            CustomText.bodyRegular16(
+                                text: "Kelola Restomu",
+                                sizeNew: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.04)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.04)).toString()),
+                                maxLines: 1
+                            ),
+                          ],
+                        ),
+                      ),
+                    ):GestureDetector(
+                      onTap: () async{
+                        SharedPreferences pref = await SharedPreferences.getInstance();
+                        pref.setString("homepg", "1");
+                        // pref.setString("homerestoname", restoName);
+                        setState(() {
+                          Navigator.pushReplacement(context, PageTransition(type: PageTransitionType.fade, child: HomeActivityResto()));
+                        });
+                      },
+                      child: Padding(
+                        padding: EdgeInsets.symmetric(
+                            horizontal: CustomSize.sizeWidth(context) / 48,
+                            vertical: CustomSize.sizeHeight(context) / 86
+                        ),
+                        child: Row(
+                          children: [
+                            Icon(MaterialIcons.store),
+                            SizedBox(width: CustomSize.sizeWidth(context) / 48,),
+                            CustomText.bodyRegular16(
+                                text: "Kelola Restomu",
+                                sizeNew: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.04)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.04)).toString()),
+                                maxLines: 1
+                            ),
+                          ],
+                        ),
+                      ),
+                    ):Container(),
+                    (homepg != "1")?Divider():Container(),
+                    (homepg != "1")?SizedBox(height: CustomSize.sizeHeight(context) / 32,):Container(),
+                    (homepg != "1")?Padding(
+                      padding: EdgeInsets.symmetric(horizontal: CustomSize.sizeWidth(context) / 48),
+                      child: CustomText.textHeading4(
+                          text: "Info Lainnya",
+                          sizeNew: double.parse(((MediaQuery.of(context).size.width*0.045).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.045)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.045)).toString()),
+                          maxLines: 1
+                      ),
+                    ):Container(),
+                    (homepg != "1")?Divider():Container(),
+                    GestureDetector(
+                      onTap: (){
+                        Navigator.pushReplacement(context, PageTransition(type: PageTransitionType.fade, child: AboutActivity()));
+                      },
+                      child: Padding(
+                        padding: EdgeInsets.symmetric(
+                            horizontal: CustomSize.sizeWidth(context) / 48,
+                            vertical: CustomSize.sizeHeight(context) / 86
+                        ),
+                        child: Row(
+                          children: [
+                            Icon(Icons.info_rounded),
+                            SizedBox(width: CustomSize.sizeWidth(context) / 48,),
+                            CustomText.bodyRegular16(
+                                text: "Tentang Kami",
+                                sizeNew: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.04)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.04)).toString()),
+                                maxLines: 1
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                    Divider(),
+                  ],
                 ),
-              )
-            ],
+                GestureDetector(
+                  onTap: () async{
+                    logOut();
+                    SharedPreferences pref = await SharedPreferences.getInstance();
+                    pref.clear();
+                    setState(() {
+                      Navigator.pushReplacement(context, PageTransition(type: PageTransitionType.fade, child: new LoginActivity()));
+                    });
+                  },
+                  child: Padding(
+                    padding: EdgeInsets.only(bottom: CustomSize.sizeHeight(context) / 48),
+                    child: Container(
+                      width: CustomSize.sizeWidth(context),
+                      height: CustomSize.sizeHeight(context) / 14,
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(30),
+                        border: Border.all(color: CustomColor.primary),
+                      ),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: [
+                          Icon(Icons.logout, color: CustomColor.primary,),
+                          SizedBox(width: CustomSize.sizeWidth(context) / 48,),
+                          CustomText.bodyRegular16(text: "Keluar", color: CustomColor.primary, sizeNew: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.04)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.04)).toString())),
+                        ],
+                      ),
+                    ),
+                  ),
+                )
+              ],
+            ),
           ),
         ),
       ),
+      data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0),
     );
   }
 }

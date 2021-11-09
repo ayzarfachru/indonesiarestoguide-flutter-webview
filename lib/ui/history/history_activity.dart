@@ -126,6 +126,13 @@ class _HistoryActivityState extends State<HistoryActivity> {
       homepg = (pref.getString('homepg'));
       print(homepg);
     });
+    Future.delayed(Duration(seconds: 1)).then((_) {
+      if (homepg != '1') {
+        _getHistory();
+      } else {
+        idResto();
+      }
+    });
   }
 
   RefreshController _refreshController =
@@ -149,20 +156,14 @@ class _HistoryActivityState extends State<HistoryActivity> {
 
   idResto() async {
     SharedPreferences pref = await SharedPreferences.getInstance();
-    pref.getString(id = "idresto");
+    id = pref.getString("idresto");
+    print('NGAB '+id.toString());
+    _getHistoryResto();
   }
 
   @override
   void initState() {
     getHomePg();
-    idResto();
-    Future.delayed(Duration(seconds: 1)).then((_) {
-      if (homepg != '1') {
-        _getHistory();
-      } else {
-        _getHistoryResto();
-      }
-    });
     getImg();
     super.initState();
   }
@@ -174,282 +175,285 @@ class _HistoryActivityState extends State<HistoryActivity> {
   }
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: CustomColor.secondary,
-      body: SafeArea(
-        child: (isLoading)?Container(
-            width: CustomSize.sizeWidth(context),
-            height: CustomSize.sizeHeight(context),
-            child: Center(child: CircularProgressIndicator(
-              color: CustomColor.primaryLight,
-            ))):SmartRefresher(
-          enablePullDown: true,
-          enablePullUp: false,
-          header: WaterDropMaterialHeader(
-            distance: 30,
-            backgroundColor: Colors.white,
-            color: CustomColor.primary,
-          ),
-          controller: _refreshController,
-          onRefresh: _onRefresh,
-          onLoading: _onLoading,
-          child: SingleChildScrollView(
-            controller: _scrollController,
-            child: (ksg != true)?Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                SizedBox(
-                  height: CustomSize.sizeHeight(context) / 32,
-                  child: Container(
-                    color: Colors.white,
-                  ),
-                ),
-                Container(
-                  width: CustomSize.sizeWidth(context),
-                  color: Colors.white,
-                  child: Padding(
-                    padding: EdgeInsets.symmetric(horizontal: CustomSize.sizeWidth(context) / 24),
-                    child: (homepg != "1")?CustomText.textHeading3(
-                        text: "Riwayat",
-                        minSize: 18,
-                        maxLines: 1
-                    ):CustomText.textHeading3(
-                        text: "Riwayat Penjualan",
-                        color: CustomColor.primary,
-                        minSize: 18,
-                        maxLines: 1
-                    ),
-                  ),
-                ),
-                ListView.builder(
-                    shrinkWrap: true,
-                    controller: _scrollController,
-                    physics: NeverScrollableScrollPhysics(),
-                    itemCount: (homepg != "1")?history.length:user.length,
-                    itemBuilder: (_, index){
-                      return Padding(
-                        padding: EdgeInsets.only(bottom: CustomSize.sizeHeight(context) / 86),
-                        child: GestureDetector(
-                          onTap: (){
-                            (homepg != "1")?Navigator.push(context, PageTransition(type: PageTransitionType.rightToLeft, child: new DetailHistory(history[index].id))):
-                            Navigator.push(context, PageTransition(type: PageTransitionType.rightToLeft, child: new DetailHistory(user[index].id)));
-                          },
-                          child: Container(
-                            width: CustomSize.sizeWidth(context),
-                            height: CustomSize.sizeHeight(context) / 4,
-                            color: Colors.white,
-                            child: Padding(
-                              padding: EdgeInsets.all(CustomSize.sizeWidth(context) / 38),
-                              child: Row(
-                                crossAxisAlignment: CrossAxisAlignment.center,
-                                children: [
-                                  Container(
-                                    width: CustomSize.sizeWidth(context) / 2.8,
-                                    height: CustomSize.sizeWidth(context) / 2.8,
-                                    decoration: BoxDecoration(
-                                        image: DecorationImage(
-                                            image: (homepg != "1")?NetworkImage(Links.subUrl + history[index].img):(user[index].img != null)?NetworkImage(Links.subUrl + user[index].img):AssetImage('assets/default.png') as ImageProvider,
-                                            fit: BoxFit.cover
-                                        ),
-                                        borderRadius: BorderRadius.circular(20)
-                                    ),
-                                  ),
-                                  SizedBox(width: CustomSize.sizeWidth(context) / 24,),
-                                  Container(
-                                    width: CustomSize.sizeWidth(context) / 2,
-                                    child: Column(
-                                      crossAxisAlignment: CrossAxisAlignment.start,
-                                      mainAxisAlignment: MainAxisAlignment.center,
-                                      children: [
-                                        CustomText.bodyMedium16(
-                                            text: (homepg != "1")?history[index].name:user[index].name
-                                            // history[index].name
-                                            ,
-                                            minSize: 16,
-                                            maxLines: 1
-                                        ),
-                                        CustomText.bodyLight12(
-                                            text: (homepg != "1")?history[index].time:user[index].time,
-                                            maxLines: 1,
-                                            minSize: 12
-                                        ),
-                                        CustomText.bodyMedium12(
-                                            text: (homepg != "1")?history[index].type:user[index].type,
-                                            maxLines: 1,
-                                            minSize: 12
-                                        ),
-                                        CustomText.bodyLight12(
-                                            text: (homepg != "1")?"Selesai":"",
-                                            maxLines: 1,
-                                            minSize: 12,
-                                            color: CustomColor.accent
-                                        ),
-                                        Row(
-                                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                          children: [
-                                            CustomText.textHeading4(
-                                                text: (homepg != "1")?NumberFormat.currency(locale: 'id', symbol: '', decimalDigits: 0).format(history[index].price):
-                                                NumberFormat.currency(locale: 'id', symbol: '', decimalDigits: 0).format(user[index].price),
-                                                minSize: 18,
-                                                maxLines: 1
-                                            ),
-                                            (homepg != "1")?
-                                            Container(
-                                              width: CustomSize.sizeWidth(context) / 4.2,
-                                              height: CustomSize.sizeHeight(context) / 24,
-                                              decoration: BoxDecoration(
-                                                  borderRadius: BorderRadius.circular(20),
-                                                  border: Border.all(color: CustomColor.accent)
-                                              ),
-                                              child: Center(child: CustomText.bodyRegular14(text: "Pesan Lagi", color: CustomColor.accent)),
-                                            ):Container(),
-                                          ],
-                                        )
-                                      ],
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ),
-                        ),
-                      );
-                    }
-                ),
-                SizedBox(height: CustomSize.sizeHeight(context) / 48,)
-              ],
-            ):Stack(
-              children: [
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    SizedBox(
-                      height: CustomSize.sizeHeight(context) / 32,
-                      child: Container(
-                        color: Colors.white,
-                      ),
-                    ),
-                    Container(
-                      width: CustomSize.sizeWidth(context),
+    return MediaQuery(
+      child: Scaffold(
+        backgroundColor: CustomColor.secondary,
+        body: SafeArea(
+          child: (isLoading)?Container(
+              width: CustomSize.sizeWidth(context),
+              height: CustomSize.sizeHeight(context),
+              child: Center(child: CircularProgressIndicator(
+                color: CustomColor.primaryLight,
+              ))):SmartRefresher(
+            enablePullDown: true,
+            enablePullUp: false,
+            header: WaterDropMaterialHeader(
+              distance: 30,
+              backgroundColor: Colors.white,
+              color: CustomColor.primary,
+            ),
+            controller: _refreshController,
+            onRefresh: _onRefresh,
+            onLoading: _onLoading,
+            child: SingleChildScrollView(
+              controller: _scrollController,
+              child: (ksg != true)?Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  SizedBox(
+                    height: CustomSize.sizeHeight(context) / 32,
+                    child: Container(
                       color: Colors.white,
-                      child: Padding(
-                        padding: EdgeInsets.symmetric(horizontal: CustomSize.sizeWidth(context) / 24),
-                        child: (homepg != "1")?CustomText.textHeading3(
-                            text: "Riwayat",
-                            minSize: 18,
-                            maxLines: 1
-                        ):CustomText.textHeading3(
-                            text: "Riwayat Pembelian",
-                            color: CustomColor.primary,
-                            minSize: 18,
-                            maxLines: 1
-                        ),
+                    ),
+                  ),
+                  Container(
+                    width: CustomSize.sizeWidth(context),
+                    color: Colors.white,
+                    child: Padding(
+                      padding: EdgeInsets.symmetric(horizontal: CustomSize.sizeWidth(context) / 24),
+                      child: (homepg != "1")?CustomText.textHeading3(
+                          text: "Riwayat",
+                          sizeNew: double.parse(((MediaQuery.of(context).size.width*0.045).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.045)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.045)).toString()),
+                          maxLines: 1
+                      ):CustomText.textHeading3(
+                          text: "Riwayat Penjualan",
+                          color: CustomColor.primary,
+                          sizeNew: double.parse(((MediaQuery.of(context).size.width*0.045).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.045)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.045)).toString()),
+                          maxLines: 1
                       ),
                     ),
-                    ListView.builder(
-                        shrinkWrap: true,
-                        controller: _scrollController,
-                        physics: NeverScrollableScrollPhysics(),
-                        itemCount: (homepg != "1")?history.length:user.length,
-                        itemBuilder: (_, index){
-                          return Padding(
-                            padding: EdgeInsets.only(bottom: CustomSize.sizeHeight(context) / 86),
-                            child: GestureDetector(
-                              onTap: (){
-                                (homepg != "1")?Navigator.push(context, PageTransition(type: PageTransitionType.rightToLeft, child: new DetailHistory(history[index].id))):
-                                Navigator.push(context, PageTransition(type: PageTransitionType.rightToLeft, child: new DetailHistory(user[index].id)));
-                              },
-                              child: Container(
-                                width: CustomSize.sizeWidth(context),
-                                height: CustomSize.sizeHeight(context) / 4,
-                                color: Colors.white,
-                                child: Padding(
-                                  padding: EdgeInsets.all(CustomSize.sizeWidth(context) / 38),
-                                  child: Row(
-                                    crossAxisAlignment: CrossAxisAlignment.center,
-                                    children: [
-                                      Container(
-                                        width: CustomSize.sizeWidth(context) / 2.8,
-                                        height: CustomSize.sizeWidth(context) / 2.8,
-                                        decoration: BoxDecoration(
-                                            image: DecorationImage(
-                                                image: (homepg != "1")?NetworkImage(Links.subUrl + history[index].img):NetworkImage(Links.subUrl + user[index].img),
-                                                fit: BoxFit.cover
-                                            ),
-                                            borderRadius: BorderRadius.circular(20)
-                                        ),
+                  ),
+                  ListView.builder(
+                      shrinkWrap: true,
+                      controller: _scrollController,
+                      physics: NeverScrollableScrollPhysics(),
+                      itemCount: (homepg != "1")?history.length:user.length,
+                      itemBuilder: (_, index){
+                        return Padding(
+                          padding: EdgeInsets.only(bottom: CustomSize.sizeHeight(context) / 86),
+                          child: GestureDetector(
+                            onTap: (){
+                              (homepg != "1")?Navigator.push(context, PageTransition(type: PageTransitionType.rightToLeft, child: new DetailHistory(history[index].id))):
+                              Navigator.push(context, PageTransition(type: PageTransitionType.rightToLeft, child: new DetailHistory(user[index].id)));
+                            },
+                            child: Container(
+                              width: CustomSize.sizeWidth(context),
+                              height: CustomSize.sizeHeight(context) / 4,
+                              color: Colors.white,
+                              child: Padding(
+                                padding: EdgeInsets.all(CustomSize.sizeWidth(context) / 38),
+                                child: Row(
+                                  crossAxisAlignment: CrossAxisAlignment.center,
+                                  children: [
+                                    Container(
+                                      width: CustomSize.sizeWidth(context) / 2.8,
+                                      height: CustomSize.sizeWidth(context) / 2.8,
+                                      decoration: BoxDecoration(
+                                          image: DecorationImage(
+                                              image: (homepg != "1")?NetworkImage(Links.subUrl + history[index].img):(user[index].img != null)?NetworkImage(Links.subUrl + user[index].img):AssetImage('assets/default.png') as ImageProvider,
+                                              fit: BoxFit.cover
+                                          ),
+                                          borderRadius: BorderRadius.circular(20)
                                       ),
-                                      SizedBox(width: CustomSize.sizeWidth(context) / 24,),
-                                      Container(
-                                        width: CustomSize.sizeWidth(context) / 2,
-                                        child: Column(
-                                          crossAxisAlignment: CrossAxisAlignment.start,
-                                          mainAxisAlignment: MainAxisAlignment.center,
-                                          children: [
-                                            CustomText.bodyMedium16(
-                                                text: (homepg != "1")?history[index].name:user[index].name
-                                                // history[index].name
-                                                ,
-                                                minSize: 16,
-                                                maxLines: 1
-                                            ),
-                                            CustomText.bodyLight12(
-                                                text: (homepg != "1")?history[index].time:user[index].time,
-                                                maxLines: 1,
-                                                minSize: 12
-                                            ),
-                                            CustomText.bodyMedium12(
-                                                text: (homepg != "1")?history[index].type:user[index].type,
-                                                maxLines: 1,
-                                                minSize: 12
-                                            ),
-                                            CustomText.bodyLight12(
-                                                text: (homepg != "1")?"Selesai":"",
-                                                maxLines: 1,
-                                                minSize: 12,
-                                                color: CustomColor.accent
-                                            ),
-                                            Row(
-                                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                              children: [
-                                                CustomText.textHeading4(
-                                                    text: (homepg != "1")?NumberFormat.currency(locale: 'id', symbol: '', decimalDigits: 0).format(history[index].price):
-                                                    NumberFormat.currency(locale: 'id', symbol: '', decimalDigits: 0).format(user[index].price),
-                                                    minSize: 18,
-                                                    maxLines: 1
+                                    ),
+                                    SizedBox(width: CustomSize.sizeWidth(context) / 24,),
+                                    Container(
+                                      width: CustomSize.sizeWidth(context) / 2,
+                                      child: Column(
+                                        crossAxisAlignment: CrossAxisAlignment.start,
+                                        mainAxisAlignment: MainAxisAlignment.center,
+                                        children: [
+                                          CustomText.bodyMedium16(
+                                              text: (homepg != "1")?history[index].name:user[index].name
+                                              // history[index].name
+                                              ,
+                                              sizeNew: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.04)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.04)).toString()),
+                                              maxLines: 1
+                                          ),
+                                          CustomText.bodyLight12(
+                                              text: (homepg != "1")?history[index].time:user[index].time,
+                                              maxLines: 1,
+                                              sizeNew: double.parse(((MediaQuery.of(context).size.width*0.03).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.03)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.03)).toString())
+                                          ),
+                                          CustomText.bodyMedium12(
+                                              text: (homepg != "1")?history[index].type:user[index].type,
+                                              maxLines: 1,
+                                              sizeNew: double.parse(((MediaQuery.of(context).size.width*0.03).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.03)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.03)).toString())
+                                          ),
+                                          CustomText.bodyLight12(
+                                              text: (homepg != "1")?"Selesai":"",
+                                              maxLines: 1,
+                                              sizeNew: double.parse(((MediaQuery.of(context).size.width*0.03).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.03)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.03)).toString()),
+                                              color: CustomColor.accent
+                                          ),
+                                          Row(
+                                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                            children: [
+                                              CustomText.textHeading4(
+                                                  text: (homepg != "1")?NumberFormat.currency(locale: 'id', symbol: '', decimalDigits: 0).format(history[index].price):
+                                                  NumberFormat.currency(locale: 'id', symbol: '', decimalDigits: 0).format(user[index].price),
+                                                  sizeNew: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.04)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.04)).toString()),
+                                                  maxLines: 1
+                                              ),
+                                              (homepg != "1")?
+                                              Container(
+                                                width: CustomSize.sizeWidth(context) / 4.2,
+                                                height: CustomSize.sizeHeight(context) / 24,
+                                                decoration: BoxDecoration(
+                                                    borderRadius: BorderRadius.circular(20),
+                                                    border: Border.all(color: CustomColor.accent)
                                                 ),
-                                                (homepg != "1")?
-                                                Container(
-                                                  width: CustomSize.sizeWidth(context) / 4.2,
-                                                  height: CustomSize.sizeHeight(context) / 24,
-                                                  decoration: BoxDecoration(
-                                                      borderRadius: BorderRadius.circular(20),
-                                                      border: Border.all(color: CustomColor.accent)
-                                                  ),
-                                                  child: Center(child: CustomText.bodyRegular14(text: "Pesan Lagi", color: CustomColor.accent)),
-                                                ):Container(),
-                                              ],
-                                            )
-                                          ],
-                                        ),
+                                                child: Center(child: CustomText.bodyRegular14(text: "Pesan Lagi", color: CustomColor.accent, sizeNew: double.parse(((MediaQuery.of(context).size.width*0.045).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.045)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.045)).toString())),),
+                                              ):Container(),
+                                            ],
+                                          )
+                                        ],
                                       ),
-                                    ],
-                                  ),
+                                    ),
+                                  ],
                                 ),
                               ),
                             ),
-                          );
-                        }
-                    ),
-                    SizedBox(height: CustomSize.sizeHeight(context) / 48,)
-                  ],
-                ),
-                Container(child: CustomText.bodyMedium12(text: "kosong", minSize: 12), alignment: Alignment.center, height: CustomSize.sizeHeight(context),),
-              ],
+                          ),
+                        );
+                      }
+                  ),
+                  SizedBox(height: CustomSize.sizeHeight(context) / 48,)
+                ],
+              ):Stack(
+                children: [
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      SizedBox(
+                        height: CustomSize.sizeHeight(context) / 32,
+                        child: Container(
+                          color: Colors.white,
+                        ),
+                      ),
+                      Container(
+                        width: CustomSize.sizeWidth(context),
+                        color: Colors.white,
+                        child: Padding(
+                          padding: EdgeInsets.symmetric(horizontal: CustomSize.sizeWidth(context) / 24),
+                          child: (homepg != "1")?CustomText.textHeading3(
+                              text: "Riwayat",
+                              sizeNew: double.parse(((MediaQuery.of(context).size.width*0.045).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.045)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.045)).toString()),
+                              maxLines: 1
+                          ):CustomText.textHeading3(
+                              text: "Riwayat Pembelian",
+                              color: CustomColor.primary,
+                              sizeNew: double.parse(((MediaQuery.of(context).size.width*0.045).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.045)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.045)).toString()),
+                              maxLines: 1
+                          ),
+                        ),
+                      ),
+                      ListView.builder(
+                          shrinkWrap: true,
+                          controller: _scrollController,
+                          physics: NeverScrollableScrollPhysics(),
+                          itemCount: (homepg != "1")?history.length:user.length,
+                          itemBuilder: (_, index){
+                            return Padding(
+                              padding: EdgeInsets.only(bottom: CustomSize.sizeHeight(context) / 86),
+                              child: GestureDetector(
+                                onTap: (){
+                                  (homepg != "1")?Navigator.push(context, PageTransition(type: PageTransitionType.rightToLeft, child: new DetailHistory(history[index].id))):
+                                  Navigator.push(context, PageTransition(type: PageTransitionType.rightToLeft, child: new DetailHistory(user[index].id)));
+                                },
+                                child: Container(
+                                  width: CustomSize.sizeWidth(context),
+                                  height: CustomSize.sizeHeight(context) / 4,
+                                  color: Colors.white,
+                                  child: Padding(
+                                    padding: EdgeInsets.all(CustomSize.sizeWidth(context) / 38),
+                                    child: Row(
+                                      crossAxisAlignment: CrossAxisAlignment.center,
+                                      children: [
+                                        Container(
+                                          width: CustomSize.sizeWidth(context) / 2.8,
+                                          height: CustomSize.sizeWidth(context) / 2.8,
+                                          decoration: BoxDecoration(
+                                              image: DecorationImage(
+                                                  image: (homepg != "1")?NetworkImage(Links.subUrl + history[index].img):NetworkImage(Links.subUrl + user[index].img),
+                                                  fit: BoxFit.cover
+                                              ),
+                                              borderRadius: BorderRadius.circular(20)
+                                          ),
+                                        ),
+                                        SizedBox(width: CustomSize.sizeWidth(context) / 24,),
+                                        Container(
+                                          width: CustomSize.sizeWidth(context) / 2,
+                                          child: Column(
+                                            crossAxisAlignment: CrossAxisAlignment.start,
+                                            mainAxisAlignment: MainAxisAlignment.center,
+                                            children: [
+                                              CustomText.bodyMedium16(
+                                                  text: (homepg != "1")?history[index].name:user[index].name
+                                                  // history[index].name
+                                                  ,
+                                                  sizeNew: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.04)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.04)).toString()),
+                                                  maxLines: 1
+                                              ),
+                                              CustomText.bodyLight12(
+                                                  text: (homepg != "1")?history[index].time:user[index].time,
+                                                  maxLines: 1,
+                                                  sizeNew: double.parse(((MediaQuery.of(context).size.width*0.03).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.03)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.03)).toString())
+                                              ),
+                                              CustomText.bodyMedium12(
+                                                  text: (homepg != "1")?history[index].type:user[index].type,
+                                                  maxLines: 1,
+                                                  sizeNew: double.parse(((MediaQuery.of(context).size.width*0.03).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.03)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.03)).toString())
+                                              ),
+                                              CustomText.bodyLight12(
+                                                  text: (homepg != "1")?"Selesai":"",
+                                                  maxLines: 1,
+                                                  sizeNew: double.parse(((MediaQuery.of(context).size.width*0.03).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.03)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.03)).toString()),
+                                                  color: CustomColor.accent
+                                              ),
+                                              Row(
+                                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                                children: [
+                                                  CustomText.textHeading4(
+                                                      text: (homepg != "1")?NumberFormat.currency(locale: 'id', symbol: '', decimalDigits: 0).format(history[index].price):
+                                                      NumberFormat.currency(locale: 'id', symbol: '', decimalDigits: 0).format(user[index].price),
+                                                      sizeNew: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.04)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.04)).toString()),
+                                                      maxLines: 1
+                                                  ),
+                                                  (homepg != "1")?
+                                                  Container(
+                                                    width: CustomSize.sizeWidth(context) / 4.2,
+                                                    height: CustomSize.sizeHeight(context) / 24,
+                                                    decoration: BoxDecoration(
+                                                        borderRadius: BorderRadius.circular(20),
+                                                        border: Border.all(color: CustomColor.accent)
+                                                    ),
+                                                    child: Center(child: CustomText.bodyRegular14(text: "Pesan Lagi", color: CustomColor.accent, sizeNew: double.parse(((MediaQuery.of(context).size.width*0.045).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.045)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.045)).toString()))),
+                                                  ):Container(),
+                                                ],
+                                              )
+                                            ],
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            );
+                          }
+                      ),
+                      SizedBox(height: CustomSize.sizeHeight(context) / 48,)
+                    ],
+                  ),
+                  Container(child: CustomText.bodyMedium12(text: "kosong", sizeNew: double.parse(((MediaQuery.of(context).size.width*0.03).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.03)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.03)).toString())), alignment: Alignment.center, height: CustomSize.sizeHeight(context),),
+                ],
+              ),
             ),
           ),
         ),
       ),
+      data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0),
     );
   }
 }

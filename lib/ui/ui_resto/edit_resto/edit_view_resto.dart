@@ -145,372 +145,375 @@ class _EditViewRestoState extends State<EditViewResto> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: SafeArea(
-        child: SingleChildScrollView(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              SizedBox(height: CustomSize.sizeHeight(context) / 38,),
-              Padding(
-                padding: EdgeInsets.symmetric(horizontal: CustomSize.sizeWidth(context) / 32),
-                child: CustomText.textHeading4(
-                    text: "Edit data restomu",
-                    minSize: 18,
-                    maxLines: 1
+    return MediaQuery(
+      child: Scaffold(
+        body: SafeArea(
+          child: SingleChildScrollView(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                SizedBox(height: CustomSize.sizeHeight(context) / 38,),
+                Padding(
+                  padding: EdgeInsets.symmetric(horizontal: CustomSize.sizeWidth(context) / 32),
+                  child: CustomText.textHeading4(
+                      text: "Edit data restomu",
+                      sizeNew: double.parse(((MediaQuery.of(context).size.width*0.045).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.045).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.045).toString()),
+                      maxLines: 1
+                  ),
                 ),
-              ),
-              SizedBox(height: CustomSize.sizeHeight(context) / 86,),
-              Divider(
-                thickness: 8,
-                color: CustomColor.secondary,
-              ),
-              Padding(
-                padding: EdgeInsets.symmetric(horizontal: CustomSize.sizeWidth(context) / 32),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    SizedBox(height: CustomSize.sizeHeight(context) / 48,),
-                    CustomText.bodyLight12(text: "Foto Resto"),
-                    SizedBox(height: CustomSize.sizeHeight(context) / 48,),
-                    Row(
-                      children: [
-                        GestureDetector(
-                          onTap: () async{
-                            // getImage();
-                            Fluttertoast.showToast(msg: 'Anda hanya bisa merubah email, nomor telepon, dan deskripsi resto di halaman ini.',);
-                          },
-                          child: Container(
-                            width: CustomSize.sizeWidth(context) / 6,
-                            height: CustomSize.sizeWidth(context) / 6,
-                            decoration: (image==null)?(img == "/".substring(0, 1))?BoxDecoration(
-                                color: CustomColor.primary,
-                                shape: BoxShape.circle
-                            ):BoxDecoration(
-                              shape: BoxShape.circle,
-                              image: new DecorationImage(
-                                  image: NetworkImage(Links.subUrl +
-                                      "$img"),
-                                  fit: BoxFit.cover
+                SizedBox(height: CustomSize.sizeHeight(context) / 86,),
+                Divider(
+                  thickness: 8,
+                  color: CustomColor.secondary,
+                ),
+                Padding(
+                  padding: EdgeInsets.symmetric(horizontal: CustomSize.sizeWidth(context) / 32),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      SizedBox(height: CustomSize.sizeHeight(context) / 48,),
+                      CustomText.bodyLight12(text: "Foto Resto", sizeNew: double.parse(((MediaQuery.of(context).size.width*0.03).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.03).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.03).toString())),
+                      SizedBox(height: CustomSize.sizeHeight(context) / 48,),
+                      Row(
+                        children: [
+                          GestureDetector(
+                            onTap: () async{
+                              // getImage();
+                              Fluttertoast.showToast(msg: 'Anda hanya bisa merubah email, nomor telepon, dan deskripsi resto di halaman ini.',);
+                            },
+                            child: Container(
+                              width: CustomSize.sizeWidth(context) / 6,
+                              height: CustomSize.sizeWidth(context) / 6,
+                              decoration: (image==null)?(img == "/".substring(0, 1))?BoxDecoration(
+                                  color: CustomColor.primary,
+                                  shape: BoxShape.circle
+                              ):BoxDecoration(
+                                shape: BoxShape.circle,
+                                image: new DecorationImage(
+                                    image: NetworkImage(Links.subUrl +
+                                        "$img"),
+                                    fit: BoxFit.cover
+                                ),
+                              ): BoxDecoration(
+                                shape: BoxShape.circle,
+                                image: new DecorationImage(
+                                    image: new FileImage(image!),
+                                    fit: BoxFit.cover
+                                ),
                               ),
-                            ): BoxDecoration(
-                              shape: BoxShape.circle,
-                              image: new DecorationImage(
-                                  image: new FileImage(image!),
-                                  fit: BoxFit.cover
-                              ),
+                              child: (img == "/".substring(0, 1))?Center(
+                                child: CustomText.text(
+                                    size: double.parse(((MediaQuery.of(context).size.width*0.094).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.094).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.094).toString()),
+                                    weight: FontWeight.w800,
+                                    text: initial,
+                                    color: Colors.white
+                                ),
+                              ):Container(),
                             ),
-                            child: (img == "/".substring(0, 1))?Center(
-                              child: CustomText.text(
-                                  size: 38,
-                                  weight: FontWeight.w800,
-                                  text: initial,
-                                  color: Colors.white
-                              ),
-                            ):Container(),
+                          ),
+                          SizedBox(width: CustomSize.sizeWidth(context) / 32,),
+                          // CustomText.bodyLight12(text: "Edit foto profile usaha"),
+                        ],
+                      ),
+                      SizedBox(height: CustomSize.sizeHeight(context) / 48,),
+                      CustomText.bodyLight12(text: "Nama", sizeNew: double.parse(((MediaQuery.of(context).size.width*0.03).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.03).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.03).toString())),
+                      SizedBox(
+                        height: CustomSize.sizeHeight(context) * 0.005,
+                      ),
+                      TextField(
+                        readOnly: true,
+                        onTap: (){
+                          Fluttertoast.showToast(msg: 'Anda hanya bisa merubah email, nomor telepon, dan deskripsi resto di halaman ini.',);
+                        },
+                        controller: _Name,
+                        keyboardType: TextInputType.text,
+                        cursorColor: Colors.black,
+                        style: GoogleFonts.poppins(
+                            textStyle:
+                            TextStyle(fontSize: 18, color: Colors.black, fontWeight: FontWeight.w600)),
+                        decoration: InputDecoration(
+                          isDense: true,
+                          contentPadding: EdgeInsets.only(bottom: CustomSize.sizeHeight(context) / 86),
+                          hintStyle: GoogleFonts.poppins(
+                              textStyle:
+                              TextStyle(fontSize: 14, color: Colors.grey)),
+                          helperStyle: GoogleFonts.poppins(
+                              textStyle: TextStyle(fontSize: 14)),
+                          enabledBorder: UnderlineInputBorder(
+
+                          ),
+                          focusedBorder: UnderlineInputBorder(
+
                           ),
                         ),
-                        SizedBox(width: CustomSize.sizeWidth(context) / 32,),
-                        // CustomText.bodyLight12(text: "Edit foto profile usaha"),
-                      ],
-                    ),
-                    SizedBox(height: CustomSize.sizeHeight(context) / 48,),
-                    CustomText.bodyLight12(text: "Nama"),
-                    SizedBox(
-                      height: CustomSize.sizeHeight(context) * 0.005,
-                    ),
-                    TextField(
-                      readOnly: true,
-                      onTap: (){
-                        Fluttertoast.showToast(msg: 'Anda hanya bisa merubah email, nomor telepon, dan deskripsi resto di halaman ini.',);
-                      },
-                      controller: _Name,
-                      keyboardType: TextInputType.text,
-                      cursorColor: Colors.black,
-                      style: GoogleFonts.poppins(
-                          textStyle:
-                          TextStyle(fontSize: 18, color: Colors.black, fontWeight: FontWeight.w600)),
-                      decoration: InputDecoration(
-                        isDense: true,
-                        contentPadding: EdgeInsets.only(bottom: CustomSize.sizeHeight(context) / 86),
-                        hintStyle: GoogleFonts.poppins(
-                            textStyle:
-                            TextStyle(fontSize: 14, color: Colors.grey)),
-                        helperStyle: GoogleFonts.poppins(
-                            textStyle: TextStyle(fontSize: 14)),
-                        enabledBorder: UnderlineInputBorder(
-
-                        ),
-                        focusedBorder: UnderlineInputBorder(
-
-                        ),
                       ),
-                    ),
-                    SizedBox(height: CustomSize.sizeHeight(context) / 48,),
-                    CustomText.bodyLight12(text: "Alamat"),
-                    SizedBox(
-                      height: CustomSize.sizeHeight(context) * 0.005,
-                    ),
-                    TextField(
-                      onTap: () async{
-                        Fluttertoast.showToast(msg: 'Tekan sekali lagi untuk refresh lokasi.',);
-                        List<Location> locations = await locationFromAddress(_Address.text.toString());
-                        // print('s '+locations.toString());
-                        // print(lat);
-                        // print(long);
-                        SharedPreferences pref = await SharedPreferences.getInstance();
-                        pref.setString("latitudeResto", (locations[0].toString().split(': ')[1].split(',')[0]).toString());
-                        pref.setString("longitudeResto", (locations[0].toString().split(',')[1].split(': ')[1]).toString());
-                        // lat = locations[0].toString().split(': ')[1].split(',')[0];
-                        // long = locations[0].toString().split(',')[1].split(': ')[1];
-                        print(locations[0].toString().split(': ')[1].split(',')[0]);
-                        print(locations[0].toString().split(',')[1].split(': ')[1]);
-
-                        // var result = await Navigator.push(
-                        //     context,
-                        //     PageTransition(
-                        //         type: PageTransitionType.rightToLeft,
-                        //         child: SearchAddressMapsResto(latitude!,longitude!)));
-                        // if(result != ""){
-                        //   SharedPreferences pref = await SharedPreferences.getInstance();
-                        //   _Address = TextEditingController(text: pref.getString('address'));
-                        //   setState(() {});
-                        // }
-                      },
-                      readOnly: true,
-                      controller: _Address,
-                      keyboardType: TextInputType.text,
-                      cursorColor: Colors.black,
-                      style: GoogleFonts.poppins(
-                          textStyle:
-                          TextStyle(fontSize: 18, color: Colors.black, fontWeight: FontWeight.w600)),
-                      decoration: InputDecoration(
-                        isDense: true,
-                        contentPadding: EdgeInsets.only(bottom: CustomSize.sizeHeight(context) / 86),
-                        hintStyle: GoogleFonts.poppins(
-                            textStyle:
-                            TextStyle(fontSize: 14, color: Colors.grey)),
-                        helperStyle: GoogleFonts.poppins(
-                            textStyle: TextStyle(fontSize: 14)),
-                        enabledBorder: UnderlineInputBorder(),
-                        focusedBorder: UnderlineInputBorder(),
-                        // suffixIcon: GestureDetector(
-                        //   // onTap: () async{
-                        //   //   var result = await Navigator.push(
-                        //   //       context,
-                        //   //       PageTransition(
-                        //   //           type: PageTransitionType.rightToLeft,
-                        //   //           child: SearchAddressMapsResto(latitude!,longitude!)));
-                        //   //   if(result != ""){
-                        //   //     SharedPreferences pref = await SharedPreferences.getInstance();
-                        //   //     _Address = TextEditingController(text: pref.getString('address'));
-                        //   //     setState(() {});
-                        //   //   }
-                        //   // },
-                        //   child: Stack(
-                        //     children: [
-                        //       Container(
-                        //         width: CustomSize.sizeWidth(context) / 4,
-                        //         decoration: BoxDecoration(
-                        //           borderRadius: BorderRadius.circular(25),
-                        //           border: Border.all(color: CustomColor.accent, width: 1),
-                        //           // color: CustomColor.accentLight
-                        //         ),
-                        //         child: Padding(
-                        //           padding: const EdgeInsets.all(2.0),
-                        //           child: Center(
-                        //             child: CustomText.textTitle8(
-                        //                 text: "Buka maps",
-                        //                 color: CustomColor.accent
-                        //             ),
-                        //           ),
-                        //         ),
-                        //       ),
-                        //     ],
-                        //   ),
-                        // )
+                      SizedBox(height: CustomSize.sizeHeight(context) / 48,),
+                      CustomText.bodyLight12(text: "Alamat", sizeNew: double.parse(((MediaQuery.of(context).size.width*0.03).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.03).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.03).toString())),
+                      SizedBox(
+                        height: CustomSize.sizeHeight(context) * 0.005,
                       ),
-                    ),
-                    SizedBox(height: CustomSize.sizeHeight(context) / 48,),
-                    CustomText.bodyLight12(text: "Email"),
-                    SizedBox(
-                      height: CustomSize.sizeHeight(context) * 0.005,
-                    ),
-                    TextField(
-                      // readOnly: (btnAddress == true)?true:false,
-                      controller: _Email,
-                      keyboardType: TextInputType.emailAddress,
-                      cursorColor: Colors.black,
-                      style: GoogleFonts.poppins(
-                          textStyle:
-                          TextStyle(fontSize: 18, color: Colors.black, fontWeight: FontWeight.w600)),
-                      decoration: InputDecoration(
-                        isDense: true,
-                        contentPadding: EdgeInsets.only(bottom: CustomSize.sizeHeight(context) / 86),
-                        hintStyle: GoogleFonts.poppins(
+                      TextField(
+                        onTap: () async{
+                          Fluttertoast.showToast(msg: 'Tekan sekali lagi untuk refresh lokasi.',);
+                          List<Location> locations = await locationFromAddress(_Address.text.toString());
+                          // print('s '+locations.toString());
+                          // print(lat);
+                          // print(long);
+                          SharedPreferences pref = await SharedPreferences.getInstance();
+                          pref.setString("latitudeResto", (locations[0].toString().split(': ')[1].split(',')[0]).toString());
+                          pref.setString("longitudeResto", (locations[0].toString().split(',')[1].split(': ')[1]).toString());
+                          // lat = locations[0].toString().split(': ')[1].split(',')[0];
+                          // long = locations[0].toString().split(',')[1].split(': ')[1];
+                          print(locations[0].toString().split(': ')[1].split(',')[0]);
+                          print(locations[0].toString().split(',')[1].split(': ')[1]);
+
+                          // var result = await Navigator.push(
+                          //     context,
+                          //     PageTransition(
+                          //         type: PageTransitionType.rightToLeft,
+                          //         child: SearchAddressMapsResto(latitude!,longitude!)));
+                          // if(result != ""){
+                          //   SharedPreferences pref = await SharedPreferences.getInstance();
+                          //   _Address = TextEditingController(text: pref.getString('address'));
+                          //   setState(() {});
+                          // }
+                        },
+                        readOnly: true,
+                        controller: _Address,
+                        keyboardType: TextInputType.text,
+                        cursorColor: Colors.black,
+                        style: GoogleFonts.poppins(
                             textStyle:
-                            TextStyle(fontSize: 14, color: Colors.grey)),
-                        helperStyle: GoogleFonts.poppins(
-                            textStyle: TextStyle(fontSize: 14)),
-                        enabledBorder: UnderlineInputBorder(
-
-                        ),
-                        focusedBorder: UnderlineInputBorder(
-
+                            TextStyle(fontSize: 18, color: Colors.black, fontWeight: FontWeight.w600)),
+                        decoration: InputDecoration(
+                          isDense: true,
+                          contentPadding: EdgeInsets.only(bottom: CustomSize.sizeHeight(context) / 86),
+                          hintStyle: GoogleFonts.poppins(
+                              textStyle:
+                              TextStyle(fontSize: 14, color: Colors.grey)),
+                          helperStyle: GoogleFonts.poppins(
+                              textStyle: TextStyle(fontSize: 14)),
+                          enabledBorder: UnderlineInputBorder(),
+                          focusedBorder: UnderlineInputBorder(),
+                          // suffixIcon: GestureDetector(
+                          //   // onTap: () async{
+                          //   //   var result = await Navigator.push(
+                          //   //       context,
+                          //   //       PageTransition(
+                          //   //           type: PageTransitionType.rightToLeft,
+                          //   //           child: SearchAddressMapsResto(latitude!,longitude!)));
+                          //   //   if(result != ""){
+                          //   //     SharedPreferences pref = await SharedPreferences.getInstance();
+                          //   //     _Address = TextEditingController(text: pref.getString('address'));
+                          //   //     setState(() {});
+                          //   //   }
+                          //   // },
+                          //   child: Stack(
+                          //     children: [
+                          //       Container(
+                          //         width: CustomSize.sizeWidth(context) / 4,
+                          //         decoration: BoxDecoration(
+                          //           borderRadius: BorderRadius.circular(25),
+                          //           border: Border.all(color: CustomColor.accent, width: 1),
+                          //           // color: CustomColor.accentLight
+                          //         ),
+                          //         child: Padding(
+                          //           padding: const EdgeInsets.all(2.0),
+                          //           child: Center(
+                          //             child: CustomText.textTitle8(
+                          //                 text: "Buka maps",
+                          //                 color: CustomColor.accent
+                          //             ),
+                          //           ),
+                          //         ),
+                          //       ),
+                          //     ],
+                          //   ),
+                          // )
                         ),
                       ),
-                    ),
-                    SizedBox(height: CustomSize.sizeHeight(context) / 48,),
-                    CustomText.bodyLight12(text: "No Telp"),
-                    SizedBox(
-                      height: CustomSize.sizeHeight(context) * 0.005,
-                    ),
-                    TextField(
-                      // readOnly: (btnAddress == true)?true:false,
-                      controller: _NoTelp,
-                      keyboardType: TextInputType.number,
-                      cursorColor: Colors.black,
-                      style: GoogleFonts.poppins(
-                          textStyle:
-                          TextStyle(fontSize: 18, color: Colors.black, fontWeight: FontWeight.w600)),
-                      decoration: InputDecoration(
-                        isDense: true,
-                        contentPadding: EdgeInsets.only(bottom: CustomSize.sizeHeight(context) / 86),
-                        hintStyle: GoogleFonts.poppins(
-                            textStyle:
-                            TextStyle(fontSize: 14, color: Colors.grey)),
-                        helperStyle: GoogleFonts.poppins(
-                            textStyle: TextStyle(fontSize: 14)),
-                        enabledBorder: UnderlineInputBorder(),
-                        focusedBorder: UnderlineInputBorder(),
+                      SizedBox(height: CustomSize.sizeHeight(context) / 48,),
+                      CustomText.bodyLight12(text: "Email", sizeNew: double.parse(((MediaQuery.of(context).size.width*0.03).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.03).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.03).toString())),
+                      SizedBox(
+                        height: CustomSize.sizeHeight(context) * 0.005,
                       ),
-                    ),
-                    SizedBox(height: CustomSize.sizeHeight(context) / 48,),
-                    CustomText.bodyLight12(text: "Deskripsi Resto"),
-                    SizedBox(
-                      height: CustomSize.sizeHeight(context) * 0.005,
-                    ),
-                    TextField(
-                      // readOnly: (btnAddress == true)?true:false,
-                      controller: _Desc,
-                      keyboardType: TextInputType.text,
-                      cursorColor: Colors.black,
-                      style: GoogleFonts.poppins(
-                          textStyle:
-                          TextStyle(fontSize: 18, color: Colors.black, fontWeight: FontWeight.w600)),
-                      decoration: InputDecoration(
-                        isDense: true,
-                        contentPadding: EdgeInsets.only(bottom: CustomSize.sizeHeight(context) / 86),
-                        hintStyle: GoogleFonts.poppins(
+                      TextField(
+                        // readOnly: (btnAddress == true)?true:false,
+                        controller: _Email,
+                        keyboardType: TextInputType.emailAddress,
+                        cursorColor: Colors.black,
+                        style: GoogleFonts.poppins(
                             textStyle:
-                            TextStyle(fontSize: 14, color: Colors.grey)),
-                        helperStyle: GoogleFonts.poppins(
-                            textStyle: TextStyle(fontSize: 14)),
-                        enabledBorder: UnderlineInputBorder(),
-                        focusedBorder: UnderlineInputBorder(),
+                            TextStyle(fontSize: 18, color: Colors.black, fontWeight: FontWeight.w600)),
+                        decoration: InputDecoration(
+                          isDense: true,
+                          contentPadding: EdgeInsets.only(bottom: CustomSize.sizeHeight(context) / 86),
+                          hintStyle: GoogleFonts.poppins(
+                              textStyle:
+                              TextStyle(fontSize: 14, color: Colors.grey)),
+                          helperStyle: GoogleFonts.poppins(
+                              textStyle: TextStyle(fontSize: 14)),
+                          enabledBorder: UnderlineInputBorder(
+
+                          ),
+                          focusedBorder: UnderlineInputBorder(
+
+                          ),
+                        ),
                       ),
-                    ),
-                    SizedBox(height: CustomSize.sizeHeight(context) / 48,),
-                  ],
-                ),
-              )
-            ],
+                      SizedBox(height: CustomSize.sizeHeight(context) / 48,),
+                      CustomText.bodyLight12(text: "No Telp", sizeNew: double.parse(((MediaQuery.of(context).size.width*0.03).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.03).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.03).toString())),
+                      SizedBox(
+                        height: CustomSize.sizeHeight(context) * 0.005,
+                      ),
+                      TextField(
+                        // readOnly: (btnAddress == true)?true:false,
+                        controller: _NoTelp,
+                        keyboardType: TextInputType.number,
+                        cursorColor: Colors.black,
+                        style: GoogleFonts.poppins(
+                            textStyle:
+                            TextStyle(fontSize: 18, color: Colors.black, fontWeight: FontWeight.w600)),
+                        decoration: InputDecoration(
+                          isDense: true,
+                          contentPadding: EdgeInsets.only(bottom: CustomSize.sizeHeight(context) / 86),
+                          hintStyle: GoogleFonts.poppins(
+                              textStyle:
+                              TextStyle(fontSize: 14, color: Colors.grey)),
+                          helperStyle: GoogleFonts.poppins(
+                              textStyle: TextStyle(fontSize: 14)),
+                          enabledBorder: UnderlineInputBorder(),
+                          focusedBorder: UnderlineInputBorder(),
+                        ),
+                      ),
+                      SizedBox(height: CustomSize.sizeHeight(context) / 48,),
+                      CustomText.bodyLight12(text: "Deskripsi Resto", sizeNew: double.parse(((MediaQuery.of(context).size.width*0.03).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.03).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.03).toString())),
+                      SizedBox(
+                        height: CustomSize.sizeHeight(context) * 0.005,
+                      ),
+                      TextField(
+                        // readOnly: (btnAddress == true)?true:false,
+                        controller: _Desc,
+                        keyboardType: TextInputType.text,
+                        cursorColor: Colors.black,
+                        style: GoogleFonts.poppins(
+                            textStyle:
+                            TextStyle(fontSize: 18, color: Colors.black, fontWeight: FontWeight.w600)),
+                        decoration: InputDecoration(
+                          isDense: true,
+                          contentPadding: EdgeInsets.only(bottom: CustomSize.sizeHeight(context) / 86),
+                          hintStyle: GoogleFonts.poppins(
+                              textStyle:
+                              TextStyle(fontSize: 14, color: Colors.grey)),
+                          helperStyle: GoogleFonts.poppins(
+                              textStyle: TextStyle(fontSize: 14)),
+                          enabledBorder: UnderlineInputBorder(),
+                          focusedBorder: UnderlineInputBorder(),
+                        ),
+                      ),
+                      SizedBox(height: CustomSize.sizeHeight(context) / 48,),
+                    ],
+                  ),
+                )
+              ],
+            ),
+          ),
+        ),
+        floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
+        floatingActionButton:
+        (karyawan == '1')?GestureDetector(
+          onTap: () async{
+            setState(() {
+              isLoading = false;
+            });
+            List<Location> locations = await locationFromAddress(_Address.text.toString());
+            SharedPreferences pref = await SharedPreferences.getInstance();
+            pref.setString("latitudeResto", (locations[0].toString().split(': ')[1].split(',')[0]).toString());
+            pref.setString("longitudeResto", (locations[0].toString().split(',')[1].split(': ')[1]).toString());
+            // lat = locations[0].toString().split(': ')[1].split(',')[0];
+            // long = locations[0].toString().split(',')[1].split(': ')[1];
+            print(locations[0].toString().split(': ')[1].split(',')[0]);
+            print(locations[0].toString().split(',')[1].split(': ')[1]);
+            pref.setString("imgResto", (image != null)?'data:image/$extension;base64,'+base64Encode(image!.readAsBytesSync()).toString():'');
+            pref.setString("nameResto", _Name.text.toString());
+            pref.setString("emailResto", _Email.text.toString());
+            pref.setString("notelpResto", _NoTelp.text.toString());
+            pref.setString("descResto", _Desc.text.toString());
+            pref.setString("addressResto", _Address.text.toString());
+            // pref.setString("latitudeResto", lat);
+            // pref.setString("longitudeResto", long);
+            print(lat);
+            print(long);
+            print(pref.getString("imgResto"));
+            print(pref.getString("nameResto"));
+            print(pref.getString("emailResto"));
+            print(pref.getString("notelpResto"));
+            print(pref.getString("latitudeResto"));
+            print(pref.getString("longitudeResto"));
+            print(pref.getString("descResto"));
+
+            Navigator.push(context, PageTransition(type: PageTransitionType.fade, child: new EditDataUsaha(facility, cuisine, can_delivery, can_takeaway, ongkir, reservation_fee, idResto, email, badanU, pemilikU, penanggungJwb, nameRekening, nameBank, nomorRekening, foto_pj, ktp)));
+
+          },
+          child: Container(
+            width: CustomSize.sizeWidth(context) / 1.1,
+            height: CustomSize.sizeHeight(context) / 14,
+            decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(30),
+                color: CustomColor.accent
+            ),
+            child: Center(child: CustomText.bodyRegular16(text: "Lanjut", color: Colors.white, sizeNew: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.04).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.04).toString()))),
+          ),
+        ):GestureDetector(
+          onTap: () async{
+            setState(() {
+              isLoading = false;
+            });
+            List<Location> locations = await locationFromAddress(_Address.text.toString());
+            // print('s '+locations.toString());
+            // print(lat);
+            // print(long);
+            SharedPreferences pref = await SharedPreferences.getInstance();
+            pref.setString("latitudeResto", (locations[0].toString().split(': ')[1].split(',')[0]).toString());
+            pref.setString("longitudeResto", (locations[0].toString().split(',')[1].split(': ')[1]).toString());
+            // lat = locations[0].toString().split(': ')[1].split(',')[0];
+            // long = locations[0].toString().split(',')[1].split(': ')[1];
+            print(locations[0].toString().split(': ')[1].split(',')[0]);
+            print(locations[0].toString().split(',')[1].split(': ')[1]);
+            pref.setString("imgResto", (image != null)?'data:image/$extension;base64,'+base64Encode(image!.readAsBytesSync()).toString():'');
+            pref.setString("nameResto", _Name.text.toString());
+            pref.setString("emailResto", _Email.text.toString());
+            pref.setString("notelpResto", _NoTelp.text.toString());
+            pref.setString("descResto", _Desc.text.toString());
+            pref.setString("addressResto", _Address.text.toString());
+            // pref.setString("latitudeResto", lat);
+            // pref.setString("longitudeResto", long);
+
+            print(lat);
+            print(long);
+            print(pref.getString("imgResto"));
+            print(pref.getString("nameResto"));
+            print(pref.getString("emailResto"));
+            print(pref.getString("notelpResto"));
+            print(pref.getString("latitudeResto"));
+            print(pref.getString("longitudeResto"));
+            print(pref.getString("descResto"));
+
+            Navigator.push(context, PageTransition(type: PageTransitionType.fade, child: new EditDataUsaha(facility, cuisine, can_delivery, can_takeaway, ongkir, reservation_fee, idResto, email, badanU, pemilikU, penanggungJwb, nameRekening, nameBank, nomorRekening, foto_pj, ktp)));
+
+          },
+          child: Container(
+            width: CustomSize.sizeWidth(context) / 1.1,
+            height: CustomSize.sizeHeight(context) / 14,
+            decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(30),
+                color: CustomColor.accent
+            ),
+            child: Center(child: CustomText.bodyRegular16(text: "Lanjut", color: Colors.white, sizeNew: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.04).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.04).toString()))),
           ),
         ),
       ),
-      floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
-      floatingActionButton:
-      (karyawan == '1')?GestureDetector(
-        onTap: () async{
-          setState(() {
-            isLoading = false;
-          });
-          List<Location> locations = await locationFromAddress(_Address.text.toString());
-          SharedPreferences pref = await SharedPreferences.getInstance();
-          pref.setString("latitudeResto", (locations[0].toString().split(': ')[1].split(',')[0]).toString());
-          pref.setString("longitudeResto", (locations[0].toString().split(',')[1].split(': ')[1]).toString());
-          // lat = locations[0].toString().split(': ')[1].split(',')[0];
-          // long = locations[0].toString().split(',')[1].split(': ')[1];
-          print(locations[0].toString().split(': ')[1].split(',')[0]);
-          print(locations[0].toString().split(',')[1].split(': ')[1]);
-          pref.setString("imgResto", (image != null)?'data:image/$extension;base64,'+base64Encode(image!.readAsBytesSync()).toString():'');
-          pref.setString("nameResto", _Name.text.toString());
-          pref.setString("emailResto", _Email.text.toString());
-          pref.setString("notelpResto", _NoTelp.text.toString());
-          pref.setString("descResto", _Desc.text.toString());
-          pref.setString("addressResto", _Address.text.toString());
-          // pref.setString("latitudeResto", lat);
-          // pref.setString("longitudeResto", long);
-          print(lat);
-          print(long);
-          print(pref.getString("imgResto"));
-          print(pref.getString("nameResto"));
-          print(pref.getString("emailResto"));
-          print(pref.getString("notelpResto"));
-          print(pref.getString("latitudeResto"));
-          print(pref.getString("longitudeResto"));
-          print(pref.getString("descResto"));
-
-          Navigator.push(context, PageTransition(type: PageTransitionType.fade, child: new EditDataUsaha(facility, cuisine, can_delivery, can_takeaway, ongkir, reservation_fee, idResto, email, badanU, pemilikU, penanggungJwb, nameRekening, nameBank, nomorRekening, foto_pj, ktp)));
-
-        },
-        child: Container(
-          width: CustomSize.sizeWidth(context) / 1.1,
-          height: CustomSize.sizeHeight(context) / 14,
-          decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(30),
-              color: CustomColor.accent
-          ),
-          child: Center(child: CustomText.bodyRegular16(text: "Lanjut", color: Colors.white,)),
-        ),
-      ):GestureDetector(
-        onTap: () async{
-          setState(() {
-            isLoading = false;
-          });
-          List<Location> locations = await locationFromAddress(_Address.text.toString());
-          // print('s '+locations.toString());
-          // print(lat);
-          // print(long);
-          SharedPreferences pref = await SharedPreferences.getInstance();
-          pref.setString("latitudeResto", (locations[0].toString().split(': ')[1].split(',')[0]).toString());
-          pref.setString("longitudeResto", (locations[0].toString().split(',')[1].split(': ')[1]).toString());
-          // lat = locations[0].toString().split(': ')[1].split(',')[0];
-          // long = locations[0].toString().split(',')[1].split(': ')[1];
-          print(locations[0].toString().split(': ')[1].split(',')[0]);
-          print(locations[0].toString().split(',')[1].split(': ')[1]);
-          pref.setString("imgResto", (image != null)?'data:image/$extension;base64,'+base64Encode(image!.readAsBytesSync()).toString():'');
-          pref.setString("nameResto", _Name.text.toString());
-          pref.setString("emailResto", _Email.text.toString());
-          pref.setString("notelpResto", _NoTelp.text.toString());
-          pref.setString("descResto", _Desc.text.toString());
-          pref.setString("addressResto", _Address.text.toString());
-          // pref.setString("latitudeResto", lat);
-          // pref.setString("longitudeResto", long);
-
-          print(lat);
-          print(long);
-          print(pref.getString("imgResto"));
-          print(pref.getString("nameResto"));
-          print(pref.getString("emailResto"));
-          print(pref.getString("notelpResto"));
-          print(pref.getString("latitudeResto"));
-          print(pref.getString("longitudeResto"));
-          print(pref.getString("descResto"));
-
-          Navigator.push(context, PageTransition(type: PageTransitionType.fade, child: new EditDataUsaha(facility, cuisine, can_delivery, can_takeaway, ongkir, reservation_fee, idResto, email, badanU, pemilikU, penanggungJwb, nameRekening, nameBank, nomorRekening, foto_pj, ktp)));
-
-        },
-        child: Container(
-          width: CustomSize.sizeWidth(context) / 1.1,
-          height: CustomSize.sizeHeight(context) / 14,
-          decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(30),
-              color: CustomColor.accent
-          ),
-          child: Center(child: CustomText.bodyRegular16(text: "Lanjut", color: Colors.white,)),
-        ),
-      ),
+      data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0),
     );
   }
 }

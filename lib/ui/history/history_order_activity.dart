@@ -440,179 +440,182 @@ class _HistoryOrderActivityState extends State<HistoryOrderActivity> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-        body: SafeArea(
-          child: (isLoading)?Container(
-              width: CustomSize.sizeWidth(context),
-              height: CustomSize.sizeHeight(context),
-              child: Center(child: CircularProgressIndicator(
-                color: CustomColor.primaryLight,
-              ))):SmartRefresher(
-            enablePullDown: true,
-            enablePullUp: false,
-            header: WaterDropMaterialHeader(
-              distance: 30,
-              backgroundColor: Colors.white,
-              color: CustomColor.primary,
-            ),
-            controller: _refreshController,
-            onRefresh: _onRefresh,
-            onLoading: _onLoading,
-            child: SingleChildScrollView(
-              controller: _scrollController,
-              child: Padding(
-                padding: EdgeInsets.symmetric(horizontal: CustomSize.sizeWidth(context) / 24),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    SizedBox(
-                      height: CustomSize.sizeHeight(context) / 32,
-                    ),
-                    (homepg != "1")?CustomText.textHeading3(
-                        text: "Semua Pesananmu",
-                        color: CustomColor.primary,
-                        minSize: 18,
-                        maxLines: 1
-                    ):CustomText.textHeading3(
-                        text: "Promo di Restoranmu",
-                        color: CustomColor.primary,
-                        minSize: 18,
-                        maxLines: 1
-                    ),
-                    ListView.builder(
-                        shrinkWrap: true,
-                        controller: _scrollController,
-                        physics: NeverScrollableScrollPhysics(),
-                        itemCount: transaction.length,
-                        itemBuilder: (_, index){
-                          Future.delayed(Duration(seconds: 1)).then((_) {
-                            setState(() {
-                              // int hargaAsli = int.parse(promoResto[index].menu.price.oriString);
-                              // int hargaAsliDeliv = int.parse(promoResto[index].menu.price.deliString);
-                              // hargaDiskon = hargaAsli-(hargaAsli*promoResto[index].discountedPrice/100);
-                              // hargaPotongan = (promoResto[index].potongan != null)?hargaAsli-promoResto[index].potongan:hargaAsli;
-                              // hargaOngkir = (promoResto[index].ongkir != null)?hargaAsliDeliv-promoResto[index].ongkir:hargaAsliDeliv;
+    return MediaQuery(
+      child: Scaffold(
+          body: SafeArea(
+            child: (isLoading)?Container(
+                width: CustomSize.sizeWidth(context),
+                height: CustomSize.sizeHeight(context),
+                child: Center(child: CircularProgressIndicator(
+                  color: CustomColor.primaryLight,
+                ))):SmartRefresher(
+              enablePullDown: true,
+              enablePullUp: false,
+              header: WaterDropMaterialHeader(
+                distance: 30,
+                backgroundColor: Colors.white,
+                color: CustomColor.primary,
+              ),
+              controller: _refreshController,
+              onRefresh: _onRefresh,
+              onLoading: _onLoading,
+              child: SingleChildScrollView(
+                controller: _scrollController,
+                child: Padding(
+                  padding: EdgeInsets.symmetric(horizontal: CustomSize.sizeWidth(context) / 24),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      SizedBox(
+                        height: CustomSize.sizeHeight(context) / 32,
+                      ),
+                      (homepg != "1")?CustomText.textHeading3(
+                          text: "Semua Pesananmu",
+                          color: CustomColor.primary,
+                          sizeNew: double.parse(((MediaQuery.of(context).size.width*0.06).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.06)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.06)).toString()),
+                          maxLines: 1
+                      ):CustomText.textHeading3(
+                          text: "Promo di Restoranmu",
+                          color: CustomColor.primary,
+                          sizeNew: double.parse(((MediaQuery.of(context).size.width*0.06).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.06)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.06)).toString()),
+                          maxLines: 1
+                      ),
+                      ListView.builder(
+                          shrinkWrap: true,
+                          controller: _scrollController,
+                          physics: NeverScrollableScrollPhysics(),
+                          itemCount: transaction.length,
+                          itemBuilder: (_, index){
+                            Future.delayed(Duration(seconds: 1)).then((_) {
+                              setState(() {
+                                // int hargaAsli = int.parse(promoResto[index].menu.price.oriString);
+                                // int hargaAsliDeliv = int.parse(promoResto[index].menu.price.deliString);
+                                // hargaDiskon = hargaAsli-(hargaAsli*promoResto[index].discountedPrice/100);
+                                // hargaPotongan = (promoResto[index].potongan != null)?hargaAsli-promoResto[index].potongan:hargaAsli;
+                                // hargaOngkir = (promoResto[index].ongkir != null)?hargaAsliDeliv-promoResto[index].ongkir:hargaAsliDeliv;
 
-                              // print(hargaDiskon.toString().split('.')[0]);
-                              // print(hargaOngkir);
+                                // print(hargaDiskon.toString().split('.')[0]);
+                                // print(hargaOngkir);
+                              });
                             });
-                          });
-                          return Padding(
-                            padding: EdgeInsets.only(top: CustomSize.sizeHeight(context) / 48),
-                            child: GestureDetector(
-                              onTap: ()async{
-                                if(transaction[index].type!.startsWith('Reservasi') != true){
-                                  SharedPreferences pref = await SharedPreferences.getInstance();
-                                  pref.setString("chatUserCount", transaction[index].chat_user);
-                                  pref.setString("idnyatrans", transaction[index].id.toString());
-                                  pref.setString("idnyatransRes", transaction[index].idResto.toString());
-                                  pref.setString("restoNameTrans99", transaction[index].nameResto);
-                                  pref.setString("alamateResto99", transaction[index].address);
-                                  Navigator.push(
-                                      context,
-                                      PageTransition(
-                                          type: PageTransitionType.rightToLeft,
-                                          child: new DetailTransaction(transaction[index].id!, transaction[index].status!, transaction[index].note!, transaction[index].idResto!)));
-                                }
-                              },
-                              child: Container(
-                                width: CustomSize.sizeWidth(context),
-                                height: CustomSize.sizeWidth(context) / 2.6,
-                                decoration: BoxDecoration(
-                                  color: Colors.white,
-                                  borderRadius: BorderRadius.circular(20),
-                                  boxShadow: [
-                                    BoxShadow(
-                                      color: Colors.grey.withOpacity(0.5),
-                                      spreadRadius: 0,
-                                      blurRadius: 7,
-                                      offset: Offset(0, 7), // changes position of shadow
-                                    ),
-                                  ],
-                                ),
-                                child: Row(
-                                  children: [
-                                    Container(
-                                      width: CustomSize.sizeWidth(context) / 2.6,
-                                      height: CustomSize.sizeWidth(context) / 2.6,
-                                      decoration: BoxDecoration(
-                                        image: DecorationImage(
-                                            image: (homepg != "1")?NetworkImage(Links.subUrl + transaction[index].img!):NetworkImage(Links.subUrl + promoResto[index].menu!.urlImg),
-                                            fit: BoxFit.cover
-                                        ),
-                                        borderRadius: BorderRadius.circular(20),
+                            return Padding(
+                              padding: EdgeInsets.only(top: CustomSize.sizeHeight(context) / 48),
+                              child: GestureDetector(
+                                onTap: ()async{
+                                  if(transaction[index].type!.startsWith('Reservasi') != true){
+                                    SharedPreferences pref = await SharedPreferences.getInstance();
+                                    pref.setString("chatUserCount", transaction[index].chat_user);
+                                    pref.setString("idnyatrans", transaction[index].id.toString());
+                                    pref.setString("idnyatransRes", transaction[index].idResto.toString());
+                                    pref.setString("restoNameTrans99", transaction[index].nameResto);
+                                    pref.setString("alamateResto99", transaction[index].address);
+                                    Navigator.push(
+                                        context,
+                                        PageTransition(
+                                            type: PageTransitionType.rightToLeft,
+                                            child: new DetailTransaction(transaction[index].id!, transaction[index].status!, transaction[index].note!, transaction[index].idResto!)));
+                                  }
+                                },
+                                child: Container(
+                                  width: CustomSize.sizeWidth(context),
+                                  height: CustomSize.sizeWidth(context) / 2.6,
+                                  decoration: BoxDecoration(
+                                    color: Colors.white,
+                                    borderRadius: BorderRadius.circular(20),
+                                    boxShadow: [
+                                      BoxShadow(
+                                        color: Colors.grey.withOpacity(0.5),
+                                        spreadRadius: 0,
+                                        blurRadius: 7,
+                                        offset: Offset(0, 7), // changes position of shadow
                                       ),
-                                    ),
-                                    SizedBox(
-                                      width: CustomSize.sizeWidth(context) / 32,
-                                    ),
-                                    Padding(
-                                      padding: EdgeInsets.symmetric(vertical: CustomSize.sizeHeight(context) / 63),
-                                      child: Container(
-                                        width: CustomSize.sizeWidth(context) / 2.2,
-                                        child: Column(
-                                          crossAxisAlignment: CrossAxisAlignment.start,
-                                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                          children: [
-                                            Column(
-                                              crossAxisAlignment: CrossAxisAlignment.start,
-                                              children: [
-                                                CustomText.bodyMedium14(text: transaction[index].nameResto.toString(), minSize: 14, maxLines: 1),
-                                                CustomText.bodyLight12(text: transaction[index].date, minSize: 12),
-                                                (transaction[index].type!.startsWith('Reservasi'))
-                                                    ?CustomText.bodyMedium10(text: transaction[index].type, minSize: 11)
-                                                    :CustomText.bodyMedium12(text: transaction[index].type, minSize: 12),
-                                              ],
-                                            ),
-                                            Row(
-                                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                              children: [
-                                                CustomText.bodyLight12(text: transaction[index].status??'Selesai', minSize: 12,
-                                                    color: (transaction[index].status == 'Menunggu')?Colors.amberAccent:(transaction[index].status != 'Diproses')?Colors.green:Colors.blue),
-                                                CustomText.bodyMedium14(text: NumberFormat.currency(locale: 'id', symbol: '', decimalDigits: 0).format(transaction[index].total), minSize: 14),
-                                              ],
-                                            )
-                                          ],
+                                    ],
+                                  ),
+                                  child: Row(
+                                    children: [
+                                      Container(
+                                        width: CustomSize.sizeWidth(context) / 2.6,
+                                        height: CustomSize.sizeWidth(context) / 2.6,
+                                        decoration: BoxDecoration(
+                                          image: DecorationImage(
+                                              image: (homepg != "1")?NetworkImage(Links.subUrl + transaction[index].img!):NetworkImage(Links.subUrl + promoResto[index].menu!.urlImg),
+                                              fit: BoxFit.cover
+                                          ),
+                                          borderRadius: BorderRadius.circular(20),
                                         ),
                                       ),
-                                    )
-                                  ],
+                                      SizedBox(
+                                        width: CustomSize.sizeWidth(context) / 32,
+                                      ),
+                                      Padding(
+                                        padding: EdgeInsets.symmetric(vertical: CustomSize.sizeHeight(context) / 63),
+                                        child: Container(
+                                          width: CustomSize.sizeWidth(context) / 2.2,
+                                          child: Column(
+                                            crossAxisAlignment: CrossAxisAlignment.start,
+                                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                            children: [
+                                              Column(
+                                                crossAxisAlignment: CrossAxisAlignment.start,
+                                                children: [
+                                                  CustomText.bodyMedium14(text: transaction[index].nameResto.toString(), sizeNew: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.04).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.04).toString()), maxLines: 1),
+                                                  CustomText.bodyLight12(text: transaction[index].date, sizeNew: double.parse(((MediaQuery.of(context).size.width*0.03).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.03).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.03).toString())),
+                                                  (transaction[index].type!.startsWith('Reservasi'))
+                                                      ?CustomText.bodyMedium10(text: transaction[index].type, sizeNew: double.parse(((MediaQuery.of(context).size.width*0.025).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.025)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.025)).toString()))
+                                                      :CustomText.bodyMedium12(text: transaction[index].type, sizeNew: double.parse(((MediaQuery.of(context).size.width*0.03).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.03).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.03).toString())),
+                                                ],
+                                              ),
+                                              Row(
+                                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                                children: [
+                                                  CustomText.bodyLight12(text: transaction[index].status??'Selesai', sizeNew: double.parse(((MediaQuery.of(context).size.width*0.03).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.03).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.03).toString()),
+                                                      color: (transaction[index].status == 'Menunggu')?Colors.amberAccent:(transaction[index].status != 'Diproses')?Colors.green:Colors.blue),
+                                                  CustomText.bodyMedium14(text: NumberFormat.currency(locale: 'id', symbol: '', decimalDigits: 0).format(transaction[index].total), sizeNew: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.04).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.04).toString())),
+                                                ],
+                                              )
+                                            ],
+                                          ),
+                                        ),
+                                      )
+                                    ],
+                                  ),
                                 ),
                               ),
-                            ),
-                          );
-                        }
-                    ),
-                    SizedBox(height: CustomSize.sizeHeight(context) / 38,)
-                  ],
+                            );
+                          }
+                      ),
+                      SizedBox(height: CustomSize.sizeHeight(context) / 38,)
+                    ],
+                  ),
                 ),
               ),
             ),
           ),
-        ),
-        floatingActionButton: (homepg != '1')?Container():GestureDetector(
-          onTap: ()async{
-            SharedPreferences pref = await SharedPreferences.getInstance();
-            // pref.remove("idMenu");
-            // pref.remove("nameMenu");
-            pref.setString("idMenu", '');
-            pref.setString("nameMenu", '');
-            Navigator.push(
-                context,
-                PageTransition(
-                    type: PageTransitionType.rightToLeft,
-                    child: AddPromo()));
-          },
-          child: Container(
-            width: CustomSize.sizeWidth(context) / 6.6,
-            height: CustomSize.sizeWidth(context) / 6.6,
-            decoration: BoxDecoration(
-                color: CustomColor.primary,
-                shape: BoxShape.circle
+          floatingActionButton: (homepg != '1')?Container():GestureDetector(
+            onTap: ()async{
+              SharedPreferences pref = await SharedPreferences.getInstance();
+              // pref.remove("idMenu");
+              // pref.remove("nameMenu");
+              pref.setString("idMenu", '');
+              pref.setString("nameMenu", '');
+              Navigator.push(
+                  context,
+                  PageTransition(
+                      type: PageTransitionType.rightToLeft,
+                      child: AddPromo()));
+            },
+            child: Container(
+              width: CustomSize.sizeWidth(context) / 6.6,
+              height: CustomSize.sizeWidth(context) / 6.6,
+              decoration: BoxDecoration(
+                  color: CustomColor.primary,
+                  shape: BoxShape.circle
+              ),
+              child: Center(child: Icon(FontAwesome.plus, color: Colors.white, size: 29,)),
             ),
-            child: Center(child: Icon(FontAwesome.plus, color: Colors.white, size: 29,)),
-          ),
-        )
+          )
+      ),
+      data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0),
     );
   }
 }

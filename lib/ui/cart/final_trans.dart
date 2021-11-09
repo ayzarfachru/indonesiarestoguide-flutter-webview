@@ -578,7 +578,10 @@ class _FinalTransState extends State<FinalTrans> {
                           // SizedBox(width: CustomSize.sizeWidth(context) / 32,),
 
                           // CustomText.textHeading6(text: (_transCode == 1)?"Pesan Antar":(_transCode == 2)?"Ambil Langsung":"Makan Ditempat",),
-                          CustomText.textHeading4(text: "Nota Transaksi",),
+                          MediaQuery(
+                              child: CustomText.textHeading4(text: "Nota Transaksi", sizeNew: double.parse(((MediaQuery.of(context).size.width*0.045).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.045)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.045)).toString())),
+                              data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0)
+                          ),
                         ],
                       ),
                       // Padding(
@@ -724,7 +727,10 @@ class _FinalTransState extends State<FinalTrans> {
                     left: CustomSize.sizeWidth(context) / 32,
                     right: CustomSize.sizeWidth(context) / 32,
                   ),
-                  child: CustomText.bodyRegular18(text: "*Semua proses pembayaran dan transaksi di luar tanggung jawab IRG!", color: CustomColor.redBtn, minSize: 15, maxLines: 3),
+                  child: MediaQuery(
+                      child: CustomText.bodyRegular18(text: "*Semua proses pembayaran dan transaksi di luar tanggung jawab IRG!", color: CustomColor.redBtn, sizeNew: double.parse(((MediaQuery.of(context).size.width*0.038).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.038).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.038).toString()), maxLines: 3),
+                      data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0)
+                  ),
                 ),
                 (_transCode == 1 || _transCode == 2 || _transCode == 3)?Divider(thickness: 6, color: Colors.transparent):SizedBox(),
                 (jmlhMeja.toString() == '')?Padding(
@@ -732,13 +738,19 @@ class _FinalTransState extends State<FinalTrans> {
                     left: CustomSize.sizeWidth(context) / 32,
                     right: CustomSize.sizeWidth(context) / 32,
                   ),
-                  child: CustomText.textHeading4(text: "Daftar Pembelian"),
+                  child: MediaQuery(
+                      child: CustomText.textHeading4(text: "Daftar Pembelian", sizeNew: double.parse(((MediaQuery.of(context).size.width*0.045).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.045)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.045)).toString())),
+                      data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0)
+                  ),
                 ):Padding(
                   padding: EdgeInsets.only(
                     left: CustomSize.sizeWidth(context) / 32,
                     right: CustomSize.sizeWidth(context) / 32,
                   ),
-                  child: CustomText.textHeading4(text: "Data Reservasi"),
+                  child: MediaQuery(
+                      child: CustomText.textHeading4(text: "Data Reservasi", sizeNew: double.parse(((MediaQuery.of(context).size.width*0.045).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.045)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.045)).toString())),
+                      data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0)
+                  ),
                 ),
                 (jmlhMeja.toString() == '')?SizedBox(height: CustomSize.sizeHeight(context) * 0.0048,):SizedBox(height: CustomSize.sizeHeight(context) * 0.0048,),
                 (jmlhMeja.toString() == '')?ListView.builder(
@@ -763,36 +775,51 @@ class _FinalTransState extends State<FinalTrans> {
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 // mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                 children: [
-                                  CustomText.textHeading7(
-                                      text: menuJson[index].name,
-                                      minSize: 16,
-                                      maxLines: 1
+                                  MediaQuery(
+                                    child: CustomText.textHeading7(
+                                        text: menuJson[index].name,
+                                        sizeNew: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.04).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.04).toString()),
+                                        maxLines: 1
+                                    ),
+                                      data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0)
                                   ),
-                                  CustomText.bodyRegular14(
-                                      text: menuJson[index].desc,
-                                      maxLines: 2,
-                                      minSize: 14
+                                  MediaQuery(
+                                    child: CustomText.bodyRegular14(
+                                        text: menuJson[index].desc,
+                                        maxLines: 2,
+                                        sizeNew: double.parse(((MediaQuery.of(context).size.width*0.035).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.035).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.035).toString())
+                                    ),
+                                      data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0)
                                   ),
                                   // CustomText.bodyRegular16(text: (noted[index].split(': ')[1] != 'kam5ia_null}')?noted[index].split('{')[1].split('}')[0]:''),
                                   // SizedBox(height: CustomSize.sizeHeight(context) / 88,),
-                                  (menuJson[index].discount == null || menuJson[index].discount == 'null' || menuJson[index].discount == '')?CustomText.bodyMedium14(
-                                      text: NumberFormat.currency(locale: 'id', symbol: '', decimalDigits: 0).format(int.parse(menuJson[index].price)),
-                                      maxLines: 1,
-                                      minSize: 16
+                                  (menuJson[index].discount == null || menuJson[index].discount == 'null' || menuJson[index].discount == '')?MediaQuery(
+                                    child: CustomText.bodyMedium14(
+                                        text: NumberFormat.currency(locale: 'id', symbol: '', decimalDigits: 0).format(int.parse(menuJson[index].price)),
+                                        maxLines: 1,
+                                        sizeNew: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.04)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.04)).toString())
+                                    ),
+                                      data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0)
                                   )
                                       :Row(
                                     children: [
-                                      CustomText.bodyMedium14(
-                                          text: NumberFormat.currency(locale: 'id', symbol: '', decimalDigits: 0).format(int.parse(menuJson[index].price)),
-                                          maxLines: 1,
-                                          minSize: 16,
-                                          decoration: TextDecoration.lineThrough
+                                      MediaQuery(
+                                        child: CustomText.bodyMedium14(
+                                            text: NumberFormat.currency(locale: 'id', symbol: '', decimalDigits: 0).format(int.parse(menuJson[index].price)),
+                                            maxLines: 1,
+                                            sizeNew: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.04)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.04)).toString()),
+                                            decoration: TextDecoration.lineThrough
+                                        ),
+                                          data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0)
                                       ),
                                       SizedBox(width: CustomSize.sizeWidth(context) / 48,),
-                                      CustomText.bodyMedium14(
-                                          text: NumberFormat.currency(locale: 'id', symbol: '', decimalDigits: 0).format(int.parse(menuJson[index].discount!)),
-                                          maxLines: 1,
-                                          minSize: 16
+                                      MediaQuery(
+                                        child: CustomText.bodyMedium14(
+                                            text: NumberFormat.currency(locale: 'id', symbol: '', decimalDigits: 0).format(int.parse(menuJson[index].discount!)),
+                                            maxLines: 1,
+                                            sizeNew: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.04)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.04)).toString())
+                                        ),
+                                          data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0)
                                       ),
                                     ],
                                   ),
@@ -810,8 +837,14 @@ class _FinalTransState extends State<FinalTrans> {
                               children: [
                                 Row(
                                   children: [
-                                    CustomText.bodyRegular16(text: qty[index]),
-                                    CustomText.bodyRegular16(text: ' Item'),
+                                    MediaQuery(
+                                        child: CustomText.bodyRegular16(text: qty[index], sizeNew: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.04)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.04)).toString())),
+                                        data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0)
+                                    ),
+                                    MediaQuery(
+                                        child: CustomText.bodyRegular16(text: ' Item', sizeNew: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.04)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.04)).toString())),
+                                        data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0)
+                                    ),
                                   ],
                                 )
                               ],
@@ -836,9 +869,18 @@ class _FinalTransState extends State<FinalTrans> {
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              CustomText.textTitle3(text: 'Jumlah Meja: '+jmlhMeja,  maxLines: 10),
-                              CustomText.textTitle3(text: 'Tanggal: '+tglReser,  maxLines: 10),
-                              CustomText.textTitle3(text: 'Jam: '+jamReser,  maxLines: 10),
+                              MediaQuery(
+                                  child: CustomText.textTitle3(text: 'Jumlah Meja: '+jmlhMeja,  maxLines: 10, sizeNew: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.04)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.04)).toString())),
+                                  data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0)
+                              ),
+                              MediaQuery(
+                                  child: CustomText.textTitle3(text: 'Tanggal: '+tglReser,  maxLines: 10, sizeNew: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.04)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.04)).toString())),
+                                  data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0)
+                              ),
+                              MediaQuery(
+                                  child: CustomText.textTitle3(text: 'Jam: '+jamReser,  maxLines: 10, sizeNew: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.04)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.04)).toString())),
+                                  data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0)
+                              ),
                             ],
                           )
                       ),
@@ -974,7 +1016,10 @@ class _FinalTransState extends State<FinalTrans> {
                     left: CustomSize.sizeWidth(context) / 32,
                     right: CustomSize.sizeWidth(context) / 32,
                   ),
-                  child: CustomText.textHeading4(text: "Catatan Pesananmu"),
+                  child: MediaQuery(
+                      child: CustomText.textHeading4(text: "Catatan Pesananmu", sizeNew: double.parse(((MediaQuery.of(context).size.width*0.045).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.045)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.045)).toString())),
+                      data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0)
+                  ),
                 ):Container(),
                 (noted2.toString() != '[]')?SizedBox(height: CustomSize.sizeHeight(context) * 0.0048,):Container(),
                 (noted2.toString() != '[]')?ListView.builder(
@@ -996,7 +1041,10 @@ class _FinalTransState extends State<FinalTrans> {
                             // CustomText.textHeading7(text: (noted2[index].split(': ')[1] != 'kam5ia_null}')?noted2[index].split('{')[1].split('}')[0].split(':')[0]+': ':'',  maxLines: 4),
                             Container(
                                 width: CustomSize.sizeWidth(context) / 1.4,
-                                child: CustomText.textTitle3(text: (noted2[index].split(': ')[1] != 'kam5ia_null}')?noted2[index].split('{')[1].split('}')[0]:'',  maxLines: 10)
+                                child: MediaQuery(
+                                    child: CustomText.textTitle3(text: (noted2[index].split(': ')[1] != 'kam5ia_null}')?noted2[index].split('{')[1].split('}')[0]:'',  maxLines: 10, sizeNew: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.04)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.04)).toString())),
+                                    data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0)
+                                )
                             ),
                             // (noted2[index].split(': ')[1] == 'kam5ia_null}' || noted2[index].split(': ')[1] == '}')?Container():GestureDetector(
                             //   onTap: (){
@@ -1130,7 +1178,10 @@ class _FinalTransState extends State<FinalTrans> {
                     left: CustomSize.sizeWidth(context) / 32,
                     right: CustomSize.sizeWidth(context) / 32,
                   ),
-                  child: CustomText.textHeading4(text: (jmlhMeja.toString() == '')?"Tipe Pembelian":'Tipe Pemesanan'),
+                  child: MediaQuery(
+                      child: CustomText.textHeading4(text: (jmlhMeja.toString() == '')?"Tipe Pembelian":'Tipe Pemesanan', sizeNew: double.parse(((MediaQuery.of(context).size.width*0.045).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.045)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.045)).toString())),
+                      data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0)
+                  ),
                 ),
                 SizedBox(height: CustomSize.sizeHeight(context) * 0.0048,),
                 Padding(
@@ -1138,7 +1189,10 @@ class _FinalTransState extends State<FinalTrans> {
                     left: CustomSize.sizeWidth(context) / 18,
                     right: CustomSize.sizeWidth(context) / 18,
                   ),
-                  child: CustomText.textHeading6(text: (jmlhMeja.toString() == '')?(_transCode == 1)?"Pesan Antar":(_transCode == 2)?"Ambil Langsung":"Makan Ditempat":'Reservation',),
+                  child: MediaQuery(
+                      child: CustomText.textHeading6(text: (jmlhMeja.toString() == '')?(_transCode == 1)?"Pesan Antar":(_transCode == 2)?"Ambil Langsung":"Makan Ditempat":'Reservation', sizeNew: double.parse(((MediaQuery.of(context).size.width*0.035).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.035).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.035).toString())),
+                      data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0)
+                  ),
                 ),
                 SizedBox(height: CustomSize.sizeHeight(context) * 0.0075),
                 (jmlhMeja.toString() == '')?(_transCode != 3)?Divider(thickness: 6, color: CustomColor.secondary,):SizedBox():SizedBox(),
@@ -1151,7 +1205,10 @@ class _FinalTransState extends State<FinalTrans> {
                         left: CustomSize.sizeWidth(context) / 32,
                         right: CustomSize.sizeWidth(context) / 32,
                       ),
-                      child: CustomText.textHeading4(text: "Alamat Resto"),
+                      child: MediaQuery(
+                          child: CustomText.textHeading4(text: "Alamat Resto", sizeNew: double.parse(((MediaQuery.of(context).size.width*0.045).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.045)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.045)).toString())),
+                          data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0)
+                      ),
                     ),
                     SizedBox(height: CustomSize.sizeHeight(context) * 0.0048,),
                     Padding(
@@ -1159,10 +1216,13 @@ class _FinalTransState extends State<FinalTrans> {
                         left: CustomSize.sizeWidth(context) / 18,
                         right: CustomSize.sizeWidth(context) / 18,
                       ),
-                      child: CustomText.textHeading6(
-                          text: restoAddress,
-                          minSize: 14,
-                          maxLines: 10
+                      child: MediaQuery(
+                        child: CustomText.textHeading6(
+                            text: restoAddress,
+                            sizeNew: double.parse(((MediaQuery.of(context).size.width*0.035).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.035).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.035).toString()),
+                            maxLines: 14
+                        ),
+                          data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0)
                       ),
                     ),
                   ],
@@ -1176,7 +1236,10 @@ class _FinalTransState extends State<FinalTrans> {
                         left: CustomSize.sizeWidth(context) / 32,
                         right: CustomSize.sizeWidth(context) / 32,
                       ),
-                      child: CustomText.textHeading4(text: "Alamat Pengiriman"),
+                      child: MediaQuery(
+                          child: CustomText.textHeading4(text: "Alamat Pengiriman", sizeNew: double.parse(((MediaQuery.of(context).size.width*0.045).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.045)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.045)).toString())),
+                          data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0)
+                      ),
                     ),
                     SizedBox(height: CustomSize.sizeHeight(context) * 0.0048,),
                     Padding(
@@ -1184,10 +1247,13 @@ class _FinalTransState extends State<FinalTrans> {
                         left: CustomSize.sizeWidth(context) / 18,
                         right: CustomSize.sizeWidth(context) / 18,
                       ),
-                      child: CustomText.textHeading6(
-                          text: delivAddress.toString(),
-                          minSize: 14,
-                          maxLines: 10
+                      child: MediaQuery(
+                        child: CustomText.textHeading6(
+                            text: delivAddress.toString(),
+                            sizeNew: double.parse(((MediaQuery.of(context).size.width*0.035).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.035).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.035).toString()),
+                            maxLines: 10
+                        ),
+                          data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0)
                       ),
                     )
                     // SizedBox(height: CustomSize.sizeHeight(context) * 0.008,),
@@ -1363,7 +1429,10 @@ class _FinalTransState extends State<FinalTrans> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        CustomText.textHeading4(text: "Data Usaha"),
+                        MediaQuery(
+                            child: CustomText.textHeading4(text: "Data Usaha", sizeNew: double.parse(((MediaQuery.of(context).size.width*0.045).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.045)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.045)).toString())),
+                            data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0)
+                        ),
                         SizedBox(height: CustomSize.sizeHeight(context) * 0.01,),
                         Container(
                           padding: EdgeInsets.only(
@@ -1374,34 +1443,56 @@ class _FinalTransState extends State<FinalTrans> {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               (nameRestoTrans != '' && nameRestoTrans != 'null')?
-                              CustomText.bodyRegular17(text: "Nama Usaha: "+nameRestoTrans, maxLines: 4):
+                              MediaQuery(
+                                  child: CustomText.bodyRegular17(text: "Nama Usaha: "+nameRestoTrans, maxLines: 4, sizeNew: double.parse(((MediaQuery.of(context).size.width*0.038).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.038).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.038).toString())),
+                                  data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0)
+                              ):
                               Row(
                                 children: [
-                                  CustomText.bodyRegular17(text: "Nama Usaha: ", maxLines: 2),
-                                  CustomText.bodyRegular17(text: "kosong", maxLines: 2, color: CustomColor.redBtn),
+                                  MediaQuery(
+                                      child: CustomText.bodyRegular17(text: "Nama Usaha: ", maxLines: 2, sizeNew: double.parse(((MediaQuery.of(context).size.width*0.038).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.038).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.038).toString())),
+                                      data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0)
+                                      ),
+                                  MediaQuery(
+                                      child: CustomText.bodyRegular17(text: "kosong", maxLines: 2, color: CustomColor.redBtn, sizeNew: double.parse(((MediaQuery.of(context).size.width*0.038).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.038).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.038).toString())),
+                                      data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0)
+                                  ),
                                 ],
                               ),
                               SizedBox(height: CustomSize.sizeHeight(context) * 0.005,),
 
                               (restoAddress != '' && restoAddress != 'null')?
                               Row(
+                                crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  CustomText.bodyRegular17(text: "Alamat Usaha: ", maxLines: 4),
+                                  MediaQuery(
+                                      child: CustomText.bodyRegular17(text: "Alamat Usaha: ", maxLines: 4, sizeNew: double.parse(((MediaQuery.of(context).size.width*0.038).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.038).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.038).toString())),
+                                      data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0)
+                                  ),
                                   GestureDetector(
                                       onTap: (){
                                         _launchURL();
                                       },
                                       child: Container(
                                           width: CustomSize.sizeWidth(context) / 2.1,
-                                          child: CustomText.bodyRegular17(text: restoAddress, maxLines: 1, minSize: 15)
+                                          child: MediaQuery(
+                                              child: CustomText.bodyRegular17(text: restoAddress, maxLines: 14, sizeNew: double.parse(((MediaQuery.of(context).size.width*0.038).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.038).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.038).toString())),
+                                              data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0)
+                                          )
                                       )
                                   ),
                                 ],
                               ):
                               Row(
                                 children: [
-                                  CustomText.bodyRegular17(text: "Alamat Usaha: ", maxLines: 2),
-                                  CustomText.bodyRegular17(text: "kosong", maxLines: 2, color: CustomColor.redBtn),
+                                  MediaQuery(
+                                      child: CustomText.bodyRegular17(text: "Alamat Usaha: ", maxLines: 2, sizeNew: double.parse(((MediaQuery.of(context).size.width*0.038).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.038).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.038).toString())),
+                                      data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0)
+                                  ),
+                                  MediaQuery(
+                                      child: CustomText.bodyRegular17(text: "kosong", maxLines: 2, color: CustomColor.redBtn, sizeNew: double.parse(((MediaQuery.of(context).size.width*0.038).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.038).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.038).toString())),
+                                      data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0)
+                                  ),
                                 ],
                               ),
                               SizedBox(height: CustomSize.sizeHeight(context) * 0.005,),
@@ -1409,19 +1500,31 @@ class _FinalTransState extends State<FinalTrans> {
                               (emailTokoTrans != '' && emailTokoTrans != 'null')?
                               Row(
                                 children: [
-                                  CustomText.bodyRegular17(text: "Email Usaha: ", maxLines: 2),
+                                  MediaQuery(
+                                      child: CustomText.bodyRegular17(text: "Email Usaha: ", maxLines: 2, sizeNew: double.parse(((MediaQuery.of(context).size.width*0.038).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.038).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.038).toString())),
+                                      data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0)
+                                  ),
                                   GestureDetector(
                                       onTap: (){
                                         launch('mailto:$emailTokoTrans');
                                       },
-                                      child: CustomText.bodyRegular17(text: emailTokoTrans, maxLines: 2)
+                                      child: MediaQuery(
+                                          child: CustomText.bodyRegular17(text: emailTokoTrans, maxLines: 2, sizeNew: double.parse(((MediaQuery.of(context).size.width*0.038).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.038).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.038).toString())),
+                                          data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0)
+                                      )
                                   ),
                                 ],
                               ):
                               Row(
                                 children: [
-                                  CustomText.bodyRegular17(text: "Email Usaha: ", maxLines: 2),
-                                  CustomText.bodyRegular17(text: "kosong", maxLines: 2, color: CustomColor.redBtn),
+                                  MediaQuery(
+                                      child: CustomText.bodyRegular17(text: "Email Usaha: ", maxLines: 2, sizeNew: double.parse(((MediaQuery.of(context).size.width*0.038).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.038).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.038).toString())),
+                                      data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0)
+                                  ),
+                                  MediaQuery(
+                                      child: CustomText.bodyRegular17(text: "kosong", maxLines: 2, color: CustomColor.redBtn, sizeNew: double.parse(((MediaQuery.of(context).size.width*0.038).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.038).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.038).toString())),
+                                      data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0)
+                                  ),
                                 ],
                               ),
                               SizedBox(height: CustomSize.sizeHeight(context) * 0.005,),
@@ -1429,69 +1532,126 @@ class _FinalTransState extends State<FinalTrans> {
                               (phoneRestoTrans != '' && phoneRestoTrans != 'null')?
                               Row(
                                 children: [
-                                  CustomText.bodyRegular17(text: "Telepon Usaha: ", maxLines: 2),
+                                  MediaQuery(
+                                      child: CustomText.bodyRegular17(text: "Telepon Usaha: ", maxLines: 2, sizeNew: double.parse(((MediaQuery.of(context).size.width*0.038).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.038).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.038).toString())),
+                                      data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0)
+                                  ),
                                   GestureDetector(
                                       onTap: (){
                                         launch('tel:$phoneRestoTrans');
                                       },
-                                      child: CustomText.bodyRegular17(text: phoneRestoTrans, maxLines: 2)
+                                      child: MediaQuery(
+                                          child: CustomText.bodyRegular17(text: phoneRestoTrans, maxLines: 2, sizeNew: double.parse(((MediaQuery.of(context).size.width*0.038).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.038).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.038).toString())),
+                                          data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0)
+                                      )
                                   ),
                                 ],
                               ):
                               Row(
                                 children: [
-                                  CustomText.bodyRegular17(text: "Telepon Usaha: ", maxLines: 2),
-                                  CustomText.bodyRegular17(text: "kosong", maxLines: 2, color: CustomColor.redBtn),
+                                  MediaQuery(
+                                      child: CustomText.bodyRegular17(text: "Telepon Usaha: ", maxLines: 2, sizeNew: double.parse(((MediaQuery.of(context).size.width*0.038).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.038).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.038).toString())),
+                                      data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0)
+                                  ),
+                                  MediaQuery(
+                                      child: CustomText.bodyRegular17(text: "kosong", maxLines: 2, color: CustomColor.redBtn, sizeNew: double.parse(((MediaQuery.of(context).size.width*0.038).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.038).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.038).toString())),
+                                      data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0)
+                                  ),
                                 ],
                               ),
                               SizedBox(height: CustomSize.sizeHeight(context) * 0.005,),
 
                               (ownerTokoTrans != '' && ownerTokoTrans != 'null')?
-                              CustomText.bodyRegular17(text: "Nama Pemilik: "+ownerTokoTrans, maxLines: 2):
+                              MediaQuery(
+                                  child: CustomText.bodyRegular17(text: "Nama Pemilik: "+ownerTokoTrans, maxLines: 2, sizeNew: double.parse(((MediaQuery.of(context).size.width*0.038).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.038).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.038).toString())),
+                                  data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0)
+                              ):
                               Row(
                                 children: [
-                                  CustomText.bodyRegular17(text: "Nama Pemilik: ", maxLines: 2),
-                                  CustomText.bodyRegular17(text: "kosong", maxLines: 2, color: CustomColor.redBtn),
+                                  MediaQuery(
+                                      child: CustomText.bodyRegular17(text: "Nama Pemilik: ", maxLines: 2, sizeNew: double.parse(((MediaQuery.of(context).size.width*0.038).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.038).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.038).toString())),
+                                      data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0)
+),
+                                  MediaQuery(
+                                      child: CustomText.bodyRegular17(text: "kosong", maxLines: 2, color: CustomColor.redBtn, sizeNew: double.parse(((MediaQuery.of(context).size.width*0.038).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.038).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.038).toString())),
+                                      data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0)
+                                  ),
                                 ],
                               ),
                               SizedBox(height: CustomSize.sizeHeight(context) * 0.005,),
 
                               (pjTokoTrans != '' && pjTokoTrans != 'null')?
-                              CustomText.bodyRegular17(text: "Nama Penanggung Jawab: "+pjTokoTrans, maxLines: 2):
+                              MediaQuery(
+                                  child: CustomText.bodyRegular17(text: "Nama Penanggung Jawab: "+pjTokoTrans, maxLines: 2, sizeNew: double.parse(((MediaQuery.of(context).size.width*0.038).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.038).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.038).toString())),
+                                  data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0)
+                              ):
                               Row(
                                 children: [
-                                  CustomText.bodyRegular17(text: "Nama Penanggung Jawab: ", maxLines: 2),
-                                  CustomText.bodyRegular17(text: "kosong", maxLines: 2, color: CustomColor.redBtn),
+                                  MediaQuery(
+                                      child: CustomText.bodyRegular17(text: "Nama Penanggung Jawab: ", maxLines: 2, sizeNew: double.parse(((MediaQuery.of(context).size.width*0.038).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.038).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.038).toString())),
+                                      data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0)
+                                  ),
+                                  MediaQuery(
+                                      child: CustomText.bodyRegular17(text: "kosong", maxLines: 2, color: CustomColor.redBtn, sizeNew: double.parse(((MediaQuery.of(context).size.width*0.038).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.038).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.038).toString())),
+                                      data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0)
+                                  ),
                                 ],
                               ),
                               SizedBox(height: CustomSize.sizeHeight(context) * 0.005,),
 
                               (nameRekening != '' && nameRekening != 'null')?
-                              CustomText.bodyRegular17(text: "Nomor Rekening atas Nama: "+nameRekening, maxLines: 2):
+                              MediaQuery(
+                                  child: CustomText.bodyRegular17(text: "Nomor Rekening atas Nama: "+nameRekening, maxLines: 2, sizeNew: double.parse(((MediaQuery.of(context).size.width*0.038).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.038).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.038).toString())),
+                                  data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0)
+                              ):
                               Row(
                                 children: [
-                                  CustomText.bodyRegular17(text: "Nomor Rekening atas Nama: ", maxLines: 2),
-                                  CustomText.bodyRegular17(text: "kosong", maxLines: 2, color: CustomColor.redBtn),
+                                  MediaQuery(
+                                      child: CustomText.bodyRegular17(text: "Nomor Rekening atas Nama: ", maxLines: 2, sizeNew: double.parse(((MediaQuery.of(context).size.width*0.038).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.038).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.038).toString())),
+                                      data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0)
+                                  ),
+                                  MediaQuery(
+                                      child: CustomText.bodyRegular17(text: "kosong", maxLines: 2, color: CustomColor.redBtn, sizeNew: double.parse(((MediaQuery.of(context).size.width*0.038).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.038).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.038).toString())),
+                                      data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0)
+                                  ),
                                 ],
                               ),
                               SizedBox(height: CustomSize.sizeHeight(context) * 0.005,),
 
                               (nameBank != '' && nameBank != 'null')?
-                              CustomText.bodyRegular17(text: "Rekening Bank: "+nameBank, maxLines: 2):
+                              MediaQuery(
+                                  child: CustomText.bodyRegular17(text: "Rekening Bank: "+nameBank, maxLines: 2, sizeNew: double.parse(((MediaQuery.of(context).size.width*0.038).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.038).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.038).toString())),
+                                  data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0)
+                              ):
                               Row(
                                 children: [
-                                  CustomText.bodyRegular17(text: "Rekening Bank: ", maxLines: 2),
-                                  CustomText.bodyRegular17(text: "kosong", maxLines: 2, color: CustomColor.redBtn),
+                                  MediaQuery(
+                                      child: CustomText.bodyRegular17(text: "Rekening Bank: ", maxLines: 2, sizeNew: double.parse(((MediaQuery.of(context).size.width*0.038).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.038).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.038).toString())),
+                                      data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0)
+                                  ),
+                                  MediaQuery(
+                                      child: CustomText.bodyRegular17(text: "kosong", maxLines: 2, color: CustomColor.redBtn, sizeNew: double.parse(((MediaQuery.of(context).size.width*0.038).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.038).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.038).toString())),
+                                      data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0)
+                                  ),
                                 ],
                               ),
                               SizedBox(height: CustomSize.sizeHeight(context) * 0.005,),
 
                               (norekTokoTrans != '' && norekTokoTrans != 'null')?
-                              CustomText.bodyRegular17(text: "Nomor Rekening: "+norekTokoTrans, maxLines: 2):
+                              MediaQuery(
+                                  child: CustomText.bodyRegular17(text: "Nomor Rekening: "+norekTokoTrans, maxLines: 2, sizeNew: double.parse(((MediaQuery.of(context).size.width*0.038).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.038).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.038).toString())),
+                                  data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0)
+                              ):
                               Row(
                                 children: [
-                                  CustomText.bodyRegular17(text: "Nomor Rekening: ", maxLines: 2),
-                                  CustomText.bodyRegular17(text: "kosong", maxLines: 2, color: CustomColor.redBtn),
+                                  MediaQuery(
+                                      child: CustomText.bodyRegular17(text: "Nomor Rekening: ", maxLines: 2, sizeNew: double.parse(((MediaQuery.of(context).size.width*0.038).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.038).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.038).toString())),
+                                      data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0)
+                                  ),
+                                  MediaQuery(
+                                      child: CustomText.bodyRegular17(text: "kosong", maxLines: 2, color: CustomColor.redBtn, sizeNew: double.parse(((MediaQuery.of(context).size.width*0.038).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.038).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.038).toString())),
+                                      data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0)
+                                  ),
                                 ],
                               ),
                             ],
@@ -1508,7 +1668,10 @@ class _FinalTransState extends State<FinalTrans> {
                     left: CustomSize.sizeWidth(context) / 32,
                     right: CustomSize.sizeWidth(context) / 32,
                   ),
-                  child: CustomText.textHeading4(text: "Rincian Pembayaran"),
+                  child: MediaQuery(
+                      child: CustomText.textHeading4(text: "Rincian Pembayaran", sizeNew: double.parse(((MediaQuery.of(context).size.width*0.045).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.045)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.045)).toString())),
+                      data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0)
+                  ),
                 ),
                 SizedBox(height: CustomSize.sizeHeight(context) * 0.0048,),
                 Column(
@@ -1521,8 +1684,14 @@ class _FinalTransState extends State<FinalTrans> {
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          CustomText.bodyLight16(text: (jmlhMeja.toString() == '')?"Harga":'Harga per meja'),
-                          CustomText.bodyLight16(text: NumberFormat.currency(locale: 'id', symbol: '', decimalDigits: 0).format((jmlhMeja.toString() == '')?int.parse(harga2):int.parse(hargaReser))),
+                          MediaQuery(
+                              child: CustomText.bodyLight16(text: (jmlhMeja.toString() == '')?"Harga":'Harga per meja', sizeNew: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.04).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.04).toString())),
+                              data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0)
+                          ),
+                          MediaQuery(
+                              child: CustomText.bodyLight16(text: NumberFormat.currency(locale: 'id', symbol: '', decimalDigits: 0).format((jmlhMeja.toString() == '')?int.parse(harga2):int.parse(hargaReser)), sizeNew: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.04).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.04).toString())),
+                              data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0)
+                          ),
                         ],
                       ),
                     ),
@@ -1534,8 +1703,14 @@ class _FinalTransState extends State<FinalTrans> {
                       ),
                       child: Row(mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          CustomText.bodyLight16(text: "Ongkir"),
-                          CustomText.bodyLight16(text: NumberFormat.currency(locale: 'id', symbol: '', decimalDigits: 0).format(int.parse(delivTotalOngkir))),
+                          MediaQuery(
+                              child: CustomText.bodyLight16(text: "Ongkir", sizeNew: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.04).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.04).toString())),
+                              data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0)
+                          ),
+                          MediaQuery(
+                              child: CustomText.bodyLight16(text: NumberFormat.currency(locale: 'id', symbol: '', decimalDigits: 0).format(int.parse(delivTotalOngkir)), sizeNew: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.04).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.04).toString())),
+                              data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0)
+                          ),
                         ],
                       ),
                     ):SizedBox():SizedBox(),
@@ -1555,8 +1730,14 @@ class _FinalTransState extends State<FinalTrans> {
                       ),
                       child: Row(mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          CustomText.textTitle3(text: "Total Pembayaran"),
-                          CustomText.textTitle3(text: NumberFormat.currency(locale: 'id', symbol: '', decimalDigits: 0).format(int.parse((jmlhMeja.toString() == '')?totalHargaTrans:totalReser))),
+                          MediaQuery(
+                              child: CustomText.textTitle3(text: "Total Pembayaran", sizeNew: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.04).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.04).toString())),
+                              data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0)
+                          ),
+                          MediaQuery(
+                              child: CustomText.textTitle3(text: NumberFormat.currency(locale: 'id', symbol: '', decimalDigits: 0).format(int.parse((jmlhMeja.toString() == '')?totalHargaTrans:totalReser)), sizeNew: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.04).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.04).toString())),
+                              data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0)
+                          ),
                         ],
                       ),
                     ),
@@ -1569,7 +1750,10 @@ class _FinalTransState extends State<FinalTrans> {
                     left: CustomSize.sizeWidth(context) / 32,
                     right: CustomSize.sizeWidth(context) / 32,
                   ),
-                  child: CustomText.bodyRegular18(text: "*Terimakasih telah melakukan pembelian menggunakan aplikasi kami!", color: CustomColor.accent, minSize: 15, maxLines: 3),
+                  child: MediaQuery(
+                      child: CustomText.bodyRegular18(text: "*Terimakasih telah melakukan pembelian menggunakan aplikasi kami!", color: CustomColor.accent, sizeNew: double.parse(((MediaQuery.of(context).size.width*0.038).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.038).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.038).toString()), maxLines: 3),
+                      data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0)
+                  ),
                 ),
                 Divider(thickness: 6, color: CustomColor.secondary,),
 
@@ -1654,7 +1838,10 @@ class _FinalTransState extends State<FinalTrans> {
                           child: Row(
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
-                              CustomText.textTitle3(text: "Selesai", color: Colors.white),
+                              MediaQuery(
+                                  child: CustomText.textTitle3(text: "Selesai", color: Colors.white, sizeNew: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.04).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.04).toString())),
+                                  data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0)
+                              ),
                               // CustomText.textTitle3(text: NumberFormat.currency(locale: 'id', symbol: '', decimalDigits: 0).format(int.parse(totalHarga)), color: Colors.white),
                             ],
                           ),

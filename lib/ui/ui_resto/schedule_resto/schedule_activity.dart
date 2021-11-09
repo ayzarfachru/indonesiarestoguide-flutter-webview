@@ -455,187 +455,190 @@ class _ScheduleActivityState extends State<ScheduleActivity> {
   Widget build(BuildContext context) {
     return WillPopScope(
       onWillPop: onWillPop,
-      child: Scaffold(
-        backgroundColor: Colors.white,
-        body: SafeArea(
-          child: (isLoading)?Container(
-              width: CustomSize.sizeWidth(context),
-              height: CustomSize.sizeHeight(context),
-              child: Center(child: CircularProgressIndicator(
+      child: MediaQuery(
+        child: Scaffold(
+          backgroundColor: Colors.white,
+          body: SafeArea(
+            child: (isLoading)?Container(
+                width: CustomSize.sizeWidth(context),
+                height: CustomSize.sizeHeight(context),
+                child: Center(child: CircularProgressIndicator(
+                  color: CustomColor.primaryLight,
+                ))):SmartRefresher(
+              enablePullDown: true,
+              enablePullUp: false,
+              header: WaterDropMaterialHeader(
+                distance: 30,
+                backgroundColor: Colors.white,
                 color: CustomColor.primaryLight,
-              ))):SmartRefresher(
-            enablePullDown: true,
-            enablePullUp: false,
-            header: WaterDropMaterialHeader(
-              distance: 30,
-              backgroundColor: Colors.white,
-              color: CustomColor.primaryLight,
-            ),
-            controller: _refreshController,
-            onRefresh: _onRefresh,
-            onLoading: _onLoading,
-            child: SingleChildScrollView(
-              controller: _scrollController,
-              child: Padding(
-                padding: EdgeInsets.symmetric(horizontal: CustomSize.sizeWidth(context) / 24),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    SizedBox(
-                      height: CustomSize.sizeHeight(context) / 32,
-                    ),
-                    CustomText.textHeading3(
-                        text: "Jadwal Operasional",
-                        color: CustomColor.primary,
-                        minSize: 18,
-                        maxLines: 1
-                    ),
-                    ListView.builder(
-                        shrinkWrap: true,
-                        controller: _scrollController,
-                        physics: NeverScrollableScrollPhysics(),
-                        itemCount: schedule.length,
-                        itemBuilder: (_, index){
-                          return Padding(
-                            padding: EdgeInsets.only(top: CustomSize.sizeHeight(context) / 48),
-                            child: Container(
-                              width: CustomSize.sizeWidth(context),
-                              height: CustomSize.sizeWidth(context) / 5.4,
-                              decoration: BoxDecoration(
-                                color: Colors.white,
-                                borderRadius: BorderRadius.circular(20),
-                                boxShadow: [
-                                  BoxShadow(
-                                    color: Colors.grey.withOpacity(0.5),
-                                    spreadRadius: 0,
-                                    blurRadius: 7,
-                                    offset: Offset(0, 0), // changes position of shadow
-                                  ),
-                                ],
-                              ),
-                              child: Row(
-                                children: [
-                                  SizedBox(
-                                    width: CustomSize.sizeWidth(context) / 32,
-                                  ),
-                                  Container(
-                                    width: CustomSize.sizeWidth(context) / 1.2,
-                                    child: Column(
-                                      mainAxisAlignment: MainAxisAlignment.center,
-                                      crossAxisAlignment: CrossAxisAlignment.start,
-                                      children: [
-                                        Row(
-                                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                          children: [
-                                            Column(
-                                              crossAxisAlignment: CrossAxisAlignment.start,
-                                              children: [
-                                                CustomText.textHeading4(
-                                                    text: schedule[index].day,
-                                                    minSize: 18,
-                                                    maxLines: 1
-                                                ),
-                                                SizedBox(
-                                                  width: CustomSize.sizeWidth(context) / 32,
-                                                ),
-                                                (schedule[index].open_at == "00:00:00" && schedule[index].open_at == "00:00:00")?
-                                                CustomText.bodyMedium12(
-                                                    text: "Hari ini tutup",
-                                                    color: CustomColor.redBtn,
-                                                    maxLines: 1,
-                                                    minSize: 12
-                                                )
-                                                :CustomText.bodyMedium12(
-                                                    text: schedule[index].open_at.split(':')[0]+':'+schedule[index].open_at.split(':')[1]
-                                                        +' - '+schedule[index].closed_at.split(':')[0]+':'+schedule[index].closed_at.split(':')[1],
-                                                    maxLines: 1,
-                                                    minSize: 12
-                                                ),
-                                              ],
-                                            ),
-                                            GestureDetector(
-                                                onTap: (){
-                                                  Navigator.push(
-                                                      context,
-                                                      PageTransition(
-                                                          type: PageTransitionType.rightToLeft,
-                                                          child: EditSchedule(schedule[index], id)));
-                                                },
-                                                child: Icon(Icons.edit, color: Colors.grey, size: 20,)
-                                            ),
-                                          ],
-                                        ),
-                                        SizedBox(
-                                          width: CustomSize.sizeWidth(context) / 32,
-                                        ),
-                                      ],
+              ),
+              controller: _refreshController,
+              onRefresh: _onRefresh,
+              onLoading: _onLoading,
+              child: SingleChildScrollView(
+                controller: _scrollController,
+                child: Padding(
+                  padding: EdgeInsets.symmetric(horizontal: CustomSize.sizeWidth(context) / 24),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      SizedBox(
+                        height: CustomSize.sizeHeight(context) / 32,
+                      ),
+                      CustomText.textHeading3(
+                          text: "Jadwal Operasional",
+                          color: CustomColor.primary,
+                          sizeNew: double.parse(((MediaQuery.of(context).size.width*0.045).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.045)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.045)).toString()),
+                          maxLines: 1
+                      ),
+                      ListView.builder(
+                          shrinkWrap: true,
+                          controller: _scrollController,
+                          physics: NeverScrollableScrollPhysics(),
+                          itemCount: schedule.length,
+                          itemBuilder: (_, index){
+                            return Padding(
+                              padding: EdgeInsets.only(top: CustomSize.sizeHeight(context) / 48),
+                              child: Container(
+                                width: CustomSize.sizeWidth(context),
+                                height: CustomSize.sizeWidth(context) / 5.4,
+                                decoration: BoxDecoration(
+                                  color: Colors.white,
+                                  borderRadius: BorderRadius.circular(20),
+                                  boxShadow: [
+                                    BoxShadow(
+                                      color: Colors.grey.withOpacity(0.5),
+                                      spreadRadius: 0,
+                                      blurRadius: 7,
+                                      offset: Offset(0, 0), // changes position of shadow
                                     ),
-                                  )
-                                ],
+                                  ],
+                                ),
+                                child: Row(
+                                  children: [
+                                    SizedBox(
+                                      width: CustomSize.sizeWidth(context) / 32,
+                                    ),
+                                    Container(
+                                      width: CustomSize.sizeWidth(context) / 1.2,
+                                      child: Column(
+                                        mainAxisAlignment: MainAxisAlignment.center,
+                                        crossAxisAlignment: CrossAxisAlignment.start,
+                                        children: [
+                                          Row(
+                                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                            children: [
+                                              Column(
+                                                crossAxisAlignment: CrossAxisAlignment.start,
+                                                children: [
+                                                  CustomText.textHeading4(
+                                                      text: schedule[index].day,
+                                                      sizeNew: double.parse(((MediaQuery.of(context).size.width*0.045).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.045).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.045).toString()),
+                                                      maxLines: 1
+                                                  ),
+                                                  SizedBox(
+                                                    width: CustomSize.sizeWidth(context) / 32,
+                                                  ),
+                                                  (schedule[index].open_at == "00:00:00" && schedule[index].open_at == "00:00:00")?
+                                                  CustomText.bodyMedium12(
+                                                      text: "Hari ini tutup",
+                                                      color: CustomColor.redBtn,
+                                                      maxLines: 1,
+                                                      sizeNew: double.parse(((MediaQuery.of(context).size.width*0.03).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.03).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.03).toString())
+                                                  )
+                                                  :CustomText.bodyMedium12(
+                                                      text: schedule[index].open_at.split(':')[0]+':'+schedule[index].open_at.split(':')[1]
+                                                          +' - '+schedule[index].closed_at.split(':')[0]+':'+schedule[index].closed_at.split(':')[1],
+                                                      maxLines: 1,
+                                                      sizeNew: double.parse(((MediaQuery.of(context).size.width*0.03).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.03).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.03).toString())
+                                                  ),
+                                                ],
+                                              ),
+                                              GestureDetector(
+                                                  onTap: (){
+                                                    Navigator.push(
+                                                        context,
+                                                        PageTransition(
+                                                            type: PageTransitionType.rightToLeft,
+                                                            child: EditSchedule(schedule[index], id)));
+                                                  },
+                                                  child: Icon(Icons.edit, color: Colors.grey, size: 20,)
+                                              ),
+                                            ],
+                                          ),
+                                          SizedBox(
+                                            width: CustomSize.sizeWidth(context) / 32,
+                                          ),
+                                        ],
+                                      ),
+                                    )
+                                  ],
+                                ),
                               ),
-                            ),
-                          );
-                        }
-                    ),
-                    SizedBox(height: CustomSize.sizeHeight(context) / 9,),
-                  ],
+                            );
+                          }
+                      ),
+                      SizedBox(height: CustomSize.sizeHeight(context) / 9,),
+                    ],
+                  ),
                 ),
               ),
             ),
           ),
-        ),
-        floatingActionButton: (isOpen == '')?Container():Column(
-          mainAxisAlignment: MainAxisAlignment.end,
-          children: [
-            GestureDetector(
-              onTap: () async{
-                // if(openAndClose == '0'){
-                //   SharedPreferences pref = await SharedPreferences.getInstance();
-                //   pref.setString("openclose", "1");
-                // }else if(openAndClose == '1'){
-                //   SharedPreferences pref = await SharedPreferences.getInstance();
-                //   pref.setString("openclose", '0');
-                // }
-                setState(() {
-                  isLoading = false;
-                });
-                
-                if (status == 'active') {
-                  if (isOpen == 'true') {
-                    _closeNow();
-                  } else {
-                    Fluttertoast.showToast(msg: "Tokomu saat ini sudah tutup",);
-                  }
-                } else {
-                  _closeNow();
-                }
-                // if (isOpen != 'false') {
-                //   _closeNow();
-                // } else {
-                //   Fluttertoast.showToast(msg: "Tokomu saat ini sudah tutup",);
-                // }
+          floatingActionButton: (isOpen == '')?Container():Column(
+            mainAxisAlignment: MainAxisAlignment.end,
+            children: [
+              GestureDetector(
+                onTap: () async{
+                  // if(openAndClose == '0'){
+                  //   SharedPreferences pref = await SharedPreferences.getInstance();
+                  //   pref.setString("openclose", "1");
+                  // }else if(openAndClose == '1'){
+                  //   SharedPreferences pref = await SharedPreferences.getInstance();
+                  //   pref.setString("openclose", '0');
+                  // }
+                  setState(() {
+                    isLoading = false;
+                  });
 
-                // SharedPreferences pref = await SharedPreferences.getInstance();
-                // pref.setString("name", _loginTextName.text.toString());
-                // pref.setString("email", _loginEmailName.text.toString());
-                // pref.setString("img", (image == null)?img:base64Encode(image.readAsBytesSync()).toString());
-                // pref.setString("gender", gender);
-                // pref.setString("tgl", tgl);
-                // pref.setString("notelp", _loginNotelpName.text.toString());
-              },
-              child: Container(
-                width: CustomSize.sizeWidth(context) / 1.1,
-                height: CustomSize.sizeHeight(context) / 14,
-                decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(30),
-                    color: (status == 'active')?(isOpen == 'true')?CustomColor.redBtn:CustomColor.redBtn:CustomColor.accent
+                  if (status == 'active') {
+                    if (isOpen == 'true') {
+                      _closeNow();
+                    } else {
+                      Fluttertoast.showToast(msg: "Tokomu saat ini sudah tutup",);
+                    }
+                  } else {
+                    _closeNow();
+                  }
+                  // if (isOpen != 'false') {
+                  //   _closeNow();
+                  // } else {
+                  //   Fluttertoast.showToast(msg: "Tokomu saat ini sudah tutup",);
+                  // }
+
+                  // SharedPreferences pref = await SharedPreferences.getInstance();
+                  // pref.setString("name", _loginTextName.text.toString());
+                  // pref.setString("email", _loginEmailName.text.toString());
+                  // pref.setString("img", (image == null)?img:base64Encode(image.readAsBytesSync()).toString());
+                  // pref.setString("gender", gender);
+                  // pref.setString("tgl", tgl);
+                  // pref.setString("notelp", _loginNotelpName.text.toString());
+                },
+                child: Container(
+                  width: CustomSize.sizeWidth(context) / 1.1,
+                  height: CustomSize.sizeHeight(context) / 14,
+                  decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(30),
+                      color: (status == 'active')?(isOpen == 'true')?CustomColor.redBtn:CustomColor.redBtn:CustomColor.accent
+                  ),
+                  child: Center(child: CustomText.bodyRegular16(text: (status == 'active')?(isOpen == 'true')?"Tutup Sekarang!":"Tutup Sekarang!":"Buka Sekarang!", color: Colors.white, sizeNew: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.04).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.04).toString()))),
                 ),
-                child: Center(child: CustomText.bodyRegular16(text: (status == 'active')?(isOpen == 'true')?"Tutup Sekarang!":"Tutup Sekarang!":"Buka Sekarang!", color: Colors.white,)),
               ),
-            ),
-            // SizedBox(height: CustomSize.sizeHeight(context) * 0.005,),
-          ],
+              // SizedBox(height: CustomSize.sizeHeight(context) * 0.005,),
+            ],
+          ),
         ),
+        data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0),
       ),
     );
   }

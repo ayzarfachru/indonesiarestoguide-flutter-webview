@@ -465,16 +465,22 @@ class _DetailPromoResto extends State<DetailPromoResto> {
                       SizedBox(
                         height: CustomSize.sizeHeight(context) / 32,
                       ),
-                      (homepg != "1")?CustomText.textHeading3(
-                          text: "Promo",
-                          color: CustomColor.primary,
-                          minSize: 18,
-                          maxLines: 1
-                      ):CustomText.textHeading3(
-                          text: "Promo di Restoranmu",
-                          color: CustomColor.primaryLight,
-                          minSize: 18,
-                          maxLines: 1
+                      (homepg != "1")?MediaQuery(
+                        child: CustomText.textHeading3(
+                            text: "Promo",
+                            color: CustomColor.primary,
+                            sizeNew: double.parse(((MediaQuery.of(context).size.width*0.06).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.06)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.06)).toString()),
+                            maxLines: 1
+                        ),
+                          data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0)
+                      ):MediaQuery(
+                        child: CustomText.textHeading3(
+                            text: "Promo di Restoranmu",
+                            color: CustomColor.primaryLight,
+                            sizeNew: double.parse(((MediaQuery.of(context).size.width*0.06).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.06)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.06)).toString()),
+                            maxLines: 1
+                        ),
+                          data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0)
                       ),
                       // (homepg != "1")?CustomText.textHeading3(
                       //     text: "di Sekitarmu",
@@ -569,16 +575,22 @@ class _DetailPromoResto extends State<DetailPromoResto> {
                                                     child: Column(
                                                       crossAxisAlignment: CrossAxisAlignment.start,
                                                       children: [
-                                                        CustomText.textHeading5(
-                                                            text: promo[index].menu!.name,
-                                                            minSize: 18,
-                                                            maxLines: 1
+                                                        MediaQuery(
+                                                          child: CustomText.textHeading5(
+                                                              text: promo[index].menu!.name,
+                                                              sizeNew: double.parse(((MediaQuery.of(context).size.width*0.06).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.06)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.06)).toString()),
+                                                              maxLines: 1
+                                                          ),
+                                                            data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0)
                                                         ),
                                                         SizedBox(height: CustomSize.sizeHeight(context) / 32,),
-                                                        CustomText.bodyRegular16(
-                                                            text: promo[index].menu!.desc,
-                                                            maxLines: 100,
-                                                            minSize: 16
+                                                        MediaQuery(
+                                                          child: CustomText.bodyRegular16(
+                                                              text: promo[index].menu!.desc,
+                                                              maxLines: 100,
+                                                              sizeNew: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.04)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.04)).toString())
+                                                          ),
+                                                            data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0)
                                                         ),
                                                         SizedBox(height: CustomSize.sizeHeight(context) / 32,),
                                                         Row(
@@ -589,23 +601,32 @@ class _DetailPromoResto extends State<DetailPromoResto> {
                                                               children: [
                                                                 Row(
                                                                   children: [
-                                                                    CustomText.bodyMedium14(
-                                                                        text: 'Harga: ',
-                                                                        maxLines: 1,
-                                                                        minSize: 14,
-                                                                        color: Colors.grey
+                                                                    MediaQuery(
+                                                                      child: CustomText.bodyMedium14(
+                                                                          text: 'Harga: ',
+                                                                          maxLines: 1,
+                                                                          sizeNew: double.parse(((MediaQuery.of(context).size.width*0.035).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.035)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.035)).toString()),
+                                                                          color: Colors.grey
+                                                                      ),
+                                                                        data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0)
                                                                     ),
-                                                                    CustomText.bodyMedium16(
-                                                                        text: NumberFormat.currency(locale: 'id', symbol: '', decimalDigits: 0).format(promo[index].menu!.price!.original),
-                                                                        maxLines: 1,
-                                                                        minSize: 16,
-                                                                        decoration: TextDecoration.lineThrough
+                                                                    MediaQuery(
+                                                                      child: CustomText.bodyMedium16(
+                                                                          text: NumberFormat.currency(locale: 'id', symbol: '', decimalDigits: 0).format(promo[index].menu!.price!.original),
+                                                                          maxLines: 1,
+                                                                          sizeNew: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.04)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.04)).toString()),
+                                                                          decoration: TextDecoration.lineThrough
+                                                                      ),
+                                                                        data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0)
                                                                     ),
                                                                     SizedBox(width: CustomSize.sizeWidth(context) / 48,),
-                                                                    CustomText.bodyMedium16(
-                                                                        text: NumberFormat.currency(locale: 'id', symbol: '', decimalDigits: 0).format(promo[index].menu!.price!.discounted),
-                                                                        maxLines: 1,
-                                                                        minSize: 16
+                                                                    MediaQuery(
+                                                                      child: CustomText.bodyMedium16(
+                                                                          text: NumberFormat.currency(locale: 'id', symbol: '', decimalDigits: 0).format(promo[index].menu!.price!.discounted),
+                                                                          maxLines: 1,
+                                                                          sizeNew: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.04)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.04)).toString())
+                                                                      ),
+                                                                        data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0)
                                                                     ),
                                                                   ],
                                                                 ),
@@ -658,11 +679,16 @@ class _DetailPromoResto extends State<DetailPromoResto> {
                                                                         color: Colors.grey[200],
                                                                         shape: BoxShape.circle
                                                                     ),
-                                                                    child: Center(child: CustomText.textHeading1(text: "-", color: Colors.grey)),
+                                                                    child: Center(child: MediaQuery(child: CustomText.textHeading1(text: "-", color: Colors.grey, sizeNew: double.parse(((MediaQuery.of(context).size.width*0.08).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.08)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.08)).toString()),),
+                                                                        data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0)
+                                                                    )),
                                                                   ),
                                                                 ),
                                                                 SizedBox(width: CustomSize.sizeWidth(context) / 24,),
-                                                                CustomText.bodyRegular16(text: qty[restoId.indexOf(promo[index].menu!.id.toString())]),
+                                                                MediaQuery(
+                                                                    child: CustomText.bodyRegular16(text: qty[restoId.indexOf(promo[index].menu!.id.toString())], sizeNew: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.04)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.04)).toString())),
+                                                                    data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0)
+                                                                ),
                                                                 SizedBox(width: CustomSize.sizeWidth(context) / 24,),
                                                                 GestureDetector(
                                                                   onTap: ()async{
@@ -683,7 +709,12 @@ class _DetailPromoResto extends State<DetailPromoResto> {
                                                                         color: Colors.grey[200],
                                                                         shape: BoxShape.circle
                                                                     ),
-                                                                    child: Center(child: CustomText.textHeading1(text: "+", color: Colors.grey)),
+                                                                    child: Center(
+                                                                        child: MediaQuery(
+                                                                            child: CustomText.textHeading1(text: "+", color: Colors.grey, sizeNew: double.parse(((MediaQuery.of(context).size.width*0.08).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.08)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.08)).toString())),
+                                                                            data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0)
+                                                                        )
+                                                                    ),
                                                                   ),
                                                                 ),
                                                               ],
@@ -695,7 +726,10 @@ class _DetailPromoResto extends State<DetailPromoResto> {
                                                             SizedBox(height: CustomSize.sizeHeight(context) / 44,),
                                                             Container(
                                                                 alignment: Alignment.centerLeft,
-                                                                child: CustomText.bodyMedium14(text: "Catatan")
+                                                                child: MediaQuery(
+                                                                    child: CustomText.bodyMedium14(text: "Catatan", sizeNew: double.parse(((MediaQuery.of(context).size.width*0.035).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.035)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.035)).toString()),),
+                                                                    data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0)
+                                                                )
                                                             ),
                                                             SizedBox(
                                                               height: CustomSize.sizeHeight(context) * 0.005,
@@ -965,7 +999,10 @@ class _DetailPromoResto extends State<DetailPromoResto> {
                                                                                     ),
                                                                                   ),
                                                                                   SizedBox(width: CustomSize.sizeWidth(context) / 32,),
-                                                                                  CustomText.textHeading6(text: "Pesan Antar",),
+                                                                                  MediaQuery(
+                                                                                      child: CustomText.textHeading6(text: "Pesan Antar", sizeNew: double.parse(((MediaQuery.of(context).size.width*0.035).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.035).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.035).toString())),
+                                                                                      data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0)
+                                                                                  ),
                                                                                 ],
                                                                               ),
                                                                             ),
@@ -1110,7 +1147,10 @@ class _DetailPromoResto extends State<DetailPromoResto> {
                                                                                     ),
                                                                                   ),
                                                                                   SizedBox(width: CustomSize.sizeWidth(context) / 32,),
-                                                                                  CustomText.textHeading6(text: "Ambil Langsung",),
+                                                                                  MediaQuery(
+                                                                                      child: CustomText.textHeading6(text: "Ambil Langsung", sizeNew: double.parse(((MediaQuery.of(context).size.width*0.035).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.035).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.035).toString())),
+                                                                                      data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0)
+                                                                                  ),
                                                                                 ],
                                                                               ),
                                                                             ),
@@ -1251,7 +1291,10 @@ class _DetailPromoResto extends State<DetailPromoResto> {
                                                                                     ),
                                                                                   ),
                                                                                   SizedBox(width: CustomSize.sizeWidth(context) / 32,),
-                                                                                  CustomText.textHeading6(text: "Makan Ditempat",),
+                                                                                  MediaQuery(
+                                                                                      child: CustomText.textHeading6(text: "Makan Ditempat", sizeNew: double.parse(((MediaQuery.of(context).size.width*0.035).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.035).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.035).toString())),
+                                                                                      data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0)
+                                                                                  ),
                                                                                 ],
                                                                               ),
                                                                             ),
@@ -1585,7 +1628,10 @@ class _DetailPromoResto extends State<DetailPromoResto> {
                                                                                               ),
                                                                                             ),
                                                                                             SizedBox(width: CustomSize.sizeWidth(context) / 32,),
-                                                                                            CustomText.textHeading6(text: "Pesan Antar",),
+                                                                                            MediaQuery(
+                                                                                                child: CustomText.textHeading6(text: "Pesan Antar", sizeNew: double.parse(((MediaQuery.of(context).size.width*0.035).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.035).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.035).toString())),
+                                                                                                data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0)
+                                                                                            ),
                                                                                           ],
                                                                                         ),
                                                                                       ),
@@ -1730,7 +1776,10 @@ class _DetailPromoResto extends State<DetailPromoResto> {
                                                                                               ),
                                                                                             ),
                                                                                             SizedBox(width: CustomSize.sizeWidth(context) / 32,),
-                                                                                            CustomText.textHeading6(text: "Ambil Langsung",),
+                                                                                            MediaQuery(
+                                                                                                child: CustomText.textHeading6(text: "Ambil Langsung", sizeNew: double.parse(((MediaQuery.of(context).size.width*0.035).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.035).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.035).toString())),
+                                                                                                data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0)
+                                                                                            ),
                                                                                           ],
                                                                                         ),
                                                                                       ),
@@ -1871,7 +1920,10 @@ class _DetailPromoResto extends State<DetailPromoResto> {
                                                                                               ),
                                                                                             ),
                                                                                             SizedBox(width: CustomSize.sizeWidth(context) / 32,),
-                                                                                            CustomText.textHeading6(text: "Makan Ditempat",),
+                                                                                            MediaQuery(
+                                                                                                child: CustomText.textHeading6(text: "Makan Ditempat", sizeNew: double.parse(((MediaQuery.of(context).size.width*0.035).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.035).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.035).toString())),
+                                                                                                data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0)
+                                                                                            ),
                                                                                           ],
                                                                                         ),
                                                                                       ),
@@ -2051,7 +2103,10 @@ class _DetailPromoResto extends State<DetailPromoResto> {
                                                                                     ),
                                                                                   ),
                                                                                   SizedBox(width: CustomSize.sizeWidth(context) / 32,),
-                                                                                  CustomText.textHeading6(text: "Pesan Antar",),
+                                                                                  MediaQuery(
+                                                                                      child: CustomText.textHeading6(text: "Pesan Antar", sizeNew: double.parse(((MediaQuery.of(context).size.width*0.035).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.035).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.035).toString())),
+                                                                                      data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0)
+                                                                                  ),
                                                                                 ],
                                                                               ),
                                                                             ),
@@ -2196,7 +2251,10 @@ class _DetailPromoResto extends State<DetailPromoResto> {
                                                                                     ),
                                                                                   ),
                                                                                   SizedBox(width: CustomSize.sizeWidth(context) / 32,),
-                                                                                  CustomText.textHeading6(text: "Ambil Langsung",),
+                                                                                  MediaQuery(
+                                                                                      child: CustomText.textHeading6(text: "Ambil Langsung", sizeNew: double.parse(((MediaQuery.of(context).size.width*0.035).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.035).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.035).toString())),
+                                                                                      data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0)
+                                                                                  ),
                                                                                 ],
                                                                               ),
                                                                             ),
@@ -2337,7 +2395,10 @@ class _DetailPromoResto extends State<DetailPromoResto> {
                                                                                     ),
                                                                                   ),
                                                                                   SizedBox(width: CustomSize.sizeWidth(context) / 32,),
-                                                                                  CustomText.textHeading6(text: "Makan Ditempat",),
+                                                                                  MediaQuery(
+                                                                                      child: CustomText.textHeading6(text: "Makan Ditempat", sizeNew: double.parse(((MediaQuery.of(context).size.width*0.035).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.035).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.035).toString())),
+                                                                                      data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0)
+                                                                                  ),
                                                                                 ],
                                                                               ),
                                                                             ),
@@ -2476,12 +2537,17 @@ class _DetailPromoResto extends State<DetailPromoResto> {
                                                             pref2.setString('latResto1', pref2.getString('latResto'));
                                                             pref2.setString('longResto1', pref2.getString('longResto'));
                                                           },
-                                                          child: Center(child: CustomText.bodyRegular16(text: "Add to cart", color: Colors.white))
+                                                          child: Center(child: MediaQuery(
+                                                              child: CustomText.bodyRegular16(text: "Add to cart", color: Colors.white, sizeNew: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.04)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.04)).toString())),
+                                                              data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0)
+                                                          ))
                                                       ):GestureDetector(
                                                           onTap: ()async{
                                                             Fluttertoast.showToast(msg: 'Maaf toko sedang tutup.');
                                                           },
-                                                          child: Center(child: CustomText.bodyRegular16(text: "Add to cart", color: Colors.white))),
+                                                          child: Center(child: MediaQuery(child: CustomText.bodyRegular16(text: "Add to cart", color: Colors.white, sizeNew: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.04)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.04)).toString())),
+                                                              data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0)
+                                                          ),)),
                                                     ),
                                                   )
                                                       :SizedBox(),
@@ -2581,62 +2647,99 @@ class _DetailPromoResto extends State<DetailPromoResto> {
                                                 )
                                               ],
                                             ),
-                                            (homepg != '1')?Container():CustomText.bodyLight12(
-                                                text: 'Jam : '+promoResto[index].expired_at!.split(' ')[1].split(':')[0]+':'+promoResto[index].expired_at!.split(' ')[1].split(':')[1],
-                                                maxLines: 1,
-                                                minSize: 12
+                                            (homepg != '1')?Container():MediaQuery(
+                                              child: CustomText.bodyLight12(
+                                                  text: 'Jam : '+promoResto[index].expired_at!.split(' ')[1].split(':')[0]+':'+promoResto[index].expired_at!.split(' ')[1].split(':')[1],
+                                                  maxLines: 1,
+                                                  sizeNew: double.parse(((MediaQuery.of(context).size.width*0.03).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.03).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.03).toString())
+                                              ),
+                                                data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0)
                                             ),
                                             SizedBox(height: CustomSize.sizeHeight(context) * 0.00626,),
-                                            (homepg != "1")?CustomText.textHeading4(
-                                                text: promo[index].menu!.name,
-                                                minSize: 18,
-                                                maxLines: 1
-                                            ):CustomText.textHeading4(
-                                                text: promoResto[index].menu!.name,
-                                                minSize: 18,
-                                                maxLines: 1
+                                            (homepg != "1")?MediaQuery(
+                                              child: CustomText.textHeading4(
+                                                  text: promo[index].menu!.name,
+                                                  sizeNew: double.parse(((MediaQuery.of(context).size.width*0.045).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.045).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.045).toString()),
+                                                  maxLines: 1
+                                              ),
+                                                data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0)
+                                            ):MediaQuery(
+                                              child: CustomText.textHeading4(
+                                                  text: promoResto[index].menu!.name,
+                                                  sizeNew: double.parse(((MediaQuery.of(context).size.width*0.045).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.045).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.045).toString()),
+                                                  maxLines: 1
+                                              ),
+                                                data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0)
                                             ),
                                             // CustomText.bodyMedium12(text: promo[index].menu!.restoName, minSize: 12),
                                             SizedBox(height: CustomSize.sizeHeight(context) * 0.00126,),
-                                            (homepg != "1")?CustomText.bodyMedium12(
-                                                text: promo[index].menu!.desc,
-                                                maxLines: 1,
-                                                minSize: 12
-                                            ):CustomText.bodyMedium12(
-                                                text: promoResto[index].word,
-                                                maxLines: 1,
-                                                minSize: 12
+                                            (homepg != "1")?MediaQuery(
+                                              child: CustomText.bodyMedium12(
+                                                  text: promo[index].menu!.desc,
+                                                  maxLines: 1,
+                                                sizeNew: double.parse(((MediaQuery.of(context).size.width*0.03).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.03).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.03).toString()),
+                                              ),
+                                                data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0)
+                                            ):MediaQuery(
+                                              child: CustomText.bodyMedium12(
+                                                  text: promoResto[index].word,
+                                                  maxLines: 1,
+                                                sizeNew: double.parse(((MediaQuery.of(context).size.width*0.03).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.03).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.03).toString()),
+                                              ),
+                                                data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0)
                                             ),
                                             SizedBox(height: CustomSize.sizeHeight(context) * 0.015,),
-                                            CustomText.bodyLight12(
-                                                text: promo[index].word,
-                                                minSize: 12,
-                                                maxLines: 2
+                                            MediaQuery(
+                                              child: CustomText.bodyLight12(
+                                                  text: promo[index].word,
+                                                  sizeNew: double.parse(((MediaQuery.of(context).size.width*0.03).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.03).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.03).toString()),
+                                                  maxLines: 2
+                                              ),
+                                                data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0)
                                             ),
                                             (homepg != "1")?SizedBox(height: CustomSize.sizeHeight(context) / 50,):SizedBox(height: CustomSize.sizeHeight(context) / 108,),
                                             Row(
                                               children: [
-                                                (homepg != "1")?CustomText.bodyRegular12(text: NumberFormat.currency(locale: 'id', symbol: '', decimalDigits: 0).format(promo[index].menu!.price!.original), minSize: 12,
-                                                    decoration: TextDecoration.lineThrough)
+                                                (homepg != "1")?MediaQuery(
+                                                  child: CustomText.bodyRegular12(text: NumberFormat.currency(locale: 'id', symbol: '', decimalDigits: 0).format(promo[index].menu!.price!.original), sizeNew: double.parse(((MediaQuery.of(context).size.width*0.03).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.03).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.03).toString()),
+                                                      decoration: TextDecoration.lineThrough),
+                                                    data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0)
+                                                )
                                                     :Column(
                                                   crossAxisAlignment: CrossAxisAlignment.end,
                                                   children: [
                                                     Row(
                                                       children: [
-                                                        CustomText.bodyRegular12(text: 'Harga menu : ', minSize: 12),
+                                                        MediaQuery(
+                                                            child: CustomText.bodyRegular12(text: 'Harga menu : ', sizeNew: double.parse(((MediaQuery.of(context).size.width*0.03).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.03).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.03).toString()),),
+                                                            data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0)
+                                                        ),
                                                         SizedBox(width: CustomSize.sizeWidth(context) / 48,),
-                                                        (promoResto[index].discountedPrice != null || promoResto[index].potongan != null)?CustomText.bodyRegular12(text: NumberFormat.currency(locale: 'id', symbol: '', decimalDigits: 0).format(int.parse(promoResto[index].menu!.price!.oriString!)), minSize: 12, color: CustomColor.redBtn,
-                                                            decoration: TextDecoration.lineThrough)
-                                                            :CustomText.bodyRegular12(text: NumberFormat.currency(locale: 'id', symbol: '', decimalDigits: 0).format(int.parse(promoResto[index].menu!.price!.oriString!)), minSize: 12,),
+                                                        (promoResto[index].discountedPrice != null || promoResto[index].potongan != null)?MediaQuery(
+                                                          child: CustomText.bodyRegular12(text: NumberFormat.currency(locale: 'id', symbol: '', decimalDigits: 0).format(int.parse(promoResto[index].menu!.price!.oriString!)), sizeNew: double.parse(((MediaQuery.of(context).size.width*0.03).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.03).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.03).toString()), color: CustomColor.redBtn,
+                                                              decoration: TextDecoration.lineThrough),
+                                                            data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0)
+                                                        )
+                                                            :MediaQuery(child: CustomText.bodyRegular12(text: NumberFormat.currency(locale: 'id', symbol: '', decimalDigits: 0).format(int.parse(promoResto[index].menu!.price!.oriString!)), sizeNew: double.parse(((MediaQuery.of(context).size.width*0.03).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.03).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.03).toString()),),
+                                                            data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0)
+                                                        ),
                                                       ],
                                                     ),
                                                     Row(
                                                       children: [
-                                                        CustomText.bodyRegular12(text: 'Delivery : ', minSize: 12),
+                                                        MediaQuery(
+                                                            child: CustomText.bodyRegular12(text: 'Delivery : ', sizeNew: double.parse(((MediaQuery.of(context).size.width*0.03).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.03).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.03).toString()),),
+                                                            data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0)
+                                                        ),
                                                         SizedBox(width: CustomSize.sizeWidth(context) / 48,),
-                                                        (promoResto[index].ongkir != null)?CustomText.bodyRegular12(text: NumberFormat.currency(locale: 'id', symbol: '', decimalDigits: 0).format(int.parse(promoResto[index].menu!.price!.deliString!)), minSize: 12, color: CustomColor.redBtn,
-                                                            decoration: TextDecoration.lineThrough)
-                                                            :CustomText.bodyRegular12(text: NumberFormat.currency(locale: 'id', symbol: '', decimalDigits: 0).format(int.parse(promoResto[index].menu!.price!.deliString!)), minSize: 12,),
+                                                        (promoResto[index].ongkir != null)?MediaQuery(
+                                                          child: CustomText.bodyRegular12(text: NumberFormat.currency(locale: 'id', symbol: '', decimalDigits: 0).format(int.parse(promoResto[index].menu!.price!.deliString!)), sizeNew: double.parse(((MediaQuery.of(context).size.width*0.03).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.03).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.03).toString()), color: CustomColor.redBtn,
+                                                              decoration: TextDecoration.lineThrough),
+                                                            data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0)
+                                                        )
+                                                            :MediaQuery(child: CustomText.bodyRegular12(text: NumberFormat.currency(locale: 'id', symbol: '', decimalDigits: 0).format(int.parse(promoResto[index].menu!.price!.deliString!)), sizeNew: double.parse(((MediaQuery.of(context).size.width*0.03).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.03).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.03).toString()),),
+                                                            data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0)
+                                                        ),
                                                       ],
                                                     ),
                                                   ],
@@ -2647,21 +2750,29 @@ class _DetailPromoResto extends State<DetailPromoResto> {
                                                   children: [
                                                     // (homepg != "1")?CustomText.bodyRegular12(text: NumberFormat.currency(locale: 'id', symbol: '', decimalDigits: 0).format(promo[index].menu!.price!.discounted), minSize: 12)
                                                     //     :
-                                                    CustomText.bodyRegular12(text:
-                                                    (promoResto[index].discountedPrice != null)?
-                                                    NumberFormat.currency(locale: 'id', symbol: '', decimalDigits: 0).format((int.parse(promoResto[index].menu!.price!.oriString!)-(int.parse(promoResto[index].menu!.price!.oriString!)*promoResto[index].discountedPrice!/100)))
-                                                        :(promoResto[index].potongan != null)?NumberFormat.currency(locale: 'id', symbol: '', decimalDigits: 0).format(int.parse(promoResto[index].menu!.price!.oriString!)-promoResto[index].potongan!)
-                                                        :'', minSize: 12),
+                                                    MediaQuery(
+                                                      child: CustomText.bodyRegular12(text:
+                                                      (promoResto[index].discountedPrice != null)?
+                                                      NumberFormat.currency(locale: 'id', symbol: '', decimalDigits: 0).format((int.parse(promoResto[index].menu!.price!.oriString!)-(int.parse(promoResto[index].menu!.price!.oriString!)*promoResto[index].discountedPrice!/100)))
+                                                          :(promoResto[index].potongan != null)?NumberFormat.currency(locale: 'id', symbol: '', decimalDigits: 0).format(int.parse(promoResto[index].menu!.price!.oriString!)-promoResto[index].potongan!)
+                                                          :'', sizeNew: double.parse(((MediaQuery.of(context).size.width*0.03).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.03).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.03).toString()),),
+                                                        data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0)
+                                                    ),
 
                                                     // (homepg != "1")?CustomText.bodyRegular12(text: NumberFormat.currency(locale: 'id', symbol: '', decimalDigits: 0).format(promo[index].menu!.price!.discounted), minSize: 12)
                                                     //     :
-                                                    CustomText.bodyRegular12(text:
-                                                    (promoResto[index].menu!.price!.deliString! != null)?
-                                                    (promoResto[index].ongkir != null)?
-                                                    NumberFormat.currency(locale: 'id', symbol: '', decimalDigits: 0).format((int.parse(promoResto[index].menu!.price!.deliString!)-promoResto[index].ongkir!))
-                                                        :'' :'', minSize: 12),
+                                                    MediaQuery(
+                                                      child: CustomText.bodyRegular12(text:
+                                                      (promoResto[index].menu!.price!.deliString! != null)?
+                                                      (promoResto[index].ongkir != null)?
+                                                      NumberFormat.currency(locale: 'id', symbol: '', decimalDigits: 0).format((int.parse(promoResto[index].menu!.price!.deliString!)-promoResto[index].ongkir!))
+                                                          :'' :'', sizeNew: double.parse(((MediaQuery.of(context).size.width*0.03).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.03).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.03).toString()),),
+                                                        data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0)
+                                                    ),
                                                   ],
-                                                ):CustomText.bodyRegular12(text: NumberFormat.currency(locale: 'id', symbol: '', decimalDigits: 0).format(promo[index].menu!.price!.discounted), minSize: 12),
+                                                ):MediaQuery(child: CustomText.bodyRegular12(text: NumberFormat.currency(locale: 'id', symbol: '', decimalDigits: 0).format(promo[index].menu!.price!.discounted), sizeNew: double.parse(((MediaQuery.of(context).size.width*0.03).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.03).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.03).toString()),),
+                                                    data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0)
+                                                ),
                                               ],
                                             )
                                           ],

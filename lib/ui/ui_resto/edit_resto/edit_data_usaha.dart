@@ -155,957 +155,960 @@ class _EditDataUsahaState extends State<EditDataUsaha> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: SafeArea(
-        child: SingleChildScrollView(
-          child: (karyawan == '1')?Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              SizedBox(height: CustomSize.sizeHeight(context) / 38,),
-              Padding(
-                padding: EdgeInsets.symmetric(horizontal: CustomSize.sizeWidth(context) / 32),
-                child: CustomText.textHeading4(
-                    text: "Edit data restomu",
-                    minSize: 18,
-                    maxLines: 1
-                ),
-              ),
-              SizedBox(height: CustomSize.sizeHeight(context) / 86,),
-              Divider(
-                thickness: 8,
-                color: CustomColor.secondary,
-              ),
-              Padding(
-                padding: EdgeInsets.symmetric(horizontal: CustomSize.sizeWidth(context) / 32),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    SizedBox(height: CustomSize.sizeHeight(context) / 48,),
-                    CustomText.bodyLight12(text: "Nama Badan Usaha (PT/CV/UD)"),
-                    SizedBox(
-                      height: CustomSize.sizeHeight(context) * 0.005,
-                    ),
-                    TextField(
-                      // readOnly: (btnAddress == true)?true:false,
-                      // onTap: (){
-                      //   Fluttertoast.showToast(msg: 'Anda tidak dapat merubah apapun di halaman ini.',);
-                      // },
-                      // readOnly: true,
-                      controller: _NameBadanUsaha,
-                      keyboardType: TextInputType.text,
-                      cursorColor: Colors.black,
-                      style: GoogleFonts.poppins(
-                          textStyle:
-                          TextStyle(fontSize: 18, color: Colors.black, fontWeight: FontWeight.w600)),
-                      decoration: InputDecoration(
-                        hintText: 'Badan Usaha',
-                        isDense: true,
-                        contentPadding: EdgeInsets.only(bottom: CustomSize.sizeHeight(context) / 86),
-                        hintStyle: GoogleFonts.poppins(
-                            textStyle:
-                            TextStyle(fontSize: 14, color: Colors.grey)),
-                        helperStyle: GoogleFonts.poppins(
-                            textStyle: TextStyle(fontSize: 14)),
-                        enabledBorder: UnderlineInputBorder(
-
-                        ),
-                        focusedBorder: UnderlineInputBorder(
-
-                        ),
-                      ),
-                    ),
-                    SizedBox(height: CustomSize.sizeHeight(context) / 48,),
-                    CustomText.bodyLight12(text: "Nama Pemilik Resto"),
-                    SizedBox(
-                      height: CustomSize.sizeHeight(context) * 0.005,
-                    ),
-                    TextField(
-                      // onTap: (){
-                      //   Fluttertoast.showToast(msg: 'Anda tidak dapat merubah apapun di halaman ini.',);
-                      // },
-                      // readOnly: true,
-                      controller: _NamePemilik,
-                      keyboardType: TextInputType.text,
-                      cursorColor: Colors.black,
-                      style: GoogleFonts.poppins(
-                          textStyle:
-                          TextStyle(fontSize: 18, color: Colors.black, fontWeight: FontWeight.w600)),
-                      decoration: InputDecoration(
-                        hintText: 'Pemilik Usaha',
-                        isDense: true,
-                        contentPadding: EdgeInsets.only(bottom: CustomSize.sizeHeight(context) / 86),
-                        hintStyle: GoogleFonts.poppins(
-                            textStyle:
-                            TextStyle(fontSize: 14, color: Colors.grey)),
-                        helperStyle: GoogleFonts.poppins(
-                            textStyle: TextStyle(fontSize: 14)),
-                        enabledBorder: UnderlineInputBorder(
-
-                        ),
-                        focusedBorder: UnderlineInputBorder(
-
-                        ),
-                      ),
-                    ),
-                    SizedBox(height: CustomSize.sizeHeight(context) / 48,),
-                    CustomText.bodyLight12(text: "Nama Penanggung Jawab"),
-                    SizedBox(
-                      height: CustomSize.sizeHeight(context) * 0.005,
-                    ),
-                    TextField(
-                      // onTap: (){
-                      //   Fluttertoast.showToast(msg: 'Anda tidak dapat merubah apapun di halaman ini.',);
-                      // },
-                      // readOnly: true,
-                      // readOnly: (btnAddress == true)?true:false,
-                      controller: _NamePenanggungJawab,
-                      keyboardType: TextInputType.text,
-                      cursorColor: Colors.black,
-                      style: GoogleFonts.poppins(
-                          textStyle:
-                          TextStyle(fontSize: 18, color: Colors.black, fontWeight: FontWeight.w600)),
-                      decoration: InputDecoration(
-                        hintText: 'Penanggung Jawab Resto',
-                        isDense: true,
-                        contentPadding: EdgeInsets.only(bottom: CustomSize.sizeHeight(context) / 86),
-                        hintStyle: GoogleFonts.poppins(
-                            textStyle:
-                            TextStyle(fontSize: 14, color: Colors.grey)),
-                        helperStyle: GoogleFonts.poppins(
-                            textStyle: TextStyle(fontSize: 14)),
-                        enabledBorder: UnderlineInputBorder(
-
-                        ),
-                        focusedBorder: UnderlineInputBorder(
-
-                        ),
-                      ),
-                    ),
-                    SizedBox(height: CustomSize.sizeHeight(context) / 48,),
-                    CustomText.bodyLight12(text: "Tambahkan Selfie Pemilik/Penanggung Jawab"),
-                    SizedBox(
-                      height: CustomSize.sizeHeight(context) * 0.015,
-                    ),
-                    GestureDetector(
-                      onTap: () async{
-                        Fluttertoast.showToast(msg: 'Anda tidak dapat merubah apapun di halaman ini.',);
-                        // getImage2();
-                      },
-                      child: Row(
-                        children: [
-                          (image2 == null)?Container(
-                            height: CustomSize.sizeHeight(context) / 6.5,
-                            width: CustomSize.sizeWidth(context) / 3.2,
-                            decoration: BoxDecoration(
-                              image: DecorationImage(
-                                  image: NetworkImage(Links.subUrl + foto_pj),
-                                  fit: BoxFit.cover
-                              ),
-                              borderRadius: BorderRadius.all(
-                                  Radius.circular(10.0) //         <--- border radius here
-                              ),
-                            ),
-                          ):Container(
-                            height: CustomSize.sizeHeight(context) / 6.5,
-                            width: CustomSize.sizeWidth(context) / 3.2,
-                            decoration: (image2==null)?(img == "/".substring(0, 1))?BoxDecoration(
-                              border: Border.all(
-                                  color: CustomColor.primaryLight,
-                                  width: 3.0
-                              ),
-                              borderRadius: BorderRadius.all(
-                                  Radius.circular(10.0) //         <--- border radius here
-                              ),
-                            ):BoxDecoration(
-                              border: Border.all(
-                                  color: CustomColor.primaryLight,
-                                  width: 3.0
-                              ),
-                              borderRadius: BorderRadius.all(
-                                  Radius.circular(10.0) //         <--- border radius here
-                              ),
-                            ): BoxDecoration(
-                              borderRadius: BorderRadius.all(
-                                  Radius.circular(10.0) //         <--- border radius here
-                              ),
-                              image: new DecorationImage(
-                                  image: new FileImage(image2!),
-                                  fit: BoxFit.cover
-                              ),
-                            ),
-                            child: (img == "/".substring(0, 1))?Center(
-                              child: CustomText.text(
-                                  size: 38,
-                                  weight: FontWeight.w800,
-                                  text: initial,
-                                  color: Colors.white
-                              ),
-                            ):Padding(
-                              padding: const EdgeInsets.only(left: 1.5),
-                              child: Center(
-                                child: (image2 == null)?CustomText.text(
-                                    size: 38,
-                                    weight: FontWeight.w800,
-                                    text: initial,
-                                    color: Colors.white
-                                ):Container(),
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                    SizedBox(height: CustomSize.sizeHeight(context) / 48,),
-                    CustomText.bodyLight12(text: "Tambahkan KTP Pemilik/Penanggung Jawab"),
-                    SizedBox(
-                      height: CustomSize.sizeHeight(context) * 0.015,
-                    ),
-                    GestureDetector(
-                      onTap: () async{
-                        // getImage3();
-                        Fluttertoast.showToast(msg: 'Anda tidak dapat merubah apapun di halaman ini.',);
-                      },
-                      child: Row(
-                        children: [
-                          (image3 == null)?Container(
-                            height: CustomSize.sizeHeight(context) / 6.5,
-                            width: CustomSize.sizeWidth(context) / 2.2,
-                            decoration: BoxDecoration(
-                              image: DecorationImage(
-                                  image: NetworkImage(Links.subUrl + ktp),
-                                  fit: BoxFit.cover
-                              ),
-                              borderRadius: BorderRadius.all(
-                                  Radius.circular(10.0) //         <--- border radius here
-                              ),
-                            ),
-                          ):Container(
-                            height: CustomSize.sizeHeight(context) / 6.5,
-                            width: CustomSize.sizeWidth(context) / 2.2,
-                            decoration: (image3==null)?(img == "/".substring(0, 1))?BoxDecoration(
-                              border: Border.all(
-                                  color: CustomColor.primaryLight,
-                                  width: 3.0
-                              ),
-                              borderRadius: BorderRadius.all(
-                                  Radius.circular(10.0) //         <--- border radius here
-                              ),
-                            ):BoxDecoration(
-                              border: Border.all(
-                                  color: CustomColor.primaryLight,
-                                  width: 3.0
-                              ),
-                              borderRadius: BorderRadius.all(
-                                  Radius.circular(10.0) //         <--- border radius here
-                              ),
-                            ): BoxDecoration(
-                              borderRadius: BorderRadius.all(
-                                  Radius.circular(10.0) //         <--- border radius here
-                              ),
-                              image: new DecorationImage(
-                                  image: new FileImage(image3!),
-                                  fit: BoxFit.cover
-                              ),
-                            ),
-                            child: (img == "/".substring(0, 1))?Center(
-                              child: CustomText.text(
-                                  size: 38,
-                                  weight: FontWeight.w800,
-                                  text: initial,
-                                  color: Colors.white
-                              ),
-                            ):Padding(
-                              padding: const EdgeInsets.only(left: 1.5),
-                              child: Center(
-                                child: (image3 == null)?CustomText.text(
-                                    size: 38,
-                                    weight: FontWeight.w800,
-                                    text: initial,
-                                    color: Colors.white
-                                ):Container(),
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                    SizedBox(height: CustomSize.sizeHeight(context) / 48,),
-                    CustomText.bodyLight12(text: "Nama Sesuai Rekening"),
-                    SizedBox(
-                      height: CustomSize.sizeHeight(context) * 0.005,
-                    ),
-                    TextField(
-                      // onTap: (){
-                      //   Fluttertoast.showToast(msg: 'Anda tidak dapat merubah apapun di halaman ini.',);
-                      // },
-                      // readOnly: true,
-                      // readOnly: (btnAddress == true)?true:false,
-                      controller: _NameRekening,
-                      keyboardType: TextInputType.text,
-                      cursorColor: Colors.black,
-                      style: GoogleFonts.poppins(
-                          textStyle:
-                          TextStyle(fontSize: 18, color: Colors.black, fontWeight: FontWeight.w600)),
-                      decoration: InputDecoration(
-                        hintText: 'Nama Sesuai Rekening Bank',
-                        isDense: true,
-                        contentPadding: EdgeInsets.only(bottom: CustomSize.sizeHeight(context) / 86),
-                        hintStyle: GoogleFonts.poppins(
-                            textStyle:
-                            TextStyle(fontSize: 14, color: Colors.grey)),
-                        helperStyle: GoogleFonts.poppins(
-                            textStyle: TextStyle(fontSize: 14)),
-                        enabledBorder: UnderlineInputBorder(
-
-                        ),
-                        focusedBorder: UnderlineInputBorder(
-
-                        ),
-                      ),
-                    ),
-                    SizedBox(height: CustomSize.sizeHeight(context) / 48,),
-                    CustomText.bodyLight12(text: "Bank"),
-                    SizedBox(
-                      height: CustomSize.sizeHeight(context) * 0.005,
-                    ),
-                    TextField(
-                      // onTap: (){
-                      //   Fluttertoast.showToast(msg: 'Anda tidak dapat merubah apapun di halaman ini.',);
-                      // },
-                      // readOnly: true,
-                      // readOnly: (btnAddress == true)?true:false,
-                      controller: _NameBank,
-                      keyboardType: TextInputType.text,
-                      cursorColor: Colors.black,
-                      style: GoogleFonts.poppins(
-                          textStyle:
-                          TextStyle(fontSize: 18, color: Colors.black, fontWeight: FontWeight.w600)),
-                      decoration: InputDecoration(
-                        hintText: 'Rekening Bank',
-                        isDense: true,
-                        contentPadding: EdgeInsets.only(bottom: CustomSize.sizeHeight(context) / 86),
-                        hintStyle: GoogleFonts.poppins(
-                            textStyle:
-                            TextStyle(fontSize: 14, color: Colors.grey)),
-                        helperStyle: GoogleFonts.poppins(
-                            textStyle: TextStyle(fontSize: 14)),
-                        enabledBorder: UnderlineInputBorder(
-
-                        ),
-                        focusedBorder: UnderlineInputBorder(
-
-                        ),
-                      ),
-                    ),
-                    SizedBox(height: CustomSize.sizeHeight(context) / 48,),
-                    CustomText.bodyLight12(text: "Nomor Rekening Bank"),
-                    SizedBox(
-                      height: CustomSize.sizeHeight(context) * 0.005,
-                    ),
-                    TextField(
-                      // onTap: (){
-                      //   Fluttertoast.showToast(msg: 'Anda tidak dapat merubah apapun di halaman ini.',);
-                      // },
-                      // readOnly: true,
-                      // readOnly: (btnAddress == true)?true:false,
-                      controller: _NoRekeningBank,
-                      keyboardType: TextInputType.number,
-                      cursorColor: Colors.black,
-                      inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-                      style: GoogleFonts.poppins(
-                          textStyle:
-                          TextStyle(fontSize: 18, color: Colors.black, fontWeight: FontWeight.w600)),
-                      decoration: InputDecoration(
-                        hintText: 'Rekening Bank',
-                        isDense: true,
-                        contentPadding: EdgeInsets.only(bottom: CustomSize.sizeHeight(context) / 86),
-                        hintStyle: GoogleFonts.poppins(
-                            textStyle:
-                            TextStyle(fontSize: 14, color: Colors.grey)),
-                        helperStyle: GoogleFonts.poppins(
-                            textStyle: TextStyle(fontSize: 14)),
-                        enabledBorder: UnderlineInputBorder(),
-                        focusedBorder: UnderlineInputBorder(),
-                      ),
-                    ),
-                    SizedBox(height: CustomSize.sizeHeight(context) / 48,),
-                    (btnAddress == true)?Container():Center(
-                      child: GestureDetector(
-                        onTap: () async{
-                          setState(() {
-                            isLoading = false;
-                          });
-                          SharedPreferences pref = await SharedPreferences.getInstance();
-                          if (image2 != null && image3 != null) {
-                            pref.setString("imgSelfie", 'data:image/$extension;base64,'+base64Encode(image2!.readAsBytesSync()).toString());
-                            pref.setString("imgKTP", 'data:image/$extension;base64,'+base64Encode(image3!.readAsBytesSync()).toString());
-                          } else if (image2 != null && image3 == null) {
-                            pref.setString("imgSelfie", 'data:image/$extension;base64,'+base64Encode(image2!.readAsBytesSync()).toString());
-                            pref.setString("imgKTP", '');
-                          } else if (image2 == null && image3 != null) {
-                            pref.setString("imgSelfie", '');
-                            pref.setString("imgKTP", 'data:image/$extension;base64,'+base64Encode(image3!.readAsBytesSync()).toString());
-                          } else if (image2 == null && image3 == null) {
-                            pref.setString("imgSelfie", '');
-                            pref.setString("imgKTP", '');
-                          }
-                          pref.setString("nameBadanUsaha", _NameBadanUsaha.text.toString());
-                          pref.setString("namePemilik", _NamePemilik.text.toString());
-                          pref.setString("namePenanggungJawab", _NamePenanggungJawab.text.toString());
-                          pref.setString("nameRekening", _NameRekening.text.toString());
-                          pref.setString("nameBank", _NameBank.text.toString());
-                          pref.setString("noRekeningBank", _NoRekeningBank.text.toString());
-                          print(pref.getString("imgSelfie"));
-                          print(pref.getString("imgKTP")+'ini ktp');
-                          print(pref.getString("nameBadanUsaha"));
-                          print(pref.getString("namePemilik"));
-                          print(pref.getString("namePenanggungJawab"));
-                          print(pref.getString("noRekeningBank"));
-
-                          Navigator.push(context, PageTransition(type: PageTransitionType.fade, child: new EditDetailResto(facility, cuisine, can_delivery, can_takeaway, ongkir, reservation_fee, idResto, email, badanU, pemilikU, penanggungJwb, nomorRekening)));
-                        },
-                        child: Container(
-                          width: CustomSize.sizeWidth(context) / 1.1,
-                          height: CustomSize.sizeHeight(context) / 14,
-                          decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(30),
-                              color: CustomColor.accent
-                          ),
-                          child: Center(child: CustomText.bodyRegular16(text: "Lanjut", color: Colors.white,)),
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              SizedBox(height: CustomSize.sizeHeight(context) / 48,),
-            ],
-          )
-              :Stack(
-              // alignment: Alignment.topCenter,
+    return MediaQuery(
+      child: Scaffold(
+        body: SafeArea(
+          child: SingleChildScrollView(
+            child: (karyawan == '1')?Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    // SizedBox(height: CustomSize.sizeHeight(context) / 38,),
-                    // Padding(
-                    //   padding: EdgeInsets.symmetric(horizontal: CustomSize.sizeWidth(context) / 32),
-                    //   child: CustomText.textHeading4(
-                    //       text: "Edit data usahamu",
-                    //       minSize: 18,
-                    //       maxLines: 1
-                    //   ),
-                    // ),
-                    SizedBox(height: CustomSize.sizeHeight(context) / 86,),
-                    // Divider(
-                    //   thickness: 8,
-                    //   color: CustomColor.secondary,
-                    // ),
-                    Padding(
-                      padding: EdgeInsets.symmetric(horizontal: CustomSize.sizeWidth(context) / 32),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          // SizedBox(height: CustomSize.sizeHeight(context) / 48,),
-                          // CustomText.bodyLight12(text: "Nama Badan Usaha (PT/CV/UD)"),
-                          // SizedBox(
-                          //   height: CustomSize.sizeHeight(context) * 0.005,
-                          // ),
-                          // TextField(
-                          //   // readOnly: (btnAddress == true)?true:false,
-                          //   controller: _NameBadanUsaha,
-                          //   keyboardType: TextInputType.text,
-                          //   cursorColor: Colors.black,
-                          //   style: GoogleFonts.poppins(
-                          //       textStyle:
-                          //       TextStyle(fontSize: 18, color: Colors.black, fontWeight: FontWeight.w600)),
-                          //   decoration: InputDecoration(
-                          //     hintText: 'Badan Usaha',
-                          //     isDense: true,
-                          //     contentPadding: EdgeInsets.only(bottom: CustomSize.sizeHeight(context) / 86),
-                          //     hintStyle: GoogleFonts.poppins(
-                          //         textStyle:
-                          //         TextStyle(fontSize: 14, color: Colors.grey)),
-                          //     helperStyle: GoogleFonts.poppins(
-                          //         textStyle: TextStyle(fontSize: 14)),
-                          //     enabledBorder: UnderlineInputBorder(
-                          //
-                          //     ),
-                          //     focusedBorder: UnderlineInputBorder(
-                          //
-                          //     ),
-                          //   ),
-                          // ),
-                          SizedBox(height: CustomSize.sizeHeight(context) / 48,),
-                          CustomText.bodyLight12(text: "Nama Pemilik Usaha", color: Colors.transparent),
-                          SizedBox(
-                            height: CustomSize.sizeHeight(context) * 0.005,
-                          ),
-                          TextField(
-                            // onTap: (){
-                            //   Fluttertoast.showToast(msg: 'Anda tidak dapat merubah apapun di halaman ini.',);
-                            // },
-                            readOnly: true,
-                            controller: _NamePemilik,
-                            keyboardType: TextInputType.text,
-                            cursorColor: Colors.black,
-                            style: GoogleFonts.poppins(
-                                textStyle:
-                                TextStyle(fontSize: 18, color: Colors.transparent, fontWeight: FontWeight.w600)),
-                            decoration: InputDecoration(
-                              hintText: 'Pemilik Usaha',
-                              isDense: true,
-                              contentPadding: EdgeInsets.only(bottom: CustomSize.sizeHeight(context) / 86),
-                              hintStyle: GoogleFonts.poppins(
-                                  textStyle:
-                                  TextStyle(fontSize: 14, color: Colors.transparent)),
-                              helperStyle: GoogleFonts.poppins(
-                                  textStyle: TextStyle(fontSize: 14, color: Colors.transparent)),
-                              enabledBorder: InputBorder.none,
-                              focusedBorder: InputBorder.none,
-                            ),
-                          ),
-                          SizedBox(height: CustomSize.sizeHeight(context) / 48,),
-                          CustomText.bodyLight12(text: "Nama Penanggung Jawab", color: Colors.transparent),
-                          SizedBox(
-                            height: CustomSize.sizeHeight(context) * 0.005,
-                          ),
-                          TextField(
-                            // onTap: (){
-                            //   Fluttertoast.showToast(msg: 'Anda tidak dapat merubah apapun di halaman ini.',);
-                            // },
-                            // readOnly: true,
-                            // readOnly: (btnAddress == true)?true:false,
-                            controller: _NamePenanggungJawab,
-                            keyboardType: TextInputType.text,
-                            cursorColor: Colors.black,
-                            style: GoogleFonts.poppins(
-                                textStyle:
-                                TextStyle(fontSize: 18, color: Colors.transparent, fontWeight: FontWeight.w600)),
-                            decoration: InputDecoration(
-                              hintText: 'Penanggung Jawab Usaha',
-                              isDense: true,
-                              contentPadding: EdgeInsets.only(bottom: CustomSize.sizeHeight(context) / 86),
-                              hintStyle: GoogleFonts.poppins(
-                                  textStyle:
-                                  TextStyle(fontSize: 14, color: Colors.transparent)),
-                              helperStyle: GoogleFonts.poppins(
-                                  textStyle: TextStyle(fontSize: 14)),
-                              enabledBorder: InputBorder.none,
-                              focusedBorder: InputBorder.none,
-                            ),
-                          ),
-                          // SizedBox(height: CustomSize.sizeHeight(context) / 48,),
-                          // CustomText.bodyLight12(text: "Tambahkan Selfie Pemilik/Penanggung Jawab"),
-                          // SizedBox(
-                          //   height: CustomSize.sizeHeight(context) * 0.015,
-                          // ),
-                          // GestureDetector(
-                          //   onTap: () async{
-                          //     Fluttertoast.showToast(msg: 'Anda tidak dapat merubah apapun di halaman ini.',);
-                          //     // getImage2();
-                          //   },
-                          //   child: Row(
-                          //     children: [
-                          //       (image2 == null)?Container(
-                          //         height: CustomSize.sizeHeight(context) / 6.5,
-                          //         width: CustomSize.sizeWidth(context) / 3.2,
-                          //         decoration: BoxDecoration(
-                          //           image: DecorationImage(
-                          //               image: NetworkImage(Links.subUrl + foto_pj),
-                          //               fit: BoxFit.cover
-                          //           ),
-                          //           borderRadius: BorderRadius.all(
-                          //               Radius.circular(10.0) //         <--- border radius here
-                          //           ),
-                          //         ),
-                          //       ):Container(
-                          //         height: CustomSize.sizeHeight(context) / 6.5,
-                          //         width: CustomSize.sizeWidth(context) / 3.2,
-                          //         decoration: (image2==null)?(img == "/".substring(0, 1))?BoxDecoration(
-                          //           border: Border.all(
-                          //               color: CustomColor.primaryLight,
-                          //               width: 3.0
-                          //           ),
-                          //           borderRadius: BorderRadius.all(
-                          //               Radius.circular(10.0) //         <--- border radius here
-                          //           ),
-                          //         ):BoxDecoration(
-                          //           border: Border.all(
-                          //               color: CustomColor.primaryLight,
-                          //               width: 3.0
-                          //           ),
-                          //           borderRadius: BorderRadius.all(
-                          //               Radius.circular(10.0) //         <--- border radius here
-                          //           ),
-                          //         ): BoxDecoration(
-                          //           borderRadius: BorderRadius.all(
-                          //               Radius.circular(10.0) //         <--- border radius here
-                          //           ),
-                          //           image: new DecorationImage(
-                          //               image: new FileImage(image2!),
-                          //               fit: BoxFit.cover
-                          //           ),
-                          //         ),
-                          //         child: (img == "/".substring(0, 1))?Center(
-                          //           child: CustomText.text(
-                          //               size: 38,
-                          //               weight: FontWeight.w800,
-                          //               text: initial,
-                          //               color: Colors.white
-                          //           ),
-                          //         ):Padding(
-                          //           padding: const EdgeInsets.only(left: 1.5),
-                          //           child: Center(
-                          //             child: (image2 == null)?CustomText.text(
-                          //                 size: 38,
-                          //                 weight: FontWeight.w800,
-                          //                 text: initial,
-                          //                 color: Colors.white
-                          //             ):Container(),
-                          //           ),
-                          //         ),
-                          //       ),
-                          //     ],
-                          //   ),
-                          // ),
-                          // SizedBox(height: CustomSize.sizeHeight(context) / 48,),
-                          // CustomText.bodyLight12(text: "Tambahkan KTP Pemilik/Penanggung Jawab"),
-                          // SizedBox(
-                          //   height: CustomSize.sizeHeight(context) * 0.015,
-                          // ),
-                          // GestureDetector(
-                          //   onTap: () async{
-                          //     // getImage3();
-                          //     Fluttertoast.showToast(msg: 'Anda tidak dapat merubah apapun di halaman ini.',);
-                          //   },
-                          //   child: Row(
-                          //     children: [
-                          //       (image3 == null)?Container(
-                          //         height: CustomSize.sizeHeight(context) / 6.5,
-                          //         width: CustomSize.sizeWidth(context) / 2.2,
-                          //         decoration: BoxDecoration(
-                          //           image: DecorationImage(
-                          //               image: NetworkImage(Links.subUrl + ktp),
-                          //               fit: BoxFit.cover
-                          //           ),
-                          //           borderRadius: BorderRadius.all(
-                          //               Radius.circular(10.0) //         <--- border radius here
-                          //           ),
-                          //         ),
-                          //       ):Container(
-                          //         height: CustomSize.sizeHeight(context) / 6.5,
-                          //         width: CustomSize.sizeWidth(context) / 2.2,
-                          //         decoration: (image3==null)?(img == "/".substring(0, 1))?BoxDecoration(
-                          //           border: Border.all(
-                          //               color: CustomColor.primaryLight,
-                          //               width: 3.0
-                          //           ),
-                          //           borderRadius: BorderRadius.all(
-                          //               Radius.circular(10.0) //         <--- border radius here
-                          //           ),
-                          //         ):BoxDecoration(
-                          //           border: Border.all(
-                          //               color: CustomColor.primaryLight,
-                          //               width: 3.0
-                          //           ),
-                          //           borderRadius: BorderRadius.all(
-                          //               Radius.circular(10.0) //         <--- border radius here
-                          //           ),
-                          //         ): BoxDecoration(
-                          //           borderRadius: BorderRadius.all(
-                          //               Radius.circular(10.0) //         <--- border radius here
-                          //           ),
-                          //           image: new DecorationImage(
-                          //               image: new FileImage(image3!),
-                          //               fit: BoxFit.cover
-                          //           ),
-                          //         ),
-                          //         child: (img == "/".substring(0, 1))?Center(
-                          //           child: CustomText.text(
-                          //               size: 38,
-                          //               weight: FontWeight.w800,
-                          //               text: initial,
-                          //               color: Colors.white
-                          //           ),
-                          //         ):Padding(
-                          //           padding: const EdgeInsets.only(left: 1.5),
-                          //           child: Center(
-                          //             child: (image3 == null)?CustomText.text(
-                          //                 size: 38,
-                          //                 weight: FontWeight.w800,
-                          //                 text: initial,
-                          //                 color: Colors.white
-                          //             ):Container(),
-                          //           ),
-                          //         ),
-                          //       ),
-                          //     ],
-                          //   ),
-                          // ),
-                          // SizedBox(height: CustomSize.sizeHeight(context) / 48,),
-                          CustomText.bodyLight12(text: "Nama Sesuai Rekening", color: Colors.transparent),
-                          SizedBox(
-                            height: CustomSize.sizeHeight(context) * 0.005,
-                          ),
-                          TextField(
-                            // onTap: (){
-                            //   Fluttertoast.showToast(msg: 'Anda tidak dapat merubah apapun di halaman ini.',);
-                            // },
-                            // readOnly: true,
-                            // readOnly: (btnAddress == true)?true:false,
-                            controller: _NameRekening,
-                            keyboardType: TextInputType.text,
-                            cursorColor: Colors.black,
-                            style: GoogleFonts.poppins(
-                                textStyle:
-                                TextStyle(fontSize: 18, color: Colors.transparent, fontWeight: FontWeight.w600)),
-                            decoration: InputDecoration(
-                              hintText: 'Nama Sesuai Rekening Bank',
-                              isDense: true,
-                              contentPadding: EdgeInsets.only(bottom: CustomSize.sizeHeight(context) / 86),
-                              hintStyle: GoogleFonts.poppins(
-                                  textStyle:
-                                  TextStyle(fontSize: 14, color: Colors.transparent)),
-                              helperStyle: GoogleFonts.poppins(
-                                  textStyle: TextStyle(fontSize: 14)),
-                              enabledBorder: InputBorder.none,
-                              focusedBorder: InputBorder.none,
-                            ),
-                          ),
-                          SizedBox(height: CustomSize.sizeHeight(context) / 48,),
-                          CustomText.bodyLight12(text: "Bank", color: Colors.transparent),
-                          SizedBox(
-                            height: CustomSize.sizeHeight(context) * 0.005,
-                          ),
-                          TextField(
-                            // onTap: (){
-                            //   Fluttertoast.showToast(msg: 'Anda tidak dapat merubah apapun di halaman ini.',);
-                            // },
-                            // readOnly: true,
-                            // readOnly: (btnAddress == true)?true:false,
-                            controller: _NameBank,
-                            keyboardType: TextInputType.text,
-                            cursorColor: Colors.black,
-                            style: GoogleFonts.poppins(
-                                textStyle:
-                                TextStyle(fontSize: 18, color: Colors.transparent, fontWeight: FontWeight.w600)),
-                            decoration: InputDecoration(
-                              hintText: 'Rekening Bank',
-                              isDense: true,
-                              contentPadding: EdgeInsets.only(bottom: CustomSize.sizeHeight(context) / 86),
-                              hintStyle: GoogleFonts.poppins(
-                                  textStyle:
-                                  TextStyle(fontSize: 14, color: Colors.transparent)),
-                              helperStyle: GoogleFonts.poppins(
-                                  textStyle: TextStyle(fontSize: 14)),
-                              enabledBorder: InputBorder.none,
-                              focusedBorder: InputBorder.none,
-                            ),
-                          ),
-                          SizedBox(height: CustomSize.sizeHeight(context) / 48,),
-                          CustomText.bodyLight12(text: "Nomor Rekening Bank", color: Colors.transparent),
-                          SizedBox(
-                            height: CustomSize.sizeHeight(context) * 0.005,
-                          ),
-                          TextField(
-                            // onTap: (){
-                            //   Fluttertoast.showToast(msg: 'Anda tidak dapat merubah apapun di halaman ini.',);
-                            // },
-                            // readOnly: true,
-                            // readOnly: (btnAddress == true)?true:false,
-                            controller: _NoRekeningBank,
-                            keyboardType: TextInputType.number,
-                            cursorColor: Colors.black,
-                            inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-                            style: GoogleFonts.poppins(
-                                textStyle:
-                                TextStyle(fontSize: 18, color: Colors.transparent, fontWeight: FontWeight.w600)),
-                            decoration: InputDecoration(
-                              hintText: 'Rekening Bank',
-                              isDense: true,
-                              contentPadding: EdgeInsets.only(bottom: CustomSize.sizeHeight(context) / 86),
-                              hintStyle: GoogleFonts.poppins(
-                                  textStyle:
-                                  TextStyle(fontSize: 14, color: Colors.transparent)),
-                              helperStyle: GoogleFonts.poppins(
-                                  textStyle: TextStyle(fontSize: 14)),
-                              enabledBorder: InputBorder.none,
-                              focusedBorder: InputBorder.none,
-                            ),
-                          ),
-                          // SizedBox(height: CustomSize.sizeHeight(context) / 48,),
-                          // (btnAddress == true)?Container():Center(
-                          //   child: GestureDetector(
-                          //     onTap: () async{
-                          //       setState(() {
-                          //         isLoading = false;
-                          //       });
-                          //       SharedPreferences pref = await SharedPreferences.getInstance();
-                          //       if (image2 != null && image3 != null) {
-                          //         pref.setString("imgSelfie", 'data:image/$extension;base64,'+base64Encode(image2!.readAsBytesSync()).toString());
-                          //         pref.setString("imgKTP", 'data:image/$extension;base64,'+base64Encode(image3!.readAsBytesSync()).toString());
-                          //       } else if (image2 != null && image3 == null) {
-                          //         pref.setString("imgSelfie", 'data:image/$extension;base64,'+base64Encode(image2!.readAsBytesSync()).toString());
-                          //         pref.setString("imgKTP", '');
-                          //       } else if (image2 == null && image3 != null) {
-                          //         pref.setString("imgSelfie", '');
-                          //         pref.setString("imgKTP", 'data:image/$extension;base64,'+base64Encode(image3!.readAsBytesSync()).toString());
-                          //       } else if (image2 == null && image3 == null) {
-                          //         pref.setString("imgSelfie", '');
-                          //         pref.setString("imgKTP", '');
-                          //       }
-                          //       pref.setString("nameBadanUsaha", _NameBadanUsaha.text.toString());
-                          //       pref.setString("namePemilik", _NamePemilik.text.toString());
-                          //       pref.setString("namePenanggungJawab", _NamePenanggungJawab.text.toString());
-                          //       pref.setString("nameRekening", _NameRekening.text.toString());
-                          //       pref.setString("nameBank", _NameBank.text.toString());
-                          //       pref.setString("noRekeningBank", _NoRekeningBank.text.toString());
-                          //       print(pref.getString("imgSelfie"));
-                          //       print(pref.getString("imgKTP")+'ini ktp');
-                          //       print(pref.getString("nameBadanUsaha"));
-                          //       print(pref.getString("namePemilik"));
-                          //       print(pref.getString("namePenanggungJawab"));
-                          //       print(pref.getString("noRekeningBank"));
-                          //
-                          //       Navigator.push(context, PageTransition(type: PageTransitionType.fade, child: new EditDetailResto(facility, cuisine, can_delivery, can_takeaway, ongkir, reservation_fee, idResto, email, badanU, pemilikU, penanggungJwb, nomorRekening)));
-                          //     },
-                          //     child: Container(
-                          //       width: CustomSize.sizeWidth(context) / 1.1,
-                          //       height: CustomSize.sizeHeight(context) / 14,
-                          //       decoration: BoxDecoration(
-                          //           borderRadius: BorderRadius.circular(30),
-                          //           color: CustomColor.accent
-                          //       ),
-                          //       child: Center(child: CustomText.bodyRegular16(text: "Lanjut", color: Colors.white,)),
-                          //     ),
-                          //   ),
-                          // ),
-                        ],
-                      ),
-                    ),
-                    // SizedBox(height: CustomSize.sizeHeight(context) / 48,),
-                  ],
+                SizedBox(height: CustomSize.sizeHeight(context) / 38,),
+                Padding(
+                  padding: EdgeInsets.symmetric(horizontal: CustomSize.sizeWidth(context) / 32),
+                  child: CustomText.textHeading4(
+                      text: "Edit data restomu",
+                      sizeNew: double.parse(((MediaQuery.of(context).size.width*0.045).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.045).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.045).toString()),
+                      maxLines: 1
+                  ),
                 ),
-
-
-                // Container(
-                //   // height: CustomSize.sizeHeight(context),
-                //   width: CustomSize.sizeWidth(context),
-                //   color: Colors.white,
-                // ),
-
-                Container(
-                  height: CustomSize.sizeHeight(context) / 1.1,
+                SizedBox(height: CustomSize.sizeHeight(context) / 86,),
+                Divider(
+                  thickness: 8,
+                  color: CustomColor.secondary,
+                ),
+                Padding(
+                  padding: EdgeInsets.symmetric(horizontal: CustomSize.sizeWidth(context) / 32),
                   child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          SizedBox(height: CustomSize.sizeHeight(context) / 38,),
-                          Padding(
-                            padding: EdgeInsets.symmetric(horizontal: CustomSize.sizeWidth(context) / 32),
-                            child: CustomText.textHeading4(
-                                text: "Edit data restomu",
-                                minSize: 18,
-                                maxLines: 1
-                            ),
+                      SizedBox(height: CustomSize.sizeHeight(context) / 48,),
+                      CustomText.bodyLight12(text: "Nama Badan Usaha (PT/CV/UD)", sizeNew: double.parse(((MediaQuery.of(context).size.width*0.03).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.03).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.03).toString())),
+                      SizedBox(
+                        height: CustomSize.sizeHeight(context) * 0.005,
+                      ),
+                      TextField(
+                        // readOnly: (btnAddress == true)?true:false,
+                        // onTap: (){
+                        //   Fluttertoast.showToast(msg: 'Anda tidak dapat merubah apapun di halaman ini.',);
+                        // },
+                        // readOnly: true,
+                        controller: _NameBadanUsaha,
+                        keyboardType: TextInputType.text,
+                        cursorColor: Colors.black,
+                        style: GoogleFonts.poppins(
+                            textStyle:
+                            TextStyle(fontSize: 18, color: Colors.black, fontWeight: FontWeight.w600)),
+                        decoration: InputDecoration(
+                          hintText: 'Badan Usaha',
+                          isDense: true,
+                          contentPadding: EdgeInsets.only(bottom: CustomSize.sizeHeight(context) / 86),
+                          hintStyle: GoogleFonts.poppins(
+                              textStyle:
+                              TextStyle(fontSize: 14, color: Colors.grey)),
+                          helperStyle: GoogleFonts.poppins(
+                              textStyle: TextStyle(fontSize: 14)),
+                          enabledBorder: UnderlineInputBorder(
+
                           ),
-                          SizedBox(height: CustomSize.sizeHeight(context) / 86,),
-                          Divider(
-                            thickness: 8,
-                            color: CustomColor.secondary,
+                          focusedBorder: UnderlineInputBorder(
+
                           ),
-                          SizedBox(height: CustomSize.sizeHeight(context) / 88,),
-                          Padding(
-                            padding: EdgeInsets.symmetric(horizontal: CustomSize.sizeWidth(context) / 22),
-                            child: Container(
-                              width: CustomSize.sizeWidth(context),
-                              // height: CustomSize.sizeHeight(context) / 3.8,
+                        ),
+                      ),
+                      SizedBox(height: CustomSize.sizeHeight(context) / 48,),
+                      CustomText.bodyLight12(text: "Nama Pemilik Resto", sizeNew: double.parse(((MediaQuery.of(context).size.width*0.03).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.03).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.03).toString())),
+                      SizedBox(
+                        height: CustomSize.sizeHeight(context) * 0.005,
+                      ),
+                      TextField(
+                        // onTap: (){
+                        //   Fluttertoast.showToast(msg: 'Anda tidak dapat merubah apapun di halaman ini.',);
+                        // },
+                        // readOnly: true,
+                        controller: _NamePemilik,
+                        keyboardType: TextInputType.text,
+                        cursorColor: Colors.black,
+                        style: GoogleFonts.poppins(
+                            textStyle:
+                            TextStyle(fontSize: 18, color: Colors.black, fontWeight: FontWeight.w600)),
+                        decoration: InputDecoration(
+                          hintText: 'Pemilik Usaha',
+                          isDense: true,
+                          contentPadding: EdgeInsets.only(bottom: CustomSize.sizeHeight(context) / 86),
+                          hintStyle: GoogleFonts.poppins(
+                              textStyle:
+                              TextStyle(fontSize: 14, color: Colors.grey)),
+                          helperStyle: GoogleFonts.poppins(
+                              textStyle: TextStyle(fontSize: 14)),
+                          enabledBorder: UnderlineInputBorder(
+
+                          ),
+                          focusedBorder: UnderlineInputBorder(
+
+                          ),
+                        ),
+                      ),
+                      SizedBox(height: CustomSize.sizeHeight(context) / 48,),
+                      CustomText.bodyLight12(text: "Nama Penanggung Jawab", sizeNew: double.parse(((MediaQuery.of(context).size.width*0.03).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.03).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.03).toString())),
+                      SizedBox(
+                        height: CustomSize.sizeHeight(context) * 0.005,
+                      ),
+                      TextField(
+                        // onTap: (){
+                        //   Fluttertoast.showToast(msg: 'Anda tidak dapat merubah apapun di halaman ini.',);
+                        // },
+                        // readOnly: true,
+                        // readOnly: (btnAddress == true)?true:false,
+                        controller: _NamePenanggungJawab,
+                        keyboardType: TextInputType.text,
+                        cursorColor: Colors.black,
+                        style: GoogleFonts.poppins(
+                            textStyle:
+                            TextStyle(fontSize: 18, color: Colors.black, fontWeight: FontWeight.w600)),
+                        decoration: InputDecoration(
+                          hintText: 'Penanggung Jawab Resto',
+                          isDense: true,
+                          contentPadding: EdgeInsets.only(bottom: CustomSize.sizeHeight(context) / 86),
+                          hintStyle: GoogleFonts.poppins(
+                              textStyle:
+                              TextStyle(fontSize: 14, color: Colors.grey)),
+                          helperStyle: GoogleFonts.poppins(
+                              textStyle: TextStyle(fontSize: 14)),
+                          enabledBorder: UnderlineInputBorder(
+
+                          ),
+                          focusedBorder: UnderlineInputBorder(
+
+                          ),
+                        ),
+                      ),
+                      SizedBox(height: CustomSize.sizeHeight(context) / 48,),
+                      CustomText.bodyLight12(text: "Tambahkan Selfie Pemilik/Penanggung Jawab", sizeNew: double.parse(((MediaQuery.of(context).size.width*0.03).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.03).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.03).toString())),
+                      SizedBox(
+                        height: CustomSize.sizeHeight(context) * 0.015,
+                      ),
+                      GestureDetector(
+                        onTap: () async{
+                          Fluttertoast.showToast(msg: 'Anda tidak dapat merubah apapun di halaman ini.',);
+                          // getImage2();
+                        },
+                        child: Row(
+                          children: [
+                            (image2 == null)?Container(
+                              height: CustomSize.sizeHeight(context) / 6.5,
+                              width: CustomSize.sizeWidth(context) / 3.2,
                               decoration: BoxDecoration(
-                                color: Colors.white,
-                                borderRadius: BorderRadius.circular(20),
-                                boxShadow: [
-                                  BoxShadow(
-                                    color: Colors.grey.withOpacity(0.5),
-                                    spreadRadius: 0,
-                                    blurRadius: 4,
-                                    offset: Offset(0, 3), // changes position of shadow
-                                  ),
-                                ],
+                                image: DecorationImage(
+                                    image: NetworkImage(Links.subUrl + foto_pj),
+                                    fit: BoxFit.cover
+                                ),
+                                borderRadius: BorderRadius.all(
+                                    Radius.circular(10.0) //         <--- border radius here
+                                ),
                               ),
-                              child: Padding(
-                                padding: const EdgeInsets.symmetric(horizontal: 20.0),
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.center,
-                                  children: [
-                                    SizedBox(height: CustomSize.sizeHeight(context) / 36,),
-                                    CustomText.bodyRegular18(text: "*Pada halaman ini data pemilik resto tidak dapat dilihat maupun diubah oleh pegawai resto!", color: CustomColor.redBtn, minSize: 15, maxLines: 3),
-                                    SizedBox(height: CustomSize.sizeHeight(context) / 36,),
-                                  ],
+                            ):Container(
+                              height: CustomSize.sizeHeight(context) / 6.5,
+                              width: CustomSize.sizeWidth(context) / 3.2,
+                              decoration: (image2==null)?(img == "/".substring(0, 1))?BoxDecoration(
+                                border: Border.all(
+                                    color: CustomColor.primaryLight,
+                                    width: 3.0
+                                ),
+                                borderRadius: BorderRadius.all(
+                                    Radius.circular(10.0) //         <--- border radius here
+                                ),
+                              ):BoxDecoration(
+                                border: Border.all(
+                                    color: CustomColor.primaryLight,
+                                    width: 3.0
+                                ),
+                                borderRadius: BorderRadius.all(
+                                    Radius.circular(10.0) //         <--- border radius here
+                                ),
+                              ): BoxDecoration(
+                                borderRadius: BorderRadius.all(
+                                    Radius.circular(10.0) //         <--- border radius here
+                                ),
+                                image: new DecorationImage(
+                                    image: new FileImage(image2!),
+                                    fit: BoxFit.cover
+                                ),
+                              ),
+                              child: (img == "/".substring(0, 1))?Center(
+                                child: CustomText.text(
+                                    size: double.parse(((MediaQuery.of(context).size.width*0.094).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.094).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.094).toString()),
+                                    weight: FontWeight.w800,
+                                    text: initial,
+                                    color: Colors.white
+                                ),
+                              ):Padding(
+                                padding: const EdgeInsets.only(left: 1.5),
+                                child: Center(
+                                  child: (image2 == null)?CustomText.text(
+                                      size: double.parse(((MediaQuery.of(context).size.width*0.094).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.094).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.094).toString()),
+                                      weight: FontWeight.w800,
+                                      text: initial,
+                                      color: Colors.white
+                                  ):Container(),
                                 ),
                               ),
                             ),
-                          ),
-                        ],
+                          ],
+                        ),
                       ),
+                      SizedBox(height: CustomSize.sizeHeight(context) / 48,),
+                      CustomText.bodyLight12(text: "Tambahkan KTP Pemilik/Penanggung Jawab", sizeNew: double.parse(((MediaQuery.of(context).size.width*0.03).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.03).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.03).toString())),
+                      SizedBox(
+                        height: CustomSize.sizeHeight(context) * 0.015,
+                      ),
+                      GestureDetector(
+                        onTap: () async{
+                          // getImage3();
+                          Fluttertoast.showToast(msg: 'Anda tidak dapat merubah apapun di halaman ini.',);
+                        },
+                        child: Row(
+                          children: [
+                            (image3 == null)?Container(
+                              height: CustomSize.sizeHeight(context) / 6.5,
+                              width: CustomSize.sizeWidth(context) / 2.2,
+                              decoration: BoxDecoration(
+                                image: DecorationImage(
+                                    image: NetworkImage(Links.subUrl + ktp),
+                                    fit: BoxFit.cover
+                                ),
+                                borderRadius: BorderRadius.all(
+                                    Radius.circular(10.0) //         <--- border radius here
+                                ),
+                              ),
+                            ):Container(
+                              height: CustomSize.sizeHeight(context) / 6.5,
+                              width: CustomSize.sizeWidth(context) / 2.2,
+                              decoration: (image3==null)?(img == "/".substring(0, 1))?BoxDecoration(
+                                border: Border.all(
+                                    color: CustomColor.primaryLight,
+                                    width: 3.0
+                                ),
+                                borderRadius: BorderRadius.all(
+                                    Radius.circular(10.0) //         <--- border radius here
+                                ),
+                              ):BoxDecoration(
+                                border: Border.all(
+                                    color: CustomColor.primaryLight,
+                                    width: 3.0
+                                ),
+                                borderRadius: BorderRadius.all(
+                                    Radius.circular(10.0) //         <--- border radius here
+                                ),
+                              ): BoxDecoration(
+                                borderRadius: BorderRadius.all(
+                                    Radius.circular(10.0) //         <--- border radius here
+                                ),
+                                image: new DecorationImage(
+                                    image: new FileImage(image3!),
+                                    fit: BoxFit.cover
+                                ),
+                              ),
+                              child: (img == "/".substring(0, 1))?Center(
+                                child: CustomText.text(
+                                    size: double.parse(((MediaQuery.of(context).size.width*0.094).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.094).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.094).toString()),
+                                    weight: FontWeight.w800,
+                                    text: initial,
+                                    color: Colors.white
+                                ),
+                              ):Padding(
+                                padding: const EdgeInsets.only(left: 1.5),
+                                child: Center(
+                                  child: (image3 == null)?CustomText.text(
+                                      size: double.parse(((MediaQuery.of(context).size.width*0.094).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.094).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.094).toString()),
+                                      weight: FontWeight.w800,
+                                      text: initial,
+                                      color: Colors.white
+                                  ):Container(),
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      SizedBox(height: CustomSize.sizeHeight(context) / 48,),
+                      CustomText.bodyLight12(text: "Nama Sesuai Rekening", sizeNew: double.parse(((MediaQuery.of(context).size.width*0.03).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.03).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.03).toString())),
+                      SizedBox(
+                        height: CustomSize.sizeHeight(context) * 0.005,
+                      ),
+                      TextField(
+                        // onTap: (){
+                        //   Fluttertoast.showToast(msg: 'Anda tidak dapat merubah apapun di halaman ini.',);
+                        // },
+                        // readOnly: true,
+                        // readOnly: (btnAddress == true)?true:false,
+                        controller: _NameRekening,
+                        keyboardType: TextInputType.text,
+                        cursorColor: Colors.black,
+                        style: GoogleFonts.poppins(
+                            textStyle:
+                            TextStyle(fontSize: 18, color: Colors.black, fontWeight: FontWeight.w600)),
+                        decoration: InputDecoration(
+                          hintText: 'Nama Sesuai Rekening Bank',
+                          isDense: true,
+                          contentPadding: EdgeInsets.only(bottom: CustomSize.sizeHeight(context) / 86),
+                          hintStyle: GoogleFonts.poppins(
+                              textStyle:
+                              TextStyle(fontSize: 14, color: Colors.grey)),
+                          helperStyle: GoogleFonts.poppins(
+                              textStyle: TextStyle(fontSize: 14)),
+                          enabledBorder: UnderlineInputBorder(
 
+                          ),
+                          focusedBorder: UnderlineInputBorder(
+
+                          ),
+                        ),
+                      ),
+                      SizedBox(height: CustomSize.sizeHeight(context) / 48,),
+                      CustomText.bodyLight12(text: "Bank", sizeNew: double.parse(((MediaQuery.of(context).size.width*0.03).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.03).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.03).toString())),
+                      SizedBox(
+                        height: CustomSize.sizeHeight(context) * 0.005,
+                      ),
+                      TextField(
+                        // onTap: (){
+                        //   Fluttertoast.showToast(msg: 'Anda tidak dapat merubah apapun di halaman ini.',);
+                        // },
+                        // readOnly: true,
+                        // readOnly: (btnAddress == true)?true:false,
+                        controller: _NameBank,
+                        keyboardType: TextInputType.text,
+                        cursorColor: Colors.black,
+                        style: GoogleFonts.poppins(
+                            textStyle:
+                            TextStyle(fontSize: 18, color: Colors.black, fontWeight: FontWeight.w600)),
+                        decoration: InputDecoration(
+                          hintText: 'Rekening Bank',
+                          isDense: true,
+                          contentPadding: EdgeInsets.only(bottom: CustomSize.sizeHeight(context) / 86),
+                          hintStyle: GoogleFonts.poppins(
+                              textStyle:
+                              TextStyle(fontSize: 14, color: Colors.grey)),
+                          helperStyle: GoogleFonts.poppins(
+                              textStyle: TextStyle(fontSize: 14)),
+                          enabledBorder: UnderlineInputBorder(
+
+                          ),
+                          focusedBorder: UnderlineInputBorder(
+
+                          ),
+                        ),
+                      ),
+                      SizedBox(height: CustomSize.sizeHeight(context) / 48,),
+                      CustomText.bodyLight12(text: "Nomor Rekening Bank", sizeNew: double.parse(((MediaQuery.of(context).size.width*0.03).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.03).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.03).toString())),
+                      SizedBox(
+                        height: CustomSize.sizeHeight(context) * 0.005,
+                      ),
+                      TextField(
+                        // onTap: (){
+                        //   Fluttertoast.showToast(msg: 'Anda tidak dapat merubah apapun di halaman ini.',);
+                        // },
+                        // readOnly: true,
+                        // readOnly: (btnAddress == true)?true:false,
+                        controller: _NoRekeningBank,
+                        keyboardType: TextInputType.number,
+                        cursorColor: Colors.black,
+                        inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+                        style: GoogleFonts.poppins(
+                            textStyle:
+                            TextStyle(fontSize: 18, color: Colors.black, fontWeight: FontWeight.w600)),
+                        decoration: InputDecoration(
+                          hintText: 'Rekening Bank',
+                          isDense: true,
+                          contentPadding: EdgeInsets.only(bottom: CustomSize.sizeHeight(context) / 86),
+                          hintStyle: GoogleFonts.poppins(
+                              textStyle:
+                              TextStyle(fontSize: 14, color: Colors.grey)),
+                          helperStyle: GoogleFonts.poppins(
+                              textStyle: TextStyle(fontSize: 14)),
+                          enabledBorder: UnderlineInputBorder(),
+                          focusedBorder: UnderlineInputBorder(),
+                        ),
+                      ),
+                      SizedBox(height: CustomSize.sizeHeight(context) / 48,),
+                      (btnAddress == true)?Container():Center(
+                        child: GestureDetector(
+                          onTap: () async{
+                            setState(() {
+                              isLoading = false;
+                            });
+                            SharedPreferences pref = await SharedPreferences.getInstance();
+                            if (image2 != null && image3 != null) {
+                              pref.setString("imgSelfie", 'data:image/$extension;base64,'+base64Encode(image2!.readAsBytesSync()).toString());
+                              pref.setString("imgKTP", 'data:image/$extension;base64,'+base64Encode(image3!.readAsBytesSync()).toString());
+                            } else if (image2 != null && image3 == null) {
+                              pref.setString("imgSelfie", 'data:image/$extension;base64,'+base64Encode(image2!.readAsBytesSync()).toString());
+                              pref.setString("imgKTP", '');
+                            } else if (image2 == null && image3 != null) {
+                              pref.setString("imgSelfie", '');
+                              pref.setString("imgKTP", 'data:image/$extension;base64,'+base64Encode(image3!.readAsBytesSync()).toString());
+                            } else if (image2 == null && image3 == null) {
+                              pref.setString("imgSelfie", '');
+                              pref.setString("imgKTP", '');
+                            }
+                            pref.setString("nameBadanUsaha", _NameBadanUsaha.text.toString());
+                            pref.setString("namePemilik", _NamePemilik.text.toString());
+                            pref.setString("namePenanggungJawab", _NamePenanggungJawab.text.toString());
+                            pref.setString("nameRekening", _NameRekening.text.toString());
+                            pref.setString("nameBank", _NameBank.text.toString());
+                            pref.setString("noRekeningBank", _NoRekeningBank.text.toString());
+                            print(pref.getString("imgSelfie"));
+                            print(pref.getString("imgKTP")+'ini ktp');
+                            print(pref.getString("nameBadanUsaha"));
+                            print(pref.getString("namePemilik"));
+                            print(pref.getString("namePenanggungJawab"));
+                            print(pref.getString("noRekeningBank"));
+
+                            Navigator.push(context, PageTransition(type: PageTransitionType.fade, child: new EditDetailResto(facility, cuisine, can_delivery, can_takeaway, ongkir, reservation_fee, idResto, email, badanU, pemilikU, penanggungJwb, nomorRekening)));
+                          },
+                          child: Container(
+                            width: CustomSize.sizeWidth(context) / 1.1,
+                            height: CustomSize.sizeHeight(context) / 14,
+                            decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(30),
+                                color: CustomColor.accent
+                            ),
+                            child: Center(child: CustomText.bodyRegular16(text: "Lanjut", color: Colors.white, sizeNew: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.04).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.04).toString()))),
+                          ),
+                        ),
+                      ),
                     ],
                   ),
                 ),
-                ]
-          ),
-        ),
-      ),
-      floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
-      floatingActionButton:
-      (karyawan == '1')?Container():GestureDetector(
-        onTap: () async{
-          setState(() {
-            isLoading = false;
-          });
-          SharedPreferences pref = await SharedPreferences.getInstance();
-          if (image2 != null && image3 != null) {
-            pref.setString("imgSelfie", 'data:image/$extension;base64,'+base64Encode(image2!.readAsBytesSync()).toString());
-            pref.setString("imgKTP", 'data:image/$extension;base64,'+base64Encode(image3!.readAsBytesSync()).toString());
-          } else if (image2 != null && image3 == null) {
-            pref.setString("imgSelfie", 'data:image/$extension;base64,'+base64Encode(image2!.readAsBytesSync()).toString());
-            pref.setString("imgKTP", '');
-          } else if (image2 == null && image3 != null) {
-            pref.setString("imgSelfie", '');
-            pref.setString("imgKTP", 'data:image/$extension;base64,'+base64Encode(image3!.readAsBytesSync()).toString());
-          } else if (image2 == null && image3 == null) {
-            pref.setString("imgSelfie", '');
-            pref.setString("imgKTP", '');
-          }
-          pref.setString("nameBadanUsaha", _NameBadanUsaha.text.toString());
-          pref.setString("namePemilik", _NamePemilik.text.toString());
-          pref.setString("namePenanggungJawab", _NamePenanggungJawab.text.toString());
-          pref.setString("nameRekening", _NameRekening.text.toString());
-          pref.setString("nameBank", _NameBank.text.toString());
-          pref.setString("noRekeningBank", _NoRekeningBank.text.toString());
-          print(pref.getString("imgSelfie"));
-          print(pref.getString("imgKTP")+'ini ktp');
-          print(pref.getString("nameBadanUsaha"));
-          print(pref.getString("namePemilik"));
-          print(pref.getString("namePenanggungJawab"));
-          print(pref.getString("noRekeningBank"));
+                SizedBox(height: CustomSize.sizeHeight(context) / 48,),
+              ],
+            )
+                :Stack(
+                // alignment: Alignment.topCenter,
+                children: [
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      // SizedBox(height: CustomSize.sizeHeight(context) / 38,),
+                      // Padding(
+                      //   padding: EdgeInsets.symmetric(horizontal: CustomSize.sizeWidth(context) / 32),
+                      //   child: CustomText.textHeading4(
+                      //       text: "Edit data usahamu",
+                      //       minSize: 18,
+                      //       maxLines: 1
+                      //   ),
+                      // ),
+                      SizedBox(height: CustomSize.sizeHeight(context) / 86,),
+                      // Divider(
+                      //   thickness: 8,
+                      //   color: CustomColor.secondary,
+                      // ),
+                      Padding(
+                        padding: EdgeInsets.symmetric(horizontal: CustomSize.sizeWidth(context) / 32),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            // SizedBox(height: CustomSize.sizeHeight(context) / 48,),
+                            // CustomText.bodyLight12(text: "Nama Badan Usaha (PT/CV/UD)"),
+                            // SizedBox(
+                            //   height: CustomSize.sizeHeight(context) * 0.005,
+                            // ),
+                            // TextField(
+                            //   // readOnly: (btnAddress == true)?true:false,
+                            //   controller: _NameBadanUsaha,
+                            //   keyboardType: TextInputType.text,
+                            //   cursorColor: Colors.black,
+                            //   style: GoogleFonts.poppins(
+                            //       textStyle:
+                            //       TextStyle(fontSize: 18, color: Colors.black, fontWeight: FontWeight.w600)),
+                            //   decoration: InputDecoration(
+                            //     hintText: 'Badan Usaha',
+                            //     isDense: true,
+                            //     contentPadding: EdgeInsets.only(bottom: CustomSize.sizeHeight(context) / 86),
+                            //     hintStyle: GoogleFonts.poppins(
+                            //         textStyle:
+                            //         TextStyle(fontSize: 14, color: Colors.grey)),
+                            //     helperStyle: GoogleFonts.poppins(
+                            //         textStyle: TextStyle(fontSize: 14)),
+                            //     enabledBorder: UnderlineInputBorder(
+                            //
+                            //     ),
+                            //     focusedBorder: UnderlineInputBorder(
+                            //
+                            //     ),
+                            //   ),
+                            // ),
+                            SizedBox(height: CustomSize.sizeHeight(context) / 48,),
+                            CustomText.bodyLight12(text: "Nama Pemilik Usaha", color: Colors.transparent, sizeNew: double.parse(((MediaQuery.of(context).size.width*0.03).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.03).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.03).toString())),
+                            SizedBox(
+                              height: CustomSize.sizeHeight(context) * 0.005,
+                            ),
+                            TextField(
+                              // onTap: (){
+                              //   Fluttertoast.showToast(msg: 'Anda tidak dapat merubah apapun di halaman ini.',);
+                              // },
+                              readOnly: true,
+                              controller: _NamePemilik,
+                              keyboardType: TextInputType.text,
+                              cursorColor: Colors.black,
+                              style: GoogleFonts.poppins(
+                                  textStyle:
+                                  TextStyle(fontSize: 18, color: Colors.transparent, fontWeight: FontWeight.w600)),
+                              decoration: InputDecoration(
+                                hintText: 'Pemilik Usaha',
+                                isDense: true,
+                                contentPadding: EdgeInsets.only(bottom: CustomSize.sizeHeight(context) / 86),
+                                hintStyle: GoogleFonts.poppins(
+                                    textStyle:
+                                    TextStyle(fontSize: 14, color: Colors.transparent)),
+                                helperStyle: GoogleFonts.poppins(
+                                    textStyle: TextStyle(fontSize: 14, color: Colors.transparent)),
+                                enabledBorder: InputBorder.none,
+                                focusedBorder: InputBorder.none,
+                              ),
+                            ),
+                            SizedBox(height: CustomSize.sizeHeight(context) / 48,),
+                            CustomText.bodyLight12(text: "Nama Penanggung Jawab", color: Colors.transparent, sizeNew: double.parse(((MediaQuery.of(context).size.width*0.03).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.03).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.03).toString())),
+                            SizedBox(
+                              height: CustomSize.sizeHeight(context) * 0.005,
+                            ),
+                            TextField(
+                              // onTap: (){
+                              //   Fluttertoast.showToast(msg: 'Anda tidak dapat merubah apapun di halaman ini.',);
+                              // },
+                              // readOnly: true,
+                              // readOnly: (btnAddress == true)?true:false,
+                              controller: _NamePenanggungJawab,
+                              keyboardType: TextInputType.text,
+                              cursorColor: Colors.black,
+                              style: GoogleFonts.poppins(
+                                  textStyle:
+                                  TextStyle(fontSize: 18, color: Colors.transparent, fontWeight: FontWeight.w600)),
+                              decoration: InputDecoration(
+                                hintText: 'Penanggung Jawab Usaha',
+                                isDense: true,
+                                contentPadding: EdgeInsets.only(bottom: CustomSize.sizeHeight(context) / 86),
+                                hintStyle: GoogleFonts.poppins(
+                                    textStyle:
+                                    TextStyle(fontSize: 14, color: Colors.transparent)),
+                                helperStyle: GoogleFonts.poppins(
+                                    textStyle: TextStyle(fontSize: 14)),
+                                enabledBorder: InputBorder.none,
+                                focusedBorder: InputBorder.none,
+                              ),
+                            ),
+                            // SizedBox(height: CustomSize.sizeHeight(context) / 48,),
+                            // CustomText.bodyLight12(text: "Tambahkan Selfie Pemilik/Penanggung Jawab"),
+                            // SizedBox(
+                            //   height: CustomSize.sizeHeight(context) * 0.015,
+                            // ),
+                            // GestureDetector(
+                            //   onTap: () async{
+                            //     Fluttertoast.showToast(msg: 'Anda tidak dapat merubah apapun di halaman ini.',);
+                            //     // getImage2();
+                            //   },
+                            //   child: Row(
+                            //     children: [
+                            //       (image2 == null)?Container(
+                            //         height: CustomSize.sizeHeight(context) / 6.5,
+                            //         width: CustomSize.sizeWidth(context) / 3.2,
+                            //         decoration: BoxDecoration(
+                            //           image: DecorationImage(
+                            //               image: NetworkImage(Links.subUrl + foto_pj),
+                            //               fit: BoxFit.cover
+                            //           ),
+                            //           borderRadius: BorderRadius.all(
+                            //               Radius.circular(10.0) //         <--- border radius here
+                            //           ),
+                            //         ),
+                            //       ):Container(
+                            //         height: CustomSize.sizeHeight(context) / 6.5,
+                            //         width: CustomSize.sizeWidth(context) / 3.2,
+                            //         decoration: (image2==null)?(img == "/".substring(0, 1))?BoxDecoration(
+                            //           border: Border.all(
+                            //               color: CustomColor.primaryLight,
+                            //               width: 3.0
+                            //           ),
+                            //           borderRadius: BorderRadius.all(
+                            //               Radius.circular(10.0) //         <--- border radius here
+                            //           ),
+                            //         ):BoxDecoration(
+                            //           border: Border.all(
+                            //               color: CustomColor.primaryLight,
+                            //               width: 3.0
+                            //           ),
+                            //           borderRadius: BorderRadius.all(
+                            //               Radius.circular(10.0) //         <--- border radius here
+                            //           ),
+                            //         ): BoxDecoration(
+                            //           borderRadius: BorderRadius.all(
+                            //               Radius.circular(10.0) //         <--- border radius here
+                            //           ),
+                            //           image: new DecorationImage(
+                            //               image: new FileImage(image2!),
+                            //               fit: BoxFit.cover
+                            //           ),
+                            //         ),
+                            //         child: (img == "/".substring(0, 1))?Center(
+                            //           child: CustomText.text(
+                            //               size: 38,
+                            //               weight: FontWeight.w800,
+                            //               text: initial,
+                            //               color: Colors.white
+                            //           ),
+                            //         ):Padding(
+                            //           padding: const EdgeInsets.only(left: 1.5),
+                            //           child: Center(
+                            //             child: (image2 == null)?CustomText.text(
+                            //                 size: 38,
+                            //                 weight: FontWeight.w800,
+                            //                 text: initial,
+                            //                 color: Colors.white
+                            //             ):Container(),
+                            //           ),
+                            //         ),
+                            //       ),
+                            //     ],
+                            //   ),
+                            // ),
+                            // SizedBox(height: CustomSize.sizeHeight(context) / 48,),
+                            // CustomText.bodyLight12(text: "Tambahkan KTP Pemilik/Penanggung Jawab"),
+                            // SizedBox(
+                            //   height: CustomSize.sizeHeight(context) * 0.015,
+                            // ),
+                            // GestureDetector(
+                            //   onTap: () async{
+                            //     // getImage3();
+                            //     Fluttertoast.showToast(msg: 'Anda tidak dapat merubah apapun di halaman ini.',);
+                            //   },
+                            //   child: Row(
+                            //     children: [
+                            //       (image3 == null)?Container(
+                            //         height: CustomSize.sizeHeight(context) / 6.5,
+                            //         width: CustomSize.sizeWidth(context) / 2.2,
+                            //         decoration: BoxDecoration(
+                            //           image: DecorationImage(
+                            //               image: NetworkImage(Links.subUrl + ktp),
+                            //               fit: BoxFit.cover
+                            //           ),
+                            //           borderRadius: BorderRadius.all(
+                            //               Radius.circular(10.0) //         <--- border radius here
+                            //           ),
+                            //         ),
+                            //       ):Container(
+                            //         height: CustomSize.sizeHeight(context) / 6.5,
+                            //         width: CustomSize.sizeWidth(context) / 2.2,
+                            //         decoration: (image3==null)?(img == "/".substring(0, 1))?BoxDecoration(
+                            //           border: Border.all(
+                            //               color: CustomColor.primaryLight,
+                            //               width: 3.0
+                            //           ),
+                            //           borderRadius: BorderRadius.all(
+                            //               Radius.circular(10.0) //         <--- border radius here
+                            //           ),
+                            //         ):BoxDecoration(
+                            //           border: Border.all(
+                            //               color: CustomColor.primaryLight,
+                            //               width: 3.0
+                            //           ),
+                            //           borderRadius: BorderRadius.all(
+                            //               Radius.circular(10.0) //         <--- border radius here
+                            //           ),
+                            //         ): BoxDecoration(
+                            //           borderRadius: BorderRadius.all(
+                            //               Radius.circular(10.0) //         <--- border radius here
+                            //           ),
+                            //           image: new DecorationImage(
+                            //               image: new FileImage(image3!),
+                            //               fit: BoxFit.cover
+                            //           ),
+                            //         ),
+                            //         child: (img == "/".substring(0, 1))?Center(
+                            //           child: CustomText.text(
+                            //               size: 38,
+                            //               weight: FontWeight.w800,
+                            //               text: initial,
+                            //               color: Colors.white
+                            //           ),
+                            //         ):Padding(
+                            //           padding: const EdgeInsets.only(left: 1.5),
+                            //           child: Center(
+                            //             child: (image3 == null)?CustomText.text(
+                            //                 size: 38,
+                            //                 weight: FontWeight.w800,
+                            //                 text: initial,
+                            //                 color: Colors.white
+                            //             ):Container(),
+                            //           ),
+                            //         ),
+                            //       ),
+                            //     ],
+                            //   ),
+                            // ),
+                            // SizedBox(height: CustomSize.sizeHeight(context) / 48,),
+                            CustomText.bodyLight12(text: "Nama Sesuai Rekening", color: Colors.transparent, sizeNew: double.parse(((MediaQuery.of(context).size.width*0.03).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.03).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.03).toString())),
+                            SizedBox(
+                              height: CustomSize.sizeHeight(context) * 0.005,
+                            ),
+                            TextField(
+                              // onTap: (){
+                              //   Fluttertoast.showToast(msg: 'Anda tidak dapat merubah apapun di halaman ini.',);
+                              // },
+                              // readOnly: true,
+                              // readOnly: (btnAddress == true)?true:false,
+                              controller: _NameRekening,
+                              keyboardType: TextInputType.text,
+                              cursorColor: Colors.black,
+                              style: GoogleFonts.poppins(
+                                  textStyle:
+                                  TextStyle(fontSize: 18, color: Colors.transparent, fontWeight: FontWeight.w600)),
+                              decoration: InputDecoration(
+                                hintText: 'Nama Sesuai Rekening Bank',
+                                isDense: true,
+                                contentPadding: EdgeInsets.only(bottom: CustomSize.sizeHeight(context) / 86),
+                                hintStyle: GoogleFonts.poppins(
+                                    textStyle:
+                                    TextStyle(fontSize: 14, color: Colors.transparent)),
+                                helperStyle: GoogleFonts.poppins(
+                                    textStyle: TextStyle(fontSize: 14)),
+                                enabledBorder: InputBorder.none,
+                                focusedBorder: InputBorder.none,
+                              ),
+                            ),
+                            SizedBox(height: CustomSize.sizeHeight(context) / 48,),
+                            CustomText.bodyLight12(text: "Bank", color: Colors.transparent, sizeNew: double.parse(((MediaQuery.of(context).size.width*0.03).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.03).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.03).toString())),
+                            SizedBox(
+                              height: CustomSize.sizeHeight(context) * 0.005,
+                            ),
+                            TextField(
+                              // onTap: (){
+                              //   Fluttertoast.showToast(msg: 'Anda tidak dapat merubah apapun di halaman ini.',);
+                              // },
+                              // readOnly: true,
+                              // readOnly: (btnAddress == true)?true:false,
+                              controller: _NameBank,
+                              keyboardType: TextInputType.text,
+                              cursorColor: Colors.black,
+                              style: GoogleFonts.poppins(
+                                  textStyle:
+                                  TextStyle(fontSize: 18, color: Colors.transparent, fontWeight: FontWeight.w600)),
+                              decoration: InputDecoration(
+                                hintText: 'Rekening Bank',
+                                isDense: true,
+                                contentPadding: EdgeInsets.only(bottom: CustomSize.sizeHeight(context) / 86),
+                                hintStyle: GoogleFonts.poppins(
+                                    textStyle:
+                                    TextStyle(fontSize: 14, color: Colors.transparent)),
+                                helperStyle: GoogleFonts.poppins(
+                                    textStyle: TextStyle(fontSize: 14)),
+                                enabledBorder: InputBorder.none,
+                                focusedBorder: InputBorder.none,
+                              ),
+                            ),
+                            SizedBox(height: CustomSize.sizeHeight(context) / 48,),
+                            CustomText.bodyLight12(text: "Nomor Rekening Bank", color: Colors.transparent, sizeNew: double.parse(((MediaQuery.of(context).size.width*0.03).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.03).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.03).toString())),
+                            SizedBox(
+                              height: CustomSize.sizeHeight(context) * 0.005,
+                            ),
+                            TextField(
+                              // onTap: (){
+                              //   Fluttertoast.showToast(msg: 'Anda tidak dapat merubah apapun di halaman ini.',);
+                              // },
+                              // readOnly: true,
+                              // readOnly: (btnAddress == true)?true:false,
+                              controller: _NoRekeningBank,
+                              keyboardType: TextInputType.number,
+                              cursorColor: Colors.black,
+                              inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+                              style: GoogleFonts.poppins(
+                                  textStyle:
+                                  TextStyle(fontSize: 18, color: Colors.transparent, fontWeight: FontWeight.w600)),
+                              decoration: InputDecoration(
+                                hintText: 'Rekening Bank',
+                                isDense: true,
+                                contentPadding: EdgeInsets.only(bottom: CustomSize.sizeHeight(context) / 86),
+                                hintStyle: GoogleFonts.poppins(
+                                    textStyle:
+                                    TextStyle(fontSize: 14, color: Colors.transparent)),
+                                helperStyle: GoogleFonts.poppins(
+                                    textStyle: TextStyle(fontSize: 14)),
+                                enabledBorder: InputBorder.none,
+                                focusedBorder: InputBorder.none,
+                              ),
+                            ),
+                            // SizedBox(height: CustomSize.sizeHeight(context) / 48,),
+                            // (btnAddress == true)?Container():Center(
+                            //   child: GestureDetector(
+                            //     onTap: () async{
+                            //       setState(() {
+                            //         isLoading = false;
+                            //       });
+                            //       SharedPreferences pref = await SharedPreferences.getInstance();
+                            //       if (image2 != null && image3 != null) {
+                            //         pref.setString("imgSelfie", 'data:image/$extension;base64,'+base64Encode(image2!.readAsBytesSync()).toString());
+                            //         pref.setString("imgKTP", 'data:image/$extension;base64,'+base64Encode(image3!.readAsBytesSync()).toString());
+                            //       } else if (image2 != null && image3 == null) {
+                            //         pref.setString("imgSelfie", 'data:image/$extension;base64,'+base64Encode(image2!.readAsBytesSync()).toString());
+                            //         pref.setString("imgKTP", '');
+                            //       } else if (image2 == null && image3 != null) {
+                            //         pref.setString("imgSelfie", '');
+                            //         pref.setString("imgKTP", 'data:image/$extension;base64,'+base64Encode(image3!.readAsBytesSync()).toString());
+                            //       } else if (image2 == null && image3 == null) {
+                            //         pref.setString("imgSelfie", '');
+                            //         pref.setString("imgKTP", '');
+                            //       }
+                            //       pref.setString("nameBadanUsaha", _NameBadanUsaha.text.toString());
+                            //       pref.setString("namePemilik", _NamePemilik.text.toString());
+                            //       pref.setString("namePenanggungJawab", _NamePenanggungJawab.text.toString());
+                            //       pref.setString("nameRekening", _NameRekening.text.toString());
+                            //       pref.setString("nameBank", _NameBank.text.toString());
+                            //       pref.setString("noRekeningBank", _NoRekeningBank.text.toString());
+                            //       print(pref.getString("imgSelfie"));
+                            //       print(pref.getString("imgKTP")+'ini ktp');
+                            //       print(pref.getString("nameBadanUsaha"));
+                            //       print(pref.getString("namePemilik"));
+                            //       print(pref.getString("namePenanggungJawab"));
+                            //       print(pref.getString("noRekeningBank"));
+                            //
+                            //       Navigator.push(context, PageTransition(type: PageTransitionType.fade, child: new EditDetailResto(facility, cuisine, can_delivery, can_takeaway, ongkir, reservation_fee, idResto, email, badanU, pemilikU, penanggungJwb, nomorRekening)));
+                            //     },
+                            //     child: Container(
+                            //       width: CustomSize.sizeWidth(context) / 1.1,
+                            //       height: CustomSize.sizeHeight(context) / 14,
+                            //       decoration: BoxDecoration(
+                            //           borderRadius: BorderRadius.circular(30),
+                            //           color: CustomColor.accent
+                            //       ),
+                            //       child: Center(child: CustomText.bodyRegular16(text: "Lanjut", color: Colors.white,)),
+                            //     ),
+                            //   ),
+                            // ),
+                          ],
+                        ),
+                      ),
+                      // SizedBox(height: CustomSize.sizeHeight(context) / 48,),
+                    ],
+                  ),
 
-          Navigator.push(context, PageTransition(type: PageTransitionType.fade, child: new EditDetailResto(facility, cuisine, can_delivery, can_takeaway, ongkir, reservation_fee, idResto, email, badanU, pemilikU, penanggungJwb, nomorRekening)));
-        },
-        child: Container(
-          alignment: Alignment.bottomCenter,
-          width: CustomSize.sizeWidth(context) / 1.1,
-          height: CustomSize.sizeHeight(context) / 14,
-          decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(30),
-              color: CustomColor.accent
+
+                  // Container(
+                  //   // height: CustomSize.sizeHeight(context),
+                  //   width: CustomSize.sizeWidth(context),
+                  //   color: Colors.white,
+                  // ),
+
+                  Container(
+                    height: CustomSize.sizeHeight(context) / 1.1,
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            SizedBox(height: CustomSize.sizeHeight(context) / 38,),
+                            Padding(
+                              padding: EdgeInsets.symmetric(horizontal: CustomSize.sizeWidth(context) / 32),
+                              child: CustomText.textHeading4(
+                                  text: "Edit data restomu",
+                                  sizeNew: double.parse(((MediaQuery.of(context).size.width*0.045).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.045).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.045).toString()),
+                                  maxLines: 1
+                              ),
+                            ),
+                            SizedBox(height: CustomSize.sizeHeight(context) / 86,),
+                            Divider(
+                              thickness: 8,
+                              color: CustomColor.secondary,
+                            ),
+                            SizedBox(height: CustomSize.sizeHeight(context) / 88,),
+                            Padding(
+                              padding: EdgeInsets.symmetric(horizontal: CustomSize.sizeWidth(context) / 22),
+                              child: Container(
+                                width: CustomSize.sizeWidth(context),
+                                // height: CustomSize.sizeHeight(context) / 3.8,
+                                decoration: BoxDecoration(
+                                  color: Colors.white,
+                                  borderRadius: BorderRadius.circular(20),
+                                  boxShadow: [
+                                    BoxShadow(
+                                      color: Colors.grey.withOpacity(0.5),
+                                      spreadRadius: 0,
+                                      blurRadius: 4,
+                                      offset: Offset(0, 3), // changes position of shadow
+                                    ),
+                                  ],
+                                ),
+                                child: Padding(
+                                  padding: const EdgeInsets.symmetric(horizontal: 20.0),
+                                  child: Column(
+                                    crossAxisAlignment: CrossAxisAlignment.center,
+                                    children: [
+                                      SizedBox(height: CustomSize.sizeHeight(context) / 36,),
+                                      CustomText.bodyRegular18(text: "*Pada halaman ini data pemilik resto tidak dapat dilihat maupun diubah oleh pegawai resto!", color: CustomColor.redBtn, sizeNew: double.parse(((MediaQuery.of(context).size.width*0.038).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.038).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.038).toString()), maxLines: 3),
+                                      SizedBox(height: CustomSize.sizeHeight(context) / 36,),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+
+                      ],
+                    ),
+                  ),
+                  ]
+            ),
           ),
-          child: Center(child: CustomText.bodyRegular16(text: "Lanjut", color: Colors.white,)),
+        ),
+        floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
+        floatingActionButton:
+        (karyawan == '1')?Container():GestureDetector(
+          onTap: () async{
+            setState(() {
+              isLoading = false;
+            });
+            SharedPreferences pref = await SharedPreferences.getInstance();
+            if (image2 != null && image3 != null) {
+              pref.setString("imgSelfie", 'data:image/$extension;base64,'+base64Encode(image2!.readAsBytesSync()).toString());
+              pref.setString("imgKTP", 'data:image/$extension;base64,'+base64Encode(image3!.readAsBytesSync()).toString());
+            } else if (image2 != null && image3 == null) {
+              pref.setString("imgSelfie", 'data:image/$extension;base64,'+base64Encode(image2!.readAsBytesSync()).toString());
+              pref.setString("imgKTP", '');
+            } else if (image2 == null && image3 != null) {
+              pref.setString("imgSelfie", '');
+              pref.setString("imgKTP", 'data:image/$extension;base64,'+base64Encode(image3!.readAsBytesSync()).toString());
+            } else if (image2 == null && image3 == null) {
+              pref.setString("imgSelfie", '');
+              pref.setString("imgKTP", '');
+            }
+            pref.setString("nameBadanUsaha", _NameBadanUsaha.text.toString());
+            pref.setString("namePemilik", _NamePemilik.text.toString());
+            pref.setString("namePenanggungJawab", _NamePenanggungJawab.text.toString());
+            pref.setString("nameRekening", _NameRekening.text.toString());
+            pref.setString("nameBank", _NameBank.text.toString());
+            pref.setString("noRekeningBank", _NoRekeningBank.text.toString());
+            print(pref.getString("imgSelfie"));
+            print(pref.getString("imgKTP")+'ini ktp');
+            print(pref.getString("nameBadanUsaha"));
+            print(pref.getString("namePemilik"));
+            print(pref.getString("namePenanggungJawab"));
+            print(pref.getString("noRekeningBank"));
+
+            Navigator.push(context, PageTransition(type: PageTransitionType.fade, child: new EditDetailResto(facility, cuisine, can_delivery, can_takeaway, ongkir, reservation_fee, idResto, email, badanU, pemilikU, penanggungJwb, nomorRekening)));
+          },
+          child: Container(
+            alignment: Alignment.bottomCenter,
+            width: CustomSize.sizeWidth(context) / 1.1,
+            height: CustomSize.sizeHeight(context) / 14,
+            decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(30),
+                color: CustomColor.accent
+            ),
+            child: Center(child: CustomText.bodyRegular16(text: "Lanjut", color: Colors.white, sizeNew: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.04).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.04).toString()))),
+          ),
         ),
       ),
+      data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0),
     );
   }
 }

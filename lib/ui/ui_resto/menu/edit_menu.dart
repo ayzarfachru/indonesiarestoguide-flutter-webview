@@ -309,339 +309,343 @@ class _EditMenuState extends State<EditMenu> {
   }
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: SafeArea(
-        child: SingleChildScrollView(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              SizedBox(height: CustomSize.sizeHeight(context) / 38,),
-              Padding(
-                padding: EdgeInsets.symmetric(horizontal: CustomSize.sizeWidth(context) / 32),
-                child: CustomText.textHeading4(
-                    text: "Edit data menu",
-                    minSize: 18,
-                    maxLines: 1
+    return MediaQuery(
+      child: Scaffold(
+        body: SafeArea(
+          child: SingleChildScrollView(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                SizedBox(height: CustomSize.sizeHeight(context) / 38,),
+                Padding(
+                  padding: EdgeInsets.symmetric(horizontal: CustomSize.sizeWidth(context) / 32),
+                  child: CustomText.textHeading4(
+                      text: "Edit data menu",
+                      sizeNew: double.parse(((MediaQuery.of(context).size.width*0.045).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.045)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.045)).toString()),
+                      maxLines: 1
+                  ),
                 ),
-              ),
-              SizedBox(height: CustomSize.sizeHeight(context) / 86,),
-              Divider(
-                thickness: 8,
-                color: CustomColor.secondary,
-              ),
-              Padding(
-                padding: EdgeInsets.symmetric(horizontal: CustomSize.sizeWidth(context) / 32),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    SizedBox(height: CustomSize.sizeHeight(context) / 48,),
-                    CustomText.bodyLight12(text: "Nama"),
-                    SizedBox(
-                      height: CustomSize.sizeHeight(context) * 0.005,
-                    ),
-                    TextField(
-                      controller: namaMenu,
-                      keyboardType: TextInputType.text,
-                      cursorColor: Colors.black,
-                      style: GoogleFonts.poppins(
-                          textStyle:
-                          TextStyle(fontSize: 18, color: Colors.black, fontWeight: FontWeight.w600)),
-                      decoration: InputDecoration(
-                        isDense: true,
-                        contentPadding: EdgeInsets.only(bottom: CustomSize.sizeHeight(context) / 86),
-                        hintStyle: GoogleFonts.poppins(
-                            textStyle:
-                            TextStyle(fontSize: 14, color: Colors.grey)),
-                        helperStyle: GoogleFonts.poppins(
-                            textStyle: TextStyle(fontSize: 14)),
-                        enabledBorder: UnderlineInputBorder(),
-                        focusedBorder: UnderlineInputBorder(),
+                SizedBox(height: CustomSize.sizeHeight(context) / 86,),
+                Divider(
+                  thickness: 8,
+                  color: CustomColor.secondary,
+                ),
+                Padding(
+                  padding: EdgeInsets.symmetric(horizontal: CustomSize.sizeWidth(context) / 32),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      SizedBox(height: CustomSize.sizeHeight(context) / 48,),
+                      CustomText.bodyLight12(text: "Nama", sizeNew: double.parse(((MediaQuery.of(context).size.width*0.03).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.03)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.03)).toString())),
+                      SizedBox(
+                        height: CustomSize.sizeHeight(context) * 0.005,
                       ),
-                    ),
-                    SizedBox(height: CustomSize.sizeHeight(context) / 48,),
-                    CustomText.bodyLight12(text: "Harga"),
-                    SizedBox(
-                      height: CustomSize.sizeHeight(context) * 0.005,
-                    ),
-                    TextField(
-                      inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-                      controller: hargaMenu,
-                      keyboardType: TextInputType.number,
-                      cursorColor: Colors.black,
-                      style: GoogleFonts.poppins(
-                          textStyle:
-                          TextStyle(fontSize: 18, color: Colors.black, fontWeight: FontWeight.w600)),
-                      decoration: InputDecoration(
-                        isDense: true,
-                        contentPadding: EdgeInsets.only(bottom: CustomSize.sizeHeight(context) / 86),
-                        hintStyle: GoogleFonts.poppins(
+                      TextField(
+                        controller: namaMenu,
+                        keyboardType: TextInputType.text,
+                        cursorColor: Colors.black,
+                        style: GoogleFonts.poppins(
                             textStyle:
-                            TextStyle(fontSize: 14, color: Colors.grey)),
-                        helperStyle: GoogleFonts.poppins(
-                            textStyle: TextStyle(fontSize: 14)),
-                        enabledBorder: UnderlineInputBorder(),
-                        focusedBorder: UnderlineInputBorder(),
+                            TextStyle(fontSize: 18, color: Colors.black, fontWeight: FontWeight.w600)),
+                        decoration: InputDecoration(
+                          isDense: true,
+                          contentPadding: EdgeInsets.only(bottom: CustomSize.sizeHeight(context) / 86),
+                          hintStyle: GoogleFonts.poppins(
+                              textStyle:
+                              TextStyle(fontSize: 14, color: Colors.grey)),
+                          helperStyle: GoogleFonts.poppins(
+                              textStyle: TextStyle(fontSize: 14)),
+                          enabledBorder: UnderlineInputBorder(),
+                          focusedBorder: UnderlineInputBorder(),
+                        ),
                       ),
-                    ),
-                    SizedBox(height: CustomSize.sizeHeight(context) / 48,),
-                    // CustomText.bodyLight12(text: "Harga menu + Harga kemasan"),
-                    // SizedBox(
-                    //   height: CustomSize.sizeHeight(context) * 0.005,
-                    // ),
-                    // TextField(
-                    //   controller: hargaDeliv,
-                    //   keyboardType: TextInputType.number,
-                    //   cursorColor: Colors.black,
-                    //   style: GoogleFonts.poppins(
-                    //       textStyle:
-                    //       TextStyle(fontSize: 18, color: Colors.black, fontWeight: FontWeight.w600)),
-                    //   decoration: InputDecoration(
-                    //     hintText: '*Contoh harga menu: 18000 -> 20000',
-                    //     isDense: true,
-                    //     contentPadding: EdgeInsets.only(bottom: CustomSize.sizeHeight(context) / 86),
-                    //     hintStyle: GoogleFonts.poppins(
-                    //         textStyle:
-                    //         TextStyle(fontSize: 14, color: Colors.grey)),
-                    //     helperStyle: GoogleFonts.poppins(
-                    //         textStyle: TextStyle(fontSize: 14)),
-                    //     enabledBorder: UnderlineInputBorder(),
-                    //     focusedBorder: UnderlineInputBorder(),
-                    //   ),
-                    // ),
-                    // SizedBox(height: CustomSize.sizeHeight(context) / 48,),
-                    CustomText.bodyLight12(text: "Tipe Menu"),
-                    SizedBox(
-                      height: CustomSize.sizeHeight(context) * 0.005,
-                    ),
-                    TextField(
-                      readOnly: true,
-                      controller: tipeMenu,
-                      keyboardType: TextInputType.text,
-                      cursorColor: Colors.black,
-                      style: GoogleFonts.poppins(
-                          textStyle:
-                          TextStyle(fontSize: 18, color: Colors.black, fontWeight: FontWeight.w600)),
-                      decoration: InputDecoration(
-                        isDense: true,
-                        contentPadding: EdgeInsets.only(bottom: CustomSize.sizeHeight(context) / 86),
-                        hintStyle: GoogleFonts.poppins(
+                      SizedBox(height: CustomSize.sizeHeight(context) / 48,),
+                      CustomText.bodyLight12(text: "Harga", sizeNew: double.parse(((MediaQuery.of(context).size.width*0.03).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.03)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.03)).toString())),
+                      SizedBox(
+                        height: CustomSize.sizeHeight(context) * 0.005,
+                      ),
+                      TextField(
+                        inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+                        controller: hargaMenu,
+                        keyboardType: TextInputType.number,
+                        cursorColor: Colors.black,
+                        style: GoogleFonts.poppins(
                             textStyle:
-                            TextStyle(fontSize: 14, color: Colors.grey)),
-                        helperStyle: GoogleFonts.poppins(
-                            textStyle: TextStyle(fontSize: 14)),
-                        enabledBorder: UnderlineInputBorder(),
-                        focusedBorder: UnderlineInputBorder(),
-                        suffixIcon: Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 8.0),
-                          child: GestureDetector(
-                            onTap: () async{
-                              _showCuisineDialog();
-                            },
-                            child: Stack(
-                              children: [
-                                Container(
-                                  width: CustomSize.sizeWidth(context) / 6,
-                                  decoration: BoxDecoration(
-                                    borderRadius: BorderRadius.circular(25),
-                                    border: Border.all(color: CustomColor.accent, width: 1),
-                                    // color: CustomColor.accentLight
-                                  ),
-                                  child: Padding(
-                                    padding: const EdgeInsets.all(2.0),
-                                    child: Center(
-                                      child: CustomText.textTitle8(
-                                          text: "Ganti",
-                                          color: CustomColor.accent
+                            TextStyle(fontSize: 18, color: Colors.black, fontWeight: FontWeight.w600)),
+                        decoration: InputDecoration(
+                          isDense: true,
+                          contentPadding: EdgeInsets.only(bottom: CustomSize.sizeHeight(context) / 86),
+                          hintStyle: GoogleFonts.poppins(
+                              textStyle:
+                              TextStyle(fontSize: 14, color: Colors.grey)),
+                          helperStyle: GoogleFonts.poppins(
+                              textStyle: TextStyle(fontSize: 14)),
+                          enabledBorder: UnderlineInputBorder(),
+                          focusedBorder: UnderlineInputBorder(),
+                        ),
+                      ),
+                      SizedBox(height: CustomSize.sizeHeight(context) / 48,),
+                      // CustomText.bodyLight12(text: "Harga menu + Harga kemasan"),
+                      // SizedBox(
+                      //   height: CustomSize.sizeHeight(context) * 0.005,
+                      // ),
+                      // TextField(
+                      //   controller: hargaDeliv,
+                      //   keyboardType: TextInputType.number,
+                      //   cursorColor: Colors.black,
+                      //   style: GoogleFonts.poppins(
+                      //       textStyle:
+                      //       TextStyle(fontSize: 18, color: Colors.black, fontWeight: FontWeight.w600)),
+                      //   decoration: InputDecoration(
+                      //     hintText: '*Contoh harga menu: 18000 -> 20000',
+                      //     isDense: true,
+                      //     contentPadding: EdgeInsets.only(bottom: CustomSize.sizeHeight(context) / 86),
+                      //     hintStyle: GoogleFonts.poppins(
+                      //         textStyle:
+                      //         TextStyle(fontSize: 14, color: Colors.grey)),
+                      //     helperStyle: GoogleFonts.poppins(
+                      //         textStyle: TextStyle(fontSize: 14)),
+                      //     enabledBorder: UnderlineInputBorder(),
+                      //     focusedBorder: UnderlineInputBorder(),
+                      //   ),
+                      // ),
+                      // SizedBox(height: CustomSize.sizeHeight(context) / 48,),
+                      CustomText.bodyLight12(text: "Tipe Menu", sizeNew: double.parse(((MediaQuery.of(context).size.width*0.03).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.03)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.03)).toString())),
+                      SizedBox(
+                        height: CustomSize.sizeHeight(context) * 0.005,
+                      ),
+                      TextField(
+                        readOnly: true,
+                        controller: tipeMenu,
+                        keyboardType: TextInputType.text,
+                        cursorColor: Colors.black,
+                        style: GoogleFonts.poppins(
+                            textStyle:
+                            TextStyle(fontSize: 18, color: Colors.black, fontWeight: FontWeight.w600)),
+                        decoration: InputDecoration(
+                          isDense: true,
+                          contentPadding: EdgeInsets.only(bottom: CustomSize.sizeHeight(context) / 86),
+                          hintStyle: GoogleFonts.poppins(
+                              textStyle:
+                              TextStyle(fontSize: 14, color: Colors.grey)),
+                          helperStyle: GoogleFonts.poppins(
+                              textStyle: TextStyle(fontSize: 14)),
+                          enabledBorder: UnderlineInputBorder(),
+                          focusedBorder: UnderlineInputBorder(),
+                          suffixIcon: Padding(
+                            padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                            child: GestureDetector(
+                              onTap: () async{
+                                _showCuisineDialog();
+                              },
+                              child: Stack(
+                                children: [
+                                  Container(
+                                    width: CustomSize.sizeWidth(context) / 6,
+                                    decoration: BoxDecoration(
+                                      borderRadius: BorderRadius.circular(25),
+                                      border: Border.all(color: CustomColor.accent, width: 1),
+                                      // color: CustomColor.accentLight
+                                    ),
+                                    child: Padding(
+                                      padding: const EdgeInsets.all(2.0),
+                                      child: Center(
+                                        child: CustomText.textTitle8(
+                                            text: "Ganti",
+                                            color: CustomColor.accent,
+                                            sizeNew: double.parse(((MediaQuery.of(context).size.width*0.035).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.035)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.035)).toString())
+                                        ),
                                       ),
                                     ),
                                   ),
-                                ),
-                              ],
+                                ],
+                              ),
                             ),
                           ),
                         ),
                       ),
-                    ),
-                    SizedBox(height: CustomSize.sizeHeight(context) / 48,),
-                    CustomText.bodyLight12(text: "Deskripsi"),
-                    SizedBox(
-                      height: CustomSize.sizeHeight(context) * 0.005,
-                    ),
-                    TextField(
-                      controller: deskMenu,
-                      keyboardType: TextInputType.text,
-                      cursorColor: Colors.black,
-                      style: GoogleFonts.poppins(
-                          textStyle:
-                          TextStyle(fontSize: 18, color: Colors.black, fontWeight: FontWeight.w600)),
-                      decoration: InputDecoration(
-                        isDense: true,
-                        contentPadding: EdgeInsets.only(bottom: CustomSize.sizeHeight(context) / 86),
-                        hintStyle: GoogleFonts.poppins(
-                            textStyle:
-                            TextStyle(fontSize: 14, color: Colors.grey)),
-                        helperStyle: GoogleFonts.poppins(
-                            textStyle: TextStyle(fontSize: 14)),
-                        enabledBorder: UnderlineInputBorder(),
-                        focusedBorder: UnderlineInputBorder(),
+                      SizedBox(height: CustomSize.sizeHeight(context) / 48,),
+                      CustomText.bodyLight12(text: "Deskripsi", sizeNew: double.parse(((MediaQuery.of(context).size.width*0.03).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.03)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.03)).toString())),
+                      SizedBox(
+                        height: CustomSize.sizeHeight(context) * 0.005,
                       ),
-                    ),
-                    SizedBox(height: CustomSize.sizeHeight(context) / 48,),
-                    CustomText.bodyLight12(text: "Tambahkan Foto Menu"),
-                    SizedBox(
-                      height: CustomSize.sizeHeight(context) * 0.015,
-                    ),
-                    GestureDetector(
-                      onTap: () async{
-                        getImage();
-                      },
-                      child: Row(
-                        children: [
-                          (image == null)?Container(
-                            height: CustomSize.sizeHeight(context) / 6.5,
-                            width: CustomSize.sizeWidth(context) / 3.2,
-                            decoration: BoxDecoration(
-                              image: DecorationImage(
-                                  image: NetworkImage(Links.subUrl + detailMenu.urlImg),
-                                  fit: BoxFit.cover
+                      TextField(
+                        controller: deskMenu,
+                        keyboardType: TextInputType.text,
+                        cursorColor: Colors.black,
+                        style: GoogleFonts.poppins(
+                            textStyle:
+                            TextStyle(fontSize: 18, color: Colors.black, fontWeight: FontWeight.w600)),
+                        decoration: InputDecoration(
+                          isDense: true,
+                          contentPadding: EdgeInsets.only(bottom: CustomSize.sizeHeight(context) / 86),
+                          hintStyle: GoogleFonts.poppins(
+                              textStyle:
+                              TextStyle(fontSize: 14, color: Colors.grey)),
+                          helperStyle: GoogleFonts.poppins(
+                              textStyle: TextStyle(fontSize: 14)),
+                          enabledBorder: UnderlineInputBorder(),
+                          focusedBorder: UnderlineInputBorder(),
+                        ),
+                      ),
+                      SizedBox(height: CustomSize.sizeHeight(context) / 48,),
+                      CustomText.bodyLight12(text: "Tambahkan Foto Menu", sizeNew: double.parse(((MediaQuery.of(context).size.width*0.03).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.03)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.03)).toString())),
+                      SizedBox(
+                        height: CustomSize.sizeHeight(context) * 0.015,
+                      ),
+                      GestureDetector(
+                        onTap: () async{
+                          getImage();
+                        },
+                        child: Row(
+                          children: [
+                            (image == null)?Container(
+                              height: CustomSize.sizeHeight(context) / 6.5,
+                              width: CustomSize.sizeWidth(context) / 3.2,
+                              decoration: BoxDecoration(
+                                image: DecorationImage(
+                                    image: NetworkImage(Links.subUrl + detailMenu.urlImg),
+                                    fit: BoxFit.cover
+                                ),
+                                borderRadius: BorderRadius.all(
+                                    Radius.circular(10.0) //         <--- border radius here
+                                ),
                               ),
-                              borderRadius: BorderRadius.all(
-                                  Radius.circular(10.0) //         <--- border radius here
+                            ):Container(
+                              height: CustomSize.sizeHeight(context) / 6.5,
+                              width: CustomSize.sizeWidth(context) / 3.2,
+                              decoration: (image==null)?(img == "/".substring(0, 1))?BoxDecoration(
+                                border: Border.all(
+                                    color: CustomColor.primaryLight,
+                                    width: 3.0
+                                ),
+                                borderRadius: BorderRadius.all(
+                                    Radius.circular(10.0) //         <--- border radius here
+                                ),
+                              ):BoxDecoration(
+                                border: Border.all(
+                                    color: CustomColor.primaryLight,
+                                    width: 3.0
+                                ),
+                                borderRadius: BorderRadius.all(
+                                    Radius.circular(10.0) //         <--- border radius here
+                                ),
+                              ): BoxDecoration(
+                                borderRadius: BorderRadius.all(
+                                    Radius.circular(10.0) //         <--- border radius here
+                                ),
+                                image: new DecorationImage(
+                                    image: new FileImage(image!),
+                                    fit: BoxFit.cover
+                                ),
                               ),
-                            ),
-                          ):Container(
-                            height: CustomSize.sizeHeight(context) / 6.5,
-                            width: CustomSize.sizeWidth(context) / 3.2,
-                            decoration: (image==null)?(img == "/".substring(0, 1))?BoxDecoration(
-                              border: Border.all(
-                                  color: CustomColor.primaryLight,
-                                  width: 3.0
-                              ),
-                              borderRadius: BorderRadius.all(
-                                  Radius.circular(10.0) //         <--- border radius here
-                              ),
-                            ):BoxDecoration(
-                              border: Border.all(
-                                  color: CustomColor.primaryLight,
-                                  width: 3.0
-                              ),
-                              borderRadius: BorderRadius.all(
-                                  Radius.circular(10.0) //         <--- border radius here
-                              ),
-                            ): BoxDecoration(
-                              borderRadius: BorderRadius.all(
-                                  Radius.circular(10.0) //         <--- border radius here
-                              ),
-                              image: new DecorationImage(
-                                  image: new FileImage(image!),
-                                  fit: BoxFit.cover
-                              ),
-                            ),
-                            child: (img == "/".substring(0, 1))?Center(
-                              child: CustomText.text(
-                                  size: 38,
-                                  weight: FontWeight.w800,
-                                  text: initial,
-                                  color: Colors.white
-                              ),
-                            ):Padding(
-                              padding: const EdgeInsets.only(left: 1.5),
-                              child: Center(
-                                child: (image == null)?CustomText.text(
-                                    size: 38,
+                              child: (img == "/".substring(0, 1))?Center(
+                                child: CustomText.text(
+                                    size: double.parse(((MediaQuery.of(context).size.width*0.094).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.094)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.094)).toString()),
                                     weight: FontWeight.w800,
                                     text: initial,
                                     color: Colors.white
-                                ):Container(),
+                                ),
+                              ):Padding(
+                                padding: const EdgeInsets.only(left: 1.5),
+                                child: Center(
+                                  child: (image == null)?CustomText.text(
+                                      size: double.parse(((MediaQuery.of(context).size.width*0.094).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.094)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.094)).toString()),
+                                      weight: FontWeight.w800,
+                                      text: initial,
+                                      color: Colors.white
+                                  ):Container(),
+                                ),
                               ),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                    SizedBox(
-                      height: CustomSize.sizeHeight(context) * 0.0150,
-                    ),
-                    //------------------------------------ checkbox favorite -------------------------------------
-                    Row(
-                      mainAxisSize: MainAxisSize.max,
-                      mainAxisAlignment: MainAxisAlignment.start,
-                      children: [
-                        Checkbox(
-                          value: favorite,
-                          onChanged: (bool? value) {
-                            setState(() {
-                              favorite = value!;
-                              print(favorite);
-                            });
-                          },
-                        ),
-                        Column(
-                          mainAxisAlignment: MainAxisAlignment.start,
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            CustomText.bodyMedium14(
-                                text: "Apakah Menu ini adalah menu",
-                                minSize: 14,
-                                maxLines: 1
-                            ),
-                            CustomText.bodyMedium14(
-                                text: "andalan di restomu ?",
-                                minSize: 14,
-                                maxLines: 1
                             ),
                           ],
                         ),
-                        // Text(' ', style: TextStyle(fontWeight: FontWeight.bold))
-                      ],
-                    ),
-                  ],
+                      ),
+                      SizedBox(
+                        height: CustomSize.sizeHeight(context) * 0.0150,
+                      ),
+                      //------------------------------------ checkbox favorite -------------------------------------
+                      Row(
+                        mainAxisSize: MainAxisSize.max,
+                        mainAxisAlignment: MainAxisAlignment.start,
+                        children: [
+                          Checkbox(
+                            value: favorite,
+                            onChanged: (bool? value) {
+                              setState(() {
+                                favorite = value!;
+                                print(favorite);
+                              });
+                            },
+                          ),
+                          Column(
+                            mainAxisAlignment: MainAxisAlignment.start,
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              CustomText.bodyMedium14(
+                                  text: "Apakah Menu ini adalah menu",
+                                  sizeNew: double.parse(((MediaQuery.of(context).size.width*0.035).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.035)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.035)).toString()),
+                                  maxLines: 1
+                              ),
+                              CustomText.bodyMedium14(
+                                  text: "andalan di restomu ?",
+                                  sizeNew: double.parse(((MediaQuery.of(context).size.width*0.035).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.035)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.035)).toString()),
+                                  maxLines: 1
+                              ),
+                            ],
+                          ),
+                          // Text(' ', style: TextStyle(fontWeight: FontWeight.bold))
+                        ],
+                      ),
+                    ],
+                  ),
                 ),
-              ),
-              SizedBox(height: CustomSize.sizeHeight(context) / 8,),
-            ],
+                SizedBox(height: CustomSize.sizeHeight(context) / 8,),
+              ],
+            ),
           ),
         ),
-      ),
-      floatingActionButton:
-      (isLoading != true)?GestureDetector(
-        onTap: () async{
-          setState(() {
-            isLoading = false;
-          });
-          _editMenu();
-          // Navigator.pushReplacement(context, PageTransition(type: PageTransitionType.fade, child: new HomeActivityResto()));
-          // SharedPreferences pref = await SharedPreferences.getInstance();
-          // pref.setString("name", namaMenu.text.toString());
-          // pref.setString("email", hargaDeliv.text.toString());
-          // pref.setString("img", (image == null)?img:base64Encode(image.readAsBytesSync()).toString());
-          // pref.setString("gender", gender);
-          // pref.setString("tgl", tgl);
-          // pref.setString("notelp", hargaMenu.text.toString());
-          print(favorite);
-        },
-        child: Container(
+        floatingActionButton:
+        (isLoading != true)?GestureDetector(
+          onTap: () async{
+            setState(() {
+              isLoading = false;
+            });
+            _editMenu();
+            // Navigator.pushReplacement(context, PageTransition(type: PageTransitionType.fade, child: new HomeActivityResto()));
+            // SharedPreferences pref = await SharedPreferences.getInstance();
+            // pref.setString("name", namaMenu.text.toString());
+            // pref.setString("email", hargaDeliv.text.toString());
+            // pref.setString("img", (image == null)?img:base64Encode(image.readAsBytesSync()).toString());
+            // pref.setString("gender", gender);
+            // pref.setString("tgl", tgl);
+            // pref.setString("notelp", hargaMenu.text.toString());
+            print(favorite);
+          },
+          child: Container(
+            width: CustomSize.sizeWidth(context) / 1.1,
+            height: CustomSize.sizeHeight(context) / 14,
+            decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(30),
+                color: CustomColor.accent
+            ),
+            child: Center(child: CustomText.bodyRegular16(text: "Simpan", color: Colors.white, sizeNew: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.04)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.04)).toString()))),
+          ),
+        ):Container(
           width: CustomSize.sizeWidth(context) / 1.1,
           height: CustomSize.sizeHeight(context) / 14,
           decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(30),
               color: CustomColor.accent
           ),
-          child: Center(child: CustomText.bodyRegular16(text: "Simpan", color: Colors.white,)),
-        ),
-      ):Container(
-        width: CustomSize.sizeWidth(context) / 1.1,
-        height: CustomSize.sizeHeight(context) / 14,
-        decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(30),
-            color: CustomColor.accent
-        ),
-        child: Center(
-          child: CircularProgressIndicator(
-            valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+          child: Center(
+            child: CircularProgressIndicator(
+              valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+            ),
           ),
         ),
       ),
+      data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0),
     );
   }
 }

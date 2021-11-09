@@ -169,139 +169,142 @@ class _PilihMenuActivityState extends State<PilihMenuActivity> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-        body: SafeArea(
-          child: SingleChildScrollView(
-            controller: _scrollController,
-            child: Padding(
-              padding: EdgeInsets.symmetric(horizontal: CustomSize.sizeWidth(context) / 24),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  SizedBox(
-                    height: CustomSize.sizeHeight(context) / 32,
-                  ),
-                  CustomText.textHeading3(
-                      text: "Pilih untuk Promo",
-                      color: CustomColor.primary,
-                      minSize: 18,
-                      maxLines: 1
-                  ),
-                  ListView.builder(
-                      shrinkWrap: true,
-                      controller: _scrollController,
-                      physics: NeverScrollableScrollPhysics(),
-                      itemCount: menu.length,
-                      itemBuilder: (_, index){
-                        return Padding(
-                          padding: EdgeInsets.only(top: CustomSize.sizeHeight(context) / 48),
-                          child: GestureDetector(
-                            onTap: () async {
-                              String idMenu = '';
-                              String nameMenu = '';
-                              idMenu = menu[index].id.toString();
-                              nameMenu = menu[index].name;
-                              SharedPreferences pref = await SharedPreferences.getInstance();
-                              pref.setString("idMenu", idMenu);
-                              pref.setString("nameMenu", nameMenu);
-                              Navigator.pushReplacement(
-                                  context,
-                                  PageTransition(
-                                      type: PageTransitionType.fade,
-                                      child: AddPromo()));
-                            },
-                            child: Container(
-                              width: CustomSize.sizeWidth(context),
-                              height: CustomSize.sizeWidth(context) / 2.6,
-                              decoration: BoxDecoration(
-                                color: Colors.white,
-                                borderRadius: BorderRadius.circular(20),
-                                boxShadow: [
-                                  BoxShadow(
-                                    color: Colors.grey.withOpacity(0.5),
-                                    spreadRadius: 0,
-                                    blurRadius: 7,
-                                    offset: Offset(0, 7), // changes position of shadow
-                                  ),
-                                ],
-                              ),
-                              child: Row(
-                                children: [
-                                  Container(
-                                    width: CustomSize.sizeWidth(context) / 2.6,
-                                    height: CustomSize.sizeWidth(context) / 2.6,
-                                    decoration: BoxDecoration(
-                                      image: DecorationImage(
-                                          image: NetworkImage(Links.subUrl + menu[index].urlImg),
-                                          fit: BoxFit.cover
+    return MediaQuery(
+      child: Scaffold(
+          body: SafeArea(
+            child: SingleChildScrollView(
+              controller: _scrollController,
+              child: Padding(
+                padding: EdgeInsets.symmetric(horizontal: CustomSize.sizeWidth(context) / 24),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    SizedBox(
+                      height: CustomSize.sizeHeight(context) / 32,
+                    ),
+                    CustomText.textHeading3(
+                        text: "Pilih untuk Promo",
+                        color: CustomColor.primary,
+                        sizeNew: double.parse(((MediaQuery.of(context).size.width*0.045).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.045)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.045)).toString()),
+                        maxLines: 1
+                    ),
+                    ListView.builder(
+                        shrinkWrap: true,
+                        controller: _scrollController,
+                        physics: NeverScrollableScrollPhysics(),
+                        itemCount: menu.length,
+                        itemBuilder: (_, index){
+                          return Padding(
+                            padding: EdgeInsets.only(top: CustomSize.sizeHeight(context) / 48),
+                            child: GestureDetector(
+                              onTap: () async {
+                                String idMenu = '';
+                                String nameMenu = '';
+                                idMenu = menu[index].id.toString();
+                                nameMenu = menu[index].name;
+                                SharedPreferences pref = await SharedPreferences.getInstance();
+                                pref.setString("idMenu", idMenu);
+                                pref.setString("nameMenu", nameMenu);
+                                Navigator.pushReplacement(
+                                    context,
+                                    PageTransition(
+                                        type: PageTransitionType.fade,
+                                        child: AddPromo()));
+                              },
+                              child: Container(
+                                width: CustomSize.sizeWidth(context),
+                                height: CustomSize.sizeWidth(context) / 2.6,
+                                decoration: BoxDecoration(
+                                  color: Colors.white,
+                                  borderRadius: BorderRadius.circular(20),
+                                  boxShadow: [
+                                    BoxShadow(
+                                      color: Colors.grey.withOpacity(0.5),
+                                      spreadRadius: 0,
+                                      blurRadius: 7,
+                                      offset: Offset(0, 7), // changes position of shadow
+                                    ),
+                                  ],
+                                ),
+                                child: Row(
+                                  children: [
+                                    Container(
+                                      width: CustomSize.sizeWidth(context) / 2.6,
+                                      height: CustomSize.sizeWidth(context) / 2.6,
+                                      decoration: BoxDecoration(
+                                        image: DecorationImage(
+                                            image: NetworkImage(Links.subUrl + menu[index].urlImg),
+                                            fit: BoxFit.cover
+                                        ),
+                                        borderRadius: BorderRadius.circular(20),
                                       ),
-                                      borderRadius: BorderRadius.circular(20),
                                     ),
-                                  ),
-                                  SizedBox(
-                                    width: CustomSize.sizeWidth(context) / 32,
-                                  ),
-                                  Container(
-                                    width: CustomSize.sizeWidth(context) / 2.1,
-                                    child: Column(
-                                      mainAxisAlignment: MainAxisAlignment.center,
-                                      crossAxisAlignment: CrossAxisAlignment.start,
-                                      children: [
-                                        Row(
-                                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                          children: [
-                                            CustomText.bodyLight12(
-                                                text: menu[index].type,
-                                                maxLines: 1,
-                                                minSize: 12
-                                            ),
-                                          ],
-                                        ),
-                                        SizedBox(height: CustomSize.sizeHeight(context) / 86,),
-                                        CustomText.textHeading4(
-                                            text: menu[index].name,
-                                            minSize: 18,
-                                            maxLines: 1
-                                        ),
-                                        CustomText.bodyMedium12(
-                                            text: menu[index].desc,
-                                            maxLines: 1,
-                                            minSize: 12
-                                        ),
-                                        SizedBox(height: CustomSize.sizeHeight(context) * 0.0025,),
-                                        (menu[index].is_recommended != '0')?CustomText.bodyMedium12(
-                                            text: (menu[index].is_recommended == '1')?'Recommended':'',
-                                            maxLines: 1,
-                                            minSize: 12,
-                                            color: CustomColor.accent
-                                        ):CustomText.bodyMedium12(
-                                            text: '',
-                                            maxLines: 1,
-                                            minSize: 12,
-                                            color: CustomColor.accent
-                                        ),
-                                        SizedBox(height: CustomSize.sizeHeight(context) / 56,),
-                                        Row(
-                                          children: [
-                                            CustomText.bodyRegular12(text: 'Harga: '+NumberFormat.currency(locale: 'id', symbol: '', decimalDigits: 0).format(menu[index].price!.original), minSize: 12),
-                                          ],
-                                        ),
-                                      ],
+                                    SizedBox(
+                                      width: CustomSize.sizeWidth(context) / 32,
                                     ),
-                                  )
-                                ],
+                                    Container(
+                                      width: CustomSize.sizeWidth(context) / 2.1,
+                                      child: Column(
+                                        mainAxisAlignment: MainAxisAlignment.center,
+                                        crossAxisAlignment: CrossAxisAlignment.start,
+                                        children: [
+                                          Row(
+                                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                            children: [
+                                              CustomText.bodyLight12(
+                                                  text: menu[index].type,
+                                                  maxLines: 1,
+                                                  sizeNew: double.parse(((MediaQuery.of(context).size.width*0.03).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.03)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.03)).toString())
+                                              ),
+                                            ],
+                                          ),
+                                          SizedBox(height: CustomSize.sizeHeight(context) / 86,),
+                                          CustomText.textHeading4(
+                                              text: menu[index].name,
+                                              sizeNew: double.parse(((MediaQuery.of(context).size.width*0.045).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.045)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.045)).toString()),
+                                              maxLines: 1
+                                          ),
+                                          CustomText.bodyMedium12(
+                                              text: menu[index].desc,
+                                              maxLines: 1,
+                                              sizeNew: double.parse(((MediaQuery.of(context).size.width*0.03).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.03)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.03)).toString())
+                                          ),
+                                          SizedBox(height: CustomSize.sizeHeight(context) * 0.0025,),
+                                          (menu[index].is_recommended != '0')?CustomText.bodyMedium12(
+                                              text: (menu[index].is_recommended == '1')?'Recommended':'',
+                                              maxLines: 1,
+                                              minSize: 12,
+                                              color: CustomColor.accent
+                                          ):CustomText.bodyMedium12(
+                                              text: '',
+                                              maxLines: 1,
+                                              minSize: 12,
+                                              color: CustomColor.accent
+                                          ),
+                                          SizedBox(height: CustomSize.sizeHeight(context) / 56,),
+                                          Row(
+                                            children: [
+                                              CustomText.bodyRegular12(text: 'Harga: '+NumberFormat.currency(locale: 'id', symbol: '', decimalDigits: 0).format(menu[index].price!.original), sizeNew: double.parse(((MediaQuery.of(context).size.width*0.03).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.03)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.03)).toString())),
+                                            ],
+                                          ),
+                                        ],
+                                      ),
+                                    )
+                                  ],
+                                ),
                               ),
                             ),
-                          ),
-                        );
-                      }
-                  ),
-                  SizedBox(height: CustomSize.sizeHeight(context) / 48,)
-                ],
+                          );
+                        }
+                    ),
+                    SizedBox(height: CustomSize.sizeHeight(context) / 48,)
+                  ],
+                ),
               ),
             ),
           ),
-        ),
+      ),
+      data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0),
     );
   }
 }

@@ -524,159 +524,162 @@ class _PesananmuActivityState extends State<PesananmuActivity> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: SafeArea(
-        child: (isLoading)?Container(
-            width: CustomSize.sizeWidth(context),
-            height: CustomSize.sizeHeight(context),
-            child: Center(child: CircularProgressIndicator(
+    return MediaQuery(
+      child: Scaffold(
+        body: SafeArea(
+          child: (isLoading)?Container(
+              width: CustomSize.sizeWidth(context),
+              height: CustomSize.sizeHeight(context),
+              child: Center(child: CircularProgressIndicator(
+                color: CustomColor.primaryLight,
+              ))):SmartRefresher(
+            enablePullDown: true,
+            enablePullUp: false,
+            header: WaterDropMaterialHeader(
+              distance: 30,
+              backgroundColor: Colors.white,
               color: CustomColor.primaryLight,
-            ))):SmartRefresher(
-          enablePullDown: true,
-          enablePullUp: false,
-          header: WaterDropMaterialHeader(
-            distance: 30,
-            backgroundColor: Colors.white,
-            color: CustomColor.primaryLight,
-          ),
-          controller: _refreshController,
-          onRefresh: _onRefresh,
-          onLoading: _onLoading,
-          child: SingleChildScrollView(
-            controller: _scrollController,
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                SizedBox(
-                  height: CustomSize.sizeHeight(context) / 32,
-                ),
-                Padding(
-                  padding: EdgeInsets.symmetric(horizontal: CustomSize.sizeWidth(context) / 24),
-                  child: CustomText.textHeading3(
-                      text: "Pesan Lagi",
-                      color: CustomColor.primary,
-                      minSize: 18,
-                      maxLines: 1
+            ),
+            controller: _refreshController,
+            onRefresh: _onRefresh,
+            onLoading: _onLoading,
+            child: SingleChildScrollView(
+              controller: _scrollController,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  SizedBox(
+                    height: CustomSize.sizeHeight(context) / 32,
                   ),
-                ),
-                SizedBox(
-                  height: CustomSize.sizeHeight(context) / 62,
-                ),
-                StaggeredGridView.countBuilder(
-                  staggeredTileBuilder: (index) {
-                    return StaggeredTile.count(1, 1.2);
-                  },
-                  crossAxisCount: 2,
-                  controller: _scrollController,
-                  physics: NeverScrollableScrollPhysics(),
-                  shrinkWrap: true,
-                  itemCount: again.length,
-                  itemBuilder: (_, index){
-                    return Padding(
-                      padding: EdgeInsets.all(CustomSize.sizeWidth(context) / 48),
-                      child: GestureDetector(
-                        onTap: (){
-                          Navigator.push(
-                              context,
-                              PageTransition(
-                                  type: PageTransitionType.rightToLeft,
-                                  child: new DetailResto(again[index].id.toString())));
-                        },
-                        child: Container(
-                          width: CustomSize.sizeWidth(context) / 2.3,
-                          height: CustomSize.sizeHeight(context) / 3,
-                          decoration: BoxDecoration(
-                            color: Colors.white,
-                            borderRadius: BorderRadius.circular(20),
-                            boxShadow: [
-                              BoxShadow(
-                                color: Colors.grey.withOpacity(0.5),
-                                spreadRadius: 0,
-                                blurRadius: 4,
-                                offset: Offset(0, 3), // changes position of shadow
-                              ),
-                            ],
-                          ),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Container(
-                                width: CustomSize.sizeWidth(context) / 2.3,
-                                height: CustomSize.sizeHeight(context) / 5.8,
-                                decoration: BoxDecoration(
-                                  color: (again[index].img != '')?Colors.transparent:CustomColor.primary,
-                                  image: (again[index].img != '')?DecorationImage(
-                                      image: NetworkImage(Links.subUrl + again[index].img!),
-                                      fit: BoxFit.cover
-                                  ):DecorationImage(
-                                      image: AssetImage("assets/irgLogo.png"),
-                                      fit: BoxFit.contain
-                                  ),
-                                  borderRadius: BorderRadius.circular(20),
+                  Padding(
+                    padding: EdgeInsets.symmetric(horizontal: CustomSize.sizeWidth(context) / 24),
+                    child: CustomText.textHeading3(
+                        text: "Pesan Lagi",
+                        color: CustomColor.primary,
+                        sizeNew: double.parse(((MediaQuery.of(context).size.width*0.06).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.06).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.06).toString()),
+                        maxLines: 1
+                    ),
+                  ),
+                  SizedBox(
+                    height: CustomSize.sizeHeight(context) / 62,
+                  ),
+                  StaggeredGridView.countBuilder(
+                    staggeredTileBuilder: (index) {
+                      return StaggeredTile.count(1, 1.2);
+                    },
+                    crossAxisCount: 2,
+                    controller: _scrollController,
+                    physics: NeverScrollableScrollPhysics(),
+                    shrinkWrap: true,
+                    itemCount: again.length,
+                    itemBuilder: (_, index){
+                      return Padding(
+                        padding: EdgeInsets.all(CustomSize.sizeWidth(context) / 48),
+                        child: GestureDetector(
+                          onTap: (){
+                            Navigator.push(
+                                context,
+                                PageTransition(
+                                    type: PageTransitionType.rightToLeft,
+                                    child: new DetailResto(again[index].id.toString())));
+                          },
+                          child: Container(
+                            width: CustomSize.sizeWidth(context) / 2.3,
+                            height: CustomSize.sizeHeight(context) / 3,
+                            decoration: BoxDecoration(
+                              color: Colors.white,
+                              borderRadius: BorderRadius.circular(20),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: Colors.grey.withOpacity(0.5),
+                                  spreadRadius: 0,
+                                  blurRadius: 4,
+                                  offset: Offset(0, 3), // changes position of shadow
                                 ),
-                              ),
-                              // (again[index].isOpen.toString() == 'true')?Container(
-                              //   width: CustomSize.sizeWidth(context) / 2.3,
-                              //   height: CustomSize.sizeHeight(context) / 5.8,
-                              //   decoration: BoxDecoration(
-                              //     color: (again[index].img != '')?Colors.transparent:CustomColor.primary,
-                              //     image: (again[index].img != '')?DecorationImage(
-                              //         image: NetworkImage(Links.subUrl + again[index].img!),
-                              //         fit: BoxFit.cover
-                              //     ):DecorationImage(
-                              //         image: AssetImage("assets/irgLogo.png"),
-                              //         fit: BoxFit.contain
-                              //     ),
-                              //     borderRadius: BorderRadius.circular(20),
-                              //   ),
-                              // ):Container(
-                              //   width: CustomSize.sizeWidth(context) / 2.3,
-                              //   height: CustomSize.sizeHeight(context) / 5.8,
-                              //   child: ClipRRect(
-                              //     borderRadius: BorderRadius.circular(20),
-                              //     child: ColorFiltered(
-                              //       colorFilter: ColorFilter.mode(
-                              //         Colors.grey,
-                              //         BlendMode.saturation,
-                              //       ),
-                              //       child: Container(
-                              //         decoration: BoxDecoration(
-                              //           color: (again[index].img != '')?Colors.transparent:CustomColor.primary,
-                              //           image: (again[index].img != '')?DecorationImage(
-                              //               image: NetworkImage(Links.subUrl + again[index].img!),
-                              //               fit: BoxFit.cover
-                              //           ):DecorationImage(
-                              //               image: AssetImage("assets/irgLogo.png"),
-                              //               fit: BoxFit.contain
-                              //           ),
-                              //           borderRadius: BorderRadius.circular(20),
-                              //         ),
-                              //       ),
-                              //     ),
-                              //   ),
-                              // ),
-                              SizedBox(height: CustomSize.sizeHeight(context) / 86,),
-                              Padding(
-                                padding: EdgeInsets.only(left: CustomSize.sizeWidth(context) / 24),
-                                child: CustomText.bodyRegular14(text: again[index].distance.toString() + " Km"),
-                              ),
-                              Padding(
-                                padding: EdgeInsets.only(left: CustomSize.sizeWidth(context) / 24),
-                                child: CustomText.bodyMedium16(text: again[index].name),
-                              ),
-                            ],
+                              ],
+                            ),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Container(
+                                  width: CustomSize.sizeWidth(context) / 2.3,
+                                  height: CustomSize.sizeHeight(context) / 5.8,
+                                  decoration: BoxDecoration(
+                                    color: (again[index].img != '')?Colors.transparent:CustomColor.primary,
+                                    image: (again[index].img != '')?DecorationImage(
+                                        image: NetworkImage(Links.subUrl + again[index].img!),
+                                        fit: BoxFit.cover
+                                    ):DecorationImage(
+                                        image: AssetImage("assets/irgLogo.png"),
+                                        fit: BoxFit.contain
+                                    ),
+                                    borderRadius: BorderRadius.circular(20),
+                                  ),
+                                ),
+                                // (again[index].isOpen.toString() == 'true')?Container(
+                                //   width: CustomSize.sizeWidth(context) / 2.3,
+                                //   height: CustomSize.sizeHeight(context) / 5.8,
+                                //   decoration: BoxDecoration(
+                                //     color: (again[index].img != '')?Colors.transparent:CustomColor.primary,
+                                //     image: (again[index].img != '')?DecorationImage(
+                                //         image: NetworkImage(Links.subUrl + again[index].img!),
+                                //         fit: BoxFit.cover
+                                //     ):DecorationImage(
+                                //         image: AssetImage("assets/irgLogo.png"),
+                                //         fit: BoxFit.contain
+                                //     ),
+                                //     borderRadius: BorderRadius.circular(20),
+                                //   ),
+                                // ):Container(
+                                //   width: CustomSize.sizeWidth(context) / 2.3,
+                                //   height: CustomSize.sizeHeight(context) / 5.8,
+                                //   child: ClipRRect(
+                                //     borderRadius: BorderRadius.circular(20),
+                                //     child: ColorFiltered(
+                                //       colorFilter: ColorFilter.mode(
+                                //         Colors.grey,
+                                //         BlendMode.saturation,
+                                //       ),
+                                //       child: Container(
+                                //         decoration: BoxDecoration(
+                                //           color: (again[index].img != '')?Colors.transparent:CustomColor.primary,
+                                //           image: (again[index].img != '')?DecorationImage(
+                                //               image: NetworkImage(Links.subUrl + again[index].img!),
+                                //               fit: BoxFit.cover
+                                //           ):DecorationImage(
+                                //               image: AssetImage("assets/irgLogo.png"),
+                                //               fit: BoxFit.contain
+                                //           ),
+                                //           borderRadius: BorderRadius.circular(20),
+                                //         ),
+                                //       ),
+                                //     ),
+                                //   ),
+                                // ),
+                                SizedBox(height: CustomSize.sizeHeight(context) / 86,),
+                                Padding(
+                                  padding: EdgeInsets.only(left: CustomSize.sizeWidth(context) / 24),
+                                  child: CustomText.bodyRegular14(text: again[index].distance.toString() + " Km", sizeNew: double.parse(((MediaQuery.of(context).size.width*0.035).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.035).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.035).toString())),
+                                ),
+                                Padding(
+                                  padding: EdgeInsets.only(left: CustomSize.sizeWidth(context) / 24),
+                                  child: CustomText.bodyMedium16(text: again[index].name, sizeNew: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.04).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.04).toString())),
+                                ),
+                              ],
+                            ),
                           ),
                         ),
-                      ),
-                    );
-                  },
-                )
-              ],
+                      );
+                    },
+                  )
+                ],
+              ),
             ),
           ),
         ),
       ),
+      data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0),
     );
   }
 }

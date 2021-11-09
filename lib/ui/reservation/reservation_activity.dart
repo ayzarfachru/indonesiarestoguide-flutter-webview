@@ -130,317 +130,320 @@ class _ReservationActivityState extends State<ReservationActivity> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: SafeArea(
-        child: SingleChildScrollView(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Padding(
-                padding: EdgeInsets.symmetric(horizontal: CustomSize.sizeWidth(context) / 24),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    SizedBox(height: CustomSize.sizeHeight(context) / 32,),
-                    CustomText.bodyLight12(text: "Alamat Restoran"),
-                    SizedBox(height: CustomSize.sizeHeight(context) * 0.005,),
-                    CustomText.textHeading6(
-                        text: address,
-                        minSize: 16,
-                        maxLines: 10
-                    ),
-                    SizedBox(height: CustomSize.sizeHeight(context) / 48,),
-                  ],
+    return MediaQuery(
+      child: Scaffold(
+        body: SafeArea(
+          child: SingleChildScrollView(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Padding(
+                  padding: EdgeInsets.symmetric(horizontal: CustomSize.sizeWidth(context) / 24),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      SizedBox(height: CustomSize.sizeHeight(context) / 32,),
+                      CustomText.bodyLight12(text: "Alamat Restoran", sizeNew: double.parse(((MediaQuery.of(context).size.width*0.03).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.03).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.03).toString())),
+                      SizedBox(height: CustomSize.sizeHeight(context) * 0.005,),
+                      CustomText.textHeading6(
+                          text: address,
+                          sizeNew: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.04).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.04).toString()),
+                          maxLines: 10
+                      ),
+                      SizedBox(height: CustomSize.sizeHeight(context) / 48,),
+                    ],
+                  ),
                 ),
-              ),
-              Divider(thickness: 6, color: CustomColor.secondary,),
-              Padding(
-                padding: EdgeInsets.symmetric(horizontal: CustomSize.sizeWidth(context) / 24),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    SizedBox(height: CustomSize.sizeHeight(context) / 48,),
-                    CustomText.bodyLight12(text: "Pesan berapa meja (1 meja untuk 4 orang)"),
-                    SizedBox(
-                      height: CustomSize.sizeHeight(context) * 0.005,
-                    ),
-                    TextField(
-                      controller: _textPerson,
-                      keyboardType: TextInputType.numberWithOptions(),
-                      cursorColor: Colors.black,
-                      inputFormatters: [FilteringTextInputFormatter.digitsOnly, LengthLimitingTextInputFormatter(2)],
-                      onChanged: (v){
-                        int i = int.parse(v);
-                        int t = int.parse(reservationFee) * i;
-                        setState(() {
-                          // _textPerson = TextEditingController(text: (_textPerson.text != '')?v:"0");
-                          total = t.toString();
-                        });
-                      },
-                      style: GoogleFonts.poppins(
-                          textStyle: TextStyle(fontSize: 18, color: Colors.black, fontWeight: FontWeight.w600)),
-                      decoration: InputDecoration(
-                        isDense: true,
-                        contentPadding: EdgeInsets.only(bottom: CustomSize.sizeHeight(context) / 86),
-                        hintStyle: GoogleFonts.poppins(
-                            textStyle: TextStyle(fontSize: 14, color: Colors.grey)),
-                        helperStyle: GoogleFonts.poppins(
-                            textStyle: TextStyle(fontSize: 14)),
-                        enabledBorder: UnderlineInputBorder(
-
-                        ),
-                        focusedBorder: UnderlineInputBorder(
-
-                        ),
+                Divider(thickness: 6, color: CustomColor.secondary,),
+                Padding(
+                  padding: EdgeInsets.symmetric(horizontal: CustomSize.sizeWidth(context) / 24),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      SizedBox(height: CustomSize.sizeHeight(context) / 48,),
+                      CustomText.bodyLight12(text: "Pesan berapa meja (1 meja untuk 4 orang)", sizeNew: double.parse(((MediaQuery.of(context).size.width*0.03).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.03).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.03).toString())),
+                      SizedBox(
+                        height: CustomSize.sizeHeight(context) * 0.005,
                       ),
-                    ),
-                    SizedBox(height: CustomSize.sizeHeight(context) / 48,),
-                    CustomText.bodyLight12(text: "Tanggal Reservation"),
-                    SizedBox(
-                      height: CustomSize.sizeHeight(context) * 0.005,
-                    ),
-                    GestureDetector(
-                      onTap: (){
-                        // DatePicker.showDatePicker(context, showTitleActions: true,
-                        //     onConfirm: (date) {
-                        //       setState(() {
-                        //         tgl = DateFormat('dd-MM-yyyy').format(date);
-                        //       });
-                        //       print(DateFormat('dd-MM-yyyy').format(date));
-                        //     },
-                        //     currentTime: DateTime(DateTime.now().year, DateTime.now().month,
-                        //         DateTime.now().day),
-                        //     locale: LocaleType.id,
-                        //     maxTime: DateTime(DateTime.now().year, 12, 31)
-                        // );
-                        _selectDate(context);
-                      },
-                      child: CustomText.textHeading4(
-                          text: (tgl != '')?tgl:'belum diisi.',
-                          minSize: 18,
-                          maxLines: 1
-                      ),
-                    ),
-                    Divider(
-                      color: Colors.black,
-                      thickness: 1,
-                    ),
-                    SizedBox(height: CustomSize.sizeHeight(context) / 48,),
-                    CustomText.bodyLight12(text: "Waktu Reservation"),
-                    SizedBox(
-                      height: CustomSize.sizeHeight(context) * 0.005,
-                    ),
-                    GestureDetector(
-                      onTap: (){
-                        setState(() {
-                          _time = TimeOfDay.now();
-                        });
-                        Navigator.of(context).push(
-                          showPicker(
-                            is24HrFormat: true,
-                            context: context,
-                            value: _time,
-                            minMinute: 0,
-                            maxMinute: 59,
-                            cancelText: 'batal',
-                            okText: 'simpan',
-                            minuteInterval: MinuteInterval.ONE,
-                            onChange: (t){
-                              setState(() {
-                                time = t.hour.toString()+':'+t.minute.toString();
-                                print(time);
-                              });
-                            },
-                            disableHour: false,
-                            disableMinute: false,
+                      TextField(
+                        controller: _textPerson,
+                        keyboardType: TextInputType.numberWithOptions(),
+                        cursorColor: Colors.black,
+                        inputFormatters: [FilteringTextInputFormatter.digitsOnly, LengthLimitingTextInputFormatter(2)],
+                        onChanged: (v){
+                          int i = int.parse(v);
+                          int t = int.parse(reservationFee) * i;
+                          setState(() {
+                            // _textPerson = TextEditingController(text: (_textPerson.text != '')?v:"0");
+                            total = t.toString();
+                          });
+                        },
+                        style: GoogleFonts.poppins(
+                            textStyle: TextStyle(fontSize: 18, color: Colors.black, fontWeight: FontWeight.w600)),
+                        decoration: InputDecoration(
+                          isDense: true,
+                          contentPadding: EdgeInsets.only(bottom: CustomSize.sizeHeight(context) / 86),
+                          hintStyle: GoogleFonts.poppins(
+                              textStyle: TextStyle(fontSize: 14, color: Colors.grey)),
+                          helperStyle: GoogleFonts.poppins(
+                              textStyle: TextStyle(fontSize: 14)),
+                          enabledBorder: UnderlineInputBorder(
+
                           ),
-                        );
-                      },
-                      child: CustomText.textHeading4(
-                          text: (time != '')?time:'belum diisi.',
-                          minSize: 18,
-                          maxLines: 1
-                      ),
-                    ),
-                    Divider(
-                      color: Colors.black,
-                      thickness: 1,
-                    ),
-                  ],
-                ),
-              ),
-              Container(
-                width: CustomSize.sizeWidth(context),
-                decoration: BoxDecoration(
-                    color: CustomColor.secondary
-                ),
-                child: Column(
-                  children: [
-                    SizedBox(height: CustomSize.sizeHeight(context) / 22.5,),
-                    Padding(
-                      padding: EdgeInsets.symmetric(horizontal: CustomSize.sizeWidth(context) / 22),
-                      child: Container(
-                        width: CustomSize.sizeWidth(context),
-                        height: CustomSize.sizeHeight(context) / 3.8,
-                        decoration: BoxDecoration(
-                          color: Colors.white,
-                          borderRadius: BorderRadius.circular(20),
-                        ),
-                        child: Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 20.0),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              SizedBox(height: CustomSize.sizeHeight(context) / 36,),
-                              CustomText.textTitle3(text: "Rincian Pembayaran"),
-                              SizedBox(height: CustomSize.sizeHeight(context) / 50,),
-                              Row(
-                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                children: [
-                                  CustomText.bodyLight16(text: "Harga" + " x " +_textPerson.text),
-                                  CustomText.bodyLight16(text: NumberFormat.currency(locale: 'id', symbol: '', decimalDigits: 0).format(int.parse(reservationFee))+" (1)"),
-                                ],
-                              ),
-                              // (_transCode == 1)?SizedBox(height: CustomSize.sizeHeight(context) / 100,):SizedBox(),
-                              // (_transCode == 1)?Row(mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              //   children: [
-                              //     CustomText.bodyLight16(text: "Ongkir"),
-                              //     CustomText.bodyLight16(text: totalOngkir),
-                              //   ],
-                              // ):SizedBox(),
-                              SizedBox(height: CustomSize.sizeHeight(context) / 64,),
-                              Divider(thickness: 1,),
-                              SizedBox(height: CustomSize.sizeHeight(context) / 120,),
-                              Row(
-                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                children: [
-                                  CustomText.textTitle3(text: "Total Pembayaran"),
-                                  CustomText.textTitle3(text: NumberFormat.currency(locale: 'id', symbol: '', decimalDigits: 0).format(int.parse(total))),
-                                ],
-                              ),
-                            ],
+                          focusedBorder: UnderlineInputBorder(
+
                           ),
                         ),
                       ),
-                    ),
-                    SizedBox(height: CustomSize.sizeHeight(context) / 40,),
-                    GestureDetector(
-                      onTap: (){
-                        if (_textPerson.text != '' || _textPerson.text != '0') {
-                          if (tgl != '') {
-                            if (time != '') {
-                              if (notelp.toString() == "null" || notelp.toString() == '') {
-                                Fluttertoast.showToast(
-                                  msg: "Isi nomor telepon anda terlebih dahulu!",);
-                                Navigator.push(context, PageTransition(type: PageTransitionType.fade, child: new ProfileActivity()));
-                              } else {
-                                showDialog(
-                                    context: context,
-                                    builder: (context) {
-                                      return AlertDialog(
-                                        contentPadding: EdgeInsets.only(left: 25, right: 25, top: 15, bottom: 5),
-                                        shape: RoundedRectangleBorder(
-                                            borderRadius: BorderRadius.all(Radius.circular(10))
-                                        ),
-                                        title: Center(child: Text('Peringatan!', style: TextStyle(color: CustomColor.redBtn))),
-                                        content: Text('Semua proses pembayaran dan transaksi di luar tanggung jawab IRG!', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500), textAlign: TextAlign.center),
-                                        actions: <Widget>[
-                                          Center(
-                                            child: Row(
-                                              mainAxisAlignment: MainAxisAlignment.spaceAround,
-                                              children: [
-                                                FlatButton(
-                                                  // minWidth: CustomSize.sizeWidth(context),
-                                                  color: CustomColor.redBtn,
-                                                  textColor: Colors.white,
-                                                  shape: RoundedRectangleBorder(
-                                                      borderRadius: BorderRadius.all(Radius.circular(10))
-                                                  ),
-                                                  child: Text('Batal'),
-                                                  onPressed: () async{
-                                                    setState(() {
-                                                      // codeDialog = valueText;
-                                                      Navigator.pop(context);
-                                                    });
-                                                  },
-                                                ),
-                                                FlatButton(
-                                                  color: CustomColor.accent,
-                                                  textColor: Colors.white,
-                                                  shape: RoundedRectangleBorder(
-                                                      borderRadius: BorderRadius.all(Radius.circular(10))
-                                                  ),
-                                                  child: Text('Setuju'),
-                                                  onPressed: () async{
-                                                    Navigator.pop(context);
-                                                    makeReservation();
-                                                    SharedPreferences pref = await SharedPreferences.getInstance();
-                                                    pref.setString("jmlhMeja", _textPerson.text.toString());
-                                                    pref.setString("tglReser", tgl);
-                                                    pref.setString("jamReser", (time != '')?time.replaceAll(' AM', '').replaceAll(' PM', '').toString():DateFormat('kk:mm').format(now));
-                                                    pref.setString("hargaReser", reservationFee);
-                                                    pref.setString("totalReser", total);
-                                                    Navigator.push(
-                                                        context,
-                                                        PageTransition(
-                                                            type: PageTransitionType.fade,
-                                                            child: FinalTrans()));
-                                                  },
-                                                ),
-                                              ],
-                                            ),
+                      SizedBox(height: CustomSize.sizeHeight(context) / 48,),
+                      CustomText.bodyLight12(text: "Tanggal Reservation", sizeNew: double.parse(((MediaQuery.of(context).size.width*0.03).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.03).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.03).toString())),
+                      SizedBox(
+                        height: CustomSize.sizeHeight(context) * 0.005,
+                      ),
+                      GestureDetector(
+                        onTap: (){
+                          // DatePicker.showDatePicker(context, showTitleActions: true,
+                          //     onConfirm: (date) {
+                          //       setState(() {
+                          //         tgl = DateFormat('dd-MM-yyyy').format(date);
+                          //       });
+                          //       print(DateFormat('dd-MM-yyyy').format(date));
+                          //     },
+                          //     currentTime: DateTime(DateTime.now().year, DateTime.now().month,
+                          //         DateTime.now().day),
+                          //     locale: LocaleType.id,
+                          //     maxTime: DateTime(DateTime.now().year, 12, 31)
+                          // );
+                          _selectDate(context);
+                        },
+                        child: CustomText.textHeading4(
+                            text: (tgl != '')?tgl:'belum diisi.',
+                            sizeNew: double.parse(((MediaQuery.of(context).size.width*0.045).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.045).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.045).toString()),
+                            maxLines: 1
+                        ),
+                      ),
+                      Divider(
+                        color: Colors.black,
+                        thickness: 1,
+                      ),
+                      SizedBox(height: CustomSize.sizeHeight(context) / 48,),
+                      CustomText.bodyLight12(text: "Waktu Reservation", sizeNew: double.parse(((MediaQuery.of(context).size.width*0.03).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.03).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.03).toString())),
+                      SizedBox(
+                        height: CustomSize.sizeHeight(context) * 0.005,
+                      ),
+                      GestureDetector(
+                        onTap: (){
+                          setState(() {
+                            _time = TimeOfDay.now();
+                          });
+                          Navigator.of(context).push(
+                            showPicker(
+                              is24HrFormat: true,
+                              context: context,
+                              value: _time,
+                              minMinute: 0,
+                              maxMinute: 59,
+                              cancelText: 'batal',
+                              okText: 'simpan',
+                              minuteInterval: MinuteInterval.ONE,
+                              onChange: (t){
+                                setState(() {
+                                  time = t.hour.toString()+':'+t.minute.toString();
+                                  print(time);
+                                });
+                              },
+                              disableHour: false,
+                              disableMinute: false,
+                            ),
+                          );
+                        },
+                        child: CustomText.textHeading4(
+                            text: (time != '')?time:'belum diisi.',
+                            sizeNew: double.parse(((MediaQuery.of(context).size.width*0.045).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.045).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.045).toString()),
+                            maxLines: 1
+                        ),
+                      ),
+                      Divider(
+                        color: Colors.black,
+                        thickness: 1,
+                      ),
+                    ],
+                  ),
+                ),
+                Container(
+                  width: CustomSize.sizeWidth(context),
+                  decoration: BoxDecoration(
+                      color: CustomColor.secondary
+                  ),
+                  child: Column(
+                    children: [
+                      SizedBox(height: CustomSize.sizeHeight(context) / 22.5,),
+                      Padding(
+                        padding: EdgeInsets.symmetric(horizontal: CustomSize.sizeWidth(context) / 22),
+                        child: Container(
+                          width: CustomSize.sizeWidth(context),
+                          height: CustomSize.sizeHeight(context) / 3.8,
+                          decoration: BoxDecoration(
+                            color: Colors.white,
+                            borderRadius: BorderRadius.circular(20),
+                          ),
+                          child: Padding(
+                            padding: const EdgeInsets.symmetric(horizontal: 20.0),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                SizedBox(height: CustomSize.sizeHeight(context) / 36,),
+                                CustomText.textTitle3(text: "Rincian Pembayaran", sizeNew: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.04).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.04).toString())),
+                                SizedBox(height: CustomSize.sizeHeight(context) / 50,),
+                                Row(
+                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    CustomText.bodyLight16(text: "Harga" + " x " +_textPerson.text, sizeNew: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.04).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.04).toString())),
+                                    CustomText.bodyLight16(text: NumberFormat.currency(locale: 'id', symbol: '', decimalDigits: 0).format(int.parse(reservationFee))+" (1)", sizeNew: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.04).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.04).toString())),
+                                  ],
+                                ),
+                                // (_transCode == 1)?SizedBox(height: CustomSize.sizeHeight(context) / 100,):SizedBox(),
+                                // (_transCode == 1)?Row(mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                //   children: [
+                                //     CustomText.bodyLight16(text: "Ongkir"),
+                                //     CustomText.bodyLight16(text: totalOngkir),
+                                //   ],
+                                // ):SizedBox(),
+                                SizedBox(height: CustomSize.sizeHeight(context) / 64,),
+                                Divider(thickness: 1,),
+                                SizedBox(height: CustomSize.sizeHeight(context) / 120,),
+                                Row(
+                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    CustomText.textTitle3(text: "Total Pembayaran", sizeNew: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.04).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.04).toString())),
+                                    CustomText.textTitle3(text: NumberFormat.currency(locale: 'id', symbol: '', decimalDigits: 0).format(int.parse(total)), sizeNew: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.04).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.04).toString())),
+                                  ],
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ),
+                      SizedBox(height: CustomSize.sizeHeight(context) / 40,),
+                      GestureDetector(
+                        onTap: (){
+                          if (_textPerson.text != '' || _textPerson.text != '0') {
+                            if (tgl != '') {
+                              if (time != '') {
+                                if (notelp.toString() == "null" || notelp.toString() == '') {
+                                  Fluttertoast.showToast(
+                                    msg: "Isi nomor telepon anda terlebih dahulu!",);
+                                  Navigator.push(context, PageTransition(type: PageTransitionType.fade, child: new ProfileActivity()));
+                                } else {
+                                  showDialog(
+                                      context: context,
+                                      builder: (context) {
+                                        return AlertDialog(
+                                          contentPadding: EdgeInsets.only(left: 25, right: 25, top: 15, bottom: 5),
+                                          shape: RoundedRectangleBorder(
+                                              borderRadius: BorderRadius.all(Radius.circular(10))
                                           ),
+                                          title: Center(child: Text('Peringatan!', style: TextStyle(color: CustomColor.redBtn))),
+                                          content: Text('Semua proses pembayaran dan transaksi di luar tanggung jawab IRG!', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500), textAlign: TextAlign.center),
+                                          actions: <Widget>[
+                                            Center(
+                                              child: Row(
+                                                mainAxisAlignment: MainAxisAlignment.spaceAround,
+                                                children: [
+                                                  FlatButton(
+                                                    // minWidth: CustomSize.sizeWidth(context),
+                                                    color: CustomColor.redBtn,
+                                                    textColor: Colors.white,
+                                                    shape: RoundedRectangleBorder(
+                                                        borderRadius: BorderRadius.all(Radius.circular(10))
+                                                    ),
+                                                    child: Text('Batal'),
+                                                    onPressed: () async{
+                                                      setState(() {
+                                                        // codeDialog = valueText;
+                                                        Navigator.pop(context);
+                                                      });
+                                                    },
+                                                  ),
+                                                  FlatButton(
+                                                    color: CustomColor.accent,
+                                                    textColor: Colors.white,
+                                                    shape: RoundedRectangleBorder(
+                                                        borderRadius: BorderRadius.all(Radius.circular(10))
+                                                    ),
+                                                    child: Text('Setuju'),
+                                                    onPressed: () async{
+                                                      Navigator.pop(context);
+                                                      makeReservation();
+                                                      SharedPreferences pref = await SharedPreferences.getInstance();
+                                                      pref.setString("jmlhMeja", _textPerson.text.toString());
+                                                      pref.setString("tglReser", tgl);
+                                                      pref.setString("jamReser", (time != '')?time.replaceAll(' AM', '').replaceAll(' PM', '').toString():DateFormat('kk:mm').format(now));
+                                                      pref.setString("hargaReser", reservationFee);
+                                                      pref.setString("totalReser", total);
+                                                      Navigator.push(
+                                                          context,
+                                                          PageTransition(
+                                                              type: PageTransitionType.fade,
+                                                              child: FinalTrans()));
+                                                    },
+                                                  ),
+                                                ],
+                                              ),
+                                            ),
 
-                                        ],
-                                      );
-                                    });
+                                          ],
+                                        );
+                                      });
+                                }
+                              } else {
+                                Fluttertoast.showToast(
+                                  msg: 'Wah, datamu kurang lengkap nih!',);
                               }
+                              // print('ini loh telp '+notelp);
                             } else {
                               Fluttertoast.showToast(
                                 msg: 'Wah, datamu kurang lengkap nih!',);
                             }
-                            // print('ini loh telp '+notelp);
                           } else {
                             Fluttertoast.showToast(
                               msg: 'Wah, datamu kurang lengkap nih!',);
                           }
-                        } else {
-                          Fluttertoast.showToast(
-                            msg: 'Wah, datamu kurang lengkap nih!',);
-                        }
 
-                      },
-                      child: Center(
-                        child: Container(
-                          width: CustomSize.sizeWidth(context) / 1.1,
-                          height: CustomSize.sizeHeight(context) / 14,
-                          decoration: BoxDecoration(
-                              color: (false)?CustomColor.textBody:CustomColor.primary,
-                              borderRadius: BorderRadius.circular(50)
-                          ),
-                          child: Center(
-                            child: Padding(
-                              padding: const EdgeInsets.symmetric(horizontal: 20.0),
-                              child: Row(
-                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                children: [
-                                  CustomText.textTitle3(text: "Reservasi Sekarang", color: Colors.white),
-                                  CustomText.textTitle3(text: NumberFormat.currency(locale: 'id', symbol: '', decimalDigits: 0).format(int.parse(total)), color: Colors.white),
-                                ],
+                        },
+                        child: Center(
+                          child: Container(
+                            width: CustomSize.sizeWidth(context) / 1.1,
+                            height: CustomSize.sizeHeight(context) / 14,
+                            decoration: BoxDecoration(
+                                color: (false)?CustomColor.textBody:CustomColor.primary,
+                                borderRadius: BorderRadius.circular(50)
+                            ),
+                            child: Center(
+                              child: Padding(
+                                padding: const EdgeInsets.symmetric(horizontal: 20.0),
+                                child: Row(
+                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    CustomText.textTitle3(text: "Reservasi Sekarang", color: Colors.white, sizeNew: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.04).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.04).toString())),
+                                    CustomText.textTitle3(text: NumberFormat.currency(locale: 'id', symbol: '', decimalDigits: 0).format(int.parse(total)), color: Colors.white, sizeNew: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.04).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.04).toString())),
+                                  ],
+                                ),
                               ),
                             ),
                           ),
                         ),
                       ),
-                    ),
-                    SizedBox(height: CustomSize.sizeHeight(context) / 54,),
-                  ],
+                      SizedBox(height: CustomSize.sizeHeight(context) / 54,),
+                    ],
+                  ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
         ),
       ),
+      data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0),
     );
   }
 }

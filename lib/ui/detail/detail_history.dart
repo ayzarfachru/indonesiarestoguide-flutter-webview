@@ -162,12 +162,18 @@ class _DetailHistoryState extends State<DetailHistory> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     SizedBox(height: CustomSize.sizeHeight(context) / 32,),
-                    CustomText.bodyLight12(text: "Alamat Pengiriman"),
+                    MediaQuery(
+                        child: CustomText.bodyLight12(text: "Alamat Pengiriman", sizeNew: double.parse(((MediaQuery.of(context).size.width*0.03).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.03)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.03)).toString())),
+                      data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0),
+                    ),
                     SizedBox(height: CustomSize.sizeHeight(context) * 0.005,),
-                    CustomText.textHeading4(
-                        text: (address != '')?address:'kosong.',
-                        minSize: 16,
-                        maxLines: 10
+                    MediaQuery(
+                      child: CustomText.textHeading4(
+                          text: (address != '')?address:'kosong.',
+                          sizeNew: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.04)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.04)).toString()),
+                          maxLines: 10
+                      ),
+                      data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0),
                     ),
                   ],
                 ),
@@ -194,7 +200,10 @@ class _DetailHistoryState extends State<DetailHistory> {
                           ),
                         ),
                         SizedBox(width: CustomSize.sizeWidth(context) / 32,),
-                        CustomText.textHeading6(text: (type == 'delivery' || type == 'Pesan antar')?"Pesan Antar":(type == 'takeaway' || type == 'Ambil Langsung')?"Ambil Langsung":"Makan Ditempat",),
+                        MediaQuery(
+                            child: CustomText.textHeading6(text: (type == 'delivery' || type == 'Pesan antar')?"Pesan Antar":(type == 'takeaway' || type == 'Ambil Langsung')?"Ambil Langsung":"Makan Ditempat", sizeNew: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.04).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.04).toString())),
+                          data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0),
+                        ),
                       ],
                     ),
                   ],
@@ -224,7 +233,7 @@ class _DetailHistoryState extends State<DetailHistory> {
                             children: [
                               SingleChildScrollView(
                                 child: Container(
-                                  height: CustomSize.sizeHeight(context) / 7,
+                                  height: CustomSize.sizeHeight(context) / 4,
                                   child: Row(
                                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                     children: [
@@ -237,15 +246,21 @@ class _DetailHistoryState extends State<DetailHistory> {
                                             Column(
                                               crossAxisAlignment: CrossAxisAlignment.start,
                                               children: [
-                                                CustomText.textHeading4(
-                                                    text: (menu.toString() != '[]')?menu[index].name:'Kosong',
-                                                    minSize: 18,
-                                                    maxLines: 1
+                                                MediaQuery(
+                                                  child: CustomText.textHeading4(
+                                                      text: (menu.toString() != '[]')?menu[index].name:'Kosong',
+                                                      sizeNew: double.parse(((MediaQuery.of(context).size.width*0.045).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.045)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.045)).toString()),
+                                                      maxLines: 1
+                                                  ),
+                                                  data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0),
                                                 ),
-                                                CustomText.bodyRegular14(
-                                                    text: (menu.toString() != '[]')?menu[index].desc:'Menu tidak ditemukan.',
-                                                    maxLines: 2,
-                                                    minSize: 14
+                                                MediaQuery(
+                                                  child: CustomText.bodyRegular14(
+                                                      text: (menu.toString() != '[]')?menu[index].desc:'Menu tidak ditemukan.',
+                                                      maxLines: 2,
+                                                      sizeNew: double.parse(((MediaQuery.of(context).size.width*0.035).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.035).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.035).toString())
+                                                  ),
+                                                  data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0),
                                                 ),
                                                 SizedBox(height: CustomSize.sizeHeight(context) / 48,),
                                                 Row(
@@ -260,10 +275,13 @@ class _DetailHistoryState extends State<DetailHistory> {
                                                     //     maxLines: 1,
                                                     //     minSize: 14
                                                     // ),
-                                                    CustomText.bodyMedium14(
-                                                        text: (menu.toString() != '[]')?menu[index].qty.toString()+' Items':'',
-                                                        maxLines: 1,
-                                                        minSize: 16
+                                                    MediaQuery(
+                                                      child: CustomText.bodyMedium14(
+                                                          text: (menu.toString() != '[]')?menu[index].qty.toString()+' Items':'',
+                                                          maxLines: 1,
+                                                          sizeNew: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.04).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.04).toString())
+                                                      ),
+                                                      data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0),
                                                     ),
                                                   ],
                                                 ),
@@ -341,20 +359,35 @@ class _DetailHistoryState extends State<DetailHistory> {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               SizedBox(height: CustomSize.sizeHeight(context) / 36,),
-                              CustomText.textTitle3(text: "Rincian Pembayaran"),
+                              MediaQuery(
+                                  child: CustomText.textTitle3(text: "Rincian Pembayaran", sizeNew: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.04)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.04)).toString())),
+                                data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0),
+                              ),
                               SizedBox(height: CustomSize.sizeHeight(context) / 50,),
                               Row(
                                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                 children: [
-                                  CustomText.bodyLight16(text: "Harga"),
-                                  CustomText.bodyLight16(text: NumberFormat.currency(locale: 'id', symbol: '', decimalDigits: 0).format(harga)),
+                                  MediaQuery(
+                                      child: CustomText.bodyLight16(text: "Harga", sizeNew: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.04).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.04).toString())),
+                                    data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0),
+                                  ),
+                                  MediaQuery(
+                                      child: CustomText.bodyLight16(text: NumberFormat.currency(locale: 'id', symbol: '', decimalDigits: 0).format(harga), sizeNew: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.04).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.04).toString())),
+                                    data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0),
+                                  ),
                                 ],
                               ),
                               SizedBox(height: (type == 'Pesan antar')?CustomSize.sizeHeight(context) / 100:0,),
                               (type == 'Pesan antar')?Row(mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                 children: [
-                                  CustomText.bodyLight16(text: "Ongkir"),
-                                  CustomText.bodyLight16(text: NumberFormat.currency(locale: 'id', symbol: '', decimalDigits: 0).format(ongkir)),
+                                  MediaQuery(
+                                      child: CustomText.bodyLight16(text: "Ongkir", sizeNew: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.04).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.04).toString())),
+                                    data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0),
+                                  ),
+                                  MediaQuery(
+                                      child: CustomText.bodyLight16(text: NumberFormat.currency(locale: 'id', symbol: '', decimalDigits: 0).format(ongkir), sizeNew: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.04).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.04).toString())),
+                                    data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0),
+                                  ),
                                 ],
                               ):SizedBox(),
                               SizedBox(height: CustomSize.sizeHeight(context) / 64,),
@@ -362,8 +395,14 @@ class _DetailHistoryState extends State<DetailHistory> {
                               SizedBox(height: CustomSize.sizeHeight(context) / 120,),
                               Row(mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                 children: [
-                                  CustomText.textTitle3(text: "Total Pembayaran"),
-                                  CustomText.textTitle3(text: NumberFormat.currency(locale: 'id', symbol: '', decimalDigits: 0).format(total)),
+                                  MediaQuery(
+                                      child: CustomText.textTitle3(text: "Total Pembayaran", sizeNew: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.04).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.04).toString())),
+                                    data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0),
+                                  ),
+                                  MediaQuery(
+                                      child: CustomText.textTitle3(text: NumberFormat.currency(locale: 'id', symbol: '', decimalDigits: 0).format(total), sizeNew: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.04).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.04).toString())),
+                                    data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0),
+                                  ),
                                 ],
                               ),
                             ],
@@ -391,7 +430,10 @@ class _DetailHistoryState extends State<DetailHistory> {
                           child: Center(
                             child: Padding(
                               padding: const EdgeInsets.symmetric(horizontal: 20.0),
-                              child: CustomText.textTitle2(text: "Pesan Lagi", color: Colors.white),
+                              child: MediaQuery(
+                                  child: CustomText.textTitle2(text: "Pesan Lagi", color: Colors.white, sizeNew: double.parse(((MediaQuery.of(context).size.width*0.045).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.045)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.045)).toString())),
+                                data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0),
+                              ),
                             ),
                           ),
                         ),
@@ -425,7 +467,10 @@ class _DetailHistoryState extends State<DetailHistory> {
                           child: Center(
                             child: Padding(
                               padding: const EdgeInsets.symmetric(horizontal: 20.0),
-                              child: CustomText.textTitle2(text: "Hapus", color: Colors.white),
+                              child: MediaQuery(
+                                  child: CustomText.textTitle2(text: "Hapus", color: Colors.white, sizeNew: double.parse(((MediaQuery.of(context).size.width*0.045).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.045)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.045)).toString())),
+                                data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0),
+                              ),
                             ),
                           ),
                         ),
@@ -450,7 +495,10 @@ class _DetailHistoryState extends State<DetailHistory> {
                         child: Center(
                           child: Padding(
                             padding: const EdgeInsets.symmetric(horizontal: 20.0),
-                            child: CustomText.textTitle2(text: "Hapus", color: Colors.white),
+                            child: MediaQuery(
+                                child: CustomText.textTitle2(text: "Hapus", color: Colors.white, sizeNew: double.parse(((MediaQuery.of(context).size.width*0.045).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.045)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.045)).toString())),
+                              data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0),
+                            ),
                           ),
                         ),
                       ),

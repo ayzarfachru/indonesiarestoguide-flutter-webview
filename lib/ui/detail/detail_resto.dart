@@ -67,7 +67,7 @@ class CuisineChipState extends State<CuisineChip> {
             shadowColor: Colors.black,
             selectedColor: Colors.green[100],
             selectedShadowColor: Colors.green,
-            label: Text('✓ '+item),
+            label: MediaQuery(child: Text('✓ '+item, style: TextStyle(fontSize: double.parse(((MediaQuery.of(context).size.width*0.033).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.033)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.033)).toString())),), data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0),),
             selected: selectedChoices.contains(item),
             labelStyle: TextStyle(color: Colors.white),
             backgroundColor: CustomColor.primaryLight,
@@ -121,7 +121,7 @@ class _FacilityChipState extends State<FacilityChip> {
             shadowColor: Colors.black,
             selectedColor: Colors.green[100],
             selectedShadowColor: Colors.green,
-            label: Text('✓ '+item),
+            label: MediaQuery(child: Text('✓ '+item, style: TextStyle(fontSize: double.parse(((MediaQuery.of(context).size.width*0.033).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.033)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.033)).toString())),), data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0),),
             selected: selectedChoices.contains(item),
             labelStyle: TextStyle(color: Colors.white),
             backgroundColor: CustomColor.primaryLight,
@@ -601,10 +601,13 @@ class _DetailRestoState extends State<DetailResto> {
                             children: [
                               Container(
                                 width: CustomSize.sizeWidth(context) / 1.4,
-                                child: CustomText.textHeading5(
-                                    text: nameResto,
-                                    maxLines: 2,
-                                    minSize: 24
+                                child: MediaQuery(
+                                  child: CustomText.textHeading5(
+                                      text: nameResto,
+                                      maxLines: 2,
+                                      sizeNew: double.parse(((MediaQuery.of(context).size.width*0.06).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.06)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.06)).toString())
+                                  ),
+                                    data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0)
                                 ),
                               ),
                               // GestureDetector(
@@ -648,7 +651,12 @@ class _DetailRestoState extends State<DetailResto> {
                             onTap: _launchURL,
                             child: Container(
                                 width: CustomSize.sizeWidth(context),
-                                child: CustomText.bodyMedium16(text: address, maxLines: 10)),
+                                child: MediaQuery(
+                                  child: CustomText.bodyMedium16(text: address, maxLines: 10,
+                                      sizeNew: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.04)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.04)).toString())
+                                  ),
+                                    data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0)
+                                )),
                           ),
                         ),
                         SizedBox(height: CustomSize.sizeHeight(context) / 38,),
@@ -671,10 +679,14 @@ class _DetailRestoState extends State<DetailResto> {
                                   children: [
                                     Icon(FontAwesome.phone, size: 20.5, color: Colors.white,),
                                     SizedBox(width: CustomSize.sizeWidth(context) * 0.01,),
-                                    CustomText.bodyMedium16(
-                                        text: "Hubungi Penjual",
-                                        color: Colors.white,
-                                        maxLines: 1
+                                    MediaQuery(
+                                      child: CustomText.bodyMedium16(
+                                          text: "Hubungi Penjual",
+                                          color: Colors.white,
+                                          maxLines: 1,
+                                          sizeNew: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.04)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.04)).toString())
+                                      ),
+                                        data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0)
                                     ),
                                   ],
                                 ),
@@ -694,7 +706,7 @@ class _DetailRestoState extends State<DetailResto> {
                                   child: GestureDetector(
                                     onTap: (){
                                       createDynamicLink().whenComplete((){
-                                        Share.share("Kunjungi restaurant kami di "+link);
+                                        Share.share('Kunjungi restaurant kami "'+nameResto+'" di '+link);
                                       });
                                     },
                                     child: Container(
@@ -710,10 +722,14 @@ class _DetailRestoState extends State<DetailResto> {
                                           children: [
                                             Icon(FontAwesome.share_alt, size: 20, color: Colors.white,),
                                             SizedBox(width: CustomSize.sizeWidth(context) * 0.01,),
-                                            CustomText.bodyMedium16(
-                                                text: "Share",
-                                                color: Colors.white,
-                                                maxLines: 1
+                                            MediaQuery(
+                                              child: CustomText.bodyMedium16(
+                                                  text: "Share",
+                                                  color: Colors.white,
+                                                  maxLines: 1,
+                                                  sizeNew: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.04)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.04)).toString())
+                                              ),
+                                                data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0)
                                             ),
                                           ],
                                         ),
@@ -746,10 +762,14 @@ class _DetailRestoState extends State<DetailResto> {
                                               Icon(FontAwesome.heart ,
                                               color: CustomColor.primaryLight, size: 20,),
                                             SizedBox(width: CustomSize.sizeWidth(context) * 0.01,),
-                                            CustomText.bodyMedium16(
-                                                text: "Unfollow",
-                                                color: CustomColor.primaryLight,
-                                                maxLines: 1
+                                            MediaQuery(
+                                              child: CustomText.bodyMedium16(
+                                                  text: "Unfollow",
+                                                  color: CustomColor.primaryLight,
+                                                  maxLines: 1,
+                                                  sizeNew: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.04)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.04)).toString())
+                                              ),
+                                                data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0)
                                             ),
                                           ],
                                         ),
@@ -778,10 +798,14 @@ class _DetailRestoState extends State<DetailResto> {
                                             
                                             Icon(FontAwesome.heart_o, color: Colors.white, size: 20,),
                                             SizedBox(width: CustomSize.sizeWidth(context) * 0.01,),
-                                            CustomText.bodyMedium16(
-                                                text: "Follow",
-                                                color: Colors.white,
-                                                maxLines: 1
+                                            MediaQuery(
+                                              child: CustomText.bodyMedium16(
+                                                  text: "Follow",
+                                                  color: Colors.white,
+                                                  maxLines: 1,
+                                                  sizeNew: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.04)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.04)).toString())
+                                              ),
+                                                data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0)
                                             ),
                                           ],
                                         ),
@@ -812,9 +836,15 @@ class _DetailRestoState extends State<DetailResto> {
                                   ),
                                   child: Column(
                                     children: [
-                                      CustomText.bodyMedium12(text: "Kisaran Harga", minSize: 12),
+                                      MediaQuery(
+                                          child: CustomText.bodyMedium12(text: "Kisaran Harga", sizeNew: double.parse(((MediaQuery.of(context).size.width*0.033).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.033)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.033)).toString())),
+                                          data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0)
+                                      ),
                                       SizedBox(height: CustomSize.sizeHeight(context) / 86,),
-                                      CustomText.bodyRegular16(text: range, minSize: 16, color: CustomColor.primary),
+                                      MediaQuery(
+                                          child: CustomText.bodyRegular16(text: range, sizeNew: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.04)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.04)).toString()), color: CustomColor.primary),
+                                          data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0)
+                                          ),
                                     ],
                                   ),
                                 ),
@@ -832,9 +862,21 @@ class _DetailRestoState extends State<DetailResto> {
                                   ),
                                   child: Column(
                                     children: [
-                                      CustomText.bodyMedium12(text: "Jam Buka & Tutup", minSize: 12),
+                                      MediaQuery(
+                                          child: CustomText.bodyMedium12(text: "Jam Buka & Tutup", sizeNew: double.parse(((MediaQuery.of(context).size.width*0.033).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.033)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.033)).toString())),
+                                          data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0)
+                                      ),
                                       SizedBox(height: CustomSize.sizeHeight(context) / 86,),
-                                      (status == 'active')?(isOpen == 'false')?CustomText.bodyRegular16(text: openClose, minSize: 16, color: CustomColor.redBtn):CustomText.bodyRegular16(text: DateFormat('kk:mm').format(DateTime.parse(DateTime.now().toString().split(' ')[0]+' '+openClose.split(' -')[0].toString())).toString()+' - '+DateFormat('kk:mm').format(DateTime.parse(DateTime.now().toString().split(' ')[0]+' '+openClose.split('- ')[1].toString())).toString(), minSize: 16, color: CustomColor.primary):CustomText.bodyRegular16(text: openClose, minSize: 16, color: CustomColor.redBtn),
+                                      (status == 'active')?(isOpen == 'false')?MediaQuery(
+                                          child: CustomText.bodyRegular16(text: DateFormat('kk:mm').format(DateTime.parse(DateTime.now().toString().split(' ')[0]+' '+openClose.split(' -')[0].toString())).toString()+' - '+DateFormat('kk:mm').format(DateTime.parse(DateTime.now().toString().split(' ')[0]+' '+openClose.split('- ')[1].toString())).toString(), sizeNew: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.04)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.04)).toString()), color: CustomColor.primary),
+                                          data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0)
+                                      ):MediaQuery(
+                                          child: CustomText.bodyRegular16(text: DateFormat('kk:mm').format(DateTime.parse(DateTime.now().toString().split(' ')[0]+' '+openClose.split(' -')[0].toString())).toString()+' - '+DateFormat('kk:mm').format(DateTime.parse(DateTime.now().toString().split(' ')[0]+' '+openClose.split('- ')[1].toString())).toString(), sizeNew: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.04)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.04)).toString()), color: CustomColor.primary),
+                                          data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0)
+                                      ):MediaQuery(
+                                          child: CustomText.bodyRegular16(text: DateFormat('kk:mm').format(DateTime.parse(DateTime.now().toString().split(' ')[0]+' '+openClose.split(' -')[0].toString())).toString()+' - '+DateFormat('kk:mm').format(DateTime.parse(DateTime.now().toString().split(' ')[0]+' '+openClose.split('- ')[1].toString())).toString(), sizeNew: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.04)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.04)).toString()), color: CustomColor.primary),
+                                          data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0)
+                                      ),
                                     ],
                                   ),
                                 ),
@@ -845,10 +887,13 @@ class _DetailRestoState extends State<DetailResto> {
                         SizedBox(height: CustomSize.sizeHeight(context) / 24,),
                         Padding(
                           padding: EdgeInsets.symmetric(horizontal: CustomSize.sizeWidth(context) / 14),
-                          child: CustomText.bodyMedium16(
-                              text: desc,
-                              minSize: 14,
-                              maxLines: 100
+                          child: MediaQuery(
+                            child: CustomText.bodyMedium16(
+                                text: desc,
+                                sizeNew: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.04)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.04)).toString()),
+                                maxLines: 100
+                            ),
+                              data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0)
                           ),
                         ),
                         SizedBox(height: CustomSize.sizeHeight(context) / 24,),
@@ -977,7 +1022,10 @@ class _DetailRestoState extends State<DetailResto> {
                               ),
                               child: Column(
                                 children: [
-                                  CustomText.bodyMedium12(text: "Tipe Resto", minSize: 12),
+                                  MediaQuery(
+                                      child: CustomText.bodyMedium12(text: "Tipe Resto", sizeNew: double.parse(((MediaQuery.of(context).size.width*0.035).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.035)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.035)).toString())),
+                                      data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0)
+                                  ),
                                   SizedBox(height: CustomSize.sizeHeight(context) / 86,),
                                   CuisineChip(
                                     cuisine,
@@ -1012,7 +1060,10 @@ class _DetailRestoState extends State<DetailResto> {
                               ),
                               child: Column(
                                 children: [
-                                  CustomText.bodyMedium12(text: "Fasilitas Resto", minSize: 12),
+                                  MediaQuery(
+                                      child: CustomText.bodyMedium12(text: "Fasilitas Resto", sizeNew: double.parse(((MediaQuery.of(context).size.width*0.035).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.035)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.035)).toString())),
+                                      data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0)
+                                  ),
                                   SizedBox(height: CustomSize.sizeHeight(context) / 86,),
                                   FacilityChip(
                                     facility,
@@ -1035,11 +1086,14 @@ class _DetailRestoState extends State<DetailResto> {
                         (promo.toString() != '[]')?SizedBox(height: CustomSize.sizeHeight(context) / 38,):Container(),
                         (promo.toString() != '[]')?Padding(
                           padding: EdgeInsets.symmetric(horizontal: CustomSize.sizeWidth(context) / 32),
-                          child: CustomText.textHeading4a(
-                              text: "Lagi promo loh . . .",
-                              color: CustomColor.primary,
-                              minSize: 20,
-                              maxLines: 1
+                          child: MediaQuery(
+                            child: CustomText.textHeading4a(
+                                text: "Lagi promo loh . . .",
+                                color: CustomColor.primary,
+                                sizeNew: double.parse(((MediaQuery.of(context).size.width*0.05).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.05)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.05)).toString()),
+                                maxLines: 1
+                            ),
+                              data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0)
                           ),
                         ):Container(),
                         (promo.toString() != '[]')?SizedBox(height: CustomSize.sizeHeight(context) / 86,):Container(),
@@ -1156,16 +1210,22 @@ class _DetailRestoState extends State<DetailResto> {
                                                       child: Column(
                                                         crossAxisAlignment: CrossAxisAlignment.start,
                                                         children: [
-                                                          CustomText.textHeading5(
-                                                              text: promo[index].menu!.name,
-                                                              minSize: 18,
-                                                              maxLines: 1
+                                                          MediaQuery(
+                                                            child: CustomText.textHeading5(
+                                                                text: promo[index].menu!.name,
+                                                                sizeNew: double.parse(((MediaQuery.of(context).size.width*0.06).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.06)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.06)).toString()),
+                                                                maxLines: 1
+                                                            ),
+                                                              data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0)
                                                           ),
                                                           SizedBox(height: CustomSize.sizeHeight(context) * 0.0025,),
-                                                          CustomText.bodyRegular16(
-                                                              text: promo[index].menu!.desc,
-                                                              maxLines: 100,
-                                                              minSize: 16
+                                                          MediaQuery(
+                                                            child: CustomText.bodyRegular16(
+                                                                text: promo[index].menu!.desc,
+                                                                maxLines: 100,
+                                                                sizeNew: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.04)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.04)).toString())
+                                                            ),
+                                                              data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0)
                                                           ),
                                                           SizedBox(height: CustomSize.sizeHeight(context) / 64,),
                                                           Row(
@@ -1176,53 +1236,74 @@ class _DetailRestoState extends State<DetailResto> {
                                                                 children: [
                                                                   Row(
                                                                     children: [
-                                                                      CustomText.bodyMedium14(
-                                                                          text: 'Harga:  ',
-                                                                          maxLines: 1,
-                                                                          minSize: 14,
-                                                                          color: Colors.grey
+                                                                      MediaQuery(
+                                                                        child: CustomText.bodyMedium14(
+                                                                            text: 'Harga:  ',
+                                                                            maxLines: 1,
+                                                                            sizeNew: double.parse(((MediaQuery.of(context).size.width*0.035).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.035)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.035)).toString()),
+                                                                            color: Colors.grey
+                                                                        ),
+                                                                          data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0)
                                                                       ),
-                                                                      CustomText.bodyMedium16(
-                                                                          text: NumberFormat.currency(locale: 'id', symbol: '', decimalDigits: 0).format(promo[index].menu!.price!.original),
-                                                                          maxLines: 1,
-                                                                          minSize: 16,
-                                                                          decoration: TextDecoration.lineThrough
+                                                                      MediaQuery(
+                                                                        child: CustomText.bodyMedium16(
+                                                                            text: NumberFormat.currency(locale: 'id', symbol: '', decimalDigits: 0).format(promo[index].menu!.price!.original),
+                                                                            maxLines: 1,
+                                                                            sizeNew: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.04)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.04)).toString()),
+                                                                            decoration: TextDecoration.lineThrough
+                                                                        ),
+                                                                          data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0)
                                                                       ),
                                                                       SizedBox(width: CustomSize.sizeWidth(context) / 48,),
-                                                                      CustomText.bodyMedium16(
-                                                                          text: NumberFormat.currency(locale: 'id', symbol: '', decimalDigits: 0).format(promo[index].menu!.price!.discounted),
-                                                                          maxLines: 1,
-                                                                          minSize: 16
+                                                                      MediaQuery(
+                                                                        child: CustomText.bodyMedium16(
+                                                                            text: NumberFormat.currency(locale: 'id', symbol: '', decimalDigits: 0).format(promo[index].menu!.price!.discounted),
+                                                                            maxLines: 1,
+                                                                            sizeNew: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.04)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.04)).toString())
+                                                                        ),
+                                                                          data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0)
                                                                       ),
                                                                     ],
                                                                   ),
                                                                   (promo[index].menu!.ex_date != 'null' || promo[index].menu!.ex_date != '')?Row(
                                                                     children: [
-                                                                      CustomText.bodyMedium14(
-                                                                          text: 'Tanggal berakhir:  ',
-                                                                          maxLines: 1,
-                                                                          minSize: 14,
-                                                                          color: Colors.grey
+                                                                      MediaQuery(
+                                                                        child: CustomText.bodyMedium14(
+                                                                            text: 'Tanggal berakhir:  ',
+                                                                            maxLines: 1,
+                                                                            sizeNew: double.parse(((MediaQuery.of(context).size.width*0.035).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.035)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.035)).toString()),
+                                                                            color: Colors.grey
+                                                                        ),
+                                                                          data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0)
                                                                       ),
-                                                                      CustomText.bodyMedium16(
-                                                                        text: DateFormat('dd-MM-y').format(DateTime.parse(promo[index].menu!.ex_date)).toString(),
-                                                                        maxLines: 1,
-                                                                        minSize: 16,
+                                                                      MediaQuery(
+                                                                        child: CustomText.bodyMedium16(
+                                                                          text: DateFormat('dd-MM-y').format(DateTime.parse(promo[index].menu!.ex_date)).toString(),
+                                                                          maxLines: 1,
+                                                                          sizeNew: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.04)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.04)).toString()),
+                                                                        ),
+                                                                          data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0)
                                                                       ),
                                                                     ],
                                                                   ):Container(),
                                                                   (promo[index].menu!.ex_date != 'null' || promo[index].menu!.ex_date != '')?Row(
                                                                     children: [
-                                                                      CustomText.bodyMedium14(
-                                                                          text: 'Jam berakhir:  ',
-                                                                          maxLines: 1,
-                                                                          minSize: 14,
-                                                                          color: Colors.grey
+                                                                      MediaQuery(
+                                                                        child: CustomText.bodyMedium14(
+                                                                            text: 'Jam berakhir:  ',
+                                                                            maxLines: 1,
+                                                                            sizeNew: double.parse(((MediaQuery.of(context).size.width*0.035).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.035)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.035)).toString()),
+                                                                            color: Colors.grey
+                                                                        ),
+                                                                          data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0)
                                                                       ),
-                                                                      CustomText.bodyMedium16(
-                                                                        text: DateFormat('kk.mm').format(DateTime.parse(promo[index].menu!.ex_date)).toString(),
-                                                                        maxLines: 1,
-                                                                        minSize: 16,
+                                                                      MediaQuery(
+                                                                        child: CustomText.bodyMedium16(
+                                                                          text: DateFormat('kk.mm').format(DateTime.parse(promo[index].menu!.ex_date)).toString(),
+                                                                          maxLines: 1,
+                                                                          sizeNew: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.04)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.04)).toString()),
+                                                                        ),
+                                                                          data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0)
                                                                       ),
                                                                     ],
                                                                   ):Container(),
@@ -1297,11 +1378,16 @@ class _DetailRestoState extends State<DetailResto> {
                                                                           color: Colors.grey[200],
                                                                           shape: BoxShape.circle
                                                                       ),
-                                                                      child: Center(child: CustomText.textHeading1(text: "-", color: Colors.grey)),
+                                                                      child: Center(child: MediaQuery(child: CustomText.textHeading1(text: "-", color: Colors.grey, sizeNew: double.parse(((MediaQuery.of(context).size.width*0.08).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.08)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.08)).toString())),
+                                                                          data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0)
+                                                                      )),
                                                                     ),
                                                                   ),
                                                                   SizedBox(width: CustomSize.sizeWidth(context) / 24,),
-                                                                  CustomText.bodyRegular16(text: qty[restoId.indexOf(promo[index].menu!.id.toString())]),
+                                                                  MediaQuery(
+                                                                      child: CustomText.bodyRegular16(text: qty[restoId.indexOf(promo[index].menu!.id.toString())], sizeNew: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.04)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.04)).toString()),),
+                                                                      data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0)
+                                                                  ),
                                                                   SizedBox(width: CustomSize.sizeWidth(context) / 24,),
                                                                   GestureDetector(
                                                                     onTap: ()async{
@@ -1322,7 +1408,9 @@ class _DetailRestoState extends State<DetailResto> {
                                                                           color: Colors.grey[200],
                                                                           shape: BoxShape.circle
                                                                       ),
-                                                                      child: Center(child: CustomText.textHeading1(text: "+", color: Colors.grey)),
+                                                                      child: Center(child: MediaQuery(child: CustomText.textHeading1(text: "+", color: Colors.grey, sizeNew: double.parse(((MediaQuery.of(context).size.width*0.08).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.08)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.08)).toString())),
+                                                                          data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0)
+                                                                      )),
                                                                     ),
                                                                   ),
                                                                 ],
@@ -1334,7 +1422,10 @@ class _DetailRestoState extends State<DetailResto> {
                                                               SizedBox(height: CustomSize.sizeHeight(context) / 44,),
                                                               Container(
                                                                   alignment: Alignment.centerLeft,
-                                                                  child: CustomText.bodyMedium14(text: "Catatan")
+                                                                  child: MediaQuery(
+                                                                      child: CustomText.bodyMedium14(text: "Catatan", sizeNew: double.parse(((MediaQuery.of(context).size.width*0.035).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.035)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.035)).toString()),),
+                                                                      data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0)
+                                                                  )
                                                               ),
                                                               SizedBox(
                                                                 height: CustomSize.sizeHeight(context) * 0.005,
@@ -1606,7 +1697,10 @@ class _DetailRestoState extends State<DetailResto> {
                                                                                       ),
                                                                                     ),
                                                                                     SizedBox(width: CustomSize.sizeWidth(context) / 32,),
-                                                                                    CustomText.textHeading6(text: "Pesan Antar",),
+                                                                                    MediaQuery(
+                                                                                        child: CustomText.textHeading6(text: "Pesan Antar", sizeNew: double.parse(((MediaQuery.of(context).size.width*0.035).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.035).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.035).toString()),),
+                                                                                        data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0)
+                                                                                    ),
                                                                                   ],
                                                                                 ),
                                                                               ),
@@ -1751,7 +1845,10 @@ class _DetailRestoState extends State<DetailResto> {
                                                                                       ),
                                                                                     ),
                                                                                     SizedBox(width: CustomSize.sizeWidth(context) / 32,),
-                                                                                    CustomText.textHeading6(text: "Ambil Langsung",),
+                                                                                    MediaQuery(
+                                                                                        child: CustomText.textHeading6(text: "Ambil Langsung", sizeNew: double.parse(((MediaQuery.of(context).size.width*0.035).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.035).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.035).toString()),),
+                                                                                        data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0)
+                                                                                    ),
                                                                                   ],
                                                                                 ),
                                                                               ),
@@ -1892,7 +1989,10 @@ class _DetailRestoState extends State<DetailResto> {
                                                                                       ),
                                                                                     ),
                                                                                     SizedBox(width: CustomSize.sizeWidth(context) / 32,),
-                                                                                    CustomText.textHeading6(text: "Makan Ditempat",),
+                                                                                    MediaQuery(
+                                                                                        child: CustomText.textHeading6(text: "Makan Ditempat", sizeNew: double.parse(((MediaQuery.of(context).size.width*0.035).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.035).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.035).toString()),),
+                                                                                        data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0)
+                                                                                    ),
                                                                                   ],
                                                                                 ),
                                                                               ),
@@ -2226,7 +2326,10 @@ class _DetailRestoState extends State<DetailResto> {
                                                                                                 ),
                                                                                               ),
                                                                                               SizedBox(width: CustomSize.sizeWidth(context) / 32,),
-                                                                                              CustomText.textHeading6(text: "Pesan Antar",),
+                                                                                              MediaQuery(
+                                                                                                  child: CustomText.textHeading6(text: "Pesan Antar", sizeNew: double.parse(((MediaQuery.of(context).size.width*0.035).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.035).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.035).toString()),),
+                                                                                                  data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0)
+                                                                                              ),
                                                                                             ],
                                                                                           ),
                                                                                         ),
@@ -2371,7 +2474,10 @@ class _DetailRestoState extends State<DetailResto> {
                                                                                                 ),
                                                                                               ),
                                                                                               SizedBox(width: CustomSize.sizeWidth(context) / 32,),
-                                                                                              CustomText.textHeading6(text: "Ambil Langsung",),
+                                                                                              MediaQuery(
+                                                                                                  child: CustomText.textHeading6(text: "Ambil Langsung", sizeNew: double.parse(((MediaQuery.of(context).size.width*0.035).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.035).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.035).toString()),),
+                                                                                                  data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0)
+                                                                                              ),
                                                                                             ],
                                                                                           ),
                                                                                         ),
@@ -2512,7 +2618,9 @@ class _DetailRestoState extends State<DetailResto> {
                                                                                                 ),
                                                                                               ),
                                                                                               SizedBox(width: CustomSize.sizeWidth(context) / 32,),
-                                                                                              CustomText.textHeading6(text: "Makan Ditempat",),
+                                                                                              MediaQuery(child: CustomText.textHeading6(text: "Makan Ditempat", sizeNew: double.parse(((MediaQuery.of(context).size.width*0.035).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.035).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.035).toString()),),
+                                                                                                  data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0)
+                                                                                              ),
                                                                                             ],
                                                                                           ),
                                                                                         ),
@@ -2692,7 +2800,10 @@ class _DetailRestoState extends State<DetailResto> {
                                                                                       ),
                                                                                     ),
                                                                                     SizedBox(width: CustomSize.sizeWidth(context) / 32,),
-                                                                                    CustomText.textHeading6(text: "Pesan Antar",),
+                                                                                    MediaQuery(
+                                                                                        child: CustomText.textHeading6(text: "Pesan Antar", sizeNew: double.parse(((MediaQuery.of(context).size.width*0.035).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.035).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.035).toString()),),
+                                                                                        data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0)
+                                                                                    ),
                                                                                   ],
                                                                                 ),
                                                                               ),
@@ -2837,7 +2948,9 @@ class _DetailRestoState extends State<DetailResto> {
                                                                                       ),
                                                                                     ),
                                                                                     SizedBox(width: CustomSize.sizeWidth(context) / 32,),
-                                                                                    CustomText.textHeading6(text: "Ambil Langsung",),
+                                                                                    MediaQuery(
+                                                                                        child: CustomText.textHeading6(text: "Ambil Langsung", sizeNew: double.parse(((MediaQuery.of(context).size.width*0.035).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.035).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.035).toString())),
+                                                                                        data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0)),
                                                                                   ],
                                                                                 ),
                                                                               ),
@@ -2978,7 +3091,10 @@ class _DetailRestoState extends State<DetailResto> {
                                                                                       ),
                                                                                     ),
                                                                                     SizedBox(width: CustomSize.sizeWidth(context) / 32,),
-                                                                                    CustomText.textHeading6(text: "Makan Ditempat",),
+                                                                                    MediaQuery(
+                                                                                        child: CustomText.textHeading6(text: "Makan Ditempat", sizeNew: double.parse(((MediaQuery.of(context).size.width*0.035).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.035).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.035).toString())),
+                                                                                        data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0)
+                                                                                    ),
                                                                                   ],
                                                                                 ),
                                                                               ),
@@ -3117,12 +3233,18 @@ class _DetailRestoState extends State<DetailResto> {
                                                               pref2.setString('latResto1', pref2.getString('latResto'));
                                                               pref2.setString('longResto1', pref2.getString('longResto'));
                                                             },
-                                                            child: Center(child: CustomText.bodyRegular16(text: "Add to cart", color: Colors.white))
+                                                            child: Center(child: MediaQuery(
+                                                                child: CustomText.bodyRegular16(text: "Add to cart", color: Colors.white, sizeNew: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.04)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.04)).toString())),
+                                                                data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0)
+                                                            ))
                                                         ):GestureDetector(
                                                             onTap: ()async{
                                                               Fluttertoast.showToast(msg: 'Maaf toko sedang tutup.');
                                                             },
-                                                            child: Center(child: CustomText.bodyRegular16(text: "Add to cart", color: Colors.white)))
+                                                            child: Center(child: MediaQuery(
+                                                                child: CustomText.bodyRegular16(text: "Add to cart", color: Colors.white, sizeNew: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.04)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.04)).toString())),
+                                                                data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0)
+                                                            )))
                                                       ),
                                                     )
                                                         :SizedBox(),
@@ -3141,10 +3263,13 @@ class _DetailRestoState extends State<DetailResto> {
                                       SizedBox(width: CustomSize.sizeWidth(context) / 48,),
                                       Container(
                                         width: CustomSize.sizeWidth(context) / 1.5,
-                                        child: CustomText.bodyLight14(
-                                            text: promo[index].word,
-                                            minSize: 14,
-                                            maxLines: 2
+                                        child: MediaQuery(
+                                          child: CustomText.bodyLight14(
+                                              text: promo[index].word,
+                                              sizeNew: double.parse(((MediaQuery.of(context).size.width*0.035).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.035).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.035).toString()),
+                                              maxLines: 2
+                                          ),
+                                            data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0)
                                         ),
                                       ),
                                       SizedBox(width: CustomSize.sizeWidth(context) / 48,),
@@ -3173,7 +3298,10 @@ class _DetailRestoState extends State<DetailResto> {
                                   color: Colors.grey[200],
                                   borderRadius: BorderRadius.circular(20)
                               ),
-                              child: Center(child: CustomText.bodyRegular14(text: "See more", color: Colors.grey)),
+                              child: Center(child: MediaQuery(
+                                  child: CustomText.bodyRegular14(text: "See more", color: Colors.grey, sizeNew: double.parse(((MediaQuery.of(context).size.width*0.035).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.035).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.035).toString())),
+                                  data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0)
+                              )),
                             ),
                           ),
                         ):Container(),
@@ -3185,7 +3313,10 @@ class _DetailRestoState extends State<DetailResto> {
                             children: [
                               Divider(),
                               SizedBox(height: CustomSize.sizeHeight(context) / 63,),
-                              CustomText.textHeading4(text: "Rekomendasi Menu", color: CustomColor.primary),
+                              MediaQuery(
+                                  child: CustomText.textHeading4(text: "Rekomendasi Menu", color: CustomColor.primary, sizeNew: double.parse(((MediaQuery.of(context).size.width*0.045).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.045).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.045).toString())),
+                                  data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0)
+                              ),
                             ],
                           ),
                         ):Container(),
@@ -3298,16 +3429,22 @@ class _DetailRestoState extends State<DetailResto> {
                                                   child: Column(
                                                     crossAxisAlignment: CrossAxisAlignment.start,
                                                     children: [
-                                                      CustomText.textHeading5(
-                                                          text: menu[index].name,
-                                                          minSize: 18,
-                                                          maxLines: 1
+                                                      MediaQuery(
+                                                        child: CustomText.textHeading5(
+                                                            text: menu[index].name,
+                                                            sizeNew: double.parse(((MediaQuery.of(context).size.width*0.06).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.06)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.06)).toString()),
+                                                            maxLines: 1
+                                                        ),
+                                                          data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0)
                                                       ),
                                                       SizedBox(height: CustomSize.sizeHeight(context) * 0.0025,),
-                                                      CustomText.bodyRegular16(
-                                                          text: menu[index].desc,
-                                                          maxLines: 100,
-                                                          minSize: 16
+                                                      MediaQuery(
+                                                        child: CustomText.bodyRegular16(
+                                                            text: menu[index].desc,
+                                                            maxLines: 100,
+                                                            sizeNew: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.04)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.04)).toString())
+                                                        ),
+                                                          data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0)
                                                       ),
                                                       SizedBox(height: CustomSize.sizeHeight(context) / 64,),
                                                       Row(
@@ -3318,31 +3455,43 @@ class _DetailRestoState extends State<DetailResto> {
                                                             children: [
                                                               Row(
                                                                 children: [
-                                                                  CustomText.bodyMedium14(
-                                                                      text: 'Harga:  ',
-                                                                      maxLines: 1,
-                                                                      minSize: 14,
-                                                                      color: Colors.grey
+                                                                  MediaQuery(
+                                                                    child: CustomText.bodyMedium14(
+                                                                        text: 'Harga:  ',
+                                                                        maxLines: 1,
+                                                                        sizeNew: double.parse(((MediaQuery.of(context).size.width*0.035).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.035)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.035)).toString()),
+                                                                        color: Colors.grey
+                                                                    ),
+                                                                      data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0)
                                                                   ),
                                                                   (menu[index].price!.discounted != null)?Row(
                                                                     children: [
-                                                                      CustomText.bodyMedium16(
-                                                                          text: NumberFormat.currency(locale: 'id', symbol: '', decimalDigits: 0).format(menu[index].price!.original),
-                                                                          maxLines: 1,
-                                                                          minSize: 16,
-                                                                          decoration: TextDecoration.lineThrough
+                                                                      MediaQuery(
+                                                                        child: CustomText.bodyMedium16(
+                                                                            text: NumberFormat.currency(locale: 'id', symbol: '', decimalDigits: 0).format(menu[index].price!.original),
+                                                                            maxLines: 1,
+                                                                            sizeNew: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.04)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.04)).toString()),
+                                                                            decoration: TextDecoration.lineThrough
+                                                                        ),
+                                                                          data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0)
                                                                       ),
                                                                       SizedBox(width: CustomSize.sizeWidth(context) / 48,),
-                                                                      CustomText.bodyMedium16(
-                                                                          text: NumberFormat.currency(locale: 'id', symbol: '', decimalDigits: 0).format(menu[index].price!.discounted),
-                                                                          maxLines: 1,
-                                                                          minSize: 16
+                                                                      MediaQuery(
+                                                                        child: CustomText.bodyMedium16(
+                                                                            text: NumberFormat.currency(locale: 'id', symbol: '', decimalDigits: 0).format(menu[index].price!.discounted),
+                                                                            maxLines: 1,
+                                                                            sizeNew: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.04)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.04)).toString())
+                                                                        ),
+                                                                          data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0)
                                                                       ),
                                                                     ],
-                                                                  ):CustomText.bodyMedium16(
-                                                                    text: NumberFormat.currency(locale: 'id', symbol: '', decimalDigits: 0).format(menu[index].price!.original),
-                                                                    maxLines: 1,
-                                                                    minSize: 16,
+                                                                  ):MediaQuery(
+                                                                    child: CustomText.bodyMedium16(
+                                                                      text: NumberFormat.currency(locale: 'id', symbol: '', decimalDigits: 0).format(menu[index].price!.original),
+                                                                      maxLines: 1,
+                                                                      sizeNew: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.04)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.04)).toString()),
+                                                                    ),
+                                                                      data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0)
                                                                   ),
                                                                 ],
                                                               ),
@@ -3424,11 +3573,16 @@ class _DetailRestoState extends State<DetailResto> {
                                                                       color: Colors.grey[200],
                                                                       shape: BoxShape.circle
                                                                   ),
-                                                                  child: Center(child: CustomText.textHeading1(text: "-", color: Colors.grey)),
+                                                                  child: Center(child: MediaQuery(child: CustomText.textHeading1(text: "-", color: Colors.grey, sizeNew: double.parse(((MediaQuery.of(context).size.width*0.08).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.08)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.08)).toString())),
+                                                                      data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0)
+                                                                  )),
                                                                 ),
                                                               ),
                                                               SizedBox(width: CustomSize.sizeWidth(context) / 24,),
-                                                              CustomText.bodyRegular16(text: qty[restoId.indexOf(menu[index].id.toString())]),
+                                                              MediaQuery(
+                                                                  child: CustomText.bodyRegular16(text: qty[restoId.indexOf(menu[index].id.toString())], sizeNew: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.04)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.04)).toString())),
+                                                                  data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0)
+                                                              ),
                                                               SizedBox(width: CustomSize.sizeWidth(context) / 24,),
                                                               GestureDetector(
                                                                 onTap: ()async{
@@ -3450,7 +3604,9 @@ class _DetailRestoState extends State<DetailResto> {
                                                                       color: Colors.grey[200],
                                                                       shape: BoxShape.circle
                                                                   ),
-                                                                  child: Center(child: CustomText.textHeading1(text: "+", color: Colors.grey)),
+                                                                  child: Center(child: MediaQuery(child: CustomText.textHeading1(text: "+", color: Colors.grey, sizeNew: double.parse(((MediaQuery.of(context).size.width*0.08).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.08)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.08)).toString())),
+                                                                      data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0)
+                                                                  )),
                                                                 ),
                                                               ),
                                                             ],
@@ -3462,7 +3618,10 @@ class _DetailRestoState extends State<DetailResto> {
                                                           SizedBox(height: CustomSize.sizeHeight(context) / 44,),
                                                           Container(
                                                               alignment: Alignment.centerLeft,
-                                                              child: CustomText.bodyMedium14(text: "Catatan")
+                                                              child: MediaQuery(
+                                                                  child: CustomText.bodyMedium14(text: "Catatan", sizeNew: double.parse(((MediaQuery.of(context).size.width*0.035).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.035)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.035)).toString())),
+                                                                  data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0)
+                                                              )
                                                           ),
                                                           SizedBox(
                                                             height: CustomSize.sizeHeight(context) * 0.005,
@@ -3724,7 +3883,7 @@ class _DetailRestoState extends State<DetailResto> {
                                                                                   ),
                                                                                 ),
                                                                                 SizedBox(width: CustomSize.sizeWidth(context) / 32,),
-                                                                                CustomText.textHeading6(text: "Pesan Antar",),
+                                                                                MediaQuery(child: CustomText.textHeading6(text: "Pesan Antar", sizeNew: double.parse(((MediaQuery.of(context).size.width*0.035).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.035).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.035).toString())), data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0)),
                                                                               ],
                                                                             ),
                                                                           ),
@@ -3858,7 +4017,7 @@ class _DetailRestoState extends State<DetailResto> {
                                                                                   ),
                                                                                 ),
                                                                                 SizedBox(width: CustomSize.sizeWidth(context) / 32,),
-                                                                                CustomText.textHeading6(text: "Ambil Langsung",),
+                                                                                MediaQuery(child: CustomText.textHeading6(text: "Ambil Langsung", sizeNew: double.parse(((MediaQuery.of(context).size.width*0.035).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.035).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.035).toString())), data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0)),
                                                                               ],
                                                                             ),
                                                                           ),
@@ -3994,7 +4153,7 @@ class _DetailRestoState extends State<DetailResto> {
                                                                                   ),
                                                                                 ),
                                                                                 SizedBox(width: CustomSize.sizeWidth(context) / 32,),
-                                                                                CustomText.textHeading6(text: "Makan Ditempat",),
+                                                                                MediaQuery(child: CustomText.textHeading6(text: "Makan Ditempat", sizeNew: double.parse(((MediaQuery.of(context).size.width*0.035).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.035).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.035).toString())), data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0)),
                                                                               ],
                                                                             ),
                                                                           ),
@@ -4306,7 +4465,7 @@ class _DetailRestoState extends State<DetailResto> {
                                                                                             ),
                                                                                           ),
                                                                                           SizedBox(width: CustomSize.sizeWidth(context) / 32,),
-                                                                                          CustomText.textHeading6(text: "Pesan Antar",),
+                                                                                          MediaQuery(child: CustomText.textHeading6(text: "Pesan Antar", sizeNew: double.parse(((MediaQuery.of(context).size.width*0.035).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.035).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.035).toString())), data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0)),
                                                                                         ],
                                                                                       ),
                                                                                     ),
@@ -4440,7 +4599,7 @@ class _DetailRestoState extends State<DetailResto> {
                                                                                             ),
                                                                                           ),
                                                                                           SizedBox(width: CustomSize.sizeWidth(context) / 32,),
-                                                                                          CustomText.textHeading6(text: "Ambil Langsung",),
+                                                                                          MediaQuery(child: CustomText.textHeading6(text: "Ambil Langsung", sizeNew: double.parse(((MediaQuery.of(context).size.width*0.035).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.035).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.035).toString())), data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0)),
                                                                                         ],
                                                                                       ),
                                                                                     ),
@@ -4572,7 +4731,7 @@ class _DetailRestoState extends State<DetailResto> {
                                                                                             ),
                                                                                           ),
                                                                                           SizedBox(width: CustomSize.sizeWidth(context) / 32,),
-                                                                                          CustomText.textHeading6(text: "Makan Ditempat",),
+                                                                                          MediaQuery(child: CustomText.textHeading6(text: "Makan Ditempat", sizeNew: double.parse(((MediaQuery.of(context).size.width*0.035).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.035).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.035).toString())), data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0)),
                                                                                         ],
                                                                                       ),
                                                                                     ),
@@ -4739,7 +4898,7 @@ class _DetailRestoState extends State<DetailResto> {
                                                                                   ),
                                                                                 ),
                                                                                 SizedBox(width: CustomSize.sizeWidth(context) / 32,),
-                                                                                CustomText.textHeading6(text: "Pesan Antar",),
+                                                                                MediaQuery(child: CustomText.textHeading6(text: "Pesan Antar", sizeNew: double.parse(((MediaQuery.of(context).size.width*0.035).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.035).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.035).toString())), data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0)),
                                                                               ],
                                                                             ),
                                                                           ),
@@ -4872,7 +5031,7 @@ class _DetailRestoState extends State<DetailResto> {
                                                                                   ),
                                                                                 ),
                                                                                 SizedBox(width: CustomSize.sizeWidth(context) / 32,),
-                                                                                CustomText.textHeading6(text: "Ambil Langsung",),
+                                                                                MediaQuery(child: CustomText.textHeading6(text: "Ambil Langsung", sizeNew: double.parse(((MediaQuery.of(context).size.width*0.035).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.035).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.035).toString())), data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0)),
                                                                               ],
                                                                             ),
                                                                           ),
@@ -5003,7 +5162,7 @@ class _DetailRestoState extends State<DetailResto> {
                                                                                   ),
                                                                                 ),
                                                                                 SizedBox(width: CustomSize.sizeWidth(context) / 32,),
-                                                                                CustomText.textHeading6(text: "Makan Ditempat",),
+                                                                                MediaQuery(child: CustomText.textHeading6(text: "Makan Ditempat", sizeNew: double.parse(((MediaQuery.of(context).size.width*0.035).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.035).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.035).toString())), data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0)),
                                                                               ],
                                                                             ),
                                                                           ),
@@ -5149,12 +5308,12 @@ class _DetailRestoState extends State<DetailResto> {
                                                           pref2.setString('longResto1', pref2.getString('longResto'));
                                                           setState(() {});
                                                         },
-                                                        child: Center(child: CustomText.bodyRegular16(text: "Add to cart", color: Colors.white))
+                                                        child: Center(child: MediaQuery(child: CustomText.bodyRegular16(text: "Add to cart", color: Colors.white, sizeNew: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.04)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.04)).toString())), data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0)))
                                                     ):GestureDetector(
                                                         onTap: ()async{
                                                           Fluttertoast.showToast(msg: 'Maaf toko sedang tutup.');
                                                         },
-                                                        child: Center(child: CustomText.bodyRegular16(text: "Add to cart", color: Colors.white))),
+                                                        child: Center(child: MediaQuery(child: CustomText.bodyRegular16(text: "Add to cart", color: Colors.white, sizeNew: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.04)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.04)).toString())), data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0)), )),
                                                   ),
                                                 ):Container(),
                                                 SizedBox(height: CustomSize.sizeHeight(context) / 86,),
@@ -5167,7 +5326,7 @@ class _DetailRestoState extends State<DetailResto> {
                                 },
                                 child: Container(
                                   width: CustomSize.sizeWidth(context),
-                                  height: CustomSize.sizeHeight(context) / 4.2,
+                                  height: CustomSize.sizeHeight(context) / 3.8,
                                   child: Column(
                                     children: [
                                       Expanded(
@@ -5183,15 +5342,21 @@ class _DetailRestoState extends State<DetailResto> {
                                                   Column(
                                                     crossAxisAlignment: CrossAxisAlignment.start,
                                                     children: [
-                                                      CustomText.textHeading4(
-                                                          text: menu[index].name,
-                                                          minSize: 18,
-                                                          maxLines: 1
+                                                      MediaQuery(
+                                                        child: CustomText.textHeading4(
+                                                            text: menu[index].name,
+                                                            sizeNew: double.parse(((MediaQuery.of(context).size.width*0.045).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.045).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.045).toString()),
+                                                            maxLines: 1
+                                                        ),
+                                                          data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0)
                                                       ),
-                                                      CustomText.bodyRegular12(
-                                                          text: menu[index].desc,
-                                                          maxLines: 2,
-                                                          minSize: 12
+                                                      MediaQuery(
+                                                        child: CustomText.bodyRegular12(
+                                                            text: menu[index].desc,
+                                                            maxLines: 2,
+                                                            sizeNew: double.parse(((MediaQuery.of(context).size.width*0.03).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.03).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.03).toString())
+                                                        ),
+                                                          data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0)
                                                       ),
                                                     ],
                                                   ),
@@ -5203,35 +5368,47 @@ class _DetailRestoState extends State<DetailResto> {
                                                         children: [
                                                           Row(
                                                             children: [
-                                                              CustomText.bodyMedium14(
-                                                                  text: 'Harga:  ',
-                                                                  maxLines: 1,
-                                                                  minSize: 14,
-                                                                  color: Colors.grey
+                                                              MediaQuery(
+                                                                child: CustomText.bodyMedium14(
+                                                                    text: 'Harga:  ',
+                                                                    maxLines: 1,
+                                                                    sizeNew: double.parse(((MediaQuery.of(context).size.width*0.035).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.035)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.035)).toString()),
+                                                                    color: Colors.grey
+                                                                ),
+                                                                  data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0)
                                                               ),
                                                               (menu[index].price!.discounted != null)?Row(
                                                                 children: [
-                                                                  CustomText.bodyMedium16(
-                                                                      text: NumberFormat.currency(locale: 'id', symbol: '', decimalDigits: 0).format(menu[index].price!.original),
-                                                                      maxLines: 1,
-                                                                      minSize: 16,
-                                                                      decoration: TextDecoration.lineThrough
+                                                                  MediaQuery(
+                                                                    child: CustomText.bodyMedium16(
+                                                                        text: NumberFormat.currency(locale: 'id', symbol: '', decimalDigits: 0).format(menu[index].price!.original),
+                                                                        maxLines: 1,
+                                                                        sizeNew: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.04)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.04)).toString()),
+                                                                        decoration: TextDecoration.lineThrough
+                                                                    ),
+                                                                      data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0)
                                                                   ),
                                                                   SizedBox(width: CustomSize.sizeWidth(context) / 48,),
-                                                                  CustomText.bodyMedium16(
-                                                                      text: NumberFormat.currency(locale: 'id', symbol: '', decimalDigits: 0).format(menu[index].price!.discounted),
-                                                                      maxLines: 1,
-                                                                      minSize: 16
+                                                                  MediaQuery(
+                                                                    child: CustomText.bodyMedium16(
+                                                                        text: NumberFormat.currency(locale: 'id', symbol: '', decimalDigits: 0).format(menu[index].price!.discounted),
+                                                                        maxLines: 1,
+                                                                        sizeNew: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.04)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.04)).toString())
+                                                                    ),
+                                                                      data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0)
                                                                   ),
                                                                 ],
-                                                              ):CustomText.bodyMedium16(
-                                                                  text: NumberFormat.currency(locale: 'id', symbol: '', decimalDigits: 0).format(menu[index].price!.original),
-                                                                  maxLines: 1,
-                                                                  minSize: 16,
+                                                              ):MediaQuery(
+                                                                child: CustomText.bodyMedium16(
+                                                                    text: NumberFormat.currency(locale: 'id', symbol: '', decimalDigits: 0).format(menu[index].price!.original),
+                                                                    maxLines: 1,
+                                                                  sizeNew: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.04)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.04)).toString()),
+                                                                ),
+                                                                  data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0)
                                                               ),
                                                             ],
                                                           ),
-                                                          SizedBox(height: CustomSize.sizeHeight(context) / 63,),
+                                                          // SizedBox(height: CustomSize.sizeHeight(context) / 63,),
                                                           // Row(
                                                           //   children: [
                                                           //     CustomText.bodyMedium14(
@@ -5443,7 +5620,7 @@ class _DetailRestoState extends State<DetailResto> {
                                                                             ),
                                                                           ),
                                                                           SizedBox(width: CustomSize.sizeWidth(context) / 32,),
-                                                                          CustomText.textHeading6(text: "Pesan Antar",),
+                                                                          MediaQuery(child: CustomText.textHeading6(text: "Pesan Antar", sizeNew: double.parse(((MediaQuery.of(context).size.width*0.035).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.035).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.035).toString())), data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0)),
                                                                         ],
                                                                       ),
                                                                     ),
@@ -5569,7 +5746,7 @@ class _DetailRestoState extends State<DetailResto> {
                                                                             ),
                                                                           ),
                                                                           SizedBox(width: CustomSize.sizeWidth(context) / 32,),
-                                                                          CustomText.textHeading6(text: "Ambil Langsung",),
+                                                                          MediaQuery(child: CustomText.textHeading6(text: "Ambil Langsung", sizeNew: double.parse(((MediaQuery.of(context).size.width*0.035).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.035).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.035).toString())), data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0)),
                                                                         ],
                                                                       ),
                                                                     ),
@@ -5693,7 +5870,7 @@ class _DetailRestoState extends State<DetailResto> {
                                                                             ),
                                                                           ),
                                                                           SizedBox(width: CustomSize.sizeWidth(context) / 32,),
-                                                                          CustomText.textHeading6(text: "Makan Ditempat",),
+                                                                          MediaQuery(child: CustomText.textHeading6(text: "Makan Ditempat", sizeNew: double.parse(((MediaQuery.of(context).size.width*0.035).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.035).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.035).toString())), data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0)),
                                                                         ],
                                                                       ),
                                                                     ),
@@ -6015,7 +6192,7 @@ class _DetailRestoState extends State<DetailResto> {
                                                                                       ),
                                                                                     ),
                                                                                     SizedBox(width: CustomSize.sizeWidth(context) / 32,),
-                                                                                    CustomText.textHeading6(text: "Pesan Antar",),
+                                                                                    MediaQuery(child: CustomText.textHeading6(text: "Pesan Antar", sizeNew: double.parse(((MediaQuery.of(context).size.width*0.035).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.035).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.035).toString())), data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0)),
                                                                                   ],
                                                                                 ),
                                                                               ),
@@ -6141,7 +6318,7 @@ class _DetailRestoState extends State<DetailResto> {
                                                                                       ),
                                                                                     ),
                                                                                     SizedBox(width: CustomSize.sizeWidth(context) / 32,),
-                                                                                    CustomText.textHeading6(text: "Ambil Langsung",),
+                                                                                    MediaQuery(child: CustomText.textHeading6(text: "Ambil Langsung", sizeNew: double.parse(((MediaQuery.of(context).size.width*0.035).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.035).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.035).toString())), data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0)),
                                                                                   ],
                                                                                 ),
                                                                               ),
@@ -6265,7 +6442,7 @@ class _DetailRestoState extends State<DetailResto> {
                                                                                       ),
                                                                                     ),
                                                                                     SizedBox(width: CustomSize.sizeWidth(context) / 32,),
-                                                                                    CustomText.textHeading6(text: "Makan Ditempat",),
+                                                                                    MediaQuery(child: CustomText.textHeading6(text: "Makan Ditempat", sizeNew: double.parse(((MediaQuery.of(context).size.width*0.035).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.035).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.035).toString())), data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0)),
                                                                                   ],
                                                                                 ),
                                                                               ),
@@ -6419,7 +6596,7 @@ class _DetailRestoState extends State<DetailResto> {
                                                                             ),
                                                                           ),
                                                                           SizedBox(width: CustomSize.sizeWidth(context) / 32,),
-                                                                          CustomText.textHeading6(text: "Pesan Antar",),
+                                                                          MediaQuery(child: CustomText.textHeading6(text: "Pesan Antar", sizeNew: double.parse(((MediaQuery.of(context).size.width*0.035).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.035).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.035).toString())), data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0)),
                                                                         ],
                                                                       ),
                                                                     ),
@@ -6541,7 +6718,7 @@ class _DetailRestoState extends State<DetailResto> {
                                                                             ),
                                                                           ),
                                                                           SizedBox(width: CustomSize.sizeWidth(context) / 32,),
-                                                                          CustomText.textHeading6(text: "Ambil Langsung",),
+                                                                          MediaQuery(child: CustomText.textHeading6(text: "Ambil Langsung", sizeNew: double.parse(((MediaQuery.of(context).size.width*0.035).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.035).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.035).toString())), data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0)),
                                                                         ],
                                                                       ),
                                                                     ),
@@ -6661,7 +6838,7 @@ class _DetailRestoState extends State<DetailResto> {
                                                                             ),
                                                                           ),
                                                                           SizedBox(width: CustomSize.sizeWidth(context) / 32,),
-                                                                          CustomText.textHeading6(text: "Makan Ditempat",),
+                                                                          MediaQuery(child: CustomText.textHeading6(text: "Makan Ditempat", sizeNew: double.parse(((MediaQuery.of(context).size.width*0.035).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.035).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.035).toString())), data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0)),
                                                                         ],
                                                                       ),
                                                                     ),
@@ -6819,7 +6996,7 @@ class _DetailRestoState extends State<DetailResto> {
                                                         color: Colors.grey[200],
                                                         borderRadius: BorderRadius.circular(20)
                                                     ),
-                                                    child: Center(child: CustomText.bodyRegular16(text: "Add", color: Colors.grey)),
+                                                    child: Center(child: MediaQuery(child: CustomText.bodyRegular16(text: "Add", color: Colors.grey, sizeNew: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.04)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.04)).toString())), data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0))),
                                                   ),
                                                 ):GestureDetector(
                                                   onTap: (){
@@ -6833,7 +7010,7 @@ class _DetailRestoState extends State<DetailResto> {
                                                         borderRadius: BorderRadius.circular(20)
                                                     ),
                                                     child: Center(
-                                                        child: CustomText.bodyRegular16(text: "Add", color: Colors.grey)),
+                                                        child: MediaQuery(child: CustomText.bodyRegular16(text: "Add", color: Colors.grey, sizeNew: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.04)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.04)).toString())), data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0))),
                                                   ),
                                                 ):Row(
                                                   children: [
@@ -6865,11 +7042,11 @@ class _DetailRestoState extends State<DetailResto> {
                                                             color: Colors.grey[200],
                                                             shape: BoxShape.circle
                                                         ),
-                                                        child: Center(child: CustomText.textHeading1(text: "-", color: Colors.grey)),
+                                                        child: Center(child: MediaQuery(child: CustomText.textHeading1(text: "-", color: Colors.grey, sizeNew: double.parse(((MediaQuery.of(context).size.width*0.08).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.08)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.08)).toString())), data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0))),
                                                       ),
                                                     ),
                                                     SizedBox(width: CustomSize.sizeWidth(context) / 24,),
-                                                    CustomText.bodyRegular16(text: qty[restoId.indexOf(menu[index].id.toString())]),
+                                                    MediaQuery(child: CustomText.bodyRegular16(text: qty[restoId.indexOf(menu[index].id.toString())], sizeNew: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.04)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.04)).toString())), data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0)),
                                                     SizedBox(width: CustomSize.sizeWidth(context) / 24,),
                                                     GestureDetector(
                                                       onTap: ()async{
@@ -6891,7 +7068,7 @@ class _DetailRestoState extends State<DetailResto> {
                                                             color: Colors.grey[200],
                                                             shape: BoxShape.circle
                                                         ),
-                                                        child: Center(child: CustomText.textHeading1(text: "+", color: Colors.grey)),
+                                                        child: Center(child: MediaQuery(child: CustomText.textHeading1(text: "+", color: Colors.grey, sizeNew: double.parse(((MediaQuery.of(context).size.width*0.08).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.08)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.08)).toString())), data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0))),
                                                       ),
                                                     ),
                                                   ],
@@ -6965,7 +7142,7 @@ class _DetailRestoState extends State<DetailResto> {
                                       Row(
                                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                         children: [
-                                          CustomText.textHeading4(text: categoryMenu[index].name, color: CustomColor.primary),
+                                          MediaQuery(child: CustomText.textHeading4(text: categoryMenu[index].name, color: CustomColor.primary, sizeNew: double.parse(((MediaQuery.of(context).size.width*0.045).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.045).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.045).toString())), data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0)),
                                           // Icon(FontAwesomeIcons.chevronRight, color: CustomColor.primary,)
                                         ],
                                       ),
@@ -7078,18 +7255,24 @@ class _DetailRestoState extends State<DetailResto> {
                                                                     child: Column(
                                                                       crossAxisAlignment: CrossAxisAlignment.start,
                                                                       children: [
-                                                                        CustomText.textHeading5(
-                                                                            text: categoryMenu[index].menu[idx].name,
-                                                                            minSize: 18,
-                                                                            maxLines: 1
+                                                                        MediaQuery(
+                                                                          child: CustomText.textHeading5(
+                                                                              text: categoryMenu[index].menu[idx].name,
+                                                                              sizeNew: double.parse(((MediaQuery.of(context).size.width*0.06).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.06)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.06)).toString()),
+                                                                              maxLines: 1
+                                                                          ),
+                                                                            data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0)
                                                                         ),
                                                                         SizedBox(height: CustomSize.sizeHeight(context) * 0.0025,),
-                                                                        CustomText.bodyRegular16(
-                                                                            text: categoryMenu[index].menu[idx].desc,
-                                                                            maxLines: 100,
-                                                                            minSize: 16
+                                                                        MediaQuery(
+                                                                          child: CustomText.bodyRegular16(
+                                                                              text: categoryMenu[index].menu[idx].desc,
+                                                                              maxLines: 100,
+                                                                              sizeNew: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.04)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.04)).toString())
+                                                                          ),
+                                                                            data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0)
                                                                         ),
-                                                                        SizedBox(height: CustomSize.sizeHeight(context) / 32,),
+                                                                        SizedBox(height: CustomSize.sizeHeight(context) / 64,),
                                                                         Row(
                                                                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                                                           children: [
@@ -7098,31 +7281,43 @@ class _DetailRestoState extends State<DetailResto> {
                                                                               children: [
                                                                                 Row(
                                                                                   children: [
-                                                                                    CustomText.bodyMedium14(
-                                                                                        text: 'Harga:  ',
-                                                                                        maxLines: 1,
-                                                                                        minSize: 14,
-                                                                                        color: Colors.grey
+                                                                                    MediaQuery(
+                                                                                      child: CustomText.bodyMedium14(
+                                                                                          text: 'Harga:  ',
+                                                                                          maxLines: 1,
+                                                                                          sizeNew: double.parse(((MediaQuery.of(context).size.width*0.035).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.035)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.035)).toString()),
+                                                                                          color: Colors.grey
+                                                                                      ),
+                                                                                        data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0)
                                                                                     ),
                                                                                     (categoryMenu[index].menu[idx].price!.discounted != null)?Row(
                                                                                       children: [
-                                                                                        CustomText.bodyMedium16(
-                                                                                            text: NumberFormat.currency(locale: 'id', symbol: '', decimalDigits: 0).format(categoryMenu[index].menu[idx].price!.original!),
-                                                                                            maxLines: 1,
-                                                                                            minSize: 16,
-                                                                                            decoration: TextDecoration.lineThrough
+                                                                                        MediaQuery(
+                                                                                          child: CustomText.bodyMedium16(
+                                                                                              text: NumberFormat.currency(locale: 'id', symbol: '', decimalDigits: 0).format(categoryMenu[index].menu[idx].price!.original!),
+                                                                                              maxLines: 1,
+                                                                                              sizeNew: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.04)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.04)).toString()),
+                                                                                              decoration: TextDecoration.lineThrough
+                                                                                          ),
+                                                                                            data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0)
                                                                                         ),
                                                                                         SizedBox(width: CustomSize.sizeWidth(context) / 48,),
-                                                                                        CustomText.bodyMedium16(
-                                                                                            text: NumberFormat.currency(locale: 'id', symbol: '', decimalDigits: 0).format(categoryMenu[index].menu[idx].price!.discounted!),
-                                                                                            maxLines: 1,
-                                                                                            minSize: 16
+                                                                                        MediaQuery(
+                                                                                          child: CustomText.bodyMedium16(
+                                                                                              text: NumberFormat.currency(locale: 'id', symbol: '', decimalDigits: 0).format(categoryMenu[index].menu[idx].price!.discounted!),
+                                                                                              maxLines: 1,
+                                                                                              sizeNew: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.04)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.04)).toString())
+                                                                                          ),
+                                                                                            data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0)
                                                                                         ),
                                                                                       ],
-                                                                                    ):CustomText.bodyMedium16(
-                                                                                        text: NumberFormat.currency(locale: 'id', symbol: '', decimalDigits: 0).format(categoryMenu[index].menu[idx].price!.original!),
-                                                                                        maxLines: 1,
-                                                                                        minSize: 16
+                                                                                    ):MediaQuery(
+                                                                                      child: CustomText.bodyMedium16(
+                                                                                          text: NumberFormat.currency(locale: 'id', symbol: '', decimalDigits: 0).format(categoryMenu[index].menu[idx].price!.original!),
+                                                                                          maxLines: 1,
+                                                                                          sizeNew: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.04)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.04)).toString())
+                                                                                      ),
+                                                                                        data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0)
                                                                                     ),
                                                                                   ],
                                                                                 ),
@@ -7158,11 +7353,11 @@ class _DetailRestoState extends State<DetailResto> {
                                                                                         color: Colors.grey[200],
                                                                                         shape: BoxShape.circle
                                                                                     ),
-                                                                                    child: Center(child: CustomText.textHeading1(text: "-", color: Colors.grey)),
+                                                                                    child: Center(child: MediaQuery(child: CustomText.textHeading1(text: "-", color: Colors.grey, sizeNew: double.parse(((MediaQuery.of(context).size.width*0.08).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.08)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.08)).toString())), data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0))),
                                                                                   ),
                                                                                 ),
                                                                                 SizedBox(width: CustomSize.sizeWidth(context) / 24,),
-                                                                                CustomText.bodyRegular16(text: qty[restoId.indexOf(categoryMenu[index].menu[idx].id.toString())]),
+                                                                                MediaQuery(child: CustomText.bodyRegular16(text: qty[restoId.indexOf(categoryMenu[index].menu[idx].id.toString())], sizeNew: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.04)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.04)).toString())), data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0)),
                                                                                 SizedBox(width: CustomSize.sizeWidth(context) / 24,),
                                                                                 GestureDetector(
                                                                                   onTap: ()async{
@@ -7183,7 +7378,7 @@ class _DetailRestoState extends State<DetailResto> {
                                                                                         color: Colors.grey[200],
                                                                                         shape: BoxShape.circle
                                                                                     ),
-                                                                                    child: Center(child: CustomText.textHeading1(text: "+", color: Colors.grey)),
+                                                                                    child: Center(child: MediaQuery(child: CustomText.textHeading1(text: "+", color: Colors.grey, sizeNew: double.parse(((MediaQuery.of(context).size.width*0.08).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.08)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.08)).toString())), data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0))),
                                                                                   ),
                                                                                 ),
                                                                               ],
@@ -7195,7 +7390,7 @@ class _DetailRestoState extends State<DetailResto> {
                                                                             SizedBox(height: CustomSize.sizeHeight(context) / 44,),
                                                                             Container(
                                                                                 alignment: Alignment.centerLeft,
-                                                                                child: CustomText.bodyMedium14(text: "Catatan")
+                                                                                child: MediaQuery(child: CustomText.bodyMedium14(text: "Catatan", sizeNew: double.parse(((MediaQuery.of(context).size.width*0.035).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.035)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.035)).toString())), data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0))
                                                                             ),
                                                                             SizedBox(
                                                                               height: CustomSize.sizeHeight(context) * 0.005,
@@ -7448,7 +7643,7 @@ class _DetailRestoState extends State<DetailResto> {
                                                                                                     ),
                                                                                                   ),
                                                                                                   SizedBox(width: CustomSize.sizeWidth(context) / 32,),
-                                                                                                  CustomText.textHeading6(text: "Pesan Antar",),
+                                                                                                  MediaQuery(child: CustomText.textHeading6(text: "Pesan Antar", sizeNew: double.parse(((MediaQuery.of(context).size.width*0.035).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.035).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.035).toString())), data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0)),
                                                                                                 ],
                                                                                               ),
                                                                                             ),
@@ -7574,7 +7769,7 @@ class _DetailRestoState extends State<DetailResto> {
                                                                                                     ),
                                                                                                   ),
                                                                                                   SizedBox(width: CustomSize.sizeWidth(context) / 32,),
-                                                                                                  CustomText.textHeading6(text: "Ambil Langsung",),
+                                                                                                  MediaQuery(child: CustomText.textHeading6(text: "Ambil Langsung", sizeNew: double.parse(((MediaQuery.of(context).size.width*0.035).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.035).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.035).toString())), data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0)),
                                                                                                 ],
                                                                                               ),
                                                                                             ),
@@ -7697,7 +7892,7 @@ class _DetailRestoState extends State<DetailResto> {
                                                                                                     ),
                                                                                                   ),
                                                                                                   SizedBox(width: CustomSize.sizeWidth(context) / 32,),
-                                                                                                  CustomText.textHeading6(text: "Makan Ditempat",),
+                                                                                                  MediaQuery(child: CustomText.textHeading6(text: "Makan Ditempat", sizeNew: double.parse(((MediaQuery.of(context).size.width*0.035).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.035).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.035).toString())), data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0)),
                                                                                                 ],
                                                                                               ),
                                                                                             ),
@@ -8017,7 +8212,7 @@ class _DetailRestoState extends State<DetailResto> {
                                                                                                               ),
                                                                                                             ),
                                                                                                             SizedBox(width: CustomSize.sizeWidth(context) / 32,),
-                                                                                                            CustomText.textHeading6(text: "Pesan Antar",),
+                                                                                                            MediaQuery(child: CustomText.textHeading6(text: "Pesan Antar", sizeNew: double.parse(((MediaQuery.of(context).size.width*0.035).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.035).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.035).toString())), data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0)),
                                                                                                           ],
                                                                                                         ),
                                                                                                       ),
@@ -8149,7 +8344,7 @@ class _DetailRestoState extends State<DetailResto> {
                                                                                                               ),
                                                                                                             ),
                                                                                                             SizedBox(width: CustomSize.sizeWidth(context) / 32,),
-                                                                                                            CustomText.textHeading6(text: "Ambil Langsung",),
+                                                                                                            MediaQuery(child: CustomText.textHeading6(text: "Ambil Langsung", sizeNew: double.parse(((MediaQuery.of(context).size.width*0.035).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.035).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.035).toString())), data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0)),
                                                                                                           ],
                                                                                                         ),
                                                                                                       ),
@@ -8278,7 +8473,7 @@ class _DetailRestoState extends State<DetailResto> {
                                                                                                               ),
                                                                                                             ),
                                                                                                             SizedBox(width: CustomSize.sizeWidth(context) / 32,),
-                                                                                                            CustomText.textHeading6(text: "Makan Ditempat",),
+                                                                                                            MediaQuery(child: CustomText.textHeading6(text: "Makan Ditempat", sizeNew: double.parse(((MediaQuery.of(context).size.width*0.035).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.035).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.035).toString())), data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0)),
                                                                                                           ],
                                                                                                         ),
                                                                                                       ),
@@ -8437,7 +8632,7 @@ class _DetailRestoState extends State<DetailResto> {
                                                                                                     ),
                                                                                                   ),
                                                                                                   SizedBox(width: CustomSize.sizeWidth(context) / 32,),
-                                                                                                  CustomText.textHeading6(text: "Pesan Antar",),
+                                                                                                  MediaQuery(child: CustomText.textHeading6(text: "Pesan Antar", sizeNew: double.parse(((MediaQuery.of(context).size.width*0.035).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.035).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.035).toString())), data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0)),
                                                                                                 ],
                                                                                               ),
                                                                                             ),
@@ -8565,7 +8760,7 @@ class _DetailRestoState extends State<DetailResto> {
                                                                                                     ),
                                                                                                   ),
                                                                                                   SizedBox(width: CustomSize.sizeWidth(context) / 32,),
-                                                                                                  CustomText.textHeading6(text: "Ambil Langsung",),
+                                                                                                  MediaQuery(child: CustomText.textHeading6(text: "Ambil Langsung", sizeNew: double.parse(((MediaQuery.of(context).size.width*0.035).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.035).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.035).toString())), data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0)),
                                                                                                 ],
                                                                                               ),
                                                                                             ),
@@ -8690,7 +8885,7 @@ class _DetailRestoState extends State<DetailResto> {
                                                                                                     ),
                                                                                                   ),
                                                                                                   SizedBox(width: CustomSize.sizeWidth(context) / 32,),
-                                                                                                  CustomText.textHeading6(text: "Makan Ditempat",),
+                                                                                                  MediaQuery(child: CustomText.textHeading6(text: "Makan Ditempat", sizeNew: double.parse(((MediaQuery.of(context).size.width*0.035).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.035).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.035).toString())), data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0)),
                                                                                                 ],
                                                                                               ),
                                                                                             ),
@@ -8834,12 +9029,12 @@ class _DetailRestoState extends State<DetailResto> {
                                                                             // print('ini in cart 2 '+pref.getString('menuJson'));
 
                                                                           },
-                                                                          child: Center(child: CustomText.bodyRegular16(text: "Add to cart", color: Colors.white))
+                                                                          child: Center(child: MediaQuery(child: CustomText.bodyRegular16(text: "Add to cart", color: Colors.white, sizeNew: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.04)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.04)).toString())), data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0)))
                                                                       ):GestureDetector(
                                                                           onTap: ()async{
                                                                             Fluttertoast.showToast(msg: 'Maaf toko sedang tutup.');
                                                                           },
-                                                                          child: Center(child: CustomText.bodyRegular16(text: "Add to cart", color: Colors.white))),
+                                                                          child: Center(child: MediaQuery(child: CustomText.bodyRegular16(text: "Add to cart", color: Colors.white, sizeNew: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.04)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.04)).toString())), data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0)))),
                                                                     ),
                                                                   ):Container(),
                                                                   SizedBox(height: CustomSize.sizeHeight(context) / 86,),
@@ -8868,15 +9063,21 @@ class _DetailRestoState extends State<DetailResto> {
                                                                 Column(
                                                                   crossAxisAlignment: CrossAxisAlignment.start,
                                                                   children: [
-                                                                    CustomText.textHeading4(
-                                                                        text: categoryMenu[index].menu[idx].name,
-                                                                        minSize: 18,
-                                                                        maxLines: 1
+                                                                    MediaQuery(
+                                                                      child: CustomText.textHeading4(
+                                                                          text: categoryMenu[index].menu[idx].name,
+                                                                          sizeNew: double.parse(((MediaQuery.of(context).size.width*0.045).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.045).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.045).toString()),
+                                                                          maxLines: 1
+                                                                      ),
+                                                                        data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0)
                                                                     ),
-                                                                    CustomText.bodyRegular12(
-                                                                        text: categoryMenu[index].menu[idx].desc,
-                                                                        maxLines: 2,
-                                                                        minSize: 12
+                                                                    MediaQuery(
+                                                                      child: CustomText.bodyRegular12(
+                                                                          text: categoryMenu[index].menu[idx].desc,
+                                                                          maxLines: 2,
+                                                                          sizeNew: double.parse(((MediaQuery.of(context).size.width*0.03).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.03).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.03).toString())
+                                                                      ),
+                                                                        data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0)
                                                                     ),
                                                                   ],
                                                                 ),
@@ -8888,31 +9089,43 @@ class _DetailRestoState extends State<DetailResto> {
                                                                       children: [
                                                                         Row(
                                                                           children: [
-                                                                            CustomText.bodyMedium14(
-                                                                                text: 'Harga:  ',
-                                                                                maxLines: 1,
-                                                                                minSize: 14,
-                                                                                color: Colors.grey
+                                                                            MediaQuery(
+                                                                              child: CustomText.bodyMedium14(
+                                                                                  text: 'Harga:  ',
+                                                                                  maxLines: 1,
+                                                                                  sizeNew: double.parse(((MediaQuery.of(context).size.width*0.035).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.035)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.035)).toString()),
+                                                                                  color: Colors.grey
+                                                                              ),
+                                                                                data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0)
                                                                             ),
                                                                             (categoryMenu[index].menu[idx].price!.discounted != null)?Row(
                                                                               children: [
-                                                                                CustomText.bodyMedium16(
-                                                                                    text: NumberFormat.currency(locale: 'id', symbol: '', decimalDigits: 0).format(categoryMenu[index].menu[idx].price!.original!),
-                                                                                    maxLines: 1,
-                                                                                    minSize: 16,
-                                                                                    decoration: TextDecoration.lineThrough
+                                                                                MediaQuery(
+                                                                                  child: CustomText.bodyMedium16(
+                                                                                      text: NumberFormat.currency(locale: 'id', symbol: '', decimalDigits: 0).format(categoryMenu[index].menu[idx].price!.original!),
+                                                                                      maxLines: 1,
+                                                                                      sizeNew: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.04)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.04)).toString()),
+                                                                                      decoration: TextDecoration.lineThrough
+                                                                                  ),
+                                                                                    data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0)
                                                                                 ),
                                                                                 SizedBox(width: CustomSize.sizeWidth(context) / 48,),
-                                                                                CustomText.bodyMedium16(
-                                                                                    text: NumberFormat.currency(locale: 'id', symbol: '', decimalDigits: 0).format(categoryMenu[index].menu[idx].price!.discounted!),
-                                                                                    maxLines: 1,
-                                                                                    minSize: 16
+                                                                                MediaQuery(
+                                                                                  child: CustomText.bodyMedium16(
+                                                                                      text: NumberFormat.currency(locale: 'id', symbol: '', decimalDigits: 0).format(categoryMenu[index].menu[idx].price!.discounted!),
+                                                                                      maxLines: 1,
+                                                                                      sizeNew: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.04)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.04)).toString())
+                                                                                  ),
+                                                                                    data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0)
                                                                                 ),
                                                                               ],
-                                                                            ):CustomText.bodyMedium16(
-                                                                                text: NumberFormat.currency(locale: 'id', symbol: '', decimalDigits: 0).format(categoryMenu[index].menu[idx].price!.original!),
-                                                                                maxLines: 1,
-                                                                                minSize: 16
+                                                                            ):MediaQuery(
+                                                                              child: CustomText.bodyMedium16(
+                                                                                  text: NumberFormat.currency(locale: 'id', symbol: '', decimalDigits: 0).format(categoryMenu[index].menu[idx].price!.original!),
+                                                                                  maxLines: 1,
+                                                                                  sizeNew: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.04)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.04)).toString())
+                                                                              ),
+                                                                                data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0)
                                                                             ),
                                                                           ],
                                                                         ),
@@ -9110,7 +9323,7 @@ class _DetailRestoState extends State<DetailResto> {
                                                                                           ),
                                                                                         ),
                                                                                         SizedBox(width: CustomSize.sizeWidth(context) / 32,),
-                                                                                        CustomText.textHeading6(text: "Pesan Antar",),
+                                                                                        MediaQuery(child: CustomText.textHeading6(text: "Pesan Antar", sizeNew: double.parse(((MediaQuery.of(context).size.width*0.035).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.035).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.035).toString())), data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0)),
                                                                                       ],
                                                                                     ),
                                                                                   ),
@@ -9234,7 +9447,7 @@ class _DetailRestoState extends State<DetailResto> {
                                                                                           ),
                                                                                         ),
                                                                                         SizedBox(width: CustomSize.sizeWidth(context) / 32,),
-                                                                                        CustomText.textHeading6(text: "Ambil Langsung",),
+                                                                                        MediaQuery(child: CustomText.textHeading6(text: "Ambil Langsung", sizeNew: double.parse(((MediaQuery.of(context).size.width*0.035).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.035).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.035).toString())), data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0)),
                                                                                       ],
                                                                                     ),
                                                                                   ),
@@ -9356,7 +9569,7 @@ class _DetailRestoState extends State<DetailResto> {
                                                                                           ),
                                                                                         ),
                                                                                         SizedBox(width: CustomSize.sizeWidth(context) / 32,),
-                                                                                        CustomText.textHeading6(text: "Makan Ditempat",),
+                                                                                        MediaQuery(child: CustomText.textHeading6(text: "Makan Ditempat", sizeNew: double.parse(((MediaQuery.of(context).size.width*0.035).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.035).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.035).toString())), data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0)),
                                                                                       ],
                                                                                     ),
                                                                                   ),
@@ -9666,7 +9879,7 @@ class _DetailRestoState extends State<DetailResto> {
                                                                                                     ),
                                                                                                   ),
                                                                                                   SizedBox(width: CustomSize.sizeWidth(context) / 32,),
-                                                                                                  CustomText.textHeading6(text: "Pesan Antar",),
+                                                                                                  MediaQuery(child: CustomText.textHeading6(text: "Pesan Antar", sizeNew: double.parse(((MediaQuery.of(context).size.width*0.035).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.035).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.035).toString())), data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0)),
                                                                                                 ],
                                                                                               ),
                                                                                             ),
@@ -9790,7 +10003,7 @@ class _DetailRestoState extends State<DetailResto> {
                                                                                                     ),
                                                                                                   ),
                                                                                                   SizedBox(width: CustomSize.sizeWidth(context) / 32,),
-                                                                                                  CustomText.textHeading6(text: "Ambil Langsung",),
+                                                                                                  MediaQuery(child: CustomText.textHeading6(text: "Ambil Langsung", sizeNew: double.parse(((MediaQuery.of(context).size.width*0.035).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.035).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.035).toString())), data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0)),
                                                                                                 ],
                                                                                               ),
                                                                                             ),
@@ -9912,7 +10125,7 @@ class _DetailRestoState extends State<DetailResto> {
                                                                                                     ),
                                                                                                   ),
                                                                                                   SizedBox(width: CustomSize.sizeWidth(context) / 32,),
-                                                                                                  CustomText.textHeading6(text: "Makan Ditempat",),
+                                                                                                  MediaQuery(child: CustomText.textHeading6(text: "Makan Ditempat", sizeNew: double.parse(((MediaQuery.of(context).size.width*0.035).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.035).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.035).toString())), data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0)),
                                                                                                 ],
                                                                                               ),
                                                                                             ),
@@ -10063,7 +10276,7 @@ class _DetailRestoState extends State<DetailResto> {
                                                                                         ),
                                                                                       ),
                                                                                       SizedBox(width: CustomSize.sizeWidth(context) / 32,),
-                                                                                      CustomText.textHeading6(text: "Pesan Antar",),
+                                                                                      MediaQuery(child: CustomText.textHeading6(text: "Pesan Antar", sizeNew: double.parse(((MediaQuery.of(context).size.width*0.035).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.035).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.035).toString())), data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0)),
                                                                                     ],
                                                                                   ),
                                                                                 ),
@@ -10183,7 +10396,7 @@ class _DetailRestoState extends State<DetailResto> {
                                                                                         ),
                                                                                       ),
                                                                                       SizedBox(width: CustomSize.sizeWidth(context) / 32,),
-                                                                                      CustomText.textHeading6(text: "Ambil Langsung",),
+                                                                                      MediaQuery(child: CustomText.textHeading6(text: "Ambil Langsung", sizeNew: double.parse(((MediaQuery.of(context).size.width*0.035).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.035).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.035).toString())), data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0)),
                                                                                     ],
                                                                                   ),
                                                                                 ),
@@ -10301,7 +10514,7 @@ class _DetailRestoState extends State<DetailResto> {
                                                                                         ),
                                                                                       ),
                                                                                       SizedBox(width: CustomSize.sizeWidth(context) / 32,),
-                                                                                      CustomText.textHeading6(text: "Makan Ditempat",),
+                                                                                      MediaQuery(child: CustomText.textHeading6(text: "Makan Ditempat", sizeNew: double.parse(((MediaQuery.of(context).size.width*0.035).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.035).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.035).toString())), data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0)),
                                                                                     ],
                                                                                   ),
                                                                                 ),
@@ -10444,7 +10657,7 @@ class _DetailRestoState extends State<DetailResto> {
                                                                       color: Colors.grey[200],
                                                                       borderRadius: BorderRadius.circular(20)
                                                                   ),
-                                                                  child: Center(child: CustomText.bodyRegular16(text: "Add", color: Colors.grey)),
+                                                                  child: Center(child: MediaQuery(child: CustomText.bodyRegular16(text: "Add", color: Colors.grey, sizeNew: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.04)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.04)).toString())), data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0))),
                                                                 ),
                                                               ):GestureDetector(
                                                                 onTap: (){
@@ -10458,7 +10671,7 @@ class _DetailRestoState extends State<DetailResto> {
                                                                       borderRadius: BorderRadius.circular(20)
                                                                   ),
                                                                   child: Center(
-                                                                      child: CustomText.bodyRegular16(text: "Add", color: Colors.grey)),
+                                                                      child: MediaQuery(child: CustomText.bodyRegular16(text: "Add", color: Colors.grey, sizeNew: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.04)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.04)).toString())), data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0))),
                                                                 ),
                                                               ):Row(
                                                                 children: [
@@ -10488,11 +10701,11 @@ class _DetailRestoState extends State<DetailResto> {
                                                                           color: Colors.grey[200],
                                                                           shape: BoxShape.circle
                                                                       ),
-                                                                      child: Center(child: CustomText.textHeading1(text: "-", color: Colors.grey)),
+                                                                      child: Center(child: MediaQuery(child: CustomText.textHeading1(text: "-", color: Colors.grey, sizeNew: double.parse(((MediaQuery.of(context).size.width*0.08).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.08)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.08)).toString())), data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0))),
                                                                     ),
                                                                   ),
                                                                   SizedBox(width: CustomSize.sizeWidth(context) / 24,),
-                                                                  CustomText.bodyRegular16(text: qty[restoId.indexOf(categoryMenu[index].menu[idx].id.toString())]),
+                                                                  MediaQuery(child: CustomText.bodyRegular16(text: qty[restoId.indexOf(categoryMenu[index].menu[idx].id.toString())], sizeNew: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.04)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.04)).toString())), data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0)),
                                                                   SizedBox(width: CustomSize.sizeWidth(context) / 24,),
                                                                   GestureDetector(
                                                                     onTap: ()async{
@@ -10512,7 +10725,7 @@ class _DetailRestoState extends State<DetailResto> {
                                                                           color: Colors.grey[200],
                                                                           shape: BoxShape.circle
                                                                       ),
-                                                                      child: Center(child: CustomText.textHeading1(text: "+", color: Colors.grey)),
+                                                                      child: Center(child: MediaQuery(child: CustomText.textHeading1(text: "+", color: Colors.grey, sizeNew: double.parse(((MediaQuery.of(context).size.width*0.08).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.08)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.08)).toString())), data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0))),
                                                                     ),
                                                                   ),
                                                                 ],
@@ -13482,7 +13695,7 @@ class _DetailRestoState extends State<DetailResto> {
                         ),
                         child: Padding(
                           padding: const EdgeInsets.all(2),
-                          child: CustomText.bodyMedium14(text: 'Sedang Tutup', color: CustomColor.redBtn, maxLines: 1),
+                          child: MediaQuery(child: CustomText.bodyMedium14(text: 'Sedang Tutup', color: CustomColor.redBtn, maxLines: 1, sizeNew: double.parse(((MediaQuery.of(context).size.width*0.035).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.035)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.035)).toString())), data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0)),
                         )),
                   ],
                 ),
@@ -13538,7 +13751,7 @@ class _DetailRestoState extends State<DetailResto> {
                   color: CustomColor.primary,
                   borderRadius: BorderRadius.circular(20)
               ),
-              child: Center(child: CustomText.bodyRegular16(text: "Reservasi Sekarang", color: Colors.white)),
+              child: Center(child: MediaQuery(child: CustomText.bodyRegular16(text: "Reservasi Sekarang", color: Colors.white, sizeNew: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.04)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.04)).toString())), data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0))),
             ),
           ):Container()
         ],
@@ -13563,7 +13776,7 @@ class _DetailRestoState extends State<DetailResto> {
               color: CustomColor.primary,
               borderRadius: BorderRadius.circular(20)
           ),
-          child: Center(child: CustomText.bodyRegular16(text: "Reservasi Sekarang", color: Colors.white)),
+          child: Center(child: MediaQuery(child: CustomText.bodyRegular16(text: "Reservasi Sekarang", color: Colors.white, sizeNew: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.04)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.04)).toString())), data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0))),
         ),
       ):Container(),
     ):Scaffold(

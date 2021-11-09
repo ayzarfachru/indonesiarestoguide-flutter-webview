@@ -175,141 +175,144 @@ class _AddEmployeesActivityState extends State<AddEmployeesActivity> {
   }
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: SafeArea(
-        child: SingleChildScrollView(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              SizedBox(height: CustomSize.sizeHeight(context) / 38,),
-              Padding(
-                padding: EdgeInsets.symmetric(horizontal: CustomSize.sizeWidth(context) / 32),
-                child: CustomText.textHeading4(
-                    text: "Tambah pegawai",
-                    minSize: 18,
-                    maxLines: 1
+    return MediaQuery(
+      child: Scaffold(
+        body: SafeArea(
+          child: SingleChildScrollView(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                SizedBox(height: CustomSize.sizeHeight(context) / 38,),
+                Padding(
+                  padding: EdgeInsets.symmetric(horizontal: CustomSize.sizeWidth(context) / 32),
+                  child: CustomText.textHeading4(
+                      text: "Tambah pegawai",
+                      sizeNew: double.parse(((MediaQuery.of(context).size.width*0.045).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.045).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.045).toString()),
+                      maxLines: 1
+                  ),
                 ),
-              ),
-              SizedBox(height: CustomSize.sizeHeight(context) / 86,),
-              Divider(
-                thickness: 8,
-                color: CustomColor.secondary,
-              ),
-              Padding(
-                padding: EdgeInsets.symmetric(horizontal: CustomSize.sizeWidth(context) / 32),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    SizedBox(height: CustomSize.sizeHeight(context) / 48,),
-                    // CustomText.bodyLight12(text: "Foto Profile"),
-                    // SizedBox(height: CustomSize.sizeHeight(context) / 48,),
-                    // Row(
-                    //   children: [
-                    //     GestureDetector(
-                    //       onTap: () async{
-                    //         getImage();
-                    //       },
-                    //       child: Container(
-                    //         width: CustomSize.sizeWidth(context) / 6,
-                    //         height: CustomSize.sizeWidth(context) / 6,
-                    //         decoration: (image==null)?(img == "/".substring(0, 1))?BoxDecoration(
-                    //             color: CustomColor.primary,
-                    //             shape: BoxShape.circle
-                    //         ):BoxDecoration(
-                    //           shape: BoxShape.circle,
-                    //           image: new DecorationImage(
-                    //               image: NetworkImage(Links.subUrl +
-                    //                   "$img"),
-                    //               fit: BoxFit.cover
-                    //           ),
-                    //         ): BoxDecoration(
-                    //           shape: BoxShape.circle,
-                    //           image: new DecorationImage(
-                    //               image: new FileImage(image),
-                    //               fit: BoxFit.cover
-                    //           ),
-                    //         ),
-                    //         child: (img == "/".substring(0, 1))?Center(
-                    //           child: CustomText.text(
-                    //               size: 38,
-                    //               weight: FontWeight.w800,
-                    //               text: initial,
-                    //               color: Colors.white
-                    //           ),
-                    //         ):Container(),
-                    //       ),
-                    //     ),
-                    //     SizedBox(width: CustomSize.sizeWidth(context) / 32,),
-                    //     CustomText.bodyLight12(text: "Upload foto profile"),
-                    //   ],
-                    // ),
-                    // SizedBox(height: CustomSize.sizeHeight(context) / 48,),
-                    CustomText.bodyLight12(text: "Email"),
-                    SizedBox(
-                      height: CustomSize.sizeHeight(context) * 0.005,
-                    ),
-                    TextField(
-                      controller: _loginEmailName,
-                      keyboardType: TextInputType.emailAddress,
-                      cursorColor: Colors.black,
-                      style: GoogleFonts.poppins(
-                          textStyle:
-                          TextStyle(fontSize: 18, color: Colors.black, fontWeight: FontWeight.w600)),
-                      decoration: InputDecoration(
-                        isDense: true,
-                        contentPadding: EdgeInsets.only(bottom: CustomSize.sizeHeight(context) / 86),
-                        hintStyle: GoogleFonts.poppins(
-                            textStyle:
-                            TextStyle(fontSize: 14, color: Colors.grey)),
-                        helperStyle: GoogleFonts.poppins(
-                            textStyle: TextStyle(fontSize: 14)),
-                        enabledBorder: UnderlineInputBorder(),
-                        focusedBorder: UnderlineInputBorder(),
+                SizedBox(height: CustomSize.sizeHeight(context) / 86,),
+                Divider(
+                  thickness: 8,
+                  color: CustomColor.secondary,
+                ),
+                Padding(
+                  padding: EdgeInsets.symmetric(horizontal: CustomSize.sizeWidth(context) / 32),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      SizedBox(height: CustomSize.sizeHeight(context) / 48,),
+                      // CustomText.bodyLight12(text: "Foto Profile"),
+                      // SizedBox(height: CustomSize.sizeHeight(context) / 48,),
+                      // Row(
+                      //   children: [
+                      //     GestureDetector(
+                      //       onTap: () async{
+                      //         getImage();
+                      //       },
+                      //       child: Container(
+                      //         width: CustomSize.sizeWidth(context) / 6,
+                      //         height: CustomSize.sizeWidth(context) / 6,
+                      //         decoration: (image==null)?(img == "/".substring(0, 1))?BoxDecoration(
+                      //             color: CustomColor.primary,
+                      //             shape: BoxShape.circle
+                      //         ):BoxDecoration(
+                      //           shape: BoxShape.circle,
+                      //           image: new DecorationImage(
+                      //               image: NetworkImage(Links.subUrl +
+                      //                   "$img"),
+                      //               fit: BoxFit.cover
+                      //           ),
+                      //         ): BoxDecoration(
+                      //           shape: BoxShape.circle,
+                      //           image: new DecorationImage(
+                      //               image: new FileImage(image),
+                      //               fit: BoxFit.cover
+                      //           ),
+                      //         ),
+                      //         child: (img == "/".substring(0, 1))?Center(
+                      //           child: CustomText.text(
+                      //               size: 38,
+                      //               weight: FontWeight.w800,
+                      //               text: initial,
+                      //               color: Colors.white
+                      //           ),
+                      //         ):Container(),
+                      //       ),
+                      //     ),
+                      //     SizedBox(width: CustomSize.sizeWidth(context) / 32,),
+                      //     CustomText.bodyLight12(text: "Upload foto profile"),
+                      //   ],
+                      // ),
+                      // SizedBox(height: CustomSize.sizeHeight(context) / 48,),
+                      CustomText.bodyLight12(text: "Email", sizeNew: double.parse(((MediaQuery.of(context).size.width*0.03).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.03).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.03).toString())),
+                      SizedBox(
+                        height: CustomSize.sizeHeight(context) * 0.005,
                       ),
-                    ),
-                    SizedBox(height: CustomSize.sizeHeight(context) / 48,),
-                  ],
-                ),
-              )
-            ],
+                      TextField(
+                        controller: _loginEmailName,
+                        keyboardType: TextInputType.emailAddress,
+                        cursorColor: Colors.black,
+                        style: GoogleFonts.poppins(
+                            textStyle:
+                            TextStyle(fontSize: 18, color: Colors.black, fontWeight: FontWeight.w600)),
+                        decoration: InputDecoration(
+                          isDense: true,
+                          contentPadding: EdgeInsets.only(bottom: CustomSize.sizeHeight(context) / 86),
+                          hintStyle: GoogleFonts.poppins(
+                              textStyle:
+                              TextStyle(fontSize: 14, color: Colors.grey)),
+                          helperStyle: GoogleFonts.poppins(
+                              textStyle: TextStyle(fontSize: 14)),
+                          enabledBorder: UnderlineInputBorder(),
+                          focusedBorder: UnderlineInputBorder(),
+                        ),
+                      ),
+                      SizedBox(height: CustomSize.sizeHeight(context) / 48,),
+                    ],
+                  ),
+                )
+              ],
+            ),
           ),
         ),
-      ),
-      floatingActionButton: GestureDetector(
-        onTap: () async{
-          setState(() {
-            isLoading = false;
-          });
-          // SharedPreferences pref = await SharedPreferences.getInstance();
-          // pref.setString("name", _loginTextName.text.toString());
-          // pref.setString("email", _loginEmailName.text.toString());
-          // pref.setString("img", (image == null)?img:base64Encode(image.readAsBytesSync()).toString());
-          // pref.setString("gender", gender);
-          // pref.setString("tgl", tgl);
-          // pref.setString("notelp", _loginNotelpName.text.toString());
-
-          if (_loginEmailName.text != '') {
-            addEployees()!.whenComplete((){
-              Navigator.pop(context);
-              Navigator.pushReplacement(context,
-                  PageTransition(
-                      type: PageTransitionType.fade,
-                      child: EmployeesActivity()));
+        floatingActionButton: GestureDetector(
+          onTap: () async{
+            setState(() {
+              isLoading = false;
             });
-          } else {
-            Fluttertoast.showToast(msg: "Isi email terlebih dahulu!",);
-          }
-        },
-        child: Container(
-          width: CustomSize.sizeWidth(context) / 1.1,
-          height: CustomSize.sizeHeight(context) / 14,
-          decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(30),
-              color: CustomColor.accent
+            // SharedPreferences pref = await SharedPreferences.getInstance();
+            // pref.setString("name", _loginTextName.text.toString());
+            // pref.setString("email", _loginEmailName.text.toString());
+            // pref.setString("img", (image == null)?img:base64Encode(image.readAsBytesSync()).toString());
+            // pref.setString("gender", gender);
+            // pref.setString("tgl", tgl);
+            // pref.setString("notelp", _loginNotelpName.text.toString());
+
+            if (_loginEmailName.text != '') {
+              addEployees()!.whenComplete((){
+                Navigator.pop(context);
+                Navigator.pushReplacement(context,
+                    PageTransition(
+                        type: PageTransitionType.fade,
+                        child: EmployeesActivity()));
+              });
+            } else {
+              Fluttertoast.showToast(msg: "Isi email terlebih dahulu!",);
+            }
+          },
+          child: Container(
+            width: CustomSize.sizeWidth(context) / 1.1,
+            height: CustomSize.sizeHeight(context) / 14,
+            decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(30),
+                color: CustomColor.accent
+            ),
+            child: Center(child: CustomText.bodyRegular16(text: "Simpan", color: Colors.white, sizeNew: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.04).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.04).toString()))),
           ),
-          child: Center(child: CustomText.bodyRegular16(text: "Simpan", color: Colors.white,)),
         ),
       ),
+      data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0),
     );
   }
 }

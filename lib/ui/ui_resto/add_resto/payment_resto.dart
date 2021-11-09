@@ -197,7 +197,8 @@ class _PaymentRestoState extends State<PaymentResto> {
                       mainAxisSize: MainAxisSize.min,
                       children: [
                         CustomText.textHeading4a(
-                          text: 'Scan Qr Code',
+                            text: 'Scan Qr Code',
+                            sizeNew: double.parse(((MediaQuery.of(context).size.width*0.05).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.05)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.05)).toString())
                         ),
                         QrImage(
                           data: code,
@@ -212,11 +213,12 @@ class _PaymentRestoState extends State<PaymentResto> {
                               CustomText.text(
                                   text: "Total Pembayaran",
                                   weight: FontWeight.w400,
-                                  size: 14
+                                  size: double.parse(((MediaQuery.of(context).size.width*0.035).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.035)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.035)).toString())
                               ),
                               CustomText.textHeading7(
                                   text: (tipe.toString() != 'Kaki Lima')?"Rp 2.750.000":"Rp 330.000",
-                                  color: CustomColor.redBtn
+                                  color: CustomColor.redBtn,
+                                  sizeNew: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.04)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.04)).toString())
                               ),
                             ],
                           ),
@@ -257,7 +259,7 @@ class _PaymentRestoState extends State<PaymentResto> {
                                 child: Center(
                                   child: CustomText.text(
                                       text: "Sudah Membayar",
-                                      size: 16,
+                                      size: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.04)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.04)).toString()),
                                       weight: FontWeight.w600,
                                       color: Colors.white,
                                       maxLines: 1
@@ -292,6 +294,7 @@ class _PaymentRestoState extends State<PaymentResto> {
                       children: [
                         CustomText.textHeading4a(
                           text: 'Scan Qr Code',
+                            sizeNew: double.parse(((MediaQuery.of(context).size.width*0.05).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.05)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.05)).toString())
                         ),
                         QrImage(
                           data: code,
@@ -306,11 +309,12 @@ class _PaymentRestoState extends State<PaymentResto> {
                               CustomText.text(
                                   text: "Total Pembayaran",
                                   weight: FontWeight.w400,
-                                  size: 14
+                                  size: double.parse(((MediaQuery.of(context).size.width*0.035).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.035)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.035)).toString())
                               ),
                               CustomText.textHeading7(
                                   text: (tipe.toString() != 'Kaki Lima')?"Rp 2.750.000":"Rp 330.000",
-                                  color: CustomColor.redBtn
+                                  color: CustomColor.redBtn,
+                                  sizeNew: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.04)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.04)).toString())
                               ),
                             ],
                           ),
@@ -351,7 +355,7 @@ class _PaymentRestoState extends State<PaymentResto> {
                                 child: Center(
                                   child: CustomText.text(
                                       text: "Sudah Membayar",
-                                      size: 16,
+                                      size: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.04)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.04)).toString()),
                                       weight: FontWeight.w600,
                                       color: Colors.white,
                                       maxLines: 1
@@ -387,6 +391,7 @@ class _PaymentRestoState extends State<PaymentResto> {
                         children: [
                           CustomText.textHeading4a(
                             text: 'Scan Qr Code',
+                              sizeNew: double.parse(((MediaQuery.of(context).size.width*0.05).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.05)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.05)).toString())
                           ),
                           QrImage(
                             data: code,
@@ -401,11 +406,12 @@ class _PaymentRestoState extends State<PaymentResto> {
                                 CustomText.text(
                                     text: "Total Pembayaran",
                                     weight: FontWeight.w400,
-                                    size: 14
+                                    size: double.parse(((MediaQuery.of(context).size.width*0.035).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.035)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.035)).toString())
                                 ),
                                 CustomText.textHeading7(
                                     text: (tipe.toString() != 'Kaki Lima')?"Rp 2.750.000":"Rp 330.000",
-                                    color: CustomColor.redBtn
+                                    color: CustomColor.redBtn,
+                                    sizeNew: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.04)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.04)).toString())
                                 ),
                               ],
                             ),
@@ -445,7 +451,7 @@ class _PaymentRestoState extends State<PaymentResto> {
                                   child: Center(
                                     child: CustomText.text(
                                         text: "Sudah Membayar",
-                                        size: 16,
+                                        size: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.04)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.04)).toString()),
                                         weight: FontWeight.w600,
                                         color: Colors.white,
                                         maxLines: 1
@@ -515,6 +521,7 @@ class _PaymentRestoState extends State<PaymentResto> {
                       children: [
                         CustomText.textHeading4a(
                           text: 'Scan Qr Code',
+                            sizeNew: double.parse(((MediaQuery.of(context).size.width*0.05).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.05)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.05)).toString())
                         ),
                         QrImage(
                           data: code,
@@ -529,11 +536,12 @@ class _PaymentRestoState extends State<PaymentResto> {
                               CustomText.text(
                                   text: "Total Pembayaran",
                                   weight: FontWeight.w400,
-                                  size: 14
+                                  size: double.parse(((MediaQuery.of(context).size.width*0.035).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.035)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.035)).toString())
                               ),
                               CustomText.textHeading7(
                                   text: (tipe.toString() != 'Kaki Lima')?"Rp 2.750.000":"Rp 330.000",
-                                  color: CustomColor.redBtn
+                                  color: CustomColor.redBtn,
+                                  sizeNew: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.04)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.04)).toString())
                               ),
                             ],
                           ),
@@ -574,7 +582,7 @@ class _PaymentRestoState extends State<PaymentResto> {
                                 child: Center(
                                   child: CustomText.text(
                                       text: "Sudah Membayar",
-                                      size: 16,
+                                      size: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.04)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.04)).toString()),
                                       weight: FontWeight.w600,
                                       color: Colors.white,
                                       maxLines: 1
@@ -609,6 +617,7 @@ class _PaymentRestoState extends State<PaymentResto> {
                       children: [
                         CustomText.textHeading4a(
                           text: 'Scan Qr Code',
+                            sizeNew: double.parse(((MediaQuery.of(context).size.width*0.05).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.05)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.05)).toString())
                         ),
                         QrImage(
                           data: code,
@@ -623,11 +632,12 @@ class _PaymentRestoState extends State<PaymentResto> {
                               CustomText.text(
                                   text: "Total Pembayaran",
                                   weight: FontWeight.w400,
-                                  size: 14
+                                  size: double.parse(((MediaQuery.of(context).size.width*0.035).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.035)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.035)).toString())
                               ),
                               CustomText.textHeading7(
                                   text: (tipe.toString() != 'Kaki Lima')?"Rp 2.750.000":"Rp 330.000",
-                                  color: CustomColor.redBtn
+                                  color: CustomColor.redBtn,
+                                  sizeNew: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.04)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.04)).toString())
                               ),
                             ],
                           ),
@@ -668,7 +678,7 @@ class _PaymentRestoState extends State<PaymentResto> {
                                 child: Center(
                                   child: CustomText.text(
                                       text: "Sudah Membayar",
-                                      size: 16,
+                                      size: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.04)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.04)).toString()),
                                       weight: FontWeight.w600,
                                       color: Colors.white,
                                       maxLines: 1
@@ -704,6 +714,7 @@ class _PaymentRestoState extends State<PaymentResto> {
                         children: [
                           CustomText.textHeading4a(
                             text: 'Scan Qr Code',
+                              sizeNew: double.parse(((MediaQuery.of(context).size.width*0.05).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.05)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.05)).toString())
                           ),
                           QrImage(
                             data: code,
@@ -718,11 +729,12 @@ class _PaymentRestoState extends State<PaymentResto> {
                                 CustomText.text(
                                     text: "Total Pembayaran",
                                     weight: FontWeight.w400,
-                                    size: 14
+                                    size: double.parse(((MediaQuery.of(context).size.width*0.035).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.035)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.035)).toString())
                                 ),
                                 CustomText.textHeading7(
                                     text: (tipe.toString() != 'Kaki Lima')?"Rp 2.750.000":"Rp 330.000",
-                                    color: CustomColor.redBtn
+                                    color: CustomColor.redBtn,
+                                    sizeNew: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.04)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.04)).toString())
                                 ),
                               ],
                             ),
@@ -763,7 +775,7 @@ class _PaymentRestoState extends State<PaymentResto> {
                                   child: Center(
                                     child: CustomText.text(
                                         text: "Sudah Membayar",
-                                        size: 16,
+                                        size: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.04)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.04)).toString()),
                                         weight: FontWeight.w600,
                                         color: Colors.white,
                                         maxLines: 1
@@ -816,7 +828,7 @@ class _PaymentRestoState extends State<PaymentResto> {
                 borderRadius: BorderRadius.all(Radius.circular(10))
             ),
             title: Center(child: Text('Perhatian!', style: TextStyle(color: CustomColor.redBtn))),
-            content: Text('Apakah yakin ingin meninggalkan halaman aktivasi pembayaran?', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500), textAlign: TextAlign.center),
+            content: Text('Apakah yakin ingin meninggalkan halaman aktivasi pembayaran?', style: TextStyle(fontSize: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.04)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.04)).toString()), fontWeight: FontWeight.w500), textAlign: TextAlign.center),
             actions: <Widget>[
               Center(
                 child: Row(
@@ -873,526 +885,542 @@ class _PaymentRestoState extends State<PaymentResto> {
   Widget build(BuildContext context) {
     return WillPopScope(
       onWillPop: onWillPop,
-      child: Scaffold(
-        body: SafeArea(
-          child: Column(
-            children: [
-              Container(
-                color: CustomColor.primaryLight,
-                child: Column(
-                  children: [
-                    SizedBox(
-                      height: CustomSize.sizeHeight(context) / 48,
-                    ),
-                    GestureDetector(
-                      onTap: (){
-                        Navigator.pop(context);
-                      },
-                      child: Padding(
-                        padding: EdgeInsets.symmetric(
-                            horizontal: CustomSize.sizeWidth(context) / 24),
-                        child: Row(
-                          children: [
-                            // FaIcon(
-                            //   FontAwesomeIcons.arrowLeft,
-                            //   color: Colors.white,
-                            // ),
-                            // SizedBox(
-                            //   width: CustomSize.sizeWidth(context) / 18,
-                            // ),
-                            Expanded(
-                              child: CustomText.textHeading4(
-                                color: Colors.white,
-                                text: "Aktivasi Resto",
-                                minSize: 18,
-                              ),
-                            ),
-                          ],
-                        ),
+      child: MediaQuery(
+        child: Scaffold(
+          body: SafeArea(
+            child: Column(
+              children: [
+                Container(
+                  color: CustomColor.primaryLight,
+                  child: Column(
+                    children: [
+                      SizedBox(
+                        height: CustomSize.sizeHeight(context) / 48,
                       ),
-                    ),
-                    SizedBox(
-                      height: CustomSize.sizeHeight(context) / 48,
-                    ),
-                  ],
-                ),
-              ),
-              Expanded(
-                child: SingleChildScrollView(
-                  child: Container(
-                    color: CustomColor.secondary,
-                    child: (isInterest)?
-                    Column(
-                      children: [
-                        Container(
-                          color: Colors.white,
-                          child: Padding(
-                            padding: EdgeInsets.all(CustomSize.sizeHeight(context) / 48),
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                CustomText.textTitle3(
-                                  text: "Informasi Resto",
+                      GestureDetector(
+                        onTap: (){
+                          Navigator.pop(context);
+                        },
+                        child: Padding(
+                          padding: EdgeInsets.symmetric(
+                              horizontal: CustomSize.sizeWidth(context) / 24),
+                          child: Row(
+                            children: [
+                              // FaIcon(
+                              //   FontAwesomeIcons.arrowLeft,
+                              //   color: Colors.white,
+                              // ),
+                              // SizedBox(
+                              //   width: CustomSize.sizeWidth(context) / 18,
+                              // ),
+                              Expanded(
+                                child: CustomText.textHeading4(
+                                  color: Colors.white,
+                                  text: "Aktivasi Resto",
+                                  sizeNew: double.parse(((MediaQuery.of(context).size.width*0.045).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.045).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.045).toString()),
                                 ),
-                                SizedBox(
-                                  height: CustomSize.sizeHeight(context) / 86,
-                                ),
-                                CustomText.textHeading5a(
-                                    text: name,
-                                    maxLines: 5
-                                ),
-                                CustomText.textHeading7(
-                                  text: phone,
-                                ),
-                                CustomText.textTitle3(
-                                    text: address,
-                                    maxLines: 10
-                                ),
-                              ],
-                            ),
+                              ),
+                            ],
                           ),
                         ),
-                        Padding(
-                          padding: EdgeInsets.all(CustomSize.sizeWidth(context) / 20),
-                          child: Container(
-                            width: CustomSize.sizeWidth(context),
-                            decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(10),
-                              color: Colors.white,
-                              boxShadow: [
-                                BoxShadow(
-                                  color: Colors.grey.withOpacity(0.5),
-                                  spreadRadius: 2,
-                                  blurRadius: 4,
-                                  offset: Offset(0, 3),
-                                ),
-                              ],
-                            ),
+                      ),
+                      SizedBox(
+                        height: CustomSize.sizeHeight(context) / 48,
+                      ),
+                    ],
+                  ),
+                ),
+                Expanded(
+                  child: SingleChildScrollView(
+                    child: Container(
+                      color: CustomColor.secondary,
+                      child: (isInterest)?
+                      Column(
+                        children: [
+                          Container(
+                            color: Colors.white,
                             child: Padding(
-                              padding: EdgeInsets.all(CustomSize.sizeWidth(context) / 24),
+                              padding: EdgeInsets.all(CustomSize.sizeHeight(context) / 48),
                               child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  CustomText.textHeading8(
-                                      text: (tipe.toString() != 'Kaki Lima')?"Rp 2.500.000 / tahun":"Rp 300.000 / tahun",
-                                      maxLines: 10
+                                  CustomText.textTitle3(
+                                      text: "Informasi Resto",
+                                      sizeNew: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.04).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.04).toString())
                                   ),
-                                  SizedBox(height: CustomSize.sizeHeight(context) / 48,),
-                                  CustomText.textTitle2c(
-                                      text: "1. Mempermudah mendapatkan pembeli / konsumen \n2. Mempermudah transaksi \n3. Biaya terjangkau \n4. Resto makin dikenal",
-                                      maxLines: 50
+                                  SizedBox(
+                                    height: CustomSize.sizeHeight(context) / 86,
+                                  ),
+                                  CustomText.textHeading5a(
+                                      text: name,
+                                      maxLines: 5,
+                                      sizeNew: double.parse(((MediaQuery.of(context).size.width*0.055).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.055).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.055).toString())
+                                  ),
+                                  CustomText.textHeading7(
+                                    text: phone,
+                                      sizeNew: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.04)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.04)).toString())
+                                  ),
+                                  CustomText.textTitle3(
+                                      text: address,
+                                      maxLines: 10,
+                                      sizeNew: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.04).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.04).toString())
                                   ),
                                 ],
                               ),
                             ),
                           ),
-                        ),
-                        Container(
-                          color: Colors.white,
-                          child: Padding(
-                            padding: EdgeInsets.all(CustomSize.sizeHeight(context) / 48),
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                SizedBox(
-                                  height: CustomSize.sizeHeight(context) / 86,
-                                ),
-                                CustomText.textTitle3(
-                                  text: "Rincian Pembayaran",
-                                ),
-                                SizedBox(
-                                  height: CustomSize.sizeHeight(context) / 32,
-                                ),
-                                Row(
-                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                  children: [
-                                    CustomText.text(
-                                      text: "Aktivasi merchant 1 tahun",
-                                    ),
-                                    CustomText.textHeading7(
-                                      text: (tipe.toString() != 'Kaki Lima')?"2.500.000":"300.000",
-                                    ),
-                                  ],
-                                ),
-                                SizedBox(
-                                  height: CustomSize.sizeHeight(context) / 86,
-                                ),
-                                Divider(),
-                                Row(
-                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                  children: [
-                                    CustomText.text(
-                                        text: "Biaya PPN 10%",
-                                        weight: FontWeight.w400,
-                                        size: 14
-                                    ),
-                                    CustomText.textHeading7(
-                                      text: "250.000",
-                                    ),
-                                  ],
-                                ),
-                                SizedBox(
-                                  height: CustomSize.sizeHeight(context) / 86,
-                                ),
-                                Divider(),
-                                Row(
-                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                  children: [
-                                    CustomText.text(
-                                        text: "Total Pembayaran",
-                                        weight: FontWeight.w400,
-                                        size: 14
-                                    ),
-                                    CustomText.textHeading7(
-                                        text: (tipe.toString() != 'Kaki Lima')?"Rp 2.750.000":"Rp 330.000",
-                                        color: CustomColor.redBtn
-                                    ),
-                                  ],
-                                ),
-                                SizedBox(
-                                  height: CustomSize.sizeHeight(context) / 86,
-                                ),
-                                Divider(),
-                                SizedBox(
-                                  height: CustomSize.sizeHeight(context) / 48,
-                                ),
-                                Container(
-                                  width: CustomSize.sizeWidth(context),
-                                  height: CustomSize.sizeHeight(context) / 16,
-                                  decoration: BoxDecoration(
-                                    borderRadius: BorderRadius.circular(100),
-                                    color: CustomColor.primaryLight,
+                          Padding(
+                            padding: EdgeInsets.all(CustomSize.sizeWidth(context) / 20),
+                            child: Container(
+                              width: CustomSize.sizeWidth(context),
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(10),
+                                color: Colors.white,
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: Colors.grey.withOpacity(0.5),
+                                    spreadRadius: 2,
+                                    blurRadius: 4,
+                                    offset: Offset(0, 3),
                                   ),
-                                  child: Material(
-                                    borderRadius: BorderRadius.circular(100),
-                                    color: Colors.transparent,
-                                    child: InkWell(
-                                      borderRadius: BorderRadius.circular(100),
-                                      splashColor: Colors.white.withOpacity(.2),
-                                      highlightColor: CustomColor.primaryLight,
-                                      onTap: (){
-                                        if (tipe.toString() != 'Kaki Lima') {
-                                          Fluttertoast.showToast(msg: "Mohon tunggu sebentar.");
-                                          checkTest3();
-
-                                        } else {
-                                          Fluttertoast.showToast(msg: "Mohon tunggu sebentar.");
-                                          checkTest2();
-                                          // reqPay2().then((value) {
-                                          //   if(value){
-                                          //     showModalBottomSheet(
-                                          //         isScrollControlled: true,
-                                          //         shape: RoundedRectangleBorder(
-                                          //             borderRadius: BorderRadius.only(topLeft: Radius.circular(20), topRight: Radius.circular(20))
-                                          //         ),
-                                          //         context: context,
-                                          //         builder: (_){
-                                          //           return StatefulBuilder(builder: (_, setStateModal){
-                                          //             return Padding(
-                                          //               padding: EdgeInsets.all(CustomSize.sizeWidth(context) / 24),
-                                          //               child: Column(
-                                          //                 mainAxisSize: MainAxisSize.min,
-                                          //                 children: [
-                                          //                   CustomText.textHeading4a(
-                                          //                     text: 'Scan Qr Code',
-                                          //                   ),
-                                          //                   QrImage(
-                                          //                     data: code,
-                                          //                     version: QrVersions.auto,
-                                          //                     size: 200.0,
-                                          //                   ),
-                                          //                   Padding(
-                                          //                     padding: EdgeInsets.symmetric(horizontal: 20),
-                                          //                     child: Row(
-                                          //                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                          //                       children: [
-                                          //                         CustomText.text(
-                                          //                             text: "Total Pembayaran",
-                                          //                             weight: FontWeight.w400,
-                                          //                             size: 14
-                                          //                         ),
-                                          //                         CustomText.textHeading7(
-                                          //                             text: (tipe.toString() != 'Kaki Lima')?"Rp 2.750.000":"Rp 330.000",
-                                          //                             color: CustomColor.redBtn
-                                          //                         ),
-                                          //                       ],
-                                          //                     ),
-                                          //                   ),
-                                          //                   SizedBox(
-                                          //                     height: CustomSize.sizeHeight(context) / 86,
-                                          //                   ),
-                                          //                   Container(
-                                          //                     width: CustomSize.sizeWidth(context),
-                                          //                     height: CustomSize.sizeHeight(context) / 16,
-                                          //                     decoration: BoxDecoration(
-                                          //                       borderRadius: BorderRadius.circular(100),
-                                          //                       color: CustomColor.primaryLight,
-                                          //                     ),
-                                          //                     child: Material(
-                                          //                       borderRadius: BorderRadius.circular(100),
-                                          //                       color: Colors.transparent,
-                                          //                       child: InkWell(
-                                          //                         borderRadius: BorderRadius.circular(100),
-                                          //                         splashColor: Colors.white.withOpacity(.2),
-                                          //                         highlightColor: CustomColor.primaryLight,
-                                          //                         onTap: (){
-                                          //                           // Navigator.push(
-                                          //                           //     context,
-                                          //                           //     PageTransition(
-                                          //                           //         type: PageTransitionType.fade,
-                                          //                           //         child: new HomeActivity()));
-                                          //                           checkTest();
-                                          //                           Navigator.pop(context);
-                                          //                           // Navigator.pop(context, "success");
-                                          //                         },
-                                          //                         child: Container(
-                                          //                           width: CustomSize.sizeWidth(context),
-                                          //                           height: CustomSize.sizeHeight(context) / 16,
-                                          //                           decoration: BoxDecoration(
-                                          //                             borderRadius: BorderRadius.circular(100),
-                                          //                           ),
-                                          //                           child: Center(
-                                          //                             child: CustomText.text(
-                                          //                                 text: "Sudah Membayar",
-                                          //                                 size: 16,
-                                          //                                 weight: FontWeight.w600,
-                                          //                                 color: Colors.white,
-                                          //                                 maxLines: 1
-                                          //                             ),
-                                          //                           ),
-                                          //                         ),
-                                          //                       ),
-                                          //                     ),
-                                          //                   ),
-                                          //                 ],
-                                          //               ),
-                                          //             );
-                                          //           });
-                                          //         }
-                                          //     );
-                                          //   }
-                                          // });
-                                        }
-                                        // showModalBottomSheet(
-                                        //     isScrollControlled: true,
-                                        //     shape: RoundedRectangleBorder(
-                                        //         borderRadius: BorderRadius.only(topLeft: Radius.circular(20), topRight: Radius.circular(20))
-                                        //     ),
-                                        //     context: context,
-                                        //     builder: (_){
-                                        //       return StatefulBuilder(builder: (_, setStateModal){
-                                        //         return Padding(
-                                        //           padding: EdgeInsets.all(CustomSize.sizeWidth(context) / 24),
-                                        //           child: Column(
-                                        //             mainAxisSize: MainAxisSize.min,
-                                        //             children: [
-                                        //               CustomText.textHeading4a(
-                                        //                 text: 'Scan Qr Code',
-                                        //               ),
-                                        //               QrImage(
-                                        //                 data: code,
-                                        //                 version: QrVersions.auto,
-                                        //                 size: 200.0,
-                                        //               ),
-                                        //               Padding(
-                                        //                 padding: EdgeInsets.symmetric(horizontal: 20),
-                                        //                 child: Row(
-                                        //                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                        //                   children: [
-                                        //                     CustomText.text(
-                                        //                         text: "Total Pembayaran",
-                                        //                         weight: FontWeight.w400,
-                                        //                         size: 14
-                                        //                     ),
-                                        //                     CustomText.textHeading7(
-                                        //                         text: (tipe.toString() != 'Kaki Lima')?"Rp 2.750.000":"Rp 330.000",
-                                        //                         color: CustomColor.redBtn
-                                        //                     ),
-                                        //                   ],
-                                        //                 ),
-                                        //               ),
-                                        //               SizedBox(
-                                        //                 height: CustomSize.sizeHeight(context) / 86,
-                                        //               ),
-                                        //               Container(
-                                        //                 width: CustomSize.sizeWidth(context),
-                                        //                 height: CustomSize.sizeHeight(context) / 16,
-                                        //                 decoration: BoxDecoration(
-                                        //                   borderRadius: BorderRadius.circular(100),
-                                        //                   color: CustomColor.primaryLight,
-                                        //                 ),
-                                        //                 child: Material(
-                                        //                   borderRadius: BorderRadius.circular(100),
-                                        //                   color: Colors.transparent,
-                                        //                   child: InkWell(
-                                        //                     borderRadius: BorderRadius.circular(100),
-                                        //                     splashColor: Colors.white.withOpacity(.2),
-                                        //                     highlightColor: CustomColor.primaryLight,
-                                        //                     onTap: (){
-                                        //                         // Navigator.push(
-                                        //                         //     context,
-                                        //                         //     PageTransition(
-                                        //                         //         type: PageTransitionType.fade,
-                                        //                         //         child: new HomeActivity()));
-                                        //                       // Navigator.pop(context);
-                                        //                       // Navigator.pop(context, "success");
-                                        //                     },
-                                        //                     child: Container(
-                                        //                       width: CustomSize.sizeWidth(context),
-                                        //                       height: CustomSize.sizeHeight(context) / 16,
-                                        //                       decoration: BoxDecoration(
-                                        //                         borderRadius: BorderRadius.circular(100),
-                                        //                       ),
-                                        //                       child: Center(
-                                        //                         child: CustomText.text(
-                                        //                             text: "Sudah Membayar",
-                                        //                             size: 16,
-                                        //                             weight: FontWeight.w600,
-                                        //                             color: Colors.white,
-                                        //                             maxLines: 1
-                                        //                         ),
-                                        //                       ),
-                                        //                     ),
-                                        //                   ),
-                                        //                 ),
-                                        //               ),
-                                        //             ],
-                                        //           ),
-                                        //         );
-                                        //       });
-                                        //     }
-                                        // );
-                                      },
-                                      child: Container(
-                                        width: CustomSize.sizeWidth(context),
-                                        height: CustomSize.sizeHeight(context) / 16,
-                                        decoration: BoxDecoration(
-                                          borderRadius: BorderRadius.circular(100),
-                                        ),
-                                        child: Padding(
-                                          padding: EdgeInsets.symmetric(horizontal: CustomSize.sizeWidth(context) / 20),
-                                          child: Row(
-                                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                            children: [
-                                              CustomText.text(
-                                                  text: "Bayar Sekarang",
-                                                  size: 16,
-                                                  weight: FontWeight.w600,
-                                                  color: Colors.white,
-                                                  maxLines: 1
-                                              ),
-                                              CustomText.text(
-                                                  text: (tipe.toString() != 'Kaki Lima')?"Rp 2.750.000":"Rp 330.000",
-                                                  size: 16,
-                                                  weight: FontWeight.w600,
-                                                  color: Colors.white,
-                                                  maxLines: 1
-                                              ),
-                                            ],
-                                          ),
-                                        ),
-                                      ),
+                                ],
+                              ),
+                              child: Padding(
+                                padding: EdgeInsets.all(CustomSize.sizeWidth(context) / 24),
+                                child: Column(
+                                  children: [
+                                    CustomText.textHeading8(
+                                        text: (tipe.toString() != 'Kaki Lima')?"Rp 2.500.000 / tahun":"Rp 300.000 / tahun",
+                                        maxLines: 10,
+                                        sizeNew: double.parse(((MediaQuery.of(context).size.width*0.07).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.07).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.07).toString())
                                     ),
-                                  ),
+                                    SizedBox(height: CustomSize.sizeHeight(context) / 48,),
+                                    CustomText.textTitle2c(
+                                        text: "1. Mempermudah mendapatkan pembeli / konsumen \n2. Mempermudah transaksi \n3. Biaya terjangkau \n4. Resto makin dikenal",
+                                        maxLines: 50,
+                                        sizeNew: double.parse(((MediaQuery.of(context).size.width*0.045).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.045).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.045).toString())
+                                    ),
+                                  ],
                                 ),
-                                SizedBox(height: CustomSize.sizeHeight(context) / 32,),
-                              ],
+                              ),
                             ),
                           ),
-                        ),
-                      ],
-                    )
-                        :Column(
-                      children: [
-                        Padding(
-                          padding: EdgeInsets.all(CustomSize.sizeWidth(context) / 24),
-                          child: Container(
-                            width: CustomSize.sizeWidth(context),
-                            decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(10),
-                              color: Colors.white,
-                              boxShadow: [
-                                BoxShadow(
-                                  color: Colors.grey.withOpacity(0.5),
-                                  spreadRadius: 2,
-                                  blurRadius: 4,
-                                  offset: Offset(0, 3),
-                                ),
-                              ],
-                            ),
+                          Container(
+                            color: Colors.white,
                             child: Padding(
-                              padding: EdgeInsets.all(CustomSize.sizeWidth(context) / 24),
+                              padding: EdgeInsets.all(CustomSize.sizeHeight(context) / 48),
                               child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  CustomText.textHeading8(
-                                      text: (tipe.toString() != 'Kaki Lima')?"Rp 2.500.000 / tahun":"Rp 300.000 / tahun",
-                                      maxLines: 10
+                                  SizedBox(
+                                    height: CustomSize.sizeHeight(context) / 86,
                                   ),
-                                  SizedBox(height: CustomSize.sizeHeight(context) / 48,),
-                                  CustomText.textTitle2c(
-                                      text: "1. Mempermudah mendapatkan pembeli / konsumen \n2. Mempermudah transaksi \n3. Biaya terjangkau \n4. Resto makin dikenal",
-                                      maxLines: 50
+                                  CustomText.textTitle3(
+                                    text: "Rincian Pembayaran",
+                                      sizeNew: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.04).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.04).toString())
                                   ),
-                                  SizedBox(height: CustomSize.sizeHeight(context) / 16,),
-                                  Container(
-                                    alignment: Alignment.centerLeft,
-                                    child: CustomText.bodyMedium14(
-                                        color: CustomColor.redBtn,
-                                        text: "Akun anda aktif sampai " + newDate.toString().split(' ')[0],
-                                        maxLines: 10
-                                    ),
+                                  SizedBox(
+                                    height: CustomSize.sizeHeight(context) / 32,
                                   ),
-                                  SizedBox(height: CustomSize.sizeHeight(context) / 86,),
+                                  Row(
+                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      CustomText.text(
+                                        text: "Aktivasi merchant 1 tahun",
+                                      ),
+                                      CustomText.textHeading7(
+                                        text: (tipe.toString() != 'Kaki Lima')?"2.500.000":"300.000",
+                                          sizeNew: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.04)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.04)).toString())
+                                      ),
+                                    ],
+                                  ),
+                                  SizedBox(
+                                    height: CustomSize.sizeHeight(context) / 86,
+                                  ),
+                                  Divider(),
+                                  Row(
+                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      CustomText.text(
+                                          text: "Biaya PPN 10%",
+                                          weight: FontWeight.w400,
+                                          size: double.parse(((MediaQuery.of(context).size.width*0.035).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.035)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.035)).toString())
+                                      ),
+                                      CustomText.textHeading7(
+                                        text: "250.000",
+                                          sizeNew: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.04)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.04)).toString())
+                                      ),
+                                    ],
+                                  ),
+                                  SizedBox(
+                                    height: CustomSize.sizeHeight(context) / 86,
+                                  ),
+                                  Divider(),
+                                  Row(
+                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      CustomText.text(
+                                          text: "Total Pembayaran",
+                                          weight: FontWeight.w400,
+                                          size: double.parse(((MediaQuery.of(context).size.width*0.035).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.035)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.035)).toString())
+                                      ),
+                                      CustomText.textHeading7(
+                                          text: (tipe.toString() != 'Kaki Lima')?"Rp 2.750.000":"Rp 330.000",
+                                          color: CustomColor.redBtn,
+                                          sizeNew: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.04)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.04)).toString())
+                                      ),
+                                    ],
+                                  ),
+                                  SizedBox(
+                                    height: CustomSize.sizeHeight(context) / 86,
+                                  ),
+                                  Divider(),
+                                  SizedBox(
+                                    height: CustomSize.sizeHeight(context) / 48,
+                                  ),
                                   Container(
                                     width: CustomSize.sizeWidth(context),
                                     height: CustomSize.sizeHeight(context) / 16,
                                     decoration: BoxDecoration(
-                                      borderRadius: BorderRadius.circular(10),
+                                      borderRadius: BorderRadius.circular(100),
                                       color: CustomColor.primaryLight,
                                     ),
                                     child: Material(
-                                      borderRadius: BorderRadius.circular(10),
+                                      borderRadius: BorderRadius.circular(100),
                                       color: Colors.transparent,
                                       child: InkWell(
-                                        borderRadius: BorderRadius.circular(10),
+                                        borderRadius: BorderRadius.circular(100),
                                         splashColor: Colors.white.withOpacity(.2),
                                         highlightColor: CustomColor.primaryLight,
                                         onTap: (){
-                                          setState(() {
-                                            isInterest = true;
-                                          });
+                                          if (tipe.toString() != 'Kaki Lima') {
+                                            Fluttertoast.showToast(msg: "Mohon tunggu sebentar.");
+                                            checkTest3();
+
+                                          } else {
+                                            Fluttertoast.showToast(msg: "Mohon tunggu sebentar.");
+                                            checkTest2();
+                                            // reqPay2().then((value) {
+                                            //   if(value){
+                                            //     showModalBottomSheet(
+                                            //         isScrollControlled: true,
+                                            //         shape: RoundedRectangleBorder(
+                                            //             borderRadius: BorderRadius.only(topLeft: Radius.circular(20), topRight: Radius.circular(20))
+                                            //         ),
+                                            //         context: context,
+                                            //         builder: (_){
+                                            //           return StatefulBuilder(builder: (_, setStateModal){
+                                            //             return Padding(
+                                            //               padding: EdgeInsets.all(CustomSize.sizeWidth(context) / 24),
+                                            //               child: Column(
+                                            //                 mainAxisSize: MainAxisSize.min,
+                                            //                 children: [
+                                            //                   CustomText.textHeading4a(
+                                            //                     text: 'Scan Qr Code',
+                                            //                   ),
+                                            //                   QrImage(
+                                            //                     data: code,
+                                            //                     version: QrVersions.auto,
+                                            //                     size: 200.0,
+                                            //                   ),
+                                            //                   Padding(
+                                            //                     padding: EdgeInsets.symmetric(horizontal: 20),
+                                            //                     child: Row(
+                                            //                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                            //                       children: [
+                                            //                         CustomText.text(
+                                            //                             text: "Total Pembayaran",
+                                            //                             weight: FontWeight.w400,
+                                            //                             size: 14
+                                            //                         ),
+                                            //                         CustomText.textHeading7(
+                                            //                             text: (tipe.toString() != 'Kaki Lima')?"Rp 2.750.000":"Rp 330.000",
+                                            //                             color: CustomColor.redBtn
+                                            //                         ),
+                                            //                       ],
+                                            //                     ),
+                                            //                   ),
+                                            //                   SizedBox(
+                                            //                     height: CustomSize.sizeHeight(context) / 86,
+                                            //                   ),
+                                            //                   Container(
+                                            //                     width: CustomSize.sizeWidth(context),
+                                            //                     height: CustomSize.sizeHeight(context) / 16,
+                                            //                     decoration: BoxDecoration(
+                                            //                       borderRadius: BorderRadius.circular(100),
+                                            //                       color: CustomColor.primaryLight,
+                                            //                     ),
+                                            //                     child: Material(
+                                            //                       borderRadius: BorderRadius.circular(100),
+                                            //                       color: Colors.transparent,
+                                            //                       child: InkWell(
+                                            //                         borderRadius: BorderRadius.circular(100),
+                                            //                         splashColor: Colors.white.withOpacity(.2),
+                                            //                         highlightColor: CustomColor.primaryLight,
+                                            //                         onTap: (){
+                                            //                           // Navigator.push(
+                                            //                           //     context,
+                                            //                           //     PageTransition(
+                                            //                           //         type: PageTransitionType.fade,
+                                            //                           //         child: new HomeActivity()));
+                                            //                           checkTest();
+                                            //                           Navigator.pop(context);
+                                            //                           // Navigator.pop(context, "success");
+                                            //                         },
+                                            //                         child: Container(
+                                            //                           width: CustomSize.sizeWidth(context),
+                                            //                           height: CustomSize.sizeHeight(context) / 16,
+                                            //                           decoration: BoxDecoration(
+                                            //                             borderRadius: BorderRadius.circular(100),
+                                            //                           ),
+                                            //                           child: Center(
+                                            //                             child: CustomText.text(
+                                            //                                 text: "Sudah Membayar",
+                                            //                                 size: 16,
+                                            //                                 weight: FontWeight.w600,
+                                            //                                 color: Colors.white,
+                                            //                                 maxLines: 1
+                                            //                             ),
+                                            //                           ),
+                                            //                         ),
+                                            //                       ),
+                                            //                     ),
+                                            //                   ),
+                                            //                 ],
+                                            //               ),
+                                            //             );
+                                            //           });
+                                            //         }
+                                            //     );
+                                            //   }
+                                            // });
+                                          }
+                                          // showModalBottomSheet(
+                                          //     isScrollControlled: true,
+                                          //     shape: RoundedRectangleBorder(
+                                          //         borderRadius: BorderRadius.only(topLeft: Radius.circular(20), topRight: Radius.circular(20))
+                                          //     ),
+                                          //     context: context,
+                                          //     builder: (_){
+                                          //       return StatefulBuilder(builder: (_, setStateModal){
+                                          //         return Padding(
+                                          //           padding: EdgeInsets.all(CustomSize.sizeWidth(context) / 24),
+                                          //           child: Column(
+                                          //             mainAxisSize: MainAxisSize.min,
+                                          //             children: [
+                                          //               CustomText.textHeading4a(
+                                          //                 text: 'Scan Qr Code',
+                                          //               ),
+                                          //               QrImage(
+                                          //                 data: code,
+                                          //                 version: QrVersions.auto,
+                                          //                 size: 200.0,
+                                          //               ),
+                                          //               Padding(
+                                          //                 padding: EdgeInsets.symmetric(horizontal: 20),
+                                          //                 child: Row(
+                                          //                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                          //                   children: [
+                                          //                     CustomText.text(
+                                          //                         text: "Total Pembayaran",
+                                          //                         weight: FontWeight.w400,
+                                          //                         size: 14
+                                          //                     ),
+                                          //                     CustomText.textHeading7(
+                                          //                         text: (tipe.toString() != 'Kaki Lima')?"Rp 2.750.000":"Rp 330.000",
+                                          //                         color: CustomColor.redBtn
+                                          //                     ),
+                                          //                   ],
+                                          //                 ),
+                                          //               ),
+                                          //               SizedBox(
+                                          //                 height: CustomSize.sizeHeight(context) / 86,
+                                          //               ),
+                                          //               Container(
+                                          //                 width: CustomSize.sizeWidth(context),
+                                          //                 height: CustomSize.sizeHeight(context) / 16,
+                                          //                 decoration: BoxDecoration(
+                                          //                   borderRadius: BorderRadius.circular(100),
+                                          //                   color: CustomColor.primaryLight,
+                                          //                 ),
+                                          //                 child: Material(
+                                          //                   borderRadius: BorderRadius.circular(100),
+                                          //                   color: Colors.transparent,
+                                          //                   child: InkWell(
+                                          //                     borderRadius: BorderRadius.circular(100),
+                                          //                     splashColor: Colors.white.withOpacity(.2),
+                                          //                     highlightColor: CustomColor.primaryLight,
+                                          //                     onTap: (){
+                                          //                         // Navigator.push(
+                                          //                         //     context,
+                                          //                         //     PageTransition(
+                                          //                         //         type: PageTransitionType.fade,
+                                          //                         //         child: new HomeActivity()));
+                                          //                       // Navigator.pop(context);
+                                          //                       // Navigator.pop(context, "success");
+                                          //                     },
+                                          //                     child: Container(
+                                          //                       width: CustomSize.sizeWidth(context),
+                                          //                       height: CustomSize.sizeHeight(context) / 16,
+                                          //                       decoration: BoxDecoration(
+                                          //                         borderRadius: BorderRadius.circular(100),
+                                          //                       ),
+                                          //                       child: Center(
+                                          //                         child: CustomText.text(
+                                          //                             text: "Sudah Membayar",
+                                          //                             size: 16,
+                                          //                             weight: FontWeight.w600,
+                                          //                             color: Colors.white,
+                                          //                             maxLines: 1
+                                          //                         ),
+                                          //                       ),
+                                          //                     ),
+                                          //                   ),
+                                          //                 ),
+                                          //               ),
+                                          //             ],
+                                          //           ),
+                                          //         );
+                                          //       });
+                                          //     }
+                                          // );
                                         },
                                         child: Container(
                                           width: CustomSize.sizeWidth(context),
                                           height: CustomSize.sizeHeight(context) / 16,
                                           decoration: BoxDecoration(
-                                            borderRadius: BorderRadius.circular(10),
+                                            borderRadius: BorderRadius.circular(100),
                                           ),
-                                          child: Center(
-                                            child: CustomText.text(
-                                                text: "Aktifkan Sekarang",
-                                                size: 16,
-                                                weight: FontWeight.w600,
-                                                color: Colors.white,
-                                                maxLines: 1
+                                          child: Padding(
+                                            padding: EdgeInsets.symmetric(horizontal: CustomSize.sizeWidth(context) / 20),
+                                            child: Row(
+                                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                              children: [
+                                                CustomText.text(
+                                                    text: "Bayar Sekarang",
+                                                    size: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.04)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.04)).toString()),
+                                                    weight: FontWeight.w600,
+                                                    color: Colors.white,
+                                                    maxLines: 1
+                                                ),
+                                                CustomText.text(
+                                                    text: (tipe.toString() != 'Kaki Lima')?"Rp 2.750.000":"Rp 330.000",
+                                                    size: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.04)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.04)).toString()),
+                                                    weight: FontWeight.w600,
+                                                    color: Colors.white,
+                                                    maxLines: 1
+                                                ),
+                                              ],
                                             ),
                                           ),
                                         ),
                                       ),
                                     ),
                                   ),
+                                  SizedBox(height: CustomSize.sizeHeight(context) / 32,),
                                 ],
                               ),
                             ),
                           ),
-                        ),
-                      ],
+                        ],
+                      )
+                          :Column(
+                        children: [
+                          Padding(
+                            padding: EdgeInsets.all(CustomSize.sizeWidth(context) / 24),
+                            child: Container(
+                              width: CustomSize.sizeWidth(context),
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(10),
+                                color: Colors.white,
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: Colors.grey.withOpacity(0.5),
+                                    spreadRadius: 2,
+                                    blurRadius: 4,
+                                    offset: Offset(0, 3),
+                                  ),
+                                ],
+                              ),
+                              child: Padding(
+                                padding: EdgeInsets.all(CustomSize.sizeWidth(context) / 24),
+                                child: Column(
+                                  children: [
+                                    CustomText.textHeading8(
+                                        text: (tipe.toString() != 'Kaki Lima')?"Rp 2.500.000 / tahun":"Rp 300.000 / tahun",
+                                        maxLines: 10,
+                                        sizeNew: double.parse(((MediaQuery.of(context).size.width*0.07).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.07).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.07).toString())
+                                    ),
+                                    SizedBox(height: CustomSize.sizeHeight(context) / 48,),
+                                    CustomText.textTitle2c(
+                                        text: "1. Mempermudah mendapatkan pembeli / konsumen \n2. Mempermudah transaksi \n3. Biaya terjangkau \n4. Resto makin dikenal",
+                                        maxLines: 50,
+                                        sizeNew: double.parse(((MediaQuery.of(context).size.width*0.045).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.045).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.045).toString())
+                                    ),
+                                    SizedBox(height: CustomSize.sizeHeight(context) / 16,),
+                                    Container(
+                                      alignment: Alignment.centerLeft,
+                                      child: CustomText.bodyMedium14(
+                                          color: CustomColor.redBtn,
+                                          text: "Akun anda aktif sampai " + newDate.toString().split(' ')[0],
+                                          maxLines: 10,
+                                          sizeNew: double.parse(((MediaQuery.of(context).size.width*0.035).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.035)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.035)).toString())
+                                      ),
+                                    ),
+                                    SizedBox(height: CustomSize.sizeHeight(context) / 86,),
+                                    Container(
+                                      width: CustomSize.sizeWidth(context),
+                                      height: CustomSize.sizeHeight(context) / 16,
+                                      decoration: BoxDecoration(
+                                        borderRadius: BorderRadius.circular(10),
+                                        color: CustomColor.primaryLight,
+                                      ),
+                                      child: Material(
+                                        borderRadius: BorderRadius.circular(10),
+                                        color: Colors.transparent,
+                                        child: InkWell(
+                                          borderRadius: BorderRadius.circular(10),
+                                          splashColor: Colors.white.withOpacity(.2),
+                                          highlightColor: CustomColor.primaryLight,
+                                          onTap: (){
+                                            setState(() {
+                                              isInterest = true;
+                                            });
+                                          },
+                                          child: Container(
+                                            width: CustomSize.sizeWidth(context),
+                                            height: CustomSize.sizeHeight(context) / 16,
+                                            decoration: BoxDecoration(
+                                              borderRadius: BorderRadius.circular(10),
+                                            ),
+                                            child: Center(
+                                              child: CustomText.text(
+                                                  text: "Aktifkan Sekarang",
+                                                  size: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.04)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.04)).toString()),
+                                                  weight: FontWeight.w600,
+                                                  color: Colors.white,
+                                                  maxLines: 1
+                                              ),
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
                     ),
                   ),
-                ),
-              )
-            ],
+                )
+              ],
+            ),
           ),
         ),
+        data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0),
       ),
     );
   }

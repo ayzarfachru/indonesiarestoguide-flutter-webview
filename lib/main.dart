@@ -56,7 +56,7 @@ class MyApp extends StatefulWidget{
   _MyAppState createState() => _MyAppState();
 }
 
-class _MyAppState extends State<MyApp> with WidgetsBindingObserver{
+class _MyAppState extends State<MyApp> {
   Future<bool> _checkForSession() async {
     await Future.delayed(Duration.zero, () {});
     return true;
@@ -142,7 +142,7 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver{
     // initDynamicLinks().then((status) {
     //   print('OI1 '+deepLink2);
     // });
-    WidgetsBinding.instance!.addObserver(this);
+    // WidgetsBinding.instance!.addObserver(this);
     _checkForSession().then((status) {
       if (status) {
         _navigateHome();
@@ -151,48 +151,48 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver{
     print('OI2 '+deepLink2);
     super.initState();
   }
+  //
+  // @override
+  // void dispose() {
+  //   WidgetsBinding.instance!.removeObserver(this);
+  //   super.dispose();
+  // }
 
-  @override
-  void dispose() {
-    WidgetsBinding.instance!.removeObserver(this);
-    super.dispose();
-  }
-
-  @override
-  void didChangeAppLifecycleState(AppLifecycleState state) {
-    if (state == AppLifecycleState.resumed) {
-      print('ASYU');
-      _checkForSession().then((status) {
-        if (status) {
-          _navigateHome();
-        }
-      });
-    }
-    if (state == AppLifecycleState.inactive) {
-      print('ASYU');
-      _checkForSession().then((status) {
-        if (status) {
-          _navigateHome();
-        }
-      });
-    }
-    if (state == AppLifecycleState.paused) {
-      print('ASYU');
-      _checkForSession().then((status) {
-        if (status) {
-          _navigateHome();
-        }
-      });
-    }
-    if (state == AppLifecycleState.detached) {
-      print('ASYU');
-      _checkForSession().then((status) {
-        if (status) {
-          _navigateHome();
-        }
-      });
-    }
-  }
+  // @override
+  // void didChangeAppLifecycleState(AppLifecycleState state) {
+  //   if (state == AppLifecycleState.resumed) {
+  //     print('ASYU');
+  //     _checkForSession().then((status) {
+  //       if (status) {
+  //         _navigateHome();
+  //       }
+  //     });
+  //   }
+  //   if (state == AppLifecycleState.inactive) {
+  //     print('ASYU');
+  //     _checkForSession().then((status) {
+  //       if (status) {
+  //         _navigateHome();
+  //       }
+  //     });
+  //   }
+  //   if (state == AppLifecycleState.paused) {
+  //     print('ASYU');
+  //     _checkForSession().then((status) {
+  //       if (status) {
+  //         _navigateHome();
+  //       }
+  //     });
+  //   }
+  //   if (state == AppLifecycleState.detached) {
+  //     print('ASYU');
+  //     _checkForSession().then((status) {
+  //       if (status) {
+  //         _navigateHome();
+  //       }
+  //     });
+  //   }
+  // }
 
   @override
   Widget build(BuildContext context) {

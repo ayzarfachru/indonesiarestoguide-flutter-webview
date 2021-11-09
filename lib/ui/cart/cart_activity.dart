@@ -507,7 +507,7 @@ class _CartActivityState extends State<CartActivity> {
     if (currentBackPressTime == null ||
         now.difference(currentBackPressTime!) > Duration(seconds: 2)) {
       currentBackPressTime = now;
-      Fluttertoast.showToast(msg: 'Tekan lagi untuk kembali ke menu utama');
+      Fluttertoast.showToast(msg: 'Tekan lagi untuk kembali ke menu utama', fontSize: double.parse(((MediaQuery.of(context).size.width*0.03).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.03)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.03)).toString()));
       return Future.value(false);
     }
 //    SystemNavigator.pop();
@@ -618,7 +618,10 @@ class _CartActivityState extends State<CartActivity> {
                             ),
                           ),
                           SizedBox(width: CustomSize.sizeWidth(context) / 32,),
-                          CustomText.textHeading6(text: (_transCode == 1)?"Pesan Antar":(_transCode == 2)?"Ambil Langsung":"Makan Ditempat",),
+                          MediaQuery(
+                              child: CustomText.textHeading6(text: (_transCode == 1)?"Pesan Antar":(_transCode == 2)?"Ambil Langsung":"Makan Ditempat", sizeNew: double.parse(((MediaQuery.of(context).size.width*0.035).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.035).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.035).toString())),
+                              data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0)
+                          ),
                         ],
                       ),
                       Padding(
@@ -656,7 +659,7 @@ class _CartActivityState extends State<CartActivity> {
                                                     type: PageTransitionType.fade,
                                                     child: CartActivity()));
                                               } else {
-                                                Fluttertoast.showToast(msg: "Pesan antar tidak tersedia.");
+                                                Fluttertoast.showToast(msg: "Pesan antar tidak tersedia.", fontSize: double.parse(((MediaQuery.of(context).size.width*0.03).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.03)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.03)).toString()));
                                               }
                                             });
                                           },
@@ -674,7 +677,10 @@ class _CartActivityState extends State<CartActivity> {
                                                 ),
                                               ),
                                               SizedBox(width: CustomSize.sizeWidth(context) / 32,),
-                                              CustomText.textHeading6(text: "Pesan Antar",),
+                                              MediaQuery(
+                                                  child: CustomText.textHeading6(text: "Pesan Antar", sizeNew: double.parse(((MediaQuery.of(context).size.width*0.035).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.035).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.035).toString())),
+                                                  data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0)
+                                              ),
                                             ],
                                           ),
                                         ),
@@ -691,7 +697,7 @@ class _CartActivityState extends State<CartActivity> {
                                                     type: PageTransitionType.fade,
                                                     child: CartActivity()));
                                               } else {
-                                                Fluttertoast.showToast(msg: "Ambil langsung tidak tersedia.");
+                                                Fluttertoast.showToast(msg: "Ambil langsung tidak tersedia.", fontSize: double.parse(((MediaQuery.of(context).size.width*0.03).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.03)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.03)).toString()));
                                               }
                                             });
                                           },
@@ -709,7 +715,10 @@ class _CartActivityState extends State<CartActivity> {
                                                 ),
                                               ),
                                               SizedBox(width: CustomSize.sizeWidth(context) / 32,),
-                                              CustomText.textHeading6(text: "Ambil Langsung",),
+                                              MediaQuery(
+                                                  child: CustomText.textHeading6(text: "Ambil Langsung", sizeNew: double.parse(((MediaQuery.of(context).size.width*0.035).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.035).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.035).toString())),
+                                                  data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0)
+                                              ),
                                             ],
                                           ),
                                         ),
@@ -740,7 +749,10 @@ class _CartActivityState extends State<CartActivity> {
                                                 ),
                                               ),
                                               SizedBox(width: CustomSize.sizeWidth(context) / 32,),
-                                              CustomText.textHeading6(text: "Makan Ditempat",),
+                                              MediaQuery(
+                                                  child: CustomText.textHeading6(text: "Makan Ditempat", sizeNew: double.parse(((MediaQuery.of(context).size.width*0.035).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.035).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.035).toString())),
+                                                  data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0)
+                                              ),
                                             ],
                                           ),
                                         ),
@@ -761,9 +773,13 @@ class _CartActivityState extends State<CartActivity> {
                             child: Padding(
                               padding: EdgeInsets.symmetric(horizontal: CustomSize.sizeWidth(context) / 32),
                               child: Center(
-                                child: CustomText.textTitle8(
-                                    text: "Ganti",
-                                    color: Colors.grey
+                                child: MediaQuery(
+                                  child: CustomText.textTitle8(
+                                      text: "Ganti",
+                                      sizeNew: double.parse(((MediaQuery.of(context).size.width*0.035).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.035).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.035).toString()),
+                                      color: Colors.grey
+                                  ),
+                                    data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0)
                                 ),
                               ),
                             ),
@@ -782,12 +798,18 @@ class _CartActivityState extends State<CartActivity> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       // SizedBox(height: CustomSize.sizeHeight(context) / 32,),
-                      CustomText.bodyLight12(text: "Alamat Toko"),
+                      MediaQuery(
+                          child: CustomText.bodyLight12(text: "Alamat Toko", sizeNew: double.parse(((MediaQuery.of(context).size.width*0.03).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.03)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.03)).toString())),
+                          data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0)
+                      ),
                       SizedBox(height: CustomSize.sizeHeight(context) * 0.005,),
-                      CustomText.textHeading6(
-                          text: restoAddress,
-                          minSize: 16,
-                          maxLines: 10
+                      MediaQuery(
+                        child: CustomText.textHeading6(
+                            text: restoAddress,
+                            sizeNew: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.04).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.04).toString()),
+                            maxLines: 10
+                        ),
+                          data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0)
                       ),
                     ],
                   ),
@@ -798,12 +820,18 @@ class _CartActivityState extends State<CartActivity> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       // SizedBox(height: CustomSize.sizeHeight(context) / 32,),
-                      CustomText.bodyLight12(text: "Alamat Pengiriman"),
+                      MediaQuery(
+                          child: CustomText.bodyLight12(text: "Alamat Pengiriman", sizeNew: double.parse(((MediaQuery.of(context).size.width*0.03).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.03)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.03)).toString())),
+                          data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0)
+                      ),
                       SizedBox(height: CustomSize.sizeHeight(context) * 0.005,),
-                      CustomText.textHeading4(
-                          text: (delivAddress.toString() == "null")?"Masukkan alamat anda.":delivAddress.toString(),
-                          minSize: 16,
-                          maxLines: 10
+                      MediaQuery(
+                        child: CustomText.textHeading4(
+                            text: (delivAddress.toString() == "null")?"Masukkan alamat anda.":delivAddress.toString(),
+                            sizeNew: double.parse(((MediaQuery.of(context).size.width*0.045).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.045)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.045)).toString()),
+                            maxLines: 10
+                        ),
+                          data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0)
                       ),
                       SizedBox(height: CustomSize.sizeHeight(context) * 0.008,),
                       Row(
@@ -900,7 +928,13 @@ class _CartActivityState extends State<CartActivity> {
                                   children: [
                                     (srchAddress2 != true)?Icon(FontAwesome.map_marker, size: 14,):Container(),
                                     (srchAddress2 != true)?SizedBox(width: CustomSize.sizeWidth(context) / 86,):Container(),
-                                    (srchAddress2 != true)?CustomText.bodyMedium12(text: "Buka maps"):CustomText.bodyMedium12(text: "Simpan")
+                                    (srchAddress2 != true)?MediaQuery(
+                                        child: CustomText.bodyMedium12(text: "Buka maps", sizeNew: double.parse(((MediaQuery.of(context).size.width*0.03).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.03)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.03)).toString())),
+                                        data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0)
+                                    ):MediaQuery(
+                                        child: CustomText.bodyMedium12(text: "Simpan", sizeNew: double.parse(((MediaQuery.of(context).size.width*0.03).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.03)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.03)).toString())),
+                                        data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0)
+                                    )
                                   ],
                                 ),
                               ),
@@ -930,156 +964,178 @@ class _CartActivityState extends State<CartActivity> {
                         child: AnimatedContainer(
                           duration: Duration(milliseconds: 500),
                           width: CustomSize.sizeWidth(context),
-                          height: (int.parse(qty[restoId.indexOf(menuJson[index].id.toString())]) <= 0) ? 0 : CustomSize.sizeHeight(context) / 4.4,
+                          height: (int.parse(qty[restoId.indexOf(menuJson[index].id.toString())]) <= 0) ? 0 : CustomSize.sizeHeight(context) / 4,
                           child: ListView(
                             physics: NeverScrollableScrollPhysics(),
                             padding: EdgeInsets.zero,
                             shrinkWrap: true,
                             children: [
-                              Container(
-                                height: CustomSize.sizeHeight(context) / 5,
-                                child: Row(
-                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                  children: [
-                                    Container(
-                                      width: CustomSize.sizeWidth(context) / 1.65,
-                                      child: Column(
-                                        crossAxisAlignment: CrossAxisAlignment.start,
-                                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                        children: [
-                                          Column(
-                                            crossAxisAlignment: CrossAxisAlignment.start,
-                                            children: [
-                                              CustomText.textHeading4(
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                children: [
+                                  Container(
+                                    width: CustomSize.sizeWidth(context) / 1.65,
+                                    height: CustomSize.sizeWidth(context) / 3,
+                                    child: Column(
+                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                      children: [
+                                        Column(
+                                          crossAxisAlignment: CrossAxisAlignment.start,
+                                          mainAxisAlignment: MainAxisAlignment.start,
+                                          children: [
+                                            MediaQuery(
+                                              child: CustomText.textHeading4(
                                                   text: menuJson[index].name,
-                                                  minSize: 18,
+                                                  sizeNew: double.parse(((MediaQuery.of(context).size.width*0.045).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.045)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.045)).toString()),
                                                   maxLines: 1
                                               ),
-                                              CustomText.bodyRegular14(
+                                                data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0)
+                                            ),
+                                            MediaQuery(
+                                              child: CustomText.bodyRegular14(
                                                   text: menuJson[index].desc,
                                                   maxLines: 2,
-                                                  minSize: 14
+                                                  sizeNew: double.parse(((MediaQuery.of(context).size.width*0.035).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.035)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.035)).toString()),
                                               ),
-                                              // CustomText.bodyRegular16(text: (noted[index].split(': ')[1] != 'kam5ia_null}')?noted[index].split('{')[1].split('}')[0]:''),
-                                              SizedBox(height: CustomSize.sizeHeight(context) / 48,),
-                                        (menuJson[index].discount == null || menuJson[index].discount == 'null' || menuJson[index].discount == '')?CustomText.bodyMedium14(
+                                                data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0)
+                                            ),
+                                            // CustomText.bodyRegular16(text: (noted[index].split(': ')[1] != 'kam5ia_null}')?noted[index].split('{')[1].split('}')[0]:''),
+                                            SizedBox(height: CustomSize.sizeHeight(context) / 48,),
+                                      (menuJson[index].discount == null || menuJson[index].discount == 'null' || menuJson[index].discount == '')?MediaQuery(
+                                        child: CustomText.bodyMedium14(
                                                   text: NumberFormat.currency(locale: 'id', symbol: '', decimalDigits: 0).format(int.parse(menuJson[index].price)),
                                                   maxLines: 1,
-                                                  minSize: 16
-                                              )
-                                            :Row(
-                                                children: [
-                                                  CustomText.bodyMedium14(
+                                            sizeNew: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.04)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.04)).toString())
+                                              ),
+                                          data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0)
+                                      )
+                                          :Row(
+                                              children: [
+                                                MediaQuery(
+                                                  child: CustomText.bodyMedium14(
                                                       text: NumberFormat.currency(locale: 'id', symbol: '', decimalDigits: 0).format(int.parse(menuJson[index].price)),
                                                       maxLines: 1,
-                                                      minSize: 16,
+                                                      sizeNew: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.04)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.04)).toString()),
                                                       decoration: TextDecoration.lineThrough
                                                   ),
-                                                  SizedBox(width: CustomSize.sizeWidth(context) / 48,),
-                                                  CustomText.bodyMedium14(
+                                                    data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0)
+                                                ),
+                                                SizedBox(width: CustomSize.sizeWidth(context) / 48,),
+                                                MediaQuery(
+                                                  child: CustomText.bodyMedium14(
                                                       text: NumberFormat.currency(locale: 'id', symbol: '', decimalDigits: 0).format(int.parse(menuJson[index].discount!)),
                                                       maxLines: 1,
-                                                      minSize: 16
+                                                      sizeNew: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.04)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.04)).toString())
                                                   ),
-                                                ],
-                                              ),
-                                            ],
-                                          ),
-                                          // (menuReady[index])?Container():CustomText.bodyMedium14(
-                                          //     text: "Menu tidak tersedia.",
-                                          //     maxLines: 1,
-                                          //     color: Colors.red
-                                          // ),
-                                          (noted[index].split(': ')[1] != 'kam5ia_null}')?Container():GestureDetector(
-                                            onTap: (){
-                                              showDialog(
-                                                  context: context,
-                                                  builder: (context) {
-                                                    return AlertDialog(
-                                                      shape: RoundedRectangleBorder(
-                                                          borderRadius: BorderRadius.all(Radius.circular(10))
-                                                      ),
-                                                      title: Text('Catatan'),
-                                                      content: TextField(
-                                                        autofocus: true,
-                                                        keyboardType: TextInputType.text,
-                                                        controller: note,
-                                                        decoration: InputDecoration(
-                                                          hintText: "Untuk pesananmu",
-                                                          border: OutlineInputBorder(
-                                                            borderRadius: BorderRadius.circular(10.0),
-                                                          ),
-                                                          enabledBorder: OutlineInputBorder(
-                                                            borderSide: const BorderSide(color: Colors.grey, width: 1.0),
-                                                          ),
-                                                          focusedBorder: OutlineInputBorder(
-                                                            borderSide: const BorderSide(color: Colors.grey, width: 2.0),
-                                                          ),
+                                                    data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0)
+                                                ),
+                                              ],
+                                            ),
+                                          ],
+                                        ),
+                                        // (menuReady[index])?Container():CustomText.bodyMedium14(
+                                        //     text: "Menu tidak tersedia.",
+                                        //     maxLines: 1,
+                                        //     color: Colors.red
+                                        // ),
+                                        (noted[index].split(': ')[1] != 'kam5ia_null}')?Container():GestureDetector(
+                                          onTap: (){
+                                            showDialog(
+                                                context: context,
+                                                builder: (context) {
+                                                  return AlertDialog(
+                                                    shape: RoundedRectangleBorder(
+                                                        borderRadius: BorderRadius.all(Radius.circular(10))
+                                                    ),
+                                                    title: CustomText.bodyMedium14(text: 'Catatan', sizeNew: double.parse(((MediaQuery.of(context).size.width*0.045).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.045)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.045)).toString())),
+                                                    content: TextField(
+                                                      autofocus: true,
+                                                      keyboardType: TextInputType.text,
+                                                      controller: note,
+                                                      decoration: InputDecoration(
+                                                        hintText: "Untuk pesananmu",
+                                                        hintStyle: TextStyle(fontSize: double.parse(((MediaQuery.of(context).size.width*0.035).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.035)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.035)).toString())),
+                                                        border: OutlineInputBorder(
+                                                          borderRadius: BorderRadius.circular(10.0),
+                                                        ),
+                                                        enabledBorder: OutlineInputBorder(
+                                                          borderSide: const BorderSide(color: Colors.grey, width: 1.0),
+                                                        ),
+                                                        focusedBorder: OutlineInputBorder(
+                                                          borderSide: const BorderSide(color: Colors.grey, width: 2.0),
                                                         ),
                                                       ),
-                                                      actions: <Widget>[
-                                                        Center(
-                                                          child: Padding(
-                                                            padding: const EdgeInsets.only(left: 10.0, right: 10.0, bottom: 8.0),
-                                                            child: FlatButton(
-                                                              minWidth: CustomSize.sizeWidth(context),
-                                                              color: CustomColor.primaryLight,
-                                                              textColor: Colors.white,
-                                                              shape: RoundedRectangleBorder(
-                                                                  borderRadius: BorderRadius.all(Radius.circular(10))
-                                                              ),
-                                                              child: Text('Simpan'),
-                                                              onPressed: () async{
-                                                                String s = noted[restoId.indexOf(menuJson[index].id.toString())];
-                                                                String i = s.replaceAll(noted[restoId.indexOf(menuJson[index].id.toString())].split(': ')[1], (note.text != '')?note.text+'}':'kam5ia_null'+'}') ;
-                                                                print(i);
-                                                                noted[restoId.indexOf(menuJson[index].id.toString())] = i.toString();
-                                                                // int i = int.parse(s) + 1;
-                                                                // print(i);
-                                                                // noted.add(note.text);
-                                                                SharedPreferences pref = await SharedPreferences.getInstance();
-                                                                pref.setStringList("note", noted);
-                                                                noteProduct = '';
-                                                                // _getData();
-                                                                getNote();
-                                                                setState(() {
-                                                                  // codeDialog = valueText;
-                                                                  Navigator.pop(context);
-                                                                  Navigator.push(context, PageTransition(
-                                                                      type: PageTransitionType.fade,
-                                                                      child: CartActivity()));
-                                                                });
-                                                              },
+                                                    ),
+                                                    actions: <Widget>[
+                                                      Center(
+                                                        child: Padding(
+                                                          padding: const EdgeInsets.only(left: 10.0, right: 10.0, bottom: 8.0),
+                                                          child: FlatButton(
+                                                            minWidth: CustomSize.sizeWidth(context),
+                                                            color: CustomColor.primaryLight,
+                                                            textColor: Colors.white,
+                                                            shape: RoundedRectangleBorder(
+                                                                borderRadius: BorderRadius.all(Radius.circular(10))
                                                             ),
+                                                            child: CustomText.bodyMedium14(text: 'Simpan', color: Colors.white, sizeNew: double.parse(((MediaQuery.of(context).size.width*0.035).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.035)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.035)).toString())),
+                                                            onPressed: () async{
+                                                              String s = noted[restoId.indexOf(menuJson[index].id.toString())];
+                                                              String i = s.replaceAll(noted[restoId.indexOf(menuJson[index].id.toString())].split(': ')[1], (note.text != '')?note.text+'}':'kam5ia_null'+'}') ;
+                                                              print(i);
+                                                              noted[restoId.indexOf(menuJson[index].id.toString())] = i.toString();
+                                                              // int i = int.parse(s) + 1;
+                                                              // print(i);
+                                                              // noted.add(note.text);
+                                                              SharedPreferences pref = await SharedPreferences.getInstance();
+                                                              pref.setStringList("note", noted);
+                                                              noteProduct = '';
+                                                              // _getData();
+                                                              getNote();
+                                                              setState(() {
+                                                                // codeDialog = valueText;
+                                                                Navigator.pop(context);
+                                                                Navigator.push(context, PageTransition(
+                                                                    type: PageTransitionType.fade,
+                                                                    child: CartActivity()));
+                                                              });
+                                                            },
                                                           ),
                                                         ),
+                                                      ),
 
-                                                      ],
-                                                    );
-                                                  });
-                                            },
-                                            child: Container(
-                                              height: CustomSize.sizeHeight(context) / 28,
-                                              width: CustomSize.sizeWidth(context) / 3,
-                                              decoration: BoxDecoration(
-                                                  borderRadius: BorderRadius.circular(20),
-                                                  border: Border.all(color: Colors.grey)
-                                              ),
-                                              child: Padding(
-                                                padding: EdgeInsets.symmetric(horizontal: CustomSize.sizeWidth(context) / 35),
-                                                child: Center(
+                                                    ],
+                                                  );
+                                                });
+                                          },
+                                          child: Container(
+                                            height: CustomSize.sizeHeight(context) / 28,
+                                            width: CustomSize.sizeWidth(context) / 3,
+                                            decoration: BoxDecoration(
+                                                borderRadius: BorderRadius.circular(20),
+                                                border: Border.all(color: Colors.grey)
+                                            ),
+                                            child: Padding(
+                                              padding: EdgeInsets.symmetric(horizontal: CustomSize.sizeWidth(context) / 35),
+                                              child: Center(
+                                                child: MediaQuery(
                                                   child: CustomText.bodyRegular14(
                                                       text: 'Tambah catatan',
-                                                      color: Colors.grey
+                                                      color: Colors.grey,
+                                                      sizeNew: double.parse(((MediaQuery.of(context).size.width*0.035).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.035)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.035)).toString())
                                                   ),
+                                                    data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0)
                                                 ),
                                               ),
                                             ),
                                           ),
-                                        ],
-                                      ),
+                                        ),
+                                      ],
                                     ),
-                                    Column(
+                                  ),
+                                  Container(
+                                    height: CustomSize.sizeWidth(context) / 2.5,
+                                    child: Column(
                                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                       crossAxisAlignment: CrossAxisAlignment.end,
                                       children: [
@@ -1198,11 +1254,17 @@ class _CartActivityState extends State<CartActivity> {
                                                     color: Colors.grey[200],
                                                     shape: BoxShape.circle
                                                 ),
-                                                child: Center(child: CustomText.textHeading1(text: "-", color: Colors.grey)),
+                                                child: Center(child: MediaQuery(
+                                                    child: CustomText.textHeading1(text: "-", color: Colors.grey, sizeNew: double.parse(((MediaQuery.of(context).size.width*0.08).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.08)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.08)).toString())),
+                                                    data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0)
+                                                )),
                                               ),
                                             ),
                                             SizedBox(width: CustomSize.sizeWidth(context) / 24,),
-                                            CustomText.bodyRegular16(text: qty[index]),
+                                            MediaQuery(
+                                                child: CustomText.bodyRegular16(text: qty[index], sizeNew: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.04)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.04)).toString())),
+                                                data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0)
+                                            ),
                                             SizedBox(width: CustomSize.sizeWidth(context) / 24,),
                                             GestureDetector(
                                               onTap: ()async{
@@ -1227,15 +1289,18 @@ class _CartActivityState extends State<CartActivity> {
                                                     color: Colors.grey[200],
                                                     shape: BoxShape.circle
                                                 ),
-                                                child: Center(child: CustomText.textHeading1(text: "+", color: Colors.grey)),
+                                                child: Center(child: MediaQuery(
+                                                    child: CustomText.textHeading1(text: "+", color: Colors.grey, sizeNew: double.parse(((MediaQuery.of(context).size.width*0.08).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.08)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.08)).toString())),
+                                                    data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0)
+                                                )),
                                               ),
                                             ),
                                           ],
                                         )
                                       ],
                                     ),
-                                  ],
-                                ),
+                                  ),
+                                ],
                               ),
                               SizedBox(height: CustomSize.sizeHeight(context) / 68,),
                               Divider()
@@ -1251,7 +1316,10 @@ class _CartActivityState extends State<CartActivity> {
                     left: CustomSize.sizeWidth(context) / 32,
                     right: CustomSize.sizeWidth(context) / 32,
                   ),
-                  child: CustomText.textHeading4(text: "Catatan Pesananmu"),
+                  child: MediaQuery(
+                      child: CustomText.textHeading4(text: "Catatan Pesananmu", sizeNew: double.parse(((MediaQuery.of(context).size.width*0.045).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.045)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.045)).toString())),
+                      data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0)
+                  ),
                 ):Container(),
                 (noted2.toString() != '[]')?SizedBox(height: CustomSize.sizeHeight(context) * 0.0048,):Container(),
                 (noted2.toString() != '[]')?ListView.builder(
@@ -1273,7 +1341,10 @@ class _CartActivityState extends State<CartActivity> {
                           // CustomText.textHeading7(text: (noted2[index].split(': ')[1] != 'kam5ia_null}')?noted2[index].split('{')[1].split('}')[0].split(':')[0]+': ':'',  maxLines: 4),
                           Container(
                               width: CustomSize.sizeWidth(context) / 1.6,
-                              child: CustomText.textTitle3(text: (noted2[index].split(': ')[1] != 'kam5ia_null}')?noted2[index].split('{')[1].split('}')[0]:'',  maxLines: 10)
+                              child: MediaQuery(
+                                  child: CustomText.textTitle3(text: (noted2[index].split(': ')[1] != 'kam5ia_null}')?noted2[index].split('{')[1].split('}')[0]:'',  maxLines: 10, sizeNew: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.04)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.04)).toString())),
+                                  data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0)
+                              )
                           ),
                           (noted2[index].split(': ')[1] == 'kam5ia_null}' || noted2[index].split(': ')[1] == '}')?Container():GestureDetector(
                             onTap: (){
@@ -1415,8 +1486,14 @@ class _CartActivityState extends State<CartActivity> {
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            CustomText.textHeading4(text: "Ada lagi pesanannya ?"),
-                            CustomText.bodyRegular16(text: "Masih bisa tambah lagi loo")
+                            MediaQuery(
+                                child: CustomText.textHeading4(text: "Ada lagi pesanannya ?", sizeNew: double.parse(((MediaQuery.of(context).size.width*0.045).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.045)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.045)).toString())),
+                                data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0)
+                            ),
+                            MediaQuery(
+                                child: CustomText.bodyRegular16(text: "Masih bisa tambah lagi loo", sizeNew: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.04)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.04)).toString())),
+                                data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0)
+                            )
                           ],
                         ),
                       ),
@@ -1439,9 +1516,13 @@ class _CartActivityState extends State<CartActivity> {
                             child: Padding(
                               padding: EdgeInsets.symmetric(horizontal: CustomSize.sizeWidth(context) / 32),
                               child: Center(
-                                child: CustomText.textTitle8(
-                                    text: "Tambah",
-                                    color: Colors.grey
+                                child: MediaQuery(
+                                  child: CustomText.textTitle8(
+                                      text: "Tambah",
+                                      color: Colors.grey,
+                                      sizeNew: double.parse(((MediaQuery.of(context).size.width*0.035).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.035).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.035).toString())
+                                  ),
+                                    data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0)
                                 ),
                               ),
                             ),
@@ -1465,7 +1546,10 @@ class _CartActivityState extends State<CartActivity> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        CustomText.textHeading7(text: "Data Usaha"),
+                        MediaQuery(
+                            child: CustomText.textHeading7(text: "Data Usaha", sizeNew: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.04).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.04).toString())),
+                            data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0)
+                        ),
                         SizedBox(height: CustomSize.sizeHeight(context) * 0.01,),
                         Container(
                           padding: EdgeInsets.only(
@@ -1476,34 +1560,56 @@ class _CartActivityState extends State<CartActivity> {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               (nameRestoTrans != '' && nameRestoTrans != 'null')?
-                              CustomText.bodyRegular17(text: "Nama Usaha: "+nameRestoTrans, maxLines: 4):
+                              MediaQuery(
+                                  child: CustomText.bodyRegular17(text: "Nama Usaha: "+nameRestoTrans, maxLines: 4, sizeNew: double.parse(((MediaQuery.of(context).size.width*0.038).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.038).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.038).toString())),
+                                  data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0)
+                              ):
                               Row(
                                 children: [
-                                  CustomText.bodyRegular17(text: "Nama Usaha: ", maxLines: 2),
-                                  CustomText.bodyRegular17(text: "kosong", maxLines: 2, color: CustomColor.redBtn),
+                                  MediaQuery(
+                                      child: CustomText.bodyRegular17(text: "Nama Usaha: ", maxLines: 2, sizeNew: double.parse(((MediaQuery.of(context).size.width*0.038).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.038).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.038).toString())),
+                                      data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0)
+                                      ),
+                                  MediaQuery(
+                                      child: CustomText.bodyRegular17(text: "kosong", maxLines: 2, color: CustomColor.redBtn, sizeNew: double.parse(((MediaQuery.of(context).size.width*0.038).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.038).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.038).toString())),
+                                      data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0)
+                                  ),
                                 ],
                               ),
                               SizedBox(height: CustomSize.sizeHeight(context) * 0.005,),
 
                               (restoAddress != '' && restoAddress != 'null')?
                               Row(
+                                crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  CustomText.bodyRegular17(text: "Alamat Usaha: ", maxLines: 4),
+                                  MediaQuery(
+                                      child: CustomText.bodyRegular17(text: "Alamat Usaha: ", maxLines: 4, sizeNew: double.parse(((MediaQuery.of(context).size.width*0.038).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.038).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.038).toString())),
+                                      data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0)
+                                  ),
                                   GestureDetector(
                                       onTap: (){
                                         _launchURL();
                                       },
                                       child: Container(
                                           width: CustomSize.sizeWidth(context) / 1.8,
-                                          child: CustomText.bodyRegular17(text: restoAddress, maxLines: 1, minSize: 15)
+                                          child: MediaQuery(
+                                              child: CustomText.bodyRegular17(text: restoAddress, maxLines: 14, sizeNew: double.parse(((MediaQuery.of(context).size.width*0.038).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.038).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.038).toString())),
+                                              data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0)
+                                          )
                                       )
                                   ),
                                 ],
                               ):
                               Row(
                                 children: [
-                                  CustomText.bodyRegular17(text: "Alamat Usaha: ", maxLines: 2),
-                                  CustomText.bodyRegular17(text: "kosong", maxLines: 2, color: CustomColor.redBtn),
+                                  MediaQuery(
+                                      child: CustomText.bodyRegular17(text: "Alamat Usaha: ", maxLines: 2, sizeNew: double.parse(((MediaQuery.of(context).size.width*0.038).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.038).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.038).toString())),
+                                      data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0)
+                                  ),
+                                  MediaQuery(
+                                      child: CustomText.bodyRegular17(text: "kosong", maxLines: 2, color: CustomColor.redBtn, sizeNew: double.parse(((MediaQuery.of(context).size.width*0.038).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.038).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.038).toString())),
+                                      data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0)
+                                  ),
                                 ],
                               ),
                               SizedBox(height: CustomSize.sizeHeight(context) * 0.005,),
@@ -1511,22 +1617,34 @@ class _CartActivityState extends State<CartActivity> {
                               (emailTokoTrans != '' && emailTokoTrans != 'null')?
                               Row(
                                 children: [
-                                  CustomText.bodyRegular17(text: "Email Usaha: ", maxLines: 2),
+                                  MediaQuery(
+                                      child: CustomText.bodyRegular17(text: "Email Usaha: ", maxLines: 2, sizeNew: double.parse(((MediaQuery.of(context).size.width*0.038).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.038).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.038).toString())),
+                                      data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0)
+                                  ),
                                   GestureDetector(
                                       onTap: (){
                                         launch('mailto:$emailTokoTrans');
                                       },
                                       child: Container(
                                           width: CustomSize.sizeWidth(context) / 1.8,
-                                          child: CustomText.bodyRegular17(text: emailTokoTrans, maxLines: 1)
+                                          child: MediaQuery(
+                                              child: CustomText.bodyRegular17(text: emailTokoTrans, maxLines: 1, sizeNew: double.parse(((MediaQuery.of(context).size.width*0.038).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.038).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.038).toString())),
+                                              data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0)
+                                          )
                                       )
                                   ),
                                 ],
                               ):
                               Row(
                                 children: [
-                                  CustomText.bodyRegular17(text: "Email Usaha: ", maxLines: 2),
-                                  CustomText.bodyRegular17(text: "kosong", maxLines: 2, color: CustomColor.redBtn),
+                                  MediaQuery(
+                                      child: CustomText.bodyRegular17(text: "Email Usaha: ", maxLines: 2, sizeNew: double.parse(((MediaQuery.of(context).size.width*0.038).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.038).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.038).toString())),
+                                      data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0)
+                                  ),
+                                  MediaQuery(
+                                      child: CustomText.bodyRegular17(text: "kosong", maxLines: 2, color: CustomColor.redBtn, sizeNew: double.parse(((MediaQuery.of(context).size.width*0.038).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.038).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.038).toString())),
+                                      data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0)
+                                  ),
                                 ],
                               ),
                               SizedBox(height: CustomSize.sizeHeight(context) * 0.005,),
@@ -1534,69 +1652,126 @@ class _CartActivityState extends State<CartActivity> {
                               (phoneRestoTrans != '' && phoneRestoTrans != 'null')?
                               Row(
                                 children: [
-                                  CustomText.bodyRegular17(text: "Telepon Usaha: ", maxLines: 2),
+                                  MediaQuery(
+                                      child: CustomText.bodyRegular17(text: "Telepon Usaha: ", maxLines: 2, sizeNew: double.parse(((MediaQuery.of(context).size.width*0.038).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.038).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.038).toString())),
+                                      data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0)
+                                  ),
                                   GestureDetector(
                                       onTap: (){
                                         launch('tel:$phoneRestoTrans');
                                       },
-                                      child: CustomText.bodyRegular17(text: phoneRestoTrans, maxLines: 2)
+                                      child: MediaQuery(
+                                          child: CustomText.bodyRegular17(text: phoneRestoTrans, maxLines: 2, sizeNew: double.parse(((MediaQuery.of(context).size.width*0.038).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.038).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.038).toString())),
+                                          data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0)
+                                      )
                                   ),
                                 ],
                               ):
                               Row(
                                 children: [
-                                  CustomText.bodyRegular17(text: "Telepon Usaha: ", maxLines: 2),
-                                  CustomText.bodyRegular17(text: "kosong", maxLines: 2, color: CustomColor.redBtn),
+                                  MediaQuery(
+                                      child: CustomText.bodyRegular17(text: "Telepon Usaha: ", maxLines: 2, sizeNew: double.parse(((MediaQuery.of(context).size.width*0.038).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.038).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.038).toString())),
+                                      data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0)
+                                  ),
+                                  MediaQuery(
+                                      child: CustomText.bodyRegular17(text: "kosong", maxLines: 2, color: CustomColor.redBtn, sizeNew: double.parse(((MediaQuery.of(context).size.width*0.038).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.038).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.038).toString())),
+                                      data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0)
+                                  ),
                                 ],
                               ),
                               SizedBox(height: CustomSize.sizeHeight(context) * 0.005,),
 
                               (ownerTokoTrans != '' && ownerTokoTrans != 'null')?
-                              CustomText.bodyRegular17(text: "Nama Pemilik: "+ownerTokoTrans, maxLines: 2):
+                              MediaQuery(
+                                  child: CustomText.bodyRegular17(text: "Nama Pemilik: "+ownerTokoTrans, maxLines: 2, sizeNew: double.parse(((MediaQuery.of(context).size.width*0.038).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.038).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.038).toString())),
+                                  data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0)
+                              ):
                               Row(
                                 children: [
-                                  CustomText.bodyRegular17(text: "Nama Pemilik: ", maxLines: 2),
-                                  CustomText.bodyRegular17(text: "kosong", maxLines: 2, color: CustomColor.redBtn),
+                                  MediaQuery(
+                                      child: CustomText.bodyRegular17(text: "Nama Pemilik: ", maxLines: 2, sizeNew: double.parse(((MediaQuery.of(context).size.width*0.038).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.038).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.038).toString())),
+                                      data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0)
+                                      ),
+                                  MediaQuery(
+                                      child: CustomText.bodyRegular17(text: "kosong", maxLines: 2, color: CustomColor.redBtn, sizeNew: double.parse(((MediaQuery.of(context).size.width*0.038).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.038).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.038).toString())),
+                                      data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0)
+                                  ),
                                 ],
                               ),
                               SizedBox(height: CustomSize.sizeHeight(context) * 0.005,),
 
                               (pjTokoTrans != '' && pjTokoTrans != 'null')?
-                              CustomText.bodyRegular17(text: "Nama Penanggung Jawab: "+pjTokoTrans, maxLines: 2):
+                              MediaQuery(
+                                  child: CustomText.bodyRegular17(text: "Nama Penanggung Jawab: "+pjTokoTrans, maxLines: 2, sizeNew: double.parse(((MediaQuery.of(context).size.width*0.038).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.038).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.038).toString())),
+                                  data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0)
+                              ):
                               Row(
                                 children: [
-                                  CustomText.bodyRegular17(text: "Nama Penanggung Jawab: ", maxLines: 2),
-                                  CustomText.bodyRegular17(text: "kosong", maxLines: 2, color: CustomColor.redBtn),
+                                  MediaQuery(
+                                      child: CustomText.bodyRegular17(text: "Nama Penanggung Jawab: ", maxLines: 2, sizeNew: double.parse(((MediaQuery.of(context).size.width*0.038).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.038).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.038).toString())),
+                                      data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0)
+                                  ),
+                                  MediaQuery(
+                                      child: CustomText.bodyRegular17(text: "kosong", maxLines: 2, color: CustomColor.redBtn, sizeNew: double.parse(((MediaQuery.of(context).size.width*0.038).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.038).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.038).toString())),
+                                      data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0)
+                                  ),
                                 ],
                               ),
                               SizedBox(height: CustomSize.sizeHeight(context) * 0.005,),
 
                               (nameRekening != '' && nameRekening != 'null')?
-                              CustomText.bodyRegular17(text: "Nomor Rekening atas Nama: "+nameRekening, maxLines: 2):
+                              MediaQuery(
+                                  child: CustomText.bodyRegular17(text: "Nomor Rekening atas Nama: "+nameRekening, maxLines: 2, sizeNew: double.parse(((MediaQuery.of(context).size.width*0.038).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.038).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.038).toString())),
+                                  data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0)
+                              ):
                               Row(
                                 children: [
-                                  CustomText.bodyRegular17(text: "Nomor Rekening atas Nama: ", maxLines: 2),
-                                  CustomText.bodyRegular17(text: "kosong", maxLines: 2, color: CustomColor.redBtn),
+                                  MediaQuery(
+                                      child: CustomText.bodyRegular17(text: "Nomor Rekening atas Nama: ", maxLines: 2, sizeNew: double.parse(((MediaQuery.of(context).size.width*0.038).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.038).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.038).toString())),
+                                      data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0)
+                                  ),
+                                  MediaQuery(
+                                      child: CustomText.bodyRegular17(text: "kosong", maxLines: 2, color: CustomColor.redBtn, sizeNew: double.parse(((MediaQuery.of(context).size.width*0.038).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.038).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.038).toString())),
+                                      data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0)
+                                  ),
                                 ],
                               ),
                               SizedBox(height: CustomSize.sizeHeight(context) * 0.005,),
 
                               (nameBank != '' && nameBank != 'null')?
-                              CustomText.bodyRegular17(text: "Rekening Bank: "+nameBank, maxLines: 2):
+                              MediaQuery(
+                                  child: CustomText.bodyRegular17(text: "Rekening Bank: "+nameBank, maxLines: 2, sizeNew: double.parse(((MediaQuery.of(context).size.width*0.038).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.038).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.038).toString())),
+                                  data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0)
+                              ):
                               Row(
                                 children: [
-                                  CustomText.bodyRegular17(text: "Rekening Bank: ", maxLines: 2),
-                                  CustomText.bodyRegular17(text: "kosong", maxLines: 2, color: CustomColor.redBtn),
+                                  MediaQuery(
+                                      child: CustomText.bodyRegular17(text: "Rekening Bank: ", maxLines: 2, sizeNew: double.parse(((MediaQuery.of(context).size.width*0.038).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.038).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.038).toString())),
+                                      data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0)
+                                  ),
+                                  MediaQuery(
+                                      child: CustomText.bodyRegular17(text: "kosong", maxLines: 2, color: CustomColor.redBtn, sizeNew: double.parse(((MediaQuery.of(context).size.width*0.038).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.038).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.038).toString())),
+                                      data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0)
+                                  ),
                                 ],
                               ),
                               SizedBox(height: CustomSize.sizeHeight(context) * 0.005,),
 
                               (norekTokoTrans != '' && norekTokoTrans != 'null')?
-                              CustomText.bodyRegular17(text: "Nomor Rekening: "+norekTokoTrans, maxLines: 2):
+                              MediaQuery(
+                                  child: CustomText.bodyRegular17(text: "Nomor Rekening: "+norekTokoTrans, maxLines: 2, sizeNew: double.parse(((MediaQuery.of(context).size.width*0.038).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.038).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.038).toString())),
+                                  data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0)
+                              ):
                               Row(
                                 children: [
-                                  CustomText.bodyRegular17(text: "Nomor Rekening: ", maxLines: 2),
-                                  CustomText.bodyRegular17(text: "kosong", maxLines: 2, color: CustomColor.redBtn),
+                                  MediaQuery(
+                                      child: CustomText.bodyRegular17(text: "Nomor Rekening: ", maxLines: 2, sizeNew: double.parse(((MediaQuery.of(context).size.width*0.038).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.038).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.038).toString())),
+                                      data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0)
+                                  ),
+                                  MediaQuery(
+                                      child: CustomText.bodyRegular17(text: "kosong", maxLines: 2, color: CustomColor.redBtn, sizeNew: double.parse(((MediaQuery.of(context).size.width*0.038).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.038).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.038).toString())),
+                                      data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0)
+                                  ),
                                 ],
                               ),
                             ],
@@ -1629,20 +1804,35 @@ class _CartActivityState extends State<CartActivity> {
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 SizedBox(height: CustomSize.sizeHeight(context) / 36,),
-                                CustomText.textTitle3(text: "Rincian Pembayaran"),
+                                MediaQuery(
+                                    child: CustomText.textTitle3(text: "Rincian Pembayaran", sizeNew: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.04).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.04).toString())),
+                                    data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0)
+                                ),
                                 SizedBox(height: CustomSize.sizeHeight(context) / 50,),
                                 Row(
                                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                   children: [
-                                    CustomText.bodyLight16(text: "Harga"),
-                                    CustomText.bodyLight16(text: NumberFormat.currency(locale: 'id', symbol: '', decimalDigits: 0).format(harga)),
+                                    MediaQuery(
+                                        child: CustomText.bodyLight16(text: "Harga", sizeNew: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.04).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.04).toString())),
+                                        data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0)
+                                    ),
+                                    MediaQuery(
+                                        child: CustomText.bodyLight16(text: NumberFormat.currency(locale: 'id', symbol: '', decimalDigits: 0).format(harga), sizeNew: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.04).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.04).toString())),
+                                        data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0)
+                                    ),
                                   ],
                                 ),
                                 (_transCode == 1)?SizedBox(height: CustomSize.sizeHeight(context) / 100,):SizedBox(),
                                 (_transCode == 1)?Row(mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                   children: [
-                                    CustomText.bodyLight16(text: "Ongkir"),
-                                    CustomText.bodyLight16(text: NumberFormat.currency(locale: 'id', symbol: '', decimalDigits: 0).format(int.parse(totalOngkir))),
+                                    MediaQuery(
+                                        child: CustomText.bodyLight16(text: "Ongkir", sizeNew: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.04).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.04).toString())),
+                                        data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0)
+                                    ),
+                                    MediaQuery(
+                                        child: CustomText.bodyLight16(text: NumberFormat.currency(locale: 'id', symbol: '', decimalDigits: 0).format(int.parse(totalOngkir)), sizeNew: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.04).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.04).toString())),
+                                        data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0)
+                                    ),
                                   ],
                                 ):SizedBox(),
                                 SizedBox(height: CustomSize.sizeHeight(context) / 64,),
@@ -1650,8 +1840,14 @@ class _CartActivityState extends State<CartActivity> {
                                 SizedBox(height: CustomSize.sizeHeight(context) / 120,),
                                 Row(mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                   children: [
-                                    CustomText.textTitle3(text: "Total Pembayaran"),
-                                    CustomText.textTitle3(text: NumberFormat.currency(locale: 'id', symbol: '', decimalDigits: 0).format(int.parse(totalHarga))),
+                                    MediaQuery(
+                                        child: CustomText.textTitle3(text: "Total Pembayaran", sizeNew: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.04).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.04).toString())),
+                                        data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0)
+                                    ),
+                                    MediaQuery(
+                                        child: CustomText.textTitle3(text: NumberFormat.currency(locale: 'id', symbol: '', decimalDigits: 0).format(int.parse(totalHarga)), sizeNew: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.04).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.04).toString())),
+                                        data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0)
+                                    ),
                                   ],
                                 ),
                               ],
@@ -1725,12 +1921,12 @@ class _CartActivityState extends State<CartActivity> {
                           print('ini loh telp '+notelp.toString()+'i');
                           if (notelp.toString() == "null" || notelp.toString() == '') {
                             Fluttertoast.showToast(
-                              msg: "Isi nomor telepon anda terlebih dahulu!",);
+                              msg: "Isi nomor telepon anda terlebih dahulu!", fontSize: double.parse(((MediaQuery.of(context).size.width*0.03).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.03)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.03)).toString()));
                             Navigator.push(context, PageTransition(type: PageTransitionType.fade, child: new ProfileActivity()));
                           } else {
                             if (message.toString() == 'resto tutup') {
                               Fluttertoast.showToast(
-                                msg: "Toko sedang tutup!",);
+                                msg: "Toko sedang tutup!", fontSize: double.parse(((MediaQuery.of(context).size.width*0.03).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.03)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.03)).toString()));
                             } else {
                               if(_transCode == 1){
                                 if(delivAddress.toString() != '' && delivAddress.toString() != 'null' && totalOngkir.toString() != '0'){
@@ -1744,8 +1940,8 @@ class _CartActivityState extends State<CartActivity> {
                                           shape: RoundedRectangleBorder(
                                               borderRadius: BorderRadius.all(Radius.circular(10))
                                           ),
-                                          title: Center(child: Text('Peringatan!', style: TextStyle(color: CustomColor.redBtn))),
-                                          content: Text('Semua proses pembayaran dan transaksi di luar tanggung jawab IRG!', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500), textAlign: TextAlign.center),
+                                          title: Center(child: Text('Peringatan!', style: TextStyle(color: CustomColor.redBtn, fontSize: double.parse(((MediaQuery.of(context).size.width*0.045).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.045).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.045).toString())))),
+                                          content: Text('Semua proses pembayaran dan transaksi di luar tanggung jawab IRG!', style: TextStyle(fontSize: double.parse(((MediaQuery.of(context).size.width*0.035).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.035).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.035).toString()), fontWeight: FontWeight.w500), textAlign: TextAlign.center),
                                           actions: <Widget>[
                                             Center(
                                               child: Row(
@@ -1758,7 +1954,7 @@ class _CartActivityState extends State<CartActivity> {
                                                     shape: RoundedRectangleBorder(
                                                         borderRadius: BorderRadius.all(Radius.circular(10))
                                                     ),
-                                                    child: Text('Batal'),
+                                                    child: Text('Batal', style: TextStyle(fontSize: double.parse(((MediaQuery.of(context).size.width*0.035).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.035).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.035).toString())),),
                                                     onPressed: () async{
                                                       setState(() {
                                                         // codeDialog = valueText;
@@ -1772,7 +1968,7 @@ class _CartActivityState extends State<CartActivity> {
                                                     shape: RoundedRectangleBorder(
                                                         borderRadius: BorderRadius.all(Radius.circular(10))
                                                     ),
-                                                    child: Text('Setuju'),
+                                                    child: Text('Setuju', style: TextStyle(fontSize: double.parse(((MediaQuery.of(context).size.width*0.035).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.035).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.035).toString()))),
                                                     onPressed: () async{
                                                       Navigator.pop(context);
                                                       String qrcode = '';
@@ -1803,7 +1999,7 @@ class _CartActivityState extends State<CartActivity> {
                                                             //         child: FinalTrans()));
                                                           }else{
                                                             Fluttertoast.showToast(
-                                                              msg: "Alamat tujuan Anda dimana?",);
+                                                              msg: "Alamat tujuan Anda dimana?", fontSize: double.parse(((MediaQuery.of(context).size.width*0.03).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.03)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.03)).toString()));
                                                           }
                                                         }else{
                                                           makeTransaction(qrcode);
@@ -1826,7 +2022,7 @@ class _CartActivityState extends State<CartActivity> {
                                       });
                                 }else{
                                   Fluttertoast.showToast(
-                                    msg: "Alamat tujuan Anda dimana?",);
+                                    msg: "Alamat tujuan Anda dimana?", fontSize: double.parse(((MediaQuery.of(context).size.width*0.03).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.03)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.03)).toString()));
                                 }
                               } else {
                                 showDialog(
@@ -1837,8 +2033,8 @@ class _CartActivityState extends State<CartActivity> {
                                         shape: RoundedRectangleBorder(
                                             borderRadius: BorderRadius.all(Radius.circular(10))
                                         ),
-                                        title: Text('Peringatan!', style: TextStyle(color: CustomColor.redBtn)),
-                                        content: Text('Semua proses pembayaran dan transaksi di luar tanggung jawab IRG!', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500), textAlign: TextAlign.center),
+                                        title: Text('Peringatan!', style: TextStyle(color: CustomColor.redBtn, fontSize: double.parse(((MediaQuery.of(context).size.width*0.045).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.045).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.045).toString()))),
+                                        content: Text('Semua proses pembayaran dan transaksi di luar tanggung jawab IRG!', style: TextStyle(fontSize: double.parse(((MediaQuery.of(context).size.width*0.035).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.035).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.035).toString()), fontWeight: FontWeight.w500), textAlign: TextAlign.center),
                                         actions: <Widget>[
                                           Center(
                                             child: Row(
@@ -1851,7 +2047,7 @@ class _CartActivityState extends State<CartActivity> {
                                                   shape: RoundedRectangleBorder(
                                                       borderRadius: BorderRadius.all(Radius.circular(10))
                                                   ),
-                                                  child: Text('Batal'),
+                                                  child: Text('Batal', style: TextStyle(fontSize: double.parse(((MediaQuery.of(context).size.width*0.03).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.03).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.03).toString()))),
                                                   onPressed: () async{
                                                     setState(() {
                                                       // codeDialog = valueText;
@@ -1865,7 +2061,7 @@ class _CartActivityState extends State<CartActivity> {
                                                   shape: RoundedRectangleBorder(
                                                       borderRadius: BorderRadius.all(Radius.circular(10))
                                                   ),
-                                                  child: Text('Setuju'),
+                                                  child: Text('Setuju', style: TextStyle(fontSize: double.parse(((MediaQuery.of(context).size.width*0.03).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.03).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.03).toString()))),
                                                   onPressed: () async{
                                                     Navigator.pop(context);
                                                     String qrcode = '';
@@ -1912,7 +2108,7 @@ class _CartActivityState extends State<CartActivity> {
                                                           //         child: FinalTrans()));
                                                         }else{
                                                           Fluttertoast.showToast(
-                                                            msg: "Alamat tujuan Anda dimana?",);
+                                                            msg: "Alamat tujuan Anda dimana?", fontSize: double.parse(((MediaQuery.of(context).size.width*0.03).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.03)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.03)).toString()));
                                                         }
                                                       }else{
                                                         makeTransaction(qrcode);
@@ -1951,8 +2147,14 @@ class _CartActivityState extends State<CartActivity> {
                                 child: Row(
                                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                   children: [
-                                    CustomText.textTitle3(text: "Pesan Sekarang", color: Colors.white),
-                                    CustomText.textTitle3(text: NumberFormat.currency(locale: 'id', symbol: '', decimalDigits: 0).format(int.parse(totalHarga)), color: Colors.white),
+                                    MediaQuery(
+                                        child: CustomText.textTitle3(text: "Pesan Sekarang", color: Colors.white, sizeNew: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.04).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.04).toString())),
+                                        data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0)
+                                    ),
+                                    MediaQuery(
+                                        child: CustomText.textTitle3(text: NumberFormat.currency(locale: 'id', symbol: '', decimalDigits: 0).format(int.parse(totalHarga)), color: Colors.white, sizeNew: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.04).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.04).toString())),
+                                        data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0)
+                                    ),
                                   ],
                                 ),
                               ),

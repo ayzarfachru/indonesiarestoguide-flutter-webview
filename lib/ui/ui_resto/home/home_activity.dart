@@ -1,10 +1,12 @@
 import 'dart:convert';
 
+import 'package:firebase_dynamic_links/firebase_dynamic_links.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_icons/flutter_icons.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:kam5ia/model/Transaction.dart';
+import 'package:kam5ia/ui/auth/login_activity.dart';
 import 'package:kam5ia/ui/detail/detail_resto.dart';
 import 'package:kam5ia/ui/history/history_activity.dart';
 import 'package:kam5ia/ui/home/home_activity.dart';
@@ -34,10 +36,10 @@ class HomeActivityResto extends StatefulWidget {
   _HomeActivityRestoState createState() => _HomeActivityRestoState();
 }
 
-class _HomeActivityRestoState extends State<HomeActivityResto> {
+class _HomeActivityRestoState extends State<HomeActivityResto> with WidgetsBindingObserver{
   String img = "";
   String homepg = "";
-  int? id;
+  int id = 0;
 
   getImg() async {
     SharedPreferences pref = await SharedPreferences.getInstance();
@@ -144,6 +146,7 @@ class _HomeActivityRestoState extends State<HomeActivityResto> {
     setState(() {
       restoName = data['resto']['name'];
       id = data['resto']['id'];
+      idResto();
       idUserRest = int.parse(data['resto']['users_id']);
       // history = _history;
       openAndClose = (data['resto']['status'].toString() == "closed" || data['resto']['status'].toString() == "")?'0':'1';
@@ -284,7 +287,7 @@ class _HomeActivityRestoState extends State<HomeActivityResto> {
 
 
     if (apiResult.statusCode == 200) {
-      print('PPP '+data['trx']['pending'].toString());
+      // print('PPP '+data['trx']['pending'].toString());
       if (transaction.toString() == '[]') {
         ksg = true;
         if (data['trx'].toString().contains('pending')) {
@@ -362,7 +365,7 @@ class _HomeActivityRestoState extends State<HomeActivityResto> {
 
 
     if (apiResult.statusCode == 200) {
-      print('PPP2 '+data['trx']['pending'].toString());
+      // print('PPP2 '+data['trx']['pending'].toString());
       if (transactionR.toString() == '[]') {
         ksg = true;
         if (data['trx'].toString().contains('pending')) {
@@ -434,16 +437,107 @@ class _HomeActivityRestoState extends State<HomeActivityResto> {
     });
   }
 
+  int queryData = 0;
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) async{
+    SharedPreferences pref = await SharedPreferences.getInstance();
+    print(pref.getString("token"));
+    if (pref.getString("token").toString() == 'null') {
+      Navigator.pushReplacement(
+          context,
+          PageTransition(
+              type: PageTransitionType.fade,
+              child: LoginActivity()));
+    } else {
+      if (state == AppLifecycleState.resumed) {
+        queryData = int.parse((MediaQuery.of(context).size.width.toString().contains('.')==true)?MediaQuery.of(context).size.width.toString().split('.')[0]:MediaQuery.of(context).size.width.toString());
+        // SharedPreferences pref = await SharedPreferences.getInstance();
+        // pref.setString('widthDevice', queryData);
+        initDynamicLinks();
+        print((MediaQuery.of(context).size.width*0.035)+1);
+        print((MediaQuery.of(context).size.width*0.035));
+        print(queryData);
+        print('ASYU');
+      }
+      if (state == AppLifecycleState.inactive) {
+        print('ASYU2');
+      }
+      if (state == AppLifecycleState.paused) {
+        print('ASYU3');
+      }
+      if (state == AppLifecycleState.detached) {
+        print('ASYU4');
+      }
+    }
+  }
+
+  @override
+  void dispose() {
+    WidgetsBinding.instance!.removeObserver(this);
+    // _scrollController.dispose();
+    // _controller.dispose();
+    super.dispose();
+  }
+
+  String deepLink2 = '';
+  Future<Widget> initDynamicLinks() async {
+    final PendingDynamicLinkData? data = await FirebaseDynamicLinks.instance.getInitialLink();
+
+    if (data != null){
+      return getRoute(data.link);
+    }
+    FirebaseDynamicLinks.instance.onLink(
+        onSuccess: (PendingDynamicLinkData dynamicLink) async {
+          print('pppp');
+          print(dynamicLink.link);
+          return getRoute(dynamicLink.link);
+        }, onError: (OnLinkErrorException e) async {
+      print('onLinkError');
+      return e.message;
+    });
+    return HomeActivity();
+  }
+
+  final GlobalKey<NavigatorState> navigatorKey = new GlobalKey<NavigatorState>();
+
+  Widget getRoute(deepLink){
+    if (deepLink.toString().isEmpty) {
+      print('kosong');
+      return HomeActivity();
+    }
+    print(deepLink.path);
+    if (deepLink.path == "/open/") {
+      final id = deepLink.queryParameters["id"];
+      print('id = '+id.toString());
+      // if (id != null) {
+      //   return DetailResto(id.toString());
+      // }
+      toDet(id.toString());
+    }
+    return HomeActivity();
+  }
+
+  Future toDet(id) async {
+    Navigator.push(
+        context,
+        PageTransition(
+            type: PageTransitionType.fade,
+            child: DetailResto(id)));
+  }
+
   @override
   void initState() {
+    WidgetsBinding.instance!.addObserver(this);
     super.initState();
     _getUserResto();
     // _getDetail();
+    initDynamicLinks();
     _getTrans();
     _getTrans2();
     getImg();
     getHomePg();
-    idResto();
+    // idResto();
     getInitial();
     checkTest();
     // _getQr();
@@ -470,959 +564,968 @@ class _HomeActivityRestoState extends State<HomeActivityResto> {
   Widget build(BuildContext context) {
     return WillPopScope(
       onWillPop: onWillPop,
-      child: Scaffold(
-        body: Stack(
-          children: [
-            Container(
-              width: CustomSize.sizeWidth(context),
-              height: CustomSize.sizeHeight(context) / 2.8,
-              decoration: BoxDecoration(
-                color: CustomColor.primaryLight,
-                borderRadius: BorderRadius.vertical( bottom: Radius.circular(60))
+      child: MediaQuery(
+        child: Scaffold(
+          body: Stack(
+            children: [
+              Container(
+                width: CustomSize.sizeWidth(context),
+                height: CustomSize.sizeHeight(context) / 2.8,
+                decoration: BoxDecoration(
+                  color: CustomColor.primaryLight,
+                  borderRadius: BorderRadius.vertical( bottom: Radius.circular(60))
+                ),
               ),
-            ),
-            SafeArea(
-              child: Padding(
-                padding: EdgeInsets.symmetric(horizontal: CustomSize.sizeWidth(context) / 20),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    SizedBox(height: CustomSize.sizeHeight(context) / 52,),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        GestureDetector(
-                            onTap: () async{
-                              SharedPreferences pref = await SharedPreferences.getInstance();
-                              pref.setString("homepg", "");
+              SafeArea(
+                child: Padding(
+                  padding: EdgeInsets.symmetric(horizontal: CustomSize.sizeWidth(context) / 20),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      SizedBox(height: CustomSize.sizeHeight(context) / 52,),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          GestureDetector(
+                              onTap: () async{
+                                SharedPreferences pref = await SharedPreferences.getInstance();
+                                pref.setString("homepg", "");
+                                setState(() {
+                                  Navigator.push(context, PageTransition(type: PageTransitionType.fade, child: new HomeActivity()));
+                                });
+                              },
+                              child: Icon(FontAwesome.sign_out, color: Colors.white, size: 32,)
+                          ),
+                          GestureDetector(
+                            onTap: (){
                               setState(() {
-                                Navigator.push(context, PageTransition(type: PageTransitionType.fade, child: new HomeActivity()));
+                                Navigator.push(context, PageTransition(type: PageTransitionType.fade, child: new ProfileActivity()));
                               });
                             },
-                            child: Icon(FontAwesome.sign_out, color: Colors.white, size: 32,)
+                            child: Container(
+                              width: CustomSize.sizeWidth(context) / 8,
+                              height: CustomSize.sizeWidth(context) / 8,
+                              decoration: (img == "" || img == null)?BoxDecoration(
+                                  color: CustomColor.primary,
+                                  shape: BoxShape.circle
+                              ):BoxDecoration(
+                                shape: BoxShape.circle,
+                                image: ("$img".substring(0, 8) == '/storage')?DecorationImage(
+                                    image: NetworkImage(Links.subUrl +
+                                        "$img"),
+                                    fit: BoxFit.cover
+                                ):DecorationImage(
+                                    image: Image.memory(Base64Decoder().convert(img)).image,
+                                    fit: BoxFit.cover
+                                ),
+                              ),
+                              child: (img == "" || img == null)?Center(
+                                child: CustomText.text(
+                                    size: double.parse(((MediaQuery.of(context).size.width*0.065).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.065)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.065)).toString()),
+                                    weight: FontWeight.w800,
+                                    text: initial,
+                                    color: Colors.white
+                                ),
+                              ):Container(),
+                            ),
+                          ),
+                        ],
+                      ),
+                      SizedBox(height: CustomSize.sizeHeight(context) / 88,),
+                      Container(
+                        padding: EdgeInsets.symmetric(horizontal: CustomSize.sizeWidth(context) / 10),
+                        child: CustomText.textHeading5(
+                          text: "Selamat Datang,",
+                          color: Colors.white,
+                            sizeNew: double.parse(((MediaQuery.of(context).size.width*0.06).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.06)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.06)).toString()),
+                          maxLines: 1
                         ),
-                        GestureDetector(
+                      ),
+                      SizedBox(height: CustomSize.sizeHeight(context) * 0.005,),
+                      Container(
+                        padding: EdgeInsets.symmetric(horizontal: CustomSize.sizeWidth(context) / 10),
+                        child: CustomText.textHeading5(
+                          text: "di "+restoName,
+                          color: Colors.white,
+                            sizeNew: double.parse(((MediaQuery.of(context).size.width*0.06).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.06)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.06)).toString()),
+                            maxLines: 1
+                        ),
+                      ),
+                      SizedBox(height: CustomSize.sizeHeight(context) / 48,),
+                      Center(
+                        child: GestureDetector(
                           onTap: (){
+                            // print(id.toString());
                             setState(() {
-                              Navigator.push(context, PageTransition(type: PageTransitionType.fade, child: new ProfileActivity()));
+                              Navigator.push(context, PageTransition(type: PageTransitionType.fade, child: new DetailRestoAdmin(id.toString())));
                             });
                           },
                           child: Container(
-                            width: CustomSize.sizeWidth(context) / 8,
-                            height: CustomSize.sizeWidth(context) / 8,
-                            decoration: (img == "" || img == null)?BoxDecoration(
-                                color: CustomColor.primary,
-                                shape: BoxShape.circle
-                            ):BoxDecoration(
-                              shape: BoxShape.circle,
-                              image: ("$img".substring(0, 8) == '/storage')?DecorationImage(
-                                  image: NetworkImage(Links.subUrl +
-                                      "$img"),
-                                  fit: BoxFit.cover
-                              ):DecorationImage(
-                                  image: Image.memory(Base64Decoder().convert(img)).image,
-                                  fit: BoxFit.cover
-                              ),
-                            ),
-                            child: (img == "" || img == null)?Center(
-                              child: CustomText.text(
-                                  size: 26,
-                                  weight: FontWeight.w800,
-                                  text: initial,
-                                  color: Colors.white
-                              ),
-                            ):Container(),
-                          ),
-                        ),
-                      ],
-                    ),
-                    SizedBox(height: CustomSize.sizeHeight(context) / 88,),
-                    Container(
-                      padding: EdgeInsets.symmetric(horizontal: CustomSize.sizeWidth(context) / 10),
-                      child: CustomText.textHeading5(
-                        text: "Selamat Datang,",
-                        color: Colors.white,
-                        minSize: 24,
-                        maxLines: 1
-                      ),
-                    ),
-                    SizedBox(height: CustomSize.sizeHeight(context) * 0.005,),
-                    Container(
-                      padding: EdgeInsets.symmetric(horizontal: CustomSize.sizeWidth(context) / 10),
-                      child: CustomText.textHeading5(
-                        text: "di "+restoName,
-                        color: Colors.white,
-                          minSize: 24,
-                          maxLines: 1
-                      ),
-                    ),
-                    SizedBox(height: CustomSize.sizeHeight(context) / 48,),
-                    Center(
-                      child: GestureDetector(
-                        onTap: (){
-                          // print(id.toString());
-                          setState(() {
-                            Navigator.push(context, PageTransition(type: PageTransitionType.fade, child: new DetailRestoAdmin(id.toString())));
-                          });
-                        },
-                        child: Container(
-                          width: CustomSize.sizeWidth(context) / 1.1,
-                          height: CustomSize.sizeHeight(context) / 8,
-                          decoration: BoxDecoration(
-                            color: Colors.white,
-                            borderRadius: BorderRadius.circular(20),
-                            boxShadow: [
-                              BoxShadow(
-                                color: Colors.grey.withOpacity(0.5),
-                                spreadRadius: 0,
-                                blurRadius: 7,
-                                offset: Offset(0, 7), // changes position of shadow
-                              ),
-                            ],
-                          ),
-                          child: Padding(
-                            padding: EdgeInsets.symmetric(horizontal: CustomSize.sizeWidth(context) / 20),
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              crossAxisAlignment: CrossAxisAlignment.center,
-                              children: [
-                                Container(
-                                  child: Column(
-                                    crossAxisAlignment: CrossAxisAlignment.start,
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    children: [
-                                      (isOpen == 'false')?CustomText.textHeading4(
-                                          text: "Restomu sedang tutup.",
-                                        minSize: 18,
-                                        maxLines: 1,
-                                        color: CustomColor.redBtn
-                                      ):CustomText.textHeading4(
-                                          text: "Restomu",
-                                        minSize: 18,
-                                        maxLines: 1
-                                      ),
-                                      SizedBox(height: CustomSize.sizeHeight(context) * 0.005,),
-                                      Column(
-                                        crossAxisAlignment: CrossAxisAlignment.start,
-                                        children: [
-                                          CustomText.bodyRegular14(
-                                            text: "Info yang ditampilin tentang",
-                                          ),
-                                          CustomText.bodyRegular14(
-                                              text: "restomu",
-                                              maxLines: 2
-                                          ),
-                                        ],
-                                      ),
-                                    ],
-                                  ),
+                            width: CustomSize.sizeWidth(context) / 1.1,
+                            height: CustomSize.sizeHeight(context) / 8,
+                            decoration: BoxDecoration(
+                              color: Colors.white,
+                              borderRadius: BorderRadius.circular(20),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: Colors.grey.withOpacity(0.5),
+                                  spreadRadius: 0,
+                                  blurRadius: 7,
+                                  offset: Offset(0, 7), // changes position of shadow
                                 ),
-                                Icon(MaterialCommunityIcons.home_account, color: CustomColor.primaryLight, size: 49,)
                               ],
                             ),
+                            child: Padding(
+                              padding: EdgeInsets.symmetric(horizontal: CustomSize.sizeWidth(context) / 20),
+                              child: Row(
+                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                crossAxisAlignment: CrossAxisAlignment.center,
+                                children: [
+                                  Container(
+                                    child: Column(
+                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      mainAxisAlignment: MainAxisAlignment.center,
+                                      children: [
+                                        (isOpen == 'false')?CustomText.textHeading4(
+                                            text: "Restomu sedang tutup.",
+                                            sizeNew: double.parse(((MediaQuery.of(context).size.width*0.045).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.045)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.045)).toString()),
+                                          maxLines: 1,
+                                          color: CustomColor.redBtn
+                                        ):CustomText.textHeading4(
+                                            text: "Restomu",
+                                            sizeNew: double.parse(((MediaQuery.of(context).size.width*0.045).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.045)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.045)).toString()),
+                                          maxLines: 1
+                                        ),
+                                        SizedBox(height: CustomSize.sizeHeight(context) * 0.005,),
+                                        Column(
+                                          crossAxisAlignment: CrossAxisAlignment.start,
+                                          children: [
+                                            CustomText.bodyRegular14(
+                                              text: "Info yang ditampilin tentang",
+                                                sizeNew: double.parse(((MediaQuery.of(context).size.width*0.035).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.035)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.035)).toString())
+                                            ),
+                                            CustomText.bodyRegular14(
+                                                text: "restomu",
+                                                maxLines: 2,
+                                                sizeNew: double.parse(((MediaQuery.of(context).size.width*0.035).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.035)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.035)).toString())
+                                            ),
+                                          ],
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                  Icon(MaterialCommunityIcons.home_account, color: CustomColor.primaryLight, size: 49,)
+                                ],
+                              ),
+                            ),
                           ),
                         ),
                       ),
-                    ),
-                    SizedBox(height: CustomSize.sizeHeight(context) / 90,),
-                    Expanded(
-                      child: SmartRefresher(
-                        enablePullDown: true,
-                        enablePullUp: false,
-                        header: WaterDropMaterialHeader(
-                          distance: 30,
-                          backgroundColor: Colors.white,
-                          color: CustomColor.primary,
-                        ),
-                        controller: _refreshController,
-                        onRefresh: _onRefresh,
-                        onLoading: _onLoading,
-                        child: SingleChildScrollView(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              SizedBox(height: CustomSize.sizeHeight(context) / 90,),
-                          CustomText.bodyMedium16(
-                              text: "Kelola Restomu",
-                              minSize: 16,
-                              maxLines: 1
+                      SizedBox(height: CustomSize.sizeHeight(context) / 90,),
+                      Expanded(
+                        child: SmartRefresher(
+                          enablePullDown: true,
+                          enablePullUp: false,
+                          header: WaterDropMaterialHeader(
+                            distance: 30,
+                            backgroundColor: Colors.white,
+                            color: CustomColor.primary,
                           ),
-                          SizedBox(height: CustomSize.sizeHeight(context) / 48,),
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              GestureDetector(
-                                onTap: (){
-                                  setState(() {
-                                    Navigator.push(context, PageTransition(type: PageTransitionType.fade, child: new MenuActivity()));
-                                  });
-                                },
-                                child: Container(
-                                  width: CustomSize.sizeWidth(context) / 3.8,
-                                  height: CustomSize.sizeWidth(context) / 3.8,
-                                  decoration: BoxDecoration(
-                                    color: Colors.white,
-                                    borderRadius: BorderRadius.circular(20),
-                                    boxShadow: [
-                                      BoxShadow(
-                                        color: Colors.grey.withOpacity(0.5),
-                                        spreadRadius: 0,
-                                        blurRadius: 7,
-                                        offset: Offset(0, 7), // changes position of shadow
-                                      ),
-                                    ],
-                                  ),
-                                  child: Column(
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    crossAxisAlignment: CrossAxisAlignment.center,
-                                    children: [
-                                      Icon(MaterialCommunityIcons.shopping, color: CustomColor.primaryLight, size: 32,),
-                                      CustomText.bodyMedium14(
-                                          text: "Menu",
-                                          minSize: 14,
-                                          maxLines: 1
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                              ),
-                              GestureDetector(
-                                onTap: (){
-                                  setState(() {
-                                    print(homepg + "oi");
-                                    // Navigator.push(context, PageTransition(type: PageTransitionType.fade, child: new PromoActivity(id.toString())));
-                                    Navigator.push(context, PageTransition(type: PageTransitionType.fade, child: new PromoActivity()));
-                                  });
-                                },
-                                child: Container(
-                                  width: CustomSize.sizeWidth(context) / 3.8,
-                                  height: CustomSize.sizeWidth(context) / 3.8,
-                                  decoration: BoxDecoration(
-                                    color: Colors.white,
-                                    borderRadius: BorderRadius.circular(20),
-                                    boxShadow: [
-                                      BoxShadow(
-                                        color: Colors.grey.withOpacity(0.5),
-                                        spreadRadius: 0,
-                                        blurRadius: 7,
-                                        offset: Offset(0, 7), // changes position of shadow
-                                      ),
-                                    ],
-                                  ),
-                                  child: Column(
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    crossAxisAlignment: CrossAxisAlignment.center,
-                                    children: [
-                                      Icon(FontAwesome.tags, color: CustomColor.primaryLight, size: 32,),
-                                      CustomText.bodyMedium14(
-                                          text: "Promo",
-                                          minSize: 14,
-                                          maxLines: 1
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                              ),
-
-
-                              GestureDetector(
-                                onTap: (){
-                                  setState(() async{
-                                    SharedPreferences pref = await SharedPreferences.getInstance();
-                                    pref.setString('rev', '0');
-                                    Navigator.push(
-                                        context,
-                                        PageTransition(
-                                            type: PageTransitionType.rightToLeft,
-                                            child: OrderActivity()));
-                                  });
-                                },
-                                child: Stack(
-                                  alignment: Alignment.topRight,
-                                  children: [
-                                    Container(
-                                      width: CustomSize.sizeWidth(context) / 3.8,
-                                      height: CustomSize.sizeWidth(context) / 3.8,
-                                      decoration: BoxDecoration(
-                                        color: Colors.white,
-                                        borderRadius: BorderRadius.circular(20),
-                                        boxShadow: [
-                                          BoxShadow(
-                                            color: Colors.grey.withOpacity(0.5),
-                                            spreadRadius: 0,
-                                            blurRadius: 7,
-                                            offset: Offset(0, 7), // changes position of shadow
-                                          ),
-                                        ],
-                                      ),
-                                      child: Column(
-                                        mainAxisAlignment: MainAxisAlignment.center,
-                                        crossAxisAlignment: CrossAxisAlignment.center,
-                                        children: [
-                                          Icon(CupertinoIcons.cart_fill, color: CustomColor.primaryLight, size: 32,),
-                                          CustomText.bodyMedium14(
-                                              text: "Transaksi",
-                                              minSize: 14,
-                                              maxLines: 1
-                                          ),
-                                        ],
-                                      ),
+                          controller: _refreshController,
+                          onRefresh: _onRefresh,
+                          onLoading: _onLoading,
+                          child: SingleChildScrollView(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                SizedBox(height: CustomSize.sizeHeight(context) / 90,),
+                            CustomText.bodyMedium16(
+                                text: "Kelola Restomu",
+                                sizeNew: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.04)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.04)).toString()),
+                                maxLines: 1
+                            ),
+                            SizedBox(height: CustomSize.sizeHeight(context) / 48,),
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                GestureDetector(
+                                  onTap: (){
+                                    setState(() {
+                                      Navigator.push(context, PageTransition(type: PageTransitionType.fade, child: new MenuActivity()));
+                                    });
+                                  },
+                                  child: Container(
+                                    width: CustomSize.sizeWidth(context) / 3.8,
+                                    height: CustomSize.sizeWidth(context) / 3.8,
+                                    decoration: BoxDecoration(
+                                      color: Colors.white,
+                                      borderRadius: BorderRadius.circular(20),
+                                      boxShadow: [
+                                        BoxShadow(
+                                          color: Colors.grey.withOpacity(0.5),
+                                          spreadRadius: 0,
+                                          blurRadius: 7,
+                                          offset: Offset(0, 7), // changes position of shadow
+                                        ),
+                                      ],
                                     ),
-                                    Container(
-                                      padding: EdgeInsets.only(right: 5, top: 5),
-                                      child: (transaction.where((element) => element.is_opened.contains('0')).length != 0 || (transactionC1.length + transaction2.length + transaction3.length) != 0)?
-                                      Stack(
-                                        alignment: Alignment.center,
-                                        children: [
-                                          Icon(Icons.circle, color: CustomColor.redBtn, size: 22,),
-                                          CustomText.bodyMedium14(text: (transaction.where((element) => element.is_opened.contains('0')).length + transactionC1.length + transaction2.length + transaction3.length).toString(), color: Colors.white)
-                                        ],
-                                      ):Container(),
+                                    child: Column(
+                                      mainAxisAlignment: MainAxisAlignment.center,
+                                      crossAxisAlignment: CrossAxisAlignment.center,
+                                      children: [
+                                        Icon(MaterialCommunityIcons.shopping, color: CustomColor.primaryLight, size: 32,),
+                                        CustomText.bodyMedium14(
+                                            text: "Menu",
+                                            sizeNew: double.parse(((MediaQuery.of(context).size.width*0.035).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.035)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.035)).toString()),
+                                            maxLines: 1
+                                        ),
+                                      ],
                                     ),
-                                  ],
-                                ),
-                              ),
-
-
-                              // GestureDetector(
-                              //   onTap: (){
-                              //     setState(() {
-                              //       // _launchURL();
-                              //       Navigator.push(context, PageTransition(type: PageTransitionType.fade, child: new MejaActivity()));
-                              //     });
-                              //   },
-                              //   child: Container(
-                              //     width: CustomSize.sizeWidth(context) / 3.8,
-                              //     height: CustomSize.sizeWidth(context) / 3.8,
-                              //     decoration: BoxDecoration(
-                              //       color: Colors.white,
-                              //       borderRadius: BorderRadius.circular(20),
-                              //       boxShadow: [
-                              //         BoxShadow(
-                              //           color: Colors.grey.withOpacity(0.5),
-                              //           spreadRadius: 0,
-                              //           blurRadius: 7,
-                              //           offset: Offset(0, 7), // changes position of shadow
-                              //         ),
-                              //       ],
-                              //     ),
-                              //     child: Column(
-                              //       mainAxisAlignment: MainAxisAlignment.center,
-                              //       crossAxisAlignment: CrossAxisAlignment.center,
-                              //       children: [
-                              //         Icon(FontAwesome.th, color: CustomColor.primaryLight, size: 32,),
-                              //         CustomText.bodyMedium14(
-                              //             text: "Meja",
-                              //             minSize: 14,
-                              //             maxLines: 1
-                              //         ),
-                              //       ],
-                              //     ),
-                              //     // child: Column(
-                              //     //   mainAxisAlignment: MainAxisAlignment.center,
-                              //     //   crossAxisAlignment: CrossAxisAlignment.center,
-                              //     //   children: [
-                              //     //     Icon(FontAwesome.qrcode, color: CustomColor.primaryLight, size: 32,),
-                              //     //     CustomText.bodyMedium14(
-                              //     //         text: "Qr Code",
-                              //     //         minSize: 14,
-                              //     //         maxLines: 1
-                              //     //     ),
-                              //     //   ],
-                              //     // ),
-                              //   ),
-                              // ),
-
-
-                            ],
-                          ),
-                              SizedBox(height: CustomSize.sizeHeight(context) / 48,),
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              GestureDetector(
-                                onTap: (){
-                                  setState(() {
-                                    Navigator.push(context, PageTransition(type: PageTransitionType.fade, child: new FollowersActivity()));
-                                  });
-                                },
-                                child: Container(
-                                  width: CustomSize.sizeWidth(context) / 3.8,
-                                  height: CustomSize.sizeWidth(context) / 3.8,
-                                  decoration: BoxDecoration(
-                                    color: Colors.white,
-                                    borderRadius: BorderRadius.circular(20),
-                                    boxShadow: [
-                                      BoxShadow(
-                                        color: Colors.grey.withOpacity(0.5),
-                                        spreadRadius: 0,
-                                        blurRadius: 7,
-                                        offset: Offset(0, 7), // changes position of shadow
-                                      ),
-                                    ],
-                                  ),
-                                  child: Column(
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    crossAxisAlignment: CrossAxisAlignment.center,
-                                    children: [
-                                      Icon(FontAwesome.group, color: CustomColor.primaryLight, size: 32,),
-                                      CustomText.bodyMedium14(
-                                          text: "Followers",
-                                          minSize: 14,
-                                          maxLines: 1
-                                      ),
-                                    ],
                                   ),
                                 ),
-                              ),
-
-                              GestureDetector(
-                                onTap: (){
-                                  setState(() {
-                                    // _launchURL();
-                                    Navigator.push(context, PageTransition(type: PageTransitionType.fade, child: new MejaActivity()));
-                                  });
-                                },
-                                child: Container(
-                                  width: CustomSize.sizeWidth(context) / 3.8,
-                                  height: CustomSize.sizeWidth(context) / 3.8,
-                                  decoration: BoxDecoration(
-                                    color: Colors.white,
-                                    borderRadius: BorderRadius.circular(20),
-                                    boxShadow: [
-                                      BoxShadow(
-                                        color: Colors.grey.withOpacity(0.5),
-                                        spreadRadius: 0,
-                                        blurRadius: 7,
-                                        offset: Offset(0, 7), // changes position of shadow
-                                      ),
-                                    ],
-                                  ),
-                                  child: Column(
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    crossAxisAlignment: CrossAxisAlignment.center,
-                                    children: [
-                                      Icon(FontAwesome.th, color: CustomColor.primaryLight, size: 32,),
-                                      CustomText.bodyMedium14(
-                                          text: "Meja",
-                                          minSize: 14,
-                                          maxLines: 1
-                                      ),
-                                    ],
-                                  ),
-                                  // child: Column(
-                                  //   mainAxisAlignment: MainAxisAlignment.center,
-                                  //   crossAxisAlignment: CrossAxisAlignment.center,
-                                  //   children: [
-                                  //     Icon(FontAwesome.qrcode, color: CustomColor.primaryLight, size: 32,),
-                                  //     CustomText.bodyMedium14(
-                                  //         text: "Qr Code",
-                                  //         minSize: 14,
-                                  //         maxLines: 1
-                                  //     ),
-                                  //   ],
-                                  // ),
-                                ),
-                              ),
-
-                              (reservation == true)?GestureDetector(
-                                onTap: (){
-                                  setState(() async{
-                                    SharedPreferences pref = await SharedPreferences.getInstance();
-                                    pref.setString('rev', '1');
-                                    Navigator.push(
-                                        context,
-                                        PageTransition(
-                                            type: PageTransitionType.rightToLeft,
-                                            child: ReservationRestoActivity()));
-                                  });
-                                },
-                                child: Stack(
-                                  alignment: Alignment.topRight,
-                                  children: [
-                                    Container(
-                                      width: CustomSize.sizeWidth(context) / 3.8,
-                                      height: CustomSize.sizeWidth(context) / 3.8,
-                                      decoration: BoxDecoration(
-                                        color: Colors.white,
-                                        borderRadius: BorderRadius.circular(20),
-                                        boxShadow: [
-                                          BoxShadow(
-                                            color: Colors.grey.withOpacity(0.5),
-                                            spreadRadius: 0,
-                                            blurRadius: 7,
-                                            offset: Offset(0, 7), // changes position of shadow
-                                          ),
-                                        ],
-                                      ),
-                                      child: Column(
-                                        mainAxisAlignment: MainAxisAlignment.center,
-                                        crossAxisAlignment: CrossAxisAlignment.center,
-                                        children: [
-                                          Icon(FontAwesome5.clipboard, color: CustomColor.primaryLight, size: 32,),
-                                          CustomText.bodyMedium14(
-                                              text: "Reservasi",
-                                              minSize: 14,
-                                              maxLines: 1
-                                          ),
-                                        ],
-                                      ),
+                                GestureDetector(
+                                  onTap: (){
+                                    setState(() {
+                                      print(homepg + "oi");
+                                      // Navigator.push(context, PageTransition(type: PageTransitionType.fade, child: new PromoActivity(id.toString())));
+                                      Navigator.push(context, PageTransition(type: PageTransitionType.fade, child: new PromoActivity()));
+                                    });
+                                  },
+                                  child: Container(
+                                    width: CustomSize.sizeWidth(context) / 3.8,
+                                    height: CustomSize.sizeWidth(context) / 3.8,
+                                    decoration: BoxDecoration(
+                                      color: Colors.white,
+                                      borderRadius: BorderRadius.circular(20),
+                                      boxShadow: [
+                                        BoxShadow(
+                                          color: Colors.grey.withOpacity(0.5),
+                                          spreadRadius: 0,
+                                          blurRadius: 7,
+                                          offset: Offset(0, 7), // changes position of shadow
+                                        ),
+                                      ],
                                     ),
-                                    Container(
-                                      padding: EdgeInsets.only(right: 5, top: 5),
-                                      child: (transactionR.where((element) => element.is_opened.contains('0')).length != 0 || (transactionC1R.length + transaction2R.length + transaction3R.length) != 0)?
-                                      Stack(
-                                        alignment: Alignment.center,
-                                        children: [
-                                          Icon(Icons.circle, color: CustomColor.redBtn, size: 22,),
-                                          CustomText.bodyMedium14(text: (transactionR.where((element) => element.is_opened.contains('0')).length + transactionC1R.length + transaction2R.length + transaction3R.length).toString(), color: Colors.white)
-                                        ],
-                                      ):Container(),
+                                    child: Column(
+                                      mainAxisAlignment: MainAxisAlignment.center,
+                                      crossAxisAlignment: CrossAxisAlignment.center,
+                                      children: [
+                                        Icon(FontAwesome.tags, color: CustomColor.primaryLight, size: 32,),
+                                        CustomText.bodyMedium14(
+                                            text: "Promo",
+                                            sizeNew: double.parse(((MediaQuery.of(context).size.width*0.035).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.035)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.035)).toString()),
+                                            maxLines: 1
+                                        ),
+                                      ],
                                     ),
-                                  ],
+                                  ),
                                 ),
-                              ):(status != 'done')?GestureDetector(
-                                onTap: (){
-                                  setState(() {
-                                    if (tunggu == 'false') {
-                                      Navigator.push(context, PageTransition(type: PageTransitionType.fade, child: new PaymentResto(restoName, phone, address)));
-                                    } else if (tunggu == 'true'){
-                                      Fluttertoast.showToast(msg: "Tunggu sebentar",);
-                                    }
-                                    // Navigator.push(context, PageTransition(type: PageTransitionType.fade, child: new FollowersActivity()));
-                                  });
-                                },
-                                child: Container(
+
+
+                                GestureDetector(
+                                  onTap: (){
+                                    setState(() async{
+                                      SharedPreferences pref = await SharedPreferences.getInstance();
+                                      pref.setString('rev', '0');
+                                      Navigator.push(
+                                          context,
+                                          PageTransition(
+                                              type: PageTransitionType.rightToLeft,
+                                              child: OrderActivity()));
+                                    });
+                                  },
+                                  child: Stack(
+                                    alignment: Alignment.topRight,
+                                    children: [
+                                      Container(
+                                        width: CustomSize.sizeWidth(context) / 3.8,
+                                        height: CustomSize.sizeWidth(context) / 3.8,
+                                        decoration: BoxDecoration(
+                                          color: Colors.white,
+                                          borderRadius: BorderRadius.circular(20),
+                                          boxShadow: [
+                                            BoxShadow(
+                                              color: Colors.grey.withOpacity(0.5),
+                                              spreadRadius: 0,
+                                              blurRadius: 7,
+                                              offset: Offset(0, 7), // changes position of shadow
+                                            ),
+                                          ],
+                                        ),
+                                        child: Column(
+                                          mainAxisAlignment: MainAxisAlignment.center,
+                                          crossAxisAlignment: CrossAxisAlignment.center,
+                                          children: [
+                                            Icon(CupertinoIcons.cart_fill, color: CustomColor.primaryLight, size: 32,),
+                                            CustomText.bodyMedium14(
+                                                text: "Transaksi",
+                                                sizeNew: double.parse(((MediaQuery.of(context).size.width*0.035).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.035)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.035)).toString()),
+                                                maxLines: 1
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                      Container(
+                                        padding: EdgeInsets.only(right: 5, top: 5),
+                                        child: (transaction.where((element) => element.is_opened.contains('0')).length != 0 || (transactionC1.length + transaction2.length + transaction3.length) != 0)?
+                                        Stack(
+                                          alignment: Alignment.center,
+                                          children: [
+                                            Icon(Icons.circle, color: CustomColor.redBtn, size: 22,),
+                                            CustomText.bodyMedium14(text: (transaction.where((element) => element.is_opened.contains('0')).length + transactionC1.length + transaction2.length + transaction3.length).toString(), color: Colors.white, sizeNew: double.parse(((MediaQuery.of(context).size.width*0.035).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.035)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.035)).toString()))
+                                          ],
+                                        ):Container(),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+
+
+                                // GestureDetector(
+                                //   onTap: (){
+                                //     setState(() {
+                                //       // _launchURL();
+                                //       Navigator.push(context, PageTransition(type: PageTransitionType.fade, child: new MejaActivity()));
+                                //     });
+                                //   },
+                                //   child: Container(
+                                //     width: CustomSize.sizeWidth(context) / 3.8,
+                                //     height: CustomSize.sizeWidth(context) / 3.8,
+                                //     decoration: BoxDecoration(
+                                //       color: Colors.white,
+                                //       borderRadius: BorderRadius.circular(20),
+                                //       boxShadow: [
+                                //         BoxShadow(
+                                //           color: Colors.grey.withOpacity(0.5),
+                                //           spreadRadius: 0,
+                                //           blurRadius: 7,
+                                //           offset: Offset(0, 7), // changes position of shadow
+                                //         ),
+                                //       ],
+                                //     ),
+                                //     child: Column(
+                                //       mainAxisAlignment: MainAxisAlignment.center,
+                                //       crossAxisAlignment: CrossAxisAlignment.center,
+                                //       children: [
+                                //         Icon(FontAwesome.th, color: CustomColor.primaryLight, size: 32,),
+                                //         CustomText.bodyMedium14(
+                                //             text: "Meja",
+                                //             minSize: 14,
+                                //             maxLines: 1
+                                //         ),
+                                //       ],
+                                //     ),
+                                //     // child: Column(
+                                //     //   mainAxisAlignment: MainAxisAlignment.center,
+                                //     //   crossAxisAlignment: CrossAxisAlignment.center,
+                                //     //   children: [
+                                //     //     Icon(FontAwesome.qrcode, color: CustomColor.primaryLight, size: 32,),
+                                //     //     CustomText.bodyMedium14(
+                                //     //         text: "Qr Code",
+                                //     //         minSize: 14,
+                                //     //         maxLines: 1
+                                //     //     ),
+                                //     //   ],
+                                //     // ),
+                                //   ),
+                                // ),
+
+
+                              ],
+                            ),
+                                SizedBox(height: CustomSize.sizeHeight(context) / 48,),
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                GestureDetector(
+                                  onTap: (){
+                                    setState(() {
+                                      Navigator.push(context, PageTransition(type: PageTransitionType.fade, child: new FollowersActivity()));
+                                    });
+                                  },
+                                  child: Container(
+                                    width: CustomSize.sizeWidth(context) / 3.8,
+                                    height: CustomSize.sizeWidth(context) / 3.8,
+                                    decoration: BoxDecoration(
+                                      color: Colors.white,
+                                      borderRadius: BorderRadius.circular(20),
+                                      boxShadow: [
+                                        BoxShadow(
+                                          color: Colors.grey.withOpacity(0.5),
+                                          spreadRadius: 0,
+                                          blurRadius: 7,
+                                          offset: Offset(0, 7), // changes position of shadow
+                                        ),
+                                      ],
+                                    ),
+                                    child: Column(
+                                      mainAxisAlignment: MainAxisAlignment.center,
+                                      crossAxisAlignment: CrossAxisAlignment.center,
+                                      children: [
+                                        Icon(FontAwesome.group, color: CustomColor.primaryLight, size: 32,),
+                                        CustomText.bodyMedium14(
+                                            text: "Followers",
+                                            sizeNew: double.parse(((MediaQuery.of(context).size.width*0.035).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.035)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.035)).toString()),
+                                            maxLines: 1
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                ),
+
+                                GestureDetector(
+                                  onTap: (){
+                                    setState(() {
+                                      // _launchURL();
+                                      Navigator.push(context, PageTransition(type: PageTransitionType.fade, child: new MejaActivity()));
+                                    });
+                                  },
+                                  child: Container(
+                                    width: CustomSize.sizeWidth(context) / 3.8,
+                                    height: CustomSize.sizeWidth(context) / 3.8,
+                                    decoration: BoxDecoration(
+                                      color: Colors.white,
+                                      borderRadius: BorderRadius.circular(20),
+                                      boxShadow: [
+                                        BoxShadow(
+                                          color: Colors.grey.withOpacity(0.5),
+                                          spreadRadius: 0,
+                                          blurRadius: 7,
+                                          offset: Offset(0, 7), // changes position of shadow
+                                        ),
+                                      ],
+                                    ),
+                                    child: Column(
+                                      mainAxisAlignment: MainAxisAlignment.center,
+                                      crossAxisAlignment: CrossAxisAlignment.center,
+                                      children: [
+                                        Icon(FontAwesome.th, color: CustomColor.primaryLight, size: 32,),
+                                        CustomText.bodyMedium14(
+                                            text: "Meja",
+                                            sizeNew: double.parse(((MediaQuery.of(context).size.width*0.035).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.035)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.035)).toString()),
+                                            maxLines: 1
+                                        ),
+                                      ],
+                                    ),
+                                    // child: Column(
+                                    //   mainAxisAlignment: MainAxisAlignment.center,
+                                    //   crossAxisAlignment: CrossAxisAlignment.center,
+                                    //   children: [
+                                    //     Icon(FontAwesome.qrcode, color: CustomColor.primaryLight, size: 32,),
+                                    //     CustomText.bodyMedium14(
+                                    //         text: "Qr Code",
+                                    //         minSize: 14,
+                                    //         maxLines: 1
+                                    //     ),
+                                    //   ],
+                                    // ),
+                                  ),
+                                ),
+
+                                (reservation == true)?GestureDetector(
+                                  onTap: (){
+                                    setState(() async{
+                                      SharedPreferences pref = await SharedPreferences.getInstance();
+                                      pref.setString('rev', '1');
+                                      Navigator.push(
+                                          context,
+                                          PageTransition(
+                                              type: PageTransitionType.rightToLeft,
+                                              child: ReservationRestoActivity()));
+                                    });
+                                  },
+                                  child: Stack(
+                                    alignment: Alignment.topRight,
+                                    children: [
+                                      Container(
+                                        width: CustomSize.sizeWidth(context) / 3.8,
+                                        height: CustomSize.sizeWidth(context) / 3.8,
+                                        decoration: BoxDecoration(
+                                          color: Colors.white,
+                                          borderRadius: BorderRadius.circular(20),
+                                          boxShadow: [
+                                            BoxShadow(
+                                              color: Colors.grey.withOpacity(0.5),
+                                              spreadRadius: 0,
+                                              blurRadius: 7,
+                                              offset: Offset(0, 7), // changes position of shadow
+                                            ),
+                                          ],
+                                        ),
+                                        child: Column(
+                                          mainAxisAlignment: MainAxisAlignment.center,
+                                          crossAxisAlignment: CrossAxisAlignment.center,
+                                          children: [
+                                            Icon(FontAwesome5.clipboard, color: CustomColor.primaryLight, size: 32,),
+                                            CustomText.bodyMedium14(
+                                                text: "Reservasi",
+                                                sizeNew: double.parse(((MediaQuery.of(context).size.width*0.035).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.035)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.035)).toString()),
+                                                maxLines: 1
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                      Container(
+                                        padding: EdgeInsets.only(right: 5, top: 5),
+                                        child: (transactionR.where((element) => element.is_opened.contains('0')).length != 0 || (transactionC1R.length + transaction2R.length + transaction3R.length) != 0)?
+                                        Stack(
+                                          alignment: Alignment.center,
+                                          children: [
+                                            Icon(Icons.circle, color: CustomColor.redBtn, size: 22,),
+                                            CustomText.bodyMedium14(text: (transactionR.where((element) => element.is_opened.contains('0')).length + transactionC1R.length + transaction2R.length + transaction3R.length).toString(), color: Colors.white, sizeNew: double.parse(((MediaQuery.of(context).size.width*0.035).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.035)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.035)).toString()))
+                                          ],
+                                        ):Container(),
+                                      ),
+                                    ],
+                                  ),
+                                ):(status != 'done')?GestureDetector(
+                                  onTap: (){
+                                    setState(() {
+                                      if (tunggu == 'false') {
+                                        Navigator.push(context, PageTransition(type: PageTransitionType.fade, child: new PaymentResto(restoName, phone, address)));
+                                      } else if (tunggu == 'true'){
+                                        Fluttertoast.showToast(msg: "Tunggu sebentar",);
+                                      }
+                                      // Navigator.push(context, PageTransition(type: PageTransitionType.fade, child: new FollowersActivity()));
+                                    });
+                                  },
+                                  child: Container(
+                                    width: CustomSize.sizeWidth(context) / 3.8,
+                                    height: CustomSize.sizeWidth(context) / 3.8,
+                                    decoration: BoxDecoration(
+                                      color: Colors.white,
+                                      borderRadius: BorderRadius.circular(20),
+                                      boxShadow: [
+                                        BoxShadow(
+                                          color: Colors.grey.withOpacity(0.5),
+                                          spreadRadius: 0,
+                                          blurRadius: 7,
+                                          offset: Offset(0, 7), // changes position of shadow
+                                        ),
+                                      ],
+                                    ),
+                                    child: Column(
+                                      mainAxisAlignment: MainAxisAlignment.center,
+                                      crossAxisAlignment: CrossAxisAlignment.center,
+                                      children: [
+                                        Icon(FontAwesome.calendar_check_o, color: CustomColor.primaryLight, size: 32,),
+                                        CustomText.bodyMedium14(
+                                            text: "Langganan",
+                                            sizeNew: double.parse(((MediaQuery.of(context).size.width*0.035).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.035)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.035)).toString()),
+                                            maxLines: 1
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                ):Container(
+                                  width: CustomSize.sizeWidth(context) / 3.8,
+                                  height: CustomSize.sizeWidth(context) / 3.8,),
+
+
+                                // Container(
+                                //   width: CustomSize.sizeWidth(context) / 3.8,
+                                //   height: CustomSize.sizeWidth(context) / 3.8,
+                                //   decoration: BoxDecoration(
+                                //     color: Colors.transparent,
+                                //   ),
+                                //   // child: Column(
+                                //   //   mainAxisAlignment: MainAxisAlignment.center,
+                                //   //   crossAxisAlignment: CrossAxisAlignment.center,
+                                //   //   children: [
+                                //   //     Icon(FontAwesome.qrcode, color: CustomColor.primaryLight, size: 32,),
+                                //   //     CustomText.bodyMedium14(
+                                //   //         text: "Qr Code",
+                                //   //         minSize: 14,
+                                //   //         maxLines: 1
+                                //   //     ),
+                                //   //   ],
+                                //   // ),
+                                // ),
+
+                                // GestureDetector(
+                                //   onTap: (){
+                                //     setState(() {
+                                //       // _launchURL();
+                                //       Navigator.push(context, PageTransition(type: PageTransitionType.fade, child: new MejaActivity()));
+                                //     });
+                                //   },
+                                //   child: Container(
+                                //     width: CustomSize.sizeWidth(context) / 3.8,
+                                //     height: CustomSize.sizeWidth(context) / 3.8,
+                                //     decoration: BoxDecoration(
+                                //       color: Colors.white,
+                                //       borderRadius: BorderRadius.circular(20),
+                                //       boxShadow: [
+                                //         BoxShadow(
+                                //           color: Colors.grey.withOpacity(0.5),
+                                //           spreadRadius: 0,
+                                //           blurRadius: 7,
+                                //           offset: Offset(0, 7), // changes position of shadow
+                                //         ),
+                                //       ],
+                                //     ),
+                                //     child: Column(
+                                //       mainAxisAlignment: MainAxisAlignment.center,
+                                //       crossAxisAlignment: CrossAxisAlignment.center,
+                                //       children: [
+                                //         Icon(FontAwesome.th, color: CustomColor.primaryLight, size: 32,),
+                                //         CustomText.bodyMedium14(
+                                //             text: "Meja",
+                                //             minSize: 14,
+                                //             maxLines: 1
+                                //         ),
+                                //       ],
+                                //     ),
+                                //     // child: Column(
+                                //     //   mainAxisAlignment: MainAxisAlignment.center,
+                                //     //   crossAxisAlignment: CrossAxisAlignment.center,
+                                //     //   children: [
+                                //     //     Icon(FontAwesome.qrcode, color: CustomColor.primaryLight, size: 32,),
+                                //     //     CustomText.bodyMedium14(
+                                //     //         text: "Qr Code",
+                                //     //         minSize: 14,
+                                //     //         maxLines: 1
+                                //     //     ),
+                                //     //   ],
+                                //     // ),
+                                //   ),
+                                // ),
+
+
+                              ],
+                            ),
+                                (reservation == true)?(status != 'done')?SizedBox(height: CustomSize.sizeHeight(context) / 48,):Container():Container(),
+                                (reservation == true)?(status != 'done')?Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                GestureDetector(
+                                  onTap: (){
+                                    setState(() {
+                                      if (tunggu == 'false') {
+                                        Navigator.push(context, PageTransition(type: PageTransitionType.fade, child: new PaymentResto(restoName, phone, address)));
+                                      } else if (tunggu == 'true'){
+                                        Fluttertoast.showToast(msg: "Tunggu sebentar",);
+                                      }
+                                      // Navigator.push(context, PageTransition(type: PageTransitionType.fade, child: new FollowersActivity()));
+                                    });
+                                  },
+                                  child: Container(
+                                    width: CustomSize.sizeWidth(context) / 3.8,
+                                    height: CustomSize.sizeWidth(context) / 3.8,
+                                    decoration: BoxDecoration(
+                                      color: Colors.white,
+                                      borderRadius: BorderRadius.circular(20),
+                                      boxShadow: [
+                                        BoxShadow(
+                                          color: Colors.grey.withOpacity(0.5),
+                                          spreadRadius: 0,
+                                          blurRadius: 7,
+                                          offset: Offset(0, 7), // changes position of shadow
+                                        ),
+                                      ],
+                                    ),
+                                    child: Column(
+                                      mainAxisAlignment: MainAxisAlignment.center,
+                                      crossAxisAlignment: CrossAxisAlignment.center,
+                                      children: [
+                                        Icon(FontAwesome.calendar_check_o, color: CustomColor.primaryLight, size: 32,),
+                                        CustomText.bodyMedium14(
+                                            text: "Langganan",
+                                            sizeNew: double.parse(((MediaQuery.of(context).size.width*0.035).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.035)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.035)).toString()),
+                                            maxLines: 1
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                ),
+                                Container(
                                   width: CustomSize.sizeWidth(context) / 3.8,
                                   height: CustomSize.sizeWidth(context) / 3.8,
-                                  decoration: BoxDecoration(
-                                    color: Colors.white,
-                                    borderRadius: BorderRadius.circular(20),
-                                    boxShadow: [
-                                      BoxShadow(
-                                        color: Colors.grey.withOpacity(0.5),
-                                        spreadRadius: 0,
-                                        blurRadius: 7,
-                                        offset: Offset(0, 7), // changes position of shadow
-                                      ),
-                                    ],
-                                  ),
-                                  child: Column(
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    crossAxisAlignment: CrossAxisAlignment.center,
-                                    children: [
-                                      Icon(FontAwesome.calendar_check_o, color: CustomColor.primaryLight, size: 32,),
-                                      CustomText.bodyMedium14(
-                                          text: "Langganan",
-                                          minSize: 14,
-                                          maxLines: 1
-                                      ),
-                                    ],
+                                ),
+
+                                Container(
+                                  width: CustomSize.sizeWidth(context) / 3.8,
+                                  height: CustomSize.sizeWidth(context) / 3.8,
+                                ),
+
+
+                                // Container(
+                                //   width: CustomSize.sizeWidth(context) / 3.8,
+                                //   height: CustomSize.sizeWidth(context) / 3.8,
+                                //   decoration: BoxDecoration(
+                                //     color: Colors.transparent,
+                                //   ),
+                                //   // child: Column(
+                                //   //   mainAxisAlignment: MainAxisAlignment.center,
+                                //   //   crossAxisAlignment: CrossAxisAlignment.center,
+                                //   //   children: [
+                                //   //     Icon(FontAwesome.qrcode, color: CustomColor.primaryLight, size: 32,),
+                                //   //     CustomText.bodyMedium14(
+                                //   //         text: "Qr Code",
+                                //   //         minSize: 14,
+                                //   //         maxLines: 1
+                                //   //     ),
+                                //   //   ],
+                                //   // ),
+                                // ),
+
+                                // GestureDetector(
+                                //   onTap: (){
+                                //     setState(() {
+                                //       // _launchURL();
+                                //       Navigator.push(context, PageTransition(type: PageTransitionType.fade, child: new MejaActivity()));
+                                //     });
+                                //   },
+                                //   child: Container(
+                                //     width: CustomSize.sizeWidth(context) / 3.8,
+                                //     height: CustomSize.sizeWidth(context) / 3.8,
+                                //     decoration: BoxDecoration(
+                                //       color: Colors.white,
+                                //       borderRadius: BorderRadius.circular(20),
+                                //       boxShadow: [
+                                //         BoxShadow(
+                                //           color: Colors.grey.withOpacity(0.5),
+                                //           spreadRadius: 0,
+                                //           blurRadius: 7,
+                                //           offset: Offset(0, 7), // changes position of shadow
+                                //         ),
+                                //       ],
+                                //     ),
+                                //     child: Column(
+                                //       mainAxisAlignment: MainAxisAlignment.center,
+                                //       crossAxisAlignment: CrossAxisAlignment.center,
+                                //       children: [
+                                //         Icon(FontAwesome.th, color: CustomColor.primaryLight, size: 32,),
+                                //         CustomText.bodyMedium14(
+                                //             text: "Meja",
+                                //             minSize: 14,
+                                //             maxLines: 1
+                                //         ),
+                                //       ],
+                                //     ),
+                                //     // child: Column(
+                                //     //   mainAxisAlignment: MainAxisAlignment.center,
+                                //     //   crossAxisAlignment: CrossAxisAlignment.center,
+                                //     //   children: [
+                                //     //     Icon(FontAwesome.qrcode, color: CustomColor.primaryLight, size: 32,),
+                                //     //     CustomText.bodyMedium14(
+                                //     //         text: "Qr Code",
+                                //     //         minSize: 14,
+                                //     //         maxLines: 1
+                                //     //     ),
+                                //     //   ],
+                                //     // ),
+                                //   ),
+                                // ),
+
+
+                              ],
+                            ):Container():Container(),
+                            // SizedBox(height: CustomSize.sizeHeight(context) / 58,),
+                            // Row(
+                            //   mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            //   children: [
+                            //     GestureDetector(
+                            //       onTap: (){
+                            //         setState(() {
+                            //           Navigator.push(context, PageTransition(type: PageTransitionType.fade, child: new ReservationRestoActivity()));
+                            //         });
+                            //       },
+                            //       child: Container(
+                            //         width: CustomSize.sizeWidth(context) / 3.8,
+                            //         height: CustomSize.sizeWidth(context) / 3.8,
+                            //         decoration: BoxDecoration(
+                            //           color: Colors.white,
+                            //           borderRadius: BorderRadius.circular(20),
+                            //           boxShadow: [
+                            //             BoxShadow(
+                            //               color: Colors.grey.withOpacity(0.5),
+                            //               spreadRadius: 0,
+                            //               blurRadius: 7,
+                            //               offset: Offset(0, 7), // changes position of shadow
+                            //             ),
+                            //           ],
+                            //         ),
+                            //         child: Column(
+                            //           mainAxisAlignment: MainAxisAlignment.center,
+                            //           crossAxisAlignment: CrossAxisAlignment.center,
+                            //           children: [
+                            //             Icon(FontAwesome5.clipboard, color: CustomColor.primaryLight, size: 32,),
+                            //             CustomText.bodyMedium14(
+                            //                 text: "Reservasi",
+                            //                 minSize: 14,
+                            //                 maxLines: 1
+                            //             ),
+                            //           ],
+                            //         ),
+                            //       ),
+                            //     ),
+                            //   ],
+                            // ),
+                            SizedBox(height: CustomSize.sizeHeight(context) / 48,),
+                            CustomText.bodyMedium16(
+                                text: "Lainnya tentang Restomu",
+                                sizeNew: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.04)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.04)).toString()),
+                                maxLines: 1
+                            ),
+                            SizedBox(height: CustomSize.sizeHeight(context) / 48,),
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                GestureDetector(
+                                  onTap: (){
+                                    setState(() {
+                                      if (id != 0) {
+                                        Navigator.push(context, PageTransition(type: PageTransitionType.fade, child: new HistoryActivity()));
+                                      } else if (id == 0){
+                                        Fluttertoast.showToast(msg: "Tunggu sebentar",);
+                                      }
+                                    });
+                                  },
+                                  child: Container(
+                                    width: CustomSize.sizeWidth(context) / 3.8,
+                                    height: CustomSize.sizeWidth(context) / 3.8,
+                                    decoration: BoxDecoration(
+                                      color: Colors.white,
+                                      borderRadius: BorderRadius.circular(20),
+                                      boxShadow: [
+                                        BoxShadow(
+                                          color: Colors.grey.withOpacity(0.5),
+                                          spreadRadius: 0,
+                                          blurRadius: 7,
+                                          offset: Offset(0, 7), // changes position of shadow
+                                        ),
+                                      ],
+                                    ),
+                                    child: Column(
+                                      mainAxisAlignment: MainAxisAlignment.center,
+                                      crossAxisAlignment: CrossAxisAlignment.center,
+                                      children: [
+                                        Icon(FontAwesome.history, color: CustomColor.primaryLight, size: 32,),
+                                        CustomText.bodyMedium14(
+                                            text: "Riwayat",
+                                            sizeNew: double.parse(((MediaQuery.of(context).size.width*0.035).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.035)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.035)).toString()),
+                                            maxLines: 1
+                                        ),
+                                      ],
+                                    ),
                                   ),
                                 ),
-                              ):Container(
-                                width: CustomSize.sizeWidth(context) / 3.8,
-                                height: CustomSize.sizeWidth(context) / 3.8,),
-
-
-                              // Container(
-                              //   width: CustomSize.sizeWidth(context) / 3.8,
-                              //   height: CustomSize.sizeWidth(context) / 3.8,
-                              //   decoration: BoxDecoration(
-                              //     color: Colors.transparent,
-                              //   ),
-                              //   // child: Column(
-                              //   //   mainAxisAlignment: MainAxisAlignment.center,
-                              //   //   crossAxisAlignment: CrossAxisAlignment.center,
-                              //   //   children: [
-                              //   //     Icon(FontAwesome.qrcode, color: CustomColor.primaryLight, size: 32,),
-                              //   //     CustomText.bodyMedium14(
-                              //   //         text: "Qr Code",
-                              //   //         minSize: 14,
-                              //   //         maxLines: 1
-                              //   //     ),
-                              //   //   ],
-                              //   // ),
-                              // ),
-
-                              // GestureDetector(
-                              //   onTap: (){
-                              //     setState(() {
-                              //       // _launchURL();
-                              //       Navigator.push(context, PageTransition(type: PageTransitionType.fade, child: new MejaActivity()));
-                              //     });
-                              //   },
-                              //   child: Container(
-                              //     width: CustomSize.sizeWidth(context) / 3.8,
-                              //     height: CustomSize.sizeWidth(context) / 3.8,
-                              //     decoration: BoxDecoration(
-                              //       color: Colors.white,
-                              //       borderRadius: BorderRadius.circular(20),
-                              //       boxShadow: [
-                              //         BoxShadow(
-                              //           color: Colors.grey.withOpacity(0.5),
-                              //           spreadRadius: 0,
-                              //           blurRadius: 7,
-                              //           offset: Offset(0, 7), // changes position of shadow
-                              //         ),
-                              //       ],
-                              //     ),
-                              //     child: Column(
-                              //       mainAxisAlignment: MainAxisAlignment.center,
-                              //       crossAxisAlignment: CrossAxisAlignment.center,
-                              //       children: [
-                              //         Icon(FontAwesome.th, color: CustomColor.primaryLight, size: 32,),
-                              //         CustomText.bodyMedium14(
-                              //             text: "Meja",
-                              //             minSize: 14,
-                              //             maxLines: 1
-                              //         ),
-                              //       ],
-                              //     ),
-                              //     // child: Column(
-                              //     //   mainAxisAlignment: MainAxisAlignment.center,
-                              //     //   crossAxisAlignment: CrossAxisAlignment.center,
-                              //     //   children: [
-                              //     //     Icon(FontAwesome.qrcode, color: CustomColor.primaryLight, size: 32,),
-                              //     //     CustomText.bodyMedium14(
-                              //     //         text: "Qr Code",
-                              //     //         minSize: 14,
-                              //     //         maxLines: 1
-                              //     //     ),
-                              //     //   ],
-                              //     // ),
-                              //   ),
-                              // ),
-
-
-                            ],
+                                GestureDetector(
+                                  onTap: (){
+                                    setState(() {
+                                      if (tunggu == 'false') {
+                                        Navigator.push(context, PageTransition(type: PageTransitionType.fade, child: new ScheduleActivity(id.toString())));
+                                      } else if (tunggu == 'true'){
+                                        Fluttertoast.showToast(msg: "Tunggu sebentar",);
+                                      }
+                                    });
+                                  },
+                                  child: Container(
+                                    width: CustomSize.sizeWidth(context) / 3.8,
+                                    height: CustomSize.sizeWidth(context) / 3.8,
+                                    decoration: BoxDecoration(
+                                      color: Colors.white,
+                                      borderRadius: BorderRadius.circular(20),
+                                      boxShadow: [
+                                        BoxShadow(
+                                          color: Colors.grey.withOpacity(0.5),
+                                          spreadRadius: 0,
+                                          blurRadius: 7,
+                                          offset: Offset(0, 7), // changes position of shadow
+                                        ),
+                                      ],
+                                    ),
+                                    child: Column(
+                                      mainAxisAlignment: MainAxisAlignment.center,
+                                      crossAxisAlignment: CrossAxisAlignment.center,
+                                      children: [
+                                        Icon(MaterialCommunityIcons.door_closed, color: CustomColor.primaryLight, size: 32,),
+                                        CustomText.bodyMedium14(
+                                            text: "Jadwal",
+                                            sizeNew: double.parse(((MediaQuery.of(context).size.width*0.035).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.035)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.035)).toString()),
+                                            maxLines: 1
+                                        ),
+                                        CustomText.bodyMedium14(
+                                            text: "Operasional",
+                                            sizeNew: double.parse(((MediaQuery.of(context).size.width*0.035).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.035)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.035)).toString()),
+                                            maxLines: 1
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                ),
+                                (idUserRest == idUser)?GestureDetector(
+                                  onTap: (){
+                                    setState(() {
+                                      Navigator.push(context, PageTransition(type: PageTransitionType.fade, child: new EmployeesActivity()));
+                                    });
+                                  },
+                                  child: Container(
+                                    width: CustomSize.sizeWidth(context) / 3.8,
+                                    height: CustomSize.sizeWidth(context) / 3.8,
+                                    decoration: BoxDecoration(
+                                      color: Colors.white,
+                                      borderRadius: BorderRadius.circular(20),
+                                      boxShadow: [
+                                        BoxShadow(
+                                          color: Colors.grey.withOpacity(0.5),
+                                          spreadRadius: 0,
+                                          blurRadius: 7,
+                                          offset: Offset(0, 7), // changes position of shadow
+                                        ),
+                                      ],
+                                    ),
+                                    child: Column(
+                                      mainAxisAlignment: MainAxisAlignment.center,
+                                      crossAxisAlignment: CrossAxisAlignment.center,
+                                      children: [
+                                        Icon(Icons.account_box_rounded, color: CustomColor.primaryLight, size: 32,),
+                                        CustomText.bodyMedium14(
+                                            text: "Karyawan",
+                                            sizeNew: double.parse(((MediaQuery.of(context).size.width*0.035).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.035)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.035)).toString()),
+                                            maxLines: 1
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                ):Container(
+                                  width: CustomSize.sizeWidth(context) / 3.8,
+                                  height: CustomSize.sizeWidth(context) / 3.8,),
+                              ],
+                            ),
+                                SizedBox(height: CustomSize.sizeHeight(context) / 59,),
+                    ],
+                  ),
                           ),
-                              (reservation == true)?(status != 'done')?SizedBox(height: CustomSize.sizeHeight(context) / 48,):Container():Container(),
-                              (reservation == true)?(status != 'done')?Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              GestureDetector(
-                                onTap: (){
-                                  setState(() {
-                                    if (tunggu == 'false') {
-                                      Navigator.push(context, PageTransition(type: PageTransitionType.fade, child: new PaymentResto(restoName, phone, address)));
-                                    } else if (tunggu == 'true'){
-                                      Fluttertoast.showToast(msg: "Tunggu sebentar",);
-                                    }
-                                    // Navigator.push(context, PageTransition(type: PageTransitionType.fade, child: new FollowersActivity()));
-                                  });
-                                },
-                                child: Container(
-                                  width: CustomSize.sizeWidth(context) / 3.8,
-                                  height: CustomSize.sizeWidth(context) / 3.8,
-                                  decoration: BoxDecoration(
-                                    color: Colors.white,
-                                    borderRadius: BorderRadius.circular(20),
-                                    boxShadow: [
-                                      BoxShadow(
-                                        color: Colors.grey.withOpacity(0.5),
-                                        spreadRadius: 0,
-                                        blurRadius: 7,
-                                        offset: Offset(0, 7), // changes position of shadow
-                                      ),
-                                    ],
-                                  ),
-                                  child: Column(
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    crossAxisAlignment: CrossAxisAlignment.center,
-                                    children: [
-                                      Icon(FontAwesome.calendar_check_o, color: CustomColor.primaryLight, size: 32,),
-                                      CustomText.bodyMedium14(
-                                          text: "Langganan",
-                                          minSize: 14,
-                                          maxLines: 1
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                              ),
-                              Container(
-                                width: CustomSize.sizeWidth(context) / 3.8,
-                                height: CustomSize.sizeWidth(context) / 3.8,
-                              ),
-
-                              Container(
-                                width: CustomSize.sizeWidth(context) / 3.8,
-                                height: CustomSize.sizeWidth(context) / 3.8,
-                              ),
-
-
-                              // Container(
-                              //   width: CustomSize.sizeWidth(context) / 3.8,
-                              //   height: CustomSize.sizeWidth(context) / 3.8,
-                              //   decoration: BoxDecoration(
-                              //     color: Colors.transparent,
-                              //   ),
-                              //   // child: Column(
-                              //   //   mainAxisAlignment: MainAxisAlignment.center,
-                              //   //   crossAxisAlignment: CrossAxisAlignment.center,
-                              //   //   children: [
-                              //   //     Icon(FontAwesome.qrcode, color: CustomColor.primaryLight, size: 32,),
-                              //   //     CustomText.bodyMedium14(
-                              //   //         text: "Qr Code",
-                              //   //         minSize: 14,
-                              //   //         maxLines: 1
-                              //   //     ),
-                              //   //   ],
-                              //   // ),
-                              // ),
-
-                              // GestureDetector(
-                              //   onTap: (){
-                              //     setState(() {
-                              //       // _launchURL();
-                              //       Navigator.push(context, PageTransition(type: PageTransitionType.fade, child: new MejaActivity()));
-                              //     });
-                              //   },
-                              //   child: Container(
-                              //     width: CustomSize.sizeWidth(context) / 3.8,
-                              //     height: CustomSize.sizeWidth(context) / 3.8,
-                              //     decoration: BoxDecoration(
-                              //       color: Colors.white,
-                              //       borderRadius: BorderRadius.circular(20),
-                              //       boxShadow: [
-                              //         BoxShadow(
-                              //           color: Colors.grey.withOpacity(0.5),
-                              //           spreadRadius: 0,
-                              //           blurRadius: 7,
-                              //           offset: Offset(0, 7), // changes position of shadow
-                              //         ),
-                              //       ],
-                              //     ),
-                              //     child: Column(
-                              //       mainAxisAlignment: MainAxisAlignment.center,
-                              //       crossAxisAlignment: CrossAxisAlignment.center,
-                              //       children: [
-                              //         Icon(FontAwesome.th, color: CustomColor.primaryLight, size: 32,),
-                              //         CustomText.bodyMedium14(
-                              //             text: "Meja",
-                              //             minSize: 14,
-                              //             maxLines: 1
-                              //         ),
-                              //       ],
-                              //     ),
-                              //     // child: Column(
-                              //     //   mainAxisAlignment: MainAxisAlignment.center,
-                              //     //   crossAxisAlignment: CrossAxisAlignment.center,
-                              //     //   children: [
-                              //     //     Icon(FontAwesome.qrcode, color: CustomColor.primaryLight, size: 32,),
-                              //     //     CustomText.bodyMedium14(
-                              //     //         text: "Qr Code",
-                              //     //         minSize: 14,
-                              //     //         maxLines: 1
-                              //     //     ),
-                              //     //   ],
-                              //     // ),
-                              //   ),
-                              // ),
-
-
-                            ],
-                          ):Container():Container(),
-                          // SizedBox(height: CustomSize.sizeHeight(context) / 58,),
-                          // Row(
-                          //   mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          //   children: [
-                          //     GestureDetector(
-                          //       onTap: (){
-                          //         setState(() {
-                          //           Navigator.push(context, PageTransition(type: PageTransitionType.fade, child: new ReservationRestoActivity()));
-                          //         });
-                          //       },
-                          //       child: Container(
-                          //         width: CustomSize.sizeWidth(context) / 3.8,
-                          //         height: CustomSize.sizeWidth(context) / 3.8,
-                          //         decoration: BoxDecoration(
-                          //           color: Colors.white,
-                          //           borderRadius: BorderRadius.circular(20),
-                          //           boxShadow: [
-                          //             BoxShadow(
-                          //               color: Colors.grey.withOpacity(0.5),
-                          //               spreadRadius: 0,
-                          //               blurRadius: 7,
-                          //               offset: Offset(0, 7), // changes position of shadow
-                          //             ),
-                          //           ],
-                          //         ),
-                          //         child: Column(
-                          //           mainAxisAlignment: MainAxisAlignment.center,
-                          //           crossAxisAlignment: CrossAxisAlignment.center,
-                          //           children: [
-                          //             Icon(FontAwesome5.clipboard, color: CustomColor.primaryLight, size: 32,),
-                          //             CustomText.bodyMedium14(
-                          //                 text: "Reservasi",
-                          //                 minSize: 14,
-                          //                 maxLines: 1
-                          //             ),
-                          //           ],
-                          //         ),
-                          //       ),
-                          //     ),
-                          //   ],
-                          // ),
-                          SizedBox(height: CustomSize.sizeHeight(context) / 48,),
-                          CustomText.bodyMedium16(
-                              text: "Lainnya tentang Restomu",
-                              minSize: 16,
-                              maxLines: 1
-                          ),
-                          SizedBox(height: CustomSize.sizeHeight(context) / 48,),
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              GestureDetector(
-                                onTap: (){
-                                  setState(() {
-                                    Navigator.push(context, PageTransition(type: PageTransitionType.fade, child: new HistoryActivity()));
-                                  });
-                                },
-                                child: Container(
-                                  width: CustomSize.sizeWidth(context) / 3.8,
-                                  height: CustomSize.sizeWidth(context) / 3.8,
-                                  decoration: BoxDecoration(
-                                    color: Colors.white,
-                                    borderRadius: BorderRadius.circular(20),
-                                    boxShadow: [
-                                      BoxShadow(
-                                        color: Colors.grey.withOpacity(0.5),
-                                        spreadRadius: 0,
-                                        blurRadius: 7,
-                                        offset: Offset(0, 7), // changes position of shadow
-                                      ),
-                                    ],
-                                  ),
-                                  child: Column(
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    crossAxisAlignment: CrossAxisAlignment.center,
-                                    children: [
-                                      Icon(FontAwesome.history, color: CustomColor.primaryLight, size: 32,),
-                                      CustomText.bodyMedium14(
-                                          text: "Riwayat",
-                                          minSize: 14,
-                                          maxLines: 1
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                              ),
-                              GestureDetector(
-                                onTap: (){
-                                  setState(() {
-                                    if (tunggu == 'false') {
-                                      Navigator.push(context, PageTransition(type: PageTransitionType.fade, child: new ScheduleActivity(id.toString())));
-                                    } else if (tunggu == 'true'){
-                                      Fluttertoast.showToast(msg: "Tunggu sebentar",);
-                                    }
-                                  });
-                                },
-                                child: Container(
-                                  width: CustomSize.sizeWidth(context) / 3.8,
-                                  height: CustomSize.sizeWidth(context) / 3.8,
-                                  decoration: BoxDecoration(
-                                    color: Colors.white,
-                                    borderRadius: BorderRadius.circular(20),
-                                    boxShadow: [
-                                      BoxShadow(
-                                        color: Colors.grey.withOpacity(0.5),
-                                        spreadRadius: 0,
-                                        blurRadius: 7,
-                                        offset: Offset(0, 7), // changes position of shadow
-                                      ),
-                                    ],
-                                  ),
-                                  child: Column(
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    crossAxisAlignment: CrossAxisAlignment.center,
-                                    children: [
-                                      Icon(MaterialCommunityIcons.door_closed, color: CustomColor.primaryLight, size: 32,),
-                                      CustomText.bodyMedium14(
-                                          text: "Jadwal",
-                                          minSize: 14,
-                                          maxLines: 1
-                                      ),
-                                      CustomText.bodyMedium14(
-                                          text: "Operasional",
-                                          minSize: 14,
-                                          maxLines: 1
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                              ),
-                              (idUserRest == idUser)?GestureDetector(
-                                onTap: (){
-                                  setState(() {
-                                    Navigator.push(context, PageTransition(type: PageTransitionType.fade, child: new EmployeesActivity()));
-                                  });
-                                },
-                                child: Container(
-                                  width: CustomSize.sizeWidth(context) / 3.8,
-                                  height: CustomSize.sizeWidth(context) / 3.8,
-                                  decoration: BoxDecoration(
-                                    color: Colors.white,
-                                    borderRadius: BorderRadius.circular(20),
-                                    boxShadow: [
-                                      BoxShadow(
-                                        color: Colors.grey.withOpacity(0.5),
-                                        spreadRadius: 0,
-                                        blurRadius: 7,
-                                        offset: Offset(0, 7), // changes position of shadow
-                                      ),
-                                    ],
-                                  ),
-                                  child: Column(
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    crossAxisAlignment: CrossAxisAlignment.center,
-                                    children: [
-                                      Icon(Icons.account_box_rounded, color: CustomColor.primaryLight, size: 32,),
-                                      CustomText.bodyMedium14(
-                                          text: "Karyawan",
-                                          minSize: 14,
-                                          maxLines: 1
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                              ):Container(
-                                width: CustomSize.sizeWidth(context) / 3.8,
-                                height: CustomSize.sizeWidth(context) / 3.8,),
-                            ],
-                          ),
-                              SizedBox(height: CustomSize.sizeHeight(context) / 59,),
-                  ],
-                ),
                         ),
                       ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
               ),
-            ),
-          ],
+            ],
+          ),
+            // floatingActionButton: GestureDetector(
+            //   onTap: (){
+            //     Navigator.push(
+            //         context,
+            //         PageTransition(
+            //             type: PageTransitionType.rightToLeft,
+            //             child: OrderActivity()));
+            //   },
+            //   child: Container(
+            //     width: CustomSize.sizeWidth(context) / 6.6,
+            //     height: CustomSize.sizeWidth(context) / 6.6,
+            //     decoration: BoxDecoration(
+            //         color: CustomColor.primaryLight,
+            //         shape: BoxShape.circle
+            //     ),
+            //     child: Center(child: Icon(CupertinoIcons.cart_fill, color: Colors.white, size: 28,)),
+            //   ),
+            // )
         ),
-          // floatingActionButton: GestureDetector(
-          //   onTap: (){
-          //     Navigator.push(
-          //         context,
-          //         PageTransition(
-          //             type: PageTransitionType.rightToLeft,
-          //             child: OrderActivity()));
-          //   },
-          //   child: Container(
-          //     width: CustomSize.sizeWidth(context) / 6.6,
-          //     height: CustomSize.sizeWidth(context) / 6.6,
-          //     decoration: BoxDecoration(
-          //         color: CustomColor.primaryLight,
-          //         shape: BoxShape.circle
-          //     ),
-          //     child: Center(child: Icon(CupertinoIcons.cart_fill, color: Colors.white, size: 28,)),
-          //   ),
-          // )
+        data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0),
       ),
     );
   }

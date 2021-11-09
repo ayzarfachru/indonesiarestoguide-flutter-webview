@@ -38,12 +38,13 @@ class CustomText{
   }
 
   static Widget textHeading1({String? text, Color? color,
-    double? minSize, int? maxLines,}){
+    double? minSize, double? sizeNew, int? maxLines,}){
     return AutoSizeText(
       text,
       style: GoogleFonts.poppins(
           textStyle: TextStyle(
-              fontSize: 32,
+              // fontSize: 32,
+              fontSize: sizeNew,
               fontWeight:
               FontWeight.w700, color: color??=Colors.black)),
       minFontSize: minSize??0,
@@ -67,12 +68,13 @@ class CustomText{
   }
 
   static Widget textHeading3({String? text, Color? color,
-    double? minSize, int? maxLines,}){
+    double? minSize, double? sizeNew, int? maxLines,}){
     return AutoSizeText(
       text,
       style: GoogleFonts.poppins(
           textStyle: TextStyle(
-              fontSize: 24,
+              // fontSize: 24,
+              fontSize: sizeNew,
               fontWeight:
               FontWeight.w500, color: color??=Colors.black)),
       minFontSize: minSize??0,
@@ -81,12 +83,13 @@ class CustomText{
   }
 
   static Widget textHeading4({String? text, Color? color,
-    double? minSize, int? maxLines,}){
+    double? minSize, double? sizeNew, int? maxLines,}){
     return AutoSizeText(
       text,
       style: GoogleFonts.poppins(
           textStyle: TextStyle(
-              fontSize: 18,
+              // fontSize: 18,
+              fontSize: sizeNew,
               fontWeight:
               FontWeight.w600, color: color??=Colors.black)),
       minFontSize: minSize??0,
@@ -95,12 +98,13 @@ class CustomText{
   }
 
   static Widget textHeading4a({String? text, Color? color,
-    double? minSize, int? maxLines,}){
+    double? minSize, double? sizeNew, int? maxLines,}){
     return AutoSizeText(
       text,
       style: GoogleFonts.poppins(
           textStyle: TextStyle(
-              fontSize: 20,
+              // fontSize: 20,
+              fontSize: sizeNew,
               fontWeight:
               FontWeight.w600, color: color??=Colors.black)),
       minFontSize: minSize??0,
@@ -109,12 +113,13 @@ class CustomText{
   }
 
   static Widget textHeading5({String? text, Color? color,
-    double? minSize, int? maxLines,}){
+    double? minSize, double? sizeNew, int? maxLines,}){
     return AutoSizeText(
       text,
       style: GoogleFonts.poppins(
           textStyle: TextStyle(
-              fontSize: 24,
+              // fontSize: 24,
+              fontSize: sizeNew,
               fontWeight:
               FontWeight.w600, color: color??=Colors.black)),
       minFontSize: minSize??0,
@@ -123,12 +128,13 @@ class CustomText{
   }
 
   static Widget textHeading5a({String? text, Color? color,
-    double? minSize, int? maxLines,}){
+    double? minSize, double? sizeNew, int? maxLines,}){
     return AutoSizeText(
       text,
       style: GoogleFonts.poppins(
           textStyle: TextStyle(
-              fontSize: 22,
+              // fontSize: 22,
+              fontSize: sizeNew,
               fontWeight:
               FontWeight.w600, color: color??=Colors.black)),
       minFontSize: minSize??0,
@@ -136,13 +142,14 @@ class CustomText{
     );
   }
 
+  // sizeNew: double.parse(((MediaQuery.of(context).size.width*0.035).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.035).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.035).toString())
   static Widget textHeading6({String? text, Color? color,
     double? minSize, double? sizeNew, double? maxSize, int? maxLines,}){
     return AutoSizeText(
       text,
       style: GoogleFonts.poppins(
           textStyle: TextStyle(
-              fontSize: sizeNew??1,
+              fontSize: sizeNew,
               fontWeight:
               FontWeight.w600, color: color??=Colors.black)),
       minFontSize: minSize??0,
@@ -152,12 +159,13 @@ class CustomText{
   }
 
   static Widget textHeading7({String? text, Color? color,
-    double? minSize, int? maxLines,}){
+    double? minSize, double? sizeNew, int? maxLines,}){
     return AutoSizeText(
       text,
       style: GoogleFonts.poppins(
           textStyle: TextStyle(
-              fontSize: 16,
+              // fontSize: 16,
+              fontSize: sizeNew,
               fontWeight:
               FontWeight.w600, color: color??=Colors.black)),
       minFontSize: minSize??0,
@@ -172,7 +180,7 @@ class CustomText{
       style: GoogleFonts.poppins(
           textStyle: TextStyle(
               // fontSize: 28,
-              fontSize: 28,
+              fontSize: sizeNew,
               fontWeight:
               FontWeight.w600, color: color??=Colors.black)),
       minFontSize: minSize??0,
@@ -181,12 +189,13 @@ class CustomText{
   }
 
   static Widget textHeading9({String? text, Color? color,
-    double? minSize, int? maxLines,}){
+    double? minSize, double? sizeNew, int? maxLines,}){
     return AutoSizeText(
       text,
       style: GoogleFonts.poppins(
           textStyle: TextStyle(
-              fontSize: 30,
+              // fontSize: 30,
+              fontSize: sizeNew,
               fontWeight:
               FontWeight.w600, color: color??=Colors.black)),
       minFontSize: minSize??0,
@@ -223,12 +232,13 @@ class CustomText{
   }
 
   static Widget textTitle2c({String? text, Color? color,
-    double? minSize, int? maxLines,}){
+    double? minSize, double? sizeNew, int? maxLines,}){
     return AutoSizeText(
       text,
       style: GoogleFonts.poppins(
           textStyle: TextStyle(
-              fontSize: 18,
+              // fontSize: 18,
+              fontSize: sizeNew,
               fontWeight:
               FontWeight.w500, color: color??=Colors.black)),
       minFontSize: minSize??0,
@@ -238,12 +248,13 @@ class CustomText{
   }
 
   static Widget textTitle3({String? text, Color? color,
-    double? minSize, int? maxLines,}){
+    double? minSize, double? sizeNew, int? maxLines,}){
     return AutoSizeText(
       text,
       style: GoogleFonts.poppins(
           textStyle: TextStyle(
-              fontSize: 16,
+              // fontSize: 16,
+              fontSize: sizeNew,
               fontWeight:
               FontWeight.w500, color: color??=Colors.black)),
       minFontSize: minSize??0,
@@ -266,12 +277,12 @@ class CustomText{
   }
 
   static Widget textTitle6({String? text, Color? color,
-    double? minSize, int? maxLines,}){
+    double? minSize, double? sizeNew, int? maxLines,}){
     return AutoSizeText(
       text,
       style: GoogleFonts.poppins(
           textStyle: TextStyle(
-              fontSize: 14,
+              fontSize: sizeNew,
               fontWeight:
               FontWeight.w700, color: color??=Colors.black)),
       minFontSize: minSize??0,
@@ -294,12 +305,13 @@ class CustomText{
   }
 
   static Widget textTitle8({String? text, Color? color,
-    double? minSize, int? maxLines,}){
+    double? minSize, double? sizeNew, int? maxLines,}){
     return AutoSizeText(
       text,
       style: GoogleFonts.poppins(
           textStyle: TextStyle(
-              fontSize: 14,
+              // fontSize: 14,
+              fontSize: sizeNew,
               fontWeight:
               FontWeight.w600, color: color??=Colors.black)),
       minFontSize: minSize??0,
@@ -368,13 +380,15 @@ class CustomText{
     );
   }
 
+  // sizeNew: double.parse(((MediaQuery.of(context).size.width*0.038).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.038).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.038).toString())
   static Widget bodyRegular18({String? text, Color? color,
-    double? minSize, int? maxLines,}){
+    double? minSize, double? sizeNew, int? maxLines,}){
     return AutoSizeText(
       text,
       style: GoogleFonts.poppins(
           textStyle: TextStyle(
-              fontSize: 15,
+              // fontSize: 15,
+              fontSize: sizeNew,
               fontWeight:
               FontWeight.w600, color: color??=Colors.black)),
       minFontSize: minSize??0,
@@ -383,12 +397,13 @@ class CustomText{
   }
 
   static Widget bodyRegular17({String? text, Color? color,
-    double? minSize, int? maxLines,}){
+    double? minSize, double? sizeNew, int? maxLines,}){
     return AutoSizeText(
       text,
       style: GoogleFonts.poppins(
           textStyle: TextStyle(
-              fontSize: 15,
+              // fontSize: 15,
+              fontSize: sizeNew,
               fontWeight:
               FontWeight.w500, color: color??=Colors.black)),
       minFontSize: minSize??0,
@@ -397,12 +412,13 @@ class CustomText{
   }
 
   static Widget bodyRegular16({String? text, Color? color,
-    double? minSize, int? maxLines,}){
+    double? minSize, double? sizeNew, int? maxLines,}){
     return AutoSizeText(
       text,
       style: GoogleFonts.poppins(
           textStyle: TextStyle(
-              fontSize: 16,
+              // fontSize: 16,
+              fontSize: sizeNew,
               fontWeight:
               FontWeight.w400, color: color??=Colors.black)),
       minFontSize: minSize??0,
@@ -411,12 +427,13 @@ class CustomText{
   }
 
   static Widget bodyRegular15({String? text, Color? color,
-    double? minSize, int? maxLines,}){
+    double? minSize, double? sizeNew, int? maxLines,}){
     return AutoSizeText(
       text,
       style: GoogleFonts.poppins(
           textStyle: TextStyle(
-              fontSize: 15,
+              // fontSize: 15,
+              fontSize: sizeNew,
               fontWeight:
               FontWeight.w400, color: color??=Colors.black)),
       minFontSize: minSize??0,
@@ -440,12 +457,12 @@ class CustomText{
   }
 
   static Widget bodyRegular12({String? text, Color? color,
-    double? minSize, int? maxLines, TextDecoration? decoration}){
+    double? minSize, double? sizeNew, int? maxLines, TextDecoration? decoration}){
     return AutoSizeText(
       text,
       style: GoogleFonts.poppins(
           textStyle: TextStyle(
-              fontSize: 12,
+              fontSize: sizeNew,
               fontWeight:
               FontWeight.w400, color: color??=Colors.black,
               decoration: decoration??TextDecoration.none)),
@@ -471,12 +488,13 @@ class CustomText{
   }
 
   static Widget bodyLight16({String? text, Color? color,
-    double? minSize, int? maxLines,}){
+    double? minSize, double? sizeNew, int? maxLines,}){
     return AutoSizeText(
       text,
       style: GoogleFonts.poppins(
           textStyle: TextStyle(
-              fontSize: 16,
+              // fontSize: 16,
+              fontSize: sizeNew,
               fontWeight:
               FontWeight.w300, color: color??=Colors.black)),
       minFontSize: minSize??0,
@@ -485,12 +503,13 @@ class CustomText{
   }
 
   static Widget bodyLight14({String? text, Color? color,
-    double? minSize, int? maxLines,}){
+    double? minSize, double? sizeNew, int? maxLines,}){
     return AutoSizeText(
       text,
       style: GoogleFonts.poppins(
           textStyle: TextStyle(
-              fontSize: 14,
+              // fontSize: 14,
+              fontSize: sizeNew,
               fontWeight:
               FontWeight.w300, color: color??=Colors.black)),
       minFontSize: minSize??0,

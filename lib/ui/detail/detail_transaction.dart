@@ -494,711 +494,573 @@ class _DetailTransactionState extends State<DetailTransaction> {
   Widget build(BuildContext context) {
     return WillPopScope(
       onWillPop: () => onWillPop(),
-      child: Scaffold(
-        body: SafeArea(
-          child: (isLoading)?Container(
-              width: CustomSize.sizeWidth(context),
-              height: CustomSize.sizeHeight(context),
-              child: Center(child: CircularProgressIndicator(
-                color: CustomColor.primaryLight,
-              ))):SingleChildScrollView(
-            controller: _scrollController,
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                (type == 'delivery' || type == 'takeaway')?Container(
-                  color: Colors.white,
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      SizedBox(height: CustomSize.sizeHeight(context) / 32,),
-                      Padding(
-                        padding: EdgeInsets.only(
-                          left: CustomSize.sizeWidth(context) / 32,
-                          right: CustomSize.sizeWidth(context) / 32,
-                        ),
-                        child: CustomText.textHeading4(text: (type == 'delivery')?"Alamat Pengiriman":"Alamat Pengambilan"),
-                      ),
-                      SizedBox(height: CustomSize.sizeHeight(context) * 0.0048,),
-                      Padding(
-                        padding: EdgeInsets.only(
-                          left: CustomSize.sizeWidth(context) / 18,
-                          right: CustomSize.sizeWidth(context) / 18,
-                        ),
-                        child: CustomText.textHeading6(
-                            text: address,
-                            minSize: 14,
-                            maxLines: 10
-                        ),
-                      ),
-                    ],
-                  ),
-                ):SizedBox(),
-                SizedBox(height: CustomSize.sizeHeight(context) * 0.0075),
-                Divider(thickness: 6, color: CustomColor.secondary,),
-                Padding(
-                  padding: EdgeInsets.only(
-                    left: CustomSize.sizeWidth(context) / 32,
-                    right: CustomSize.sizeWidth(context) / 32,
-                  ),
-                  child: CustomText.textHeading4(text: "Tipe Pembelian"),
-                ),
-                SizedBox(height: CustomSize.sizeHeight(context) * 0.0048,),
-                Padding(
-                  padding: EdgeInsets.only(
-                    left: CustomSize.sizeWidth(context) / 18,
-                    right: CustomSize.sizeWidth(context) / 18,
-                  ),
-                  child: CustomText.textHeading6(text: (type == 'delivery')?"Pesan Antar":(type == 'takeaway')?"Ambil Langsung":"Makan Ditempat",),
-                ),
-                SizedBox(height: CustomSize.sizeHeight(context) * 0.0075),
-                Divider(thickness: 6, color: CustomColor.secondary,),
-                ListView.builder(
-                    shrinkWrap: true,
-                    physics: NeverScrollableScrollPhysics(),
-                    controller: _scrollController,
-                    itemCount: menu.length,
-                    itemBuilder: (_, index){
-                      return Padding(
-                        padding: EdgeInsets.only(
-                          top: CustomSize.sizeWidth(context) / 68,
-                          left: CustomSize.sizeWidth(context) / 32,
-                          right: CustomSize.sizeWidth(context) / 32,
-                        ),
-                        child: Column(
-                          children: [
-                            Row(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                Container(
-                                  width: CustomSize.sizeWidth(context) / 1.65,
-                                  child: Column(
-                                    crossAxisAlignment: CrossAxisAlignment.start,
-                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                    children: [
-                                      Column(
-                                        crossAxisAlignment: CrossAxisAlignment.start,
-                                        mainAxisAlignment: MainAxisAlignment.start,
-                                        children: [
-                                          CustomText.textHeading4(
-                                              text: menu[index].name,
-                                              minSize: 18,
-                                              maxLines: 1
-                                          ),
-                                          CustomText.bodyRegular12(
-                                              text: menu[index].desc,
-                                              maxLines: 2,
-                                              minSize: 12
-                                          ),
-                                          SizedBox(height: CustomSize.sizeHeight(context) / 48,),
-                                          Row(
-                                            children: [
-                                              CustomText.bodyMedium14(
-                                                  text: NumberFormat.currency(locale: 'id', symbol: '', decimalDigits: 0).format(menu[index].price!.original) ,
-                                                  maxLines: 1,
-                                                  minSize: 16
-                                              ),
-                                            ],
-                                          ),
-                                          SizedBox(height: CustomSize.sizeHeight(context) * 0.0025),
-                                          CustomText.bodyMedium14(
-                                              text: menu[index].qty.toString()+' Item',
-                                              maxLines: 1,
-                                              minSize: 16
-                                          ),
-                                        ],
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                                Column(
-                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                  crossAxisAlignment: CrossAxisAlignment.end,
-                                  children: [
-                                    Container(
-                                      width: CustomSize.sizeWidth(context) / 3.4,
-                                      height: CustomSize.sizeWidth(context) / 3.4,
-                                      decoration: BoxDecoration(
-                                          image: DecorationImage(
-                                              image: NetworkImage(Links.subUrl + menu[index].urlImg),
-                                              fit: BoxFit.cover
-                                          ),
-                                          borderRadius: BorderRadius.circular(20)
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ],
-                            ),
-                            Divider()
-                          ],
-                        ),
-                      );
-                    }
-                ),
-                SizedBox(height: CustomSize.sizeHeight(context) * 0.0075),
-                (note != '' && note != '[]' && note != 'null')?Divider(thickness: 6, color: CustomColor.secondary,):Container(),
-                (note != '' && note != '[]' && note != 'null')?Padding(
-                  padding: EdgeInsets.only(
-                    left: CustomSize.sizeWidth(context) / 32,
-                    right: CustomSize.sizeWidth(context) / 32,
-                  ),
-                  child: CustomText.textHeading4(text: "Catatan mu"),
-                ):Container(),
-                (note != '' && note != '[]' && note != 'null')?SizedBox(height: CustomSize.sizeHeight(context) * 0.0048,):Container(),
-                (note != '' && note != '[]' && note != 'null')?Padding(
-                  padding: EdgeInsets.only(
-                    left: CustomSize.sizeWidth(context) / 18,
-                    right: CustomSize.sizeWidth(context) / 18,
-                  ),
-                  child: CustomText.textHeading6(text: note.replaceAll('[', '').replaceAll(']', '').replaceAll('{', '').replaceAll('}, ', '\n').replaceAll('}', ''), maxLines: 99),
-                ):Container(),
-                (note != '' && note != '[]' && note != 'null')?SizedBox(height: CustomSize.sizeHeight(context) * 0.0075):Container(),
-                Divider(thickness: 6, color: CustomColor.secondary,),
-                Padding(
-                  padding: EdgeInsets.symmetric(
-                      horizontal: CustomSize.sizeWidth(context) / 32,
-                      vertical: CustomSize.sizeHeight(context) / 55
-                  ),
-                  child: Container(
-                    width: CustomSize.sizeWidth(context),
-                    decoration: BoxDecoration(
-                        color: Colors.white
-                    ),
+      child: MediaQuery(
+        child: Scaffold(
+          body: SafeArea(
+            child: (isLoading)?Container(
+                width: CustomSize.sizeWidth(context),
+                height: CustomSize.sizeHeight(context),
+                child: Center(child: CircularProgressIndicator(
+                  color: CustomColor.primaryLight,
+                ))):SingleChildScrollView(
+              controller: _scrollController,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  (type == 'delivery' || type == 'takeaway')?Container(
+                    color: Colors.white,
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
-                      mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        CustomText.textHeading7(text: "Data Usaha"),
-                        SizedBox(height: CustomSize.sizeHeight(context) * 0.01,),
-                        Container(
+                        SizedBox(height: CustomSize.sizeHeight(context) / 32,),
+                        Padding(
                           padding: EdgeInsets.only(
-                            left: CustomSize.sizeWidth(context) / 25,
-                            right: CustomSize.sizeWidth(context) / 25,
+                            left: CustomSize.sizeWidth(context) / 32,
+                            right: CustomSize.sizeWidth(context) / 32,
                           ),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              (nameRestoTrans != '' && nameRestoTrans != 'null')?
-                              CustomText.bodyRegular17(text: "Nama Usaha: "+nameRestoTrans, maxLines: 4):
-                              Row(
-                                children: [
-                                  CustomText.bodyRegular17(text: "Nama Usaha: ", maxLines: 2),
-                                  CustomText.bodyRegular17(text: "kosong", maxLines: 2, color: CustomColor.redBtn),
-                                ],
-                              ),
-                              SizedBox(height: CustomSize.sizeHeight(context) * 0.005,),
-
-                              (badanRestoTrans != '' && badanRestoTrans != 'null')?
-                              CustomText.bodyRegular17(text: "Badan Usaha: "+badanRestoTrans, maxLines: 4):
-                              Row(
-                                children: [
-                                  CustomText.bodyRegular17(text: "Badan Usaha: ", maxLines: 2),
-                                  CustomText.bodyRegular17(text: "kosong", maxLines: 2, color: CustomColor.redBtn),
-                                ],
-                              ),
-                              SizedBox(height: CustomSize.sizeHeight(context) * 0.005,),
-
-                              (restoAddress != '' && restoAddress != 'null')?
-                              Row(
-                                children: [
-                                  CustomText.bodyRegular17(text: "Alamat Usaha: ", maxLines: 4),
-                                  GestureDetector(
-                                      onTap: (){
-                                        _launchURL();
-                                      },
-                                      child: Container(
-                                          width: CustomSize.sizeWidth(context) / 1.8,
-                                          child: CustomText.bodyRegular17(text: restoAddress, maxLines: 1, minSize: 15)
-                                      )
-                                  ),
-                                ],
-                              ):
-                              Row(
-                                children: [
-                                  CustomText.bodyRegular17(text: "Alamat Usaha: ", maxLines: 2),
-                                  CustomText.bodyRegular17(text: "kosong", maxLines: 2, color: CustomColor.redBtn),
-                                ],
-                              ),
-                              SizedBox(height: CustomSize.sizeHeight(context) * 0.005,),
-
-                              (emailTokoTrans != '' && emailTokoTrans != 'null')?
-                              Row(
-                                children: [
-                                  CustomText.bodyRegular17(text: "Email Usaha: ", maxLines: 2),
-                                  GestureDetector(
-                                      onTap: (){
-                                        launch('mailto:$emailTokoTrans');
-                                      },
-                                      child: Container(
-                                          width: CustomSize.sizeWidth(context) / 1.8,
-                                          child: CustomText.bodyRegular17(text: emailTokoTrans, maxLines: 1)
-                                      )
-                                  ),
-                                ],
-                              ):
-                              Row(
-                                children: [
-                                  CustomText.bodyRegular17(text: "Email Usaha: ", maxLines: 2),
-                                  CustomText.bodyRegular17(text: "kosong", maxLines: 2, color: CustomColor.redBtn),
-                                ],
-                              ),
-                              SizedBox(height: CustomSize.sizeHeight(context) * 0.005,),
-
-                              (phone != '' && phone != 'null')?
-                              Row(
-                                children: [
-                                  CustomText.bodyRegular17(text: "Telepon Usaha: ", maxLines: 2),
-                                  GestureDetector(
-                                      onTap: (){
-                                        launch('tel:$phone');
-                                      },
-                                      child: CustomText.bodyRegular17(text: phone, maxLines: 2)
-                                  ),
-                                ],
-                              ):
-                              Row(
-                                children: [
-                                  CustomText.bodyRegular17(text: "Telepon Usaha: ", maxLines: 2),
-                                  CustomText.bodyRegular17(text: "kosong", maxLines: 2, color: CustomColor.redBtn),
-                                ],
-                              ),
-                              SizedBox(height: CustomSize.sizeHeight(context) * 0.005,),
-
-                              (ownerTokoTrans != '' && ownerTokoTrans != 'null')?
-                              CustomText.bodyRegular17(text: "Nama Pemilik: "+ownerTokoTrans, maxLines: 2):
-                              Row(
-                                children: [
-                                  CustomText.bodyRegular17(text: "Nama Pemilik: ", maxLines: 2),
-                                  CustomText.bodyRegular17(text: "kosong", maxLines: 2, color: CustomColor.redBtn),
-                                ],
-                              ),
-                              SizedBox(height: CustomSize.sizeHeight(context) * 0.005,),
-
-                              (pjTokoTrans != '' && pjTokoTrans != 'null')?
-                              CustomText.bodyRegular17(text: "Nama Penanggung Jawab: "+pjTokoTrans, maxLines: 2):
-                              Row(
-                                children: [
-                                  CustomText.bodyRegular17(text: "Nama Penanggung Jawab: ", maxLines: 2),
-                                  CustomText.bodyRegular17(text: "kosong", maxLines: 2, color: CustomColor.redBtn),
-                                ],
-                              ),
-                              SizedBox(height: CustomSize.sizeHeight(context) * 0.005,),
-
-                              (nameRekening != '' && nameRekening != 'null')?
-                              CustomText.bodyRegular17(text: "Nomor Rekening atas Nama: "+nameRekening, maxLines: 2):
-                              Row(
-                                children: [
-                                  CustomText.bodyRegular17(text: "Nomor Rekening atas Nama: ", maxLines: 2),
-                                  CustomText.bodyRegular17(text: "kosong", maxLines: 2, color: CustomColor.redBtn),
-                                ],
-                              ),
-                              SizedBox(height: CustomSize.sizeHeight(context) * 0.005,),
-
-                              (nameBank != '' && nameBank != 'null')?
-                              CustomText.bodyRegular17(text: "Rekening Bank: "+nameBank, maxLines: 2):
-                              Row(
-                                children: [
-                                  CustomText.bodyRegular17(text: "Rekening Bank: ", maxLines: 2),
-                                  CustomText.bodyRegular17(text: "kosong", maxLines: 2, color: CustomColor.redBtn),
-                                ],
-                              ),
-                              SizedBox(height: CustomSize.sizeHeight(context) * 0.005,),
-
-                              (norekTokoTrans != '' && norekTokoTrans != 'null')?
-                              CustomText.bodyRegular17(text: "Nomor Rekening: "+norekTokoTrans, maxLines: 2):
-                              Row(
-                                children: [
-                                  CustomText.bodyRegular17(text: "Nomor Rekening: ", maxLines: 2),
-                                  CustomText.bodyRegular17(text: "kosong", maxLines: 2, color: CustomColor.redBtn),
-                                ],
-                              ),
-                            ],
+                          child: CustomText.textHeading4(text: (type == 'delivery')?"Alamat Pengiriman":"Alamat Pengambilan", sizeNew: double.parse(((MediaQuery.of(context).size.width*0.045).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.045).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.045).toString())),
+                        ),
+                        SizedBox(height: CustomSize.sizeHeight(context) * 0.0048,),
+                        Padding(
+                          padding: EdgeInsets.only(
+                            left: CustomSize.sizeWidth(context) / 18,
+                            right: CustomSize.sizeWidth(context) / 18,
+                          ),
+                          child: CustomText.textHeading6(
+                              text: address,
+                              sizeNew: double.parse(((MediaQuery.of(context).size.width*0.035).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.035).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.035).toString()),
+                              maxLines: 10
                           ),
                         ),
                       ],
                     ),
+                  ):SizedBox(),
+                  SizedBox(height: CustomSize.sizeHeight(context) * 0.0075),
+                  Divider(thickness: 6, color: CustomColor.secondary,),
+                  Padding(
+                    padding: EdgeInsets.only(
+                      left: CustomSize.sizeWidth(context) / 32,
+                      right: CustomSize.sizeWidth(context) / 32,
+                    ),
+                    child: CustomText.textHeading4(text: "Tipe Pembelian", sizeNew: double.parse(((MediaQuery.of(context).size.width*0.035).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.035).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.035).toString())),
                   ),
-                ),
-                // Divider(thickness: 6, color: CustomColor.secondary,),
-                // Padding(
-                //   padding: EdgeInsets.symmetric(
-                //       horizontal: CustomSize.sizeWidth(context) / 32,
-                //       vertical: CustomSize.sizeHeight(context) / 55
-                //   ),
-                //   child: Container(
-                //     width: CustomSize.sizeWidth(context),
-                //     decoration: BoxDecoration(
-                //         color: Colors.white
-                //     ),
-                //     child: Column(
-                //       crossAxisAlignment: CrossAxisAlignment.start,
-                //       children: [
-                //         CustomText.textHeading7(text: "Data Usaha"),
-                //         SizedBox(height: CustomSize.sizeHeight(context) * 0.01,),
-                //         Container(
-                //           padding: EdgeInsets.only(
-                //             left: CustomSize.sizeWidth(context) / 25,
-                //             right: CustomSize.sizeWidth(context) / 25,
-                //           ),
-                //           child: Column(
-                //             crossAxisAlignment: CrossAxisAlignment.start,
-                //             children: [
-                //               (nameRestoTrans != '')?
-                //               CustomText.bodyRegular17(text: "Nama Usaha: "+nameRestoTrans, maxLines: 4):
-                //               Row(
-                //                 children: [
-                //                   CustomText.bodyRegular17(text: "Nama Usaha: ", maxLines: 2),
-                //                   CustomText.bodyRegular17(text: "kosong", maxLines: 2, color: CustomColor.redBtn),
-                //                 ],
-                //               ),
-                //               SizedBox(height: CustomSize.sizeHeight(context) * 0.005,),
-                //
-                //               (restoAddress != '')?
-                //               Row(
-                //                 children: [
-                //                   CustomText.bodyRegular17(text: "Alamat Usaha: ", maxLines: 4),
-                //                   GestureDetector(
-                //                       onTap: (){
-                //                         _launchURL();
-                //                       },
-                //                       child: Container(
-                //                           width: CustomSize.sizeWidth(context) / 1.8,
-                //                           child: CustomText.bodyRegular17(text: restoAddress, maxLines: 1, minSize: 15)
-                //                       )
-                //                   ),
-                //                 ],
-                //               ):
-                //               Row(
-                //                 children: [
-                //                   CustomText.bodyRegular17(text: "Alamat Usaha: ", maxLines: 2),
-                //                   CustomText.bodyRegular17(text: "kosong", maxLines: 2, color: CustomColor.redBtn),
-                //                 ],
-                //               ),
-                //               SizedBox(height: CustomSize.sizeHeight(context) * 0.005,),
-                //
-                //               (emailTokoTrans != '')?
-                //               Row(
-                //                 children: [
-                //                   CustomText.bodyRegular17(text: "Email Usaha: ", maxLines: 2),
-                //                   GestureDetector(
-                //                       onTap: (){
-                //                         launch('mailto:$emailTokoTrans');
-                //                       },
-                //                       child: Container(
-                //                           width: CustomSize.sizeWidth(context) / 1.8,
-                //                           child: CustomText.bodyRegular17(text: emailTokoTrans, maxLines: 1)
-                //                       )
-                //                   ),
-                //                 ],
-                //               ):
-                //               Row(
-                //                 children: [
-                //                   CustomText.bodyRegular17(text: "Email Usaha: ", maxLines: 2),
-                //                   CustomText.bodyRegular17(text: "kosong", maxLines: 2, color: CustomColor.redBtn),
-                //                 ],
-                //               ),
-                //               SizedBox(height: CustomSize.sizeHeight(context) * 0.005,),
-                //
-                //               (phoneRestoTrans != '')?
-                //               Row(
-                //                 children: [
-                //                   CustomText.bodyRegular17(text: "Telepon Usaha: ", maxLines: 2),
-                //                   GestureDetector(
-                //                       onTap: (){
-                //                         launch('tel:$phoneRestoTrans');
-                //                       },
-                //                       child: CustomText.bodyRegular17(text: phoneRestoTrans, maxLines: 2)
-                //                   ),
-                //                 ],
-                //               ):
-                //               Row(
-                //                 children: [
-                //                   CustomText.bodyRegular17(text: "Telepon Usaha: ", maxLines: 2),
-                //                   CustomText.bodyRegular17(text: "kosong", maxLines: 2, color: CustomColor.redBtn),
-                //                 ],
-                //               ),
-                //               SizedBox(height: CustomSize.sizeHeight(context) * 0.005,),
-                //
-                //               (ownerTokoTrans != '')?
-                //               CustomText.bodyRegular17(text: "Nama Pemilik: "+ownerTokoTrans, maxLines: 2):
-                //               Row(
-                //                 children: [
-                //                   CustomText.bodyRegular17(text: "Nama Pemilik: ", maxLines: 2),
-                //                   CustomText.bodyRegular17(text: "kosong", maxLines: 2, color: CustomColor.redBtn),
-                //                 ],
-                //               ),
-                //               SizedBox(height: CustomSize.sizeHeight(context) * 0.005,),
-                //
-                //               (pjTokoTrans != '')?
-                //               CustomText.bodyRegular17(text: "Nama Penanggung Jawab: "+pjTokoTrans, maxLines: 2):
-                //               Row(
-                //                 children: [
-                //                   CustomText.bodyRegular17(text: "Nama Penanggung Jawab: ", maxLines: 2),
-                //                   CustomText.bodyRegular17(text: "kosong", maxLines: 2, color: CustomColor.redBtn),
-                //                 ],
-                //               ),
-                //               SizedBox(height: CustomSize.sizeHeight(context) * 0.005,),
-                //
-                //               (nameNorekTokoTrans != '')?
-                //               CustomText.bodyRegular17(text: "Nomor Rekening atas Nama: "+nameNorekTokoTrans, maxLines: 2):
-                //               Row(
-                //                 children: [
-                //                   CustomText.bodyRegular17(text: "Nomor Rekening atas Nama: ", maxLines: 2),
-                //                   CustomText.bodyRegular17(text: "kosong", maxLines: 2, color: CustomColor.redBtn),
-                //                 ],
-                //               ),
-                //               SizedBox(height: CustomSize.sizeHeight(context) * 0.005,),
-                //
-                //               (bankTokoTrans != '')?
-                //               CustomText.bodyRegular17(text: "Rekening Bank: "+bankTokoTrans, maxLines: 2):
-                //               Row(
-                //                 children: [
-                //                   CustomText.bodyRegular17(text: "Rekening Bank: ", maxLines: 2),
-                //                   CustomText.bodyRegular17(text: "kosong", maxLines: 2, color: CustomColor.redBtn),
-                //                 ],
-                //               ),
-                //               SizedBox(height: CustomSize.sizeHeight(context) * 0.005,),
-                //
-                //               (norekTokoTrans != '')?
-                //               CustomText.bodyRegular17(text: "Nomor Rekening: "+norekTokoTrans, maxLines: 2):
-                //               Row(
-                //                 children: [
-                //                   CustomText.bodyRegular17(text: "Nomor Rekening: ", maxLines: 2),
-                //                   CustomText.bodyRegular17(text: "kosong", maxLines: 2, color: CustomColor.redBtn),
-                //                 ],
-                //               ),
-                //             ],
-                //           ),
-                //         ),
-                //       ],
-                //     ),
-                //   ),
-                // ),
-                Container(
-                  width: CustomSize.sizeWidth(context),
-                  decoration: BoxDecoration(
-                      color: CustomColor.secondary
+                  SizedBox(height: CustomSize.sizeHeight(context) * 0.0048,),
+                  Padding(
+                    padding: EdgeInsets.only(
+                      left: CustomSize.sizeWidth(context) / 18,
+                      right: CustomSize.sizeWidth(context) / 18,
+                    ),
+                    child: CustomText.textHeading6(text: (type == 'delivery')?"Pesan Antar":(type == 'takeaway')?"Ambil Langsung":"Makan Ditempat", sizeNew: double.parse(((MediaQuery.of(context).size.width*0.035).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.035).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.035).toString())),
                   ),
-                  child: Column(
-                    children: [
-                      SizedBox(height: CustomSize.sizeHeight(context) / 48,),
-                      Padding(
-                        padding: EdgeInsets.symmetric(horizontal: CustomSize.sizeWidth(context) / 22),
-                        child: Container(
-                          width: CustomSize.sizeWidth(context),
-                          height: CustomSize.sizeHeight(context) / 3.8,
-                          decoration: BoxDecoration(
-                            color: Colors.white,
-                            borderRadius: BorderRadius.circular(20),
+                  SizedBox(height: CustomSize.sizeHeight(context) * 0.0075),
+                  Divider(thickness: 6, color: CustomColor.secondary,),
+                  ListView.builder(
+                      shrinkWrap: true,
+                      physics: NeverScrollableScrollPhysics(),
+                      controller: _scrollController,
+                      itemCount: menu.length,
+                      itemBuilder: (_, index){
+                        return Padding(
+                          padding: EdgeInsets.only(
+                            top: CustomSize.sizeWidth(context) / 68,
+                            left: CustomSize.sizeWidth(context) / 32,
+                            right: CustomSize.sizeWidth(context) / 32,
                           ),
-                          child: Padding(
-                            padding: const EdgeInsets.symmetric(horizontal: 20.0),
+                          child: Column(
+                            children: [
+                              Row(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                children: [
+                                  Container(
+                                    width: CustomSize.sizeWidth(context) / 1.65,
+                                    child: Column(
+                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                      children: [
+                                        Column(
+                                          crossAxisAlignment: CrossAxisAlignment.start,
+                                          mainAxisAlignment: MainAxisAlignment.start,
+                                          children: [
+                                            CustomText.textHeading4(
+                                                text: menu[index].name,
+                                                sizeNew: double.parse(((MediaQuery.of(context).size.width*0.045).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.045).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.045).toString()),
+                                                maxLines: 1
+                                            ),
+                                            CustomText.bodyRegular12(
+                                                text: menu[index].desc,
+                                                maxLines: 2,
+                                                sizeNew: double.parse(((MediaQuery.of(context).size.width*0.03).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.03).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.03).toString())
+                                            ),
+                                            SizedBox(height: CustomSize.sizeHeight(context) / 48,),
+                                            Row(
+                                              children: [
+                                                CustomText.bodyMedium14(
+                                                    text: NumberFormat.currency(locale: 'id', symbol: '', decimalDigits: 0).format(menu[index].price!.original) ,
+                                                    maxLines: 1,
+                                                    sizeNew: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.04).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.04).toString())
+                                                ),
+                                              ],
+                                            ),
+                                            SizedBox(height: CustomSize.sizeHeight(context) * 0.0025),
+                                            CustomText.bodyMedium14(
+                                                text: menu[index].qty.toString()+' Item',
+                                                maxLines: 1,
+                                                sizeNew: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.04).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.04).toString())
+                                            ),
+                                          ],
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                  Column(
+                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                    crossAxisAlignment: CrossAxisAlignment.end,
+                                    children: [
+                                      Container(
+                                        width: CustomSize.sizeWidth(context) / 3.4,
+                                        height: CustomSize.sizeWidth(context) / 3.4,
+                                        decoration: BoxDecoration(
+                                            image: DecorationImage(
+                                                image: NetworkImage(Links.subUrl + menu[index].urlImg),
+                                                fit: BoxFit.cover
+                                            ),
+                                            borderRadius: BorderRadius.circular(20)
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ],
+                              ),
+                              Divider()
+                            ],
+                          ),
+                        );
+                      }
+                  ),
+                  SizedBox(height: CustomSize.sizeHeight(context) * 0.0075),
+                  (note != '' && note != '[]' && note != 'null')?Divider(thickness: 6, color: CustomColor.secondary,):Container(),
+                  (note != '' && note != '[]' && note != 'null')?Padding(
+                    padding: EdgeInsets.only(
+                      left: CustomSize.sizeWidth(context) / 32,
+                      right: CustomSize.sizeWidth(context) / 32,
+                    ),
+                    child: CustomText.textHeading4(text: "Catatan mu", sizeNew: double.parse(((MediaQuery.of(context).size.width*0.035).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.035).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.035).toString())),
+                  ):Container(),
+                  (note != '' && note != '[]' && note != 'null')?SizedBox(height: CustomSize.sizeHeight(context) * 0.0048,):Container(),
+                  (note != '' && note != '[]' && note != 'null')?Padding(
+                    padding: EdgeInsets.only(
+                      left: CustomSize.sizeWidth(context) / 18,
+                      right: CustomSize.sizeWidth(context) / 18,
+                    ),
+                    child: CustomText.textHeading6(text: note.replaceAll('[', '').replaceAll(']', '').replaceAll('{', '').replaceAll('}, ', '\n').replaceAll('}', ''), maxLines: 99, sizeNew: double.parse(((MediaQuery.of(context).size.width*0.035).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.035).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.035).toString())),
+                  ):Container(),
+                  (note != '' && note != '[]' && note != 'null')?SizedBox(height: CustomSize.sizeHeight(context) * 0.0075):Container(),
+                  Divider(thickness: 6, color: CustomColor.secondary,),
+                  Padding(
+                    padding: EdgeInsets.symmetric(
+                        horizontal: CustomSize.sizeWidth(context) / 32,
+                        vertical: CustomSize.sizeHeight(context) / 55
+                    ),
+                    child: Container(
+                      width: CustomSize.sizeWidth(context),
+                      decoration: BoxDecoration(
+                          color: Colors.white
+                      ),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          CustomText.textHeading7(text: "Data Usaha", sizeNew: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.04).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.04).toString())),
+                          SizedBox(height: CustomSize.sizeHeight(context) * 0.01,),
+                          Container(
+                            padding: EdgeInsets.only(
+                              left: CustomSize.sizeWidth(context) / 25,
+                              right: CustomSize.sizeWidth(context) / 25,
+                            ),
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                SizedBox(height: CustomSize.sizeHeight(context) / 36,),
-                                CustomText.textTitle3(text: "Rincian Pembayaran"),
-                                SizedBox(height: CustomSize.sizeHeight(context) / 50,),
+                                (nameRestoTrans != '' && nameRestoTrans != 'null')?
+                                CustomText.bodyRegular17(text: "Nama Usaha: "+nameRestoTrans, maxLines: 4, sizeNew: double.parse(((MediaQuery.of(context).size.width*0.038).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.038).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.038).toString())):
                                 Row(
-                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                   children: [
-                                    CustomText.bodyLight16(text: "Harga"),
-                                    CustomText.bodyLight16(text: NumberFormat.currency(locale: 'id', symbol: '', decimalDigits: 0).format(total)),
+                                    CustomText.bodyRegular17(text: "Nama Usaha: ", maxLines: 2, sizeNew: double.parse(((MediaQuery.of(context).size.width*0.038).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.038).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.038).toString())),
+                                    CustomText.bodyRegular17(text: "kosong", maxLines: 2, color: CustomColor.redBtn, sizeNew: double.parse(((MediaQuery.of(context).size.width*0.038).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.038).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.038).toString())),
                                   ],
                                 ),
-                                SizedBox(height: (type == 'delivery')?CustomSize.sizeHeight(context) / 100:0,),
-                                (type == 'delivery')?Row(mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                SizedBox(height: CustomSize.sizeHeight(context) * 0.005,),
+
+                                (badanRestoTrans != '' && badanRestoTrans != 'null')?
+                                CustomText.bodyRegular17(text: "Badan Usaha: "+badanRestoTrans, maxLines: 4, sizeNew: double.parse(((MediaQuery.of(context).size.width*0.038).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.038).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.038).toString())):
+                                Row(
                                   children: [
-                                    CustomText.bodyLight16(text: "Ongkir"),
-                                    CustomText.bodyLight16(text: NumberFormat.currency(locale: 'id', symbol: '', decimalDigits: 0).format(ongkir)),
-                                  ],
-                                ):SizedBox(),
-                                SizedBox(height: CustomSize.sizeHeight(context) / 64,),
-                                Divider(thickness: 1,),
-                                SizedBox(height: CustomSize.sizeHeight(context) / 120,),
-                                Row(mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                  children: [
-                                    CustomText.textTitle3(text: "Total Pembayaran"),
-                                    CustomText.textTitle3(text: NumberFormat.currency(locale: 'id', symbol: '', decimalDigits: 0).format(totalAll)),
+                                    CustomText.bodyRegular17(text: "Badan Usaha: ", maxLines: 2, sizeNew: double.parse(((MediaQuery.of(context).size.width*0.038).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.038).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.038).toString())),
+                                    CustomText.bodyRegular17(text: "kosong", maxLines: 2, color: CustomColor.redBtn, sizeNew: double.parse(((MediaQuery.of(context).size.width*0.038).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.038).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.038).toString())),
                                   ],
                                 ),
-                                // SizedBox(height: CustomSize.sizeHeight(context) / 34,),
+                                SizedBox(height: CustomSize.sizeHeight(context) * 0.005,),
+
+                                (restoAddress != '' && restoAddress != 'null')?
+                                Row(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    CustomText.bodyRegular17(text: "Alamat Usaha: ", maxLines: 4, sizeNew: double.parse(((MediaQuery.of(context).size.width*0.038).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.038).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.038).toString())),
+                                    GestureDetector(
+                                        onTap: (){
+                                          _launchURL();
+                                        },
+                                        child: Container(
+                                            width: CustomSize.sizeWidth(context) / 1.8,
+                                            child: CustomText.bodyRegular17(text: restoAddress, maxLines: 14, sizeNew: double.parse(((MediaQuery.of(context).size.width*0.038).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.038).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.038).toString()))
+                                        )
+                                    ),
+                                  ],
+                                ):
+                                Row(
+                                  children: [
+                                    CustomText.bodyRegular17(text: "Alamat Usaha: ", maxLines: 2, sizeNew: double.parse(((MediaQuery.of(context).size.width*0.038).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.038).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.038).toString())),
+                                    CustomText.bodyRegular17(text: "kosong", maxLines: 2, color: CustomColor.redBtn, sizeNew: double.parse(((MediaQuery.of(context).size.width*0.038).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.038).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.038).toString())),
+                                  ],
+                                ),
+                                SizedBox(height: CustomSize.sizeHeight(context) * 0.005,),
+
+                                (emailTokoTrans != '' && emailTokoTrans != 'null')?
+                                Row(
+                                  children: [
+                                    CustomText.bodyRegular17(text: "Email Usaha: ", maxLines: 2, sizeNew: double.parse(((MediaQuery.of(context).size.width*0.038).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.038).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.038).toString())),
+                                    GestureDetector(
+                                        onTap: (){
+                                          launch('mailto:$emailTokoTrans');
+                                        },
+                                        child: Container(
+                                            width: CustomSize.sizeWidth(context) / 1.8,
+                                            child: CustomText.bodyRegular17(text: emailTokoTrans, maxLines: 1, sizeNew: double.parse(((MediaQuery.of(context).size.width*0.038).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.038).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.038).toString()))
+                                        )
+                                    ),
+                                  ],
+                                ):
+                                Row(
+                                  children: [
+                                    CustomText.bodyRegular17(text: "Email Usaha: ", maxLines: 2, sizeNew: double.parse(((MediaQuery.of(context).size.width*0.038).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.038).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.038).toString())),
+                                    CustomText.bodyRegular17(text: "kosong", maxLines: 2, color: CustomColor.redBtn, sizeNew: double.parse(((MediaQuery.of(context).size.width*0.038).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.038).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.038).toString())),
+                                  ],
+                                ),
+                                SizedBox(height: CustomSize.sizeHeight(context) * 0.005,),
+
+                                (phone != '' && phone != 'null')?
+                                Row(
+                                  children: [
+                                    CustomText.bodyRegular17(text: "Telepon Usaha: ", maxLines: 2, sizeNew: double.parse(((MediaQuery.of(context).size.width*0.038).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.038).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.038).toString())),
+                                    GestureDetector(
+                                        onTap: (){
+                                          launch('tel:$phone');
+                                        },
+                                        child: CustomText.bodyRegular17(text: phone, maxLines: 2, sizeNew: double.parse(((MediaQuery.of(context).size.width*0.038).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.038).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.038).toString()))
+                                    ),
+                                  ],
+                                ):
+                                Row(
+                                  children: [
+                                    CustomText.bodyRegular17(text: "Telepon Usaha: ", maxLines: 2, sizeNew: double.parse(((MediaQuery.of(context).size.width*0.038).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.038).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.038).toString())),
+                                    CustomText.bodyRegular17(text: "kosong", maxLines: 2, color: CustomColor.redBtn, sizeNew: double.parse(((MediaQuery.of(context).size.width*0.038).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.038).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.038).toString())),
+                                  ],
+                                ),
+                                SizedBox(height: CustomSize.sizeHeight(context) * 0.005,),
+
+                                (ownerTokoTrans != '' && ownerTokoTrans != 'null')?
+                                CustomText.bodyRegular17(text: "Nama Pemilik: "+ownerTokoTrans, maxLines: 2, sizeNew: double.parse(((MediaQuery.of(context).size.width*0.038).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.038).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.038).toString())):
+                                Row(
+                                  children: [
+                                    CustomText.bodyRegular17(text: "Nama Pemilik: ", maxLines: 2, sizeNew: double.parse(((MediaQuery.of(context).size.width*0.038).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.038).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.038).toString())),
+                                    CustomText.bodyRegular17(text: "kosong", maxLines: 2, color: CustomColor.redBtn, sizeNew: double.parse(((MediaQuery.of(context).size.width*0.038).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.038).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.038).toString())),
+                                  ],
+                                ),
+                                SizedBox(height: CustomSize.sizeHeight(context) * 0.005,),
+
+                                (pjTokoTrans != '' && pjTokoTrans != 'null')?
+                                CustomText.bodyRegular17(text: "Nama Penanggung Jawab: "+pjTokoTrans, maxLines: 2, sizeNew: double.parse(((MediaQuery.of(context).size.width*0.038).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.038).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.038).toString())):
+                                Row(
+                                  children: [
+                                    CustomText.bodyRegular17(text: "Nama Penanggung Jawab: ", maxLines: 2, sizeNew: double.parse(((MediaQuery.of(context).size.width*0.038).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.038).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.038).toString())),
+                                    CustomText.bodyRegular17(text: "kosong", maxLines: 2, color: CustomColor.redBtn, sizeNew: double.parse(((MediaQuery.of(context).size.width*0.038).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.038).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.038).toString())),
+                                  ],
+                                ),
+                                SizedBox(height: CustomSize.sizeHeight(context) * 0.005,),
+
+                                (nameRekening != '' && nameRekening != 'null')?
+                                CustomText.bodyRegular17(text: "Nomor Rekening atas Nama: "+nameRekening, maxLines: 2, sizeNew: double.parse(((MediaQuery.of(context).size.width*0.038).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.038).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.038).toString())):
+                                Row(
+                                  children: [
+                                    CustomText.bodyRegular17(text: "Nomor Rekening atas Nama: ", maxLines: 2, sizeNew: double.parse(((MediaQuery.of(context).size.width*0.038).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.038).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.038).toString())),
+                                    CustomText.bodyRegular17(text: "kosong", maxLines: 2, color: CustomColor.redBtn, sizeNew: double.parse(((MediaQuery.of(context).size.width*0.038).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.038).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.038).toString())),
+                                  ],
+                                ),
+                                SizedBox(height: CustomSize.sizeHeight(context) * 0.005,),
+
+                                (nameBank != '' && nameBank != 'null')?
+                                CustomText.bodyRegular17(text: "Rekening Bank: "+nameBank, maxLines: 2, sizeNew: double.parse(((MediaQuery.of(context).size.width*0.038).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.038).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.038).toString())):
+                                Row(
+                                  children: [
+                                    CustomText.bodyRegular17(text: "Rekening Bank: ", maxLines: 2, sizeNew: double.parse(((MediaQuery.of(context).size.width*0.038).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.038).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.038).toString())),
+                                    CustomText.bodyRegular17(text: "kosong", maxLines: 2, color: CustomColor.redBtn, sizeNew: double.parse(((MediaQuery.of(context).size.width*0.038).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.038).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.038).toString())),
+                                  ],
+                                ),
+                                SizedBox(height: CustomSize.sizeHeight(context) * 0.005,),
+
+                                (norekTokoTrans != '' && norekTokoTrans != 'null')?
+                                CustomText.bodyRegular17(text: "Nomor Rekening: "+norekTokoTrans, maxLines: 2, sizeNew: double.parse(((MediaQuery.of(context).size.width*0.038).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.038).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.038).toString())):
+                                Row(
+                                  children: [
+                                    CustomText.bodyRegular17(text: "Nomor Rekening: ", maxLines: 2, sizeNew: double.parse(((MediaQuery.of(context).size.width*0.038).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.038).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.038).toString())),
+                                    CustomText.bodyRegular17(text: "kosong", maxLines: 2, color: CustomColor.redBtn, sizeNew: double.parse(((MediaQuery.of(context).size.width*0.038).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.038).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.038).toString())),
+                                  ],
+                                ),
                               ],
                             ),
                           ),
-                        ),
+                        ],
                       ),
-                      // SizedBox(height: CustomSize.sizeHeight(context) / 64,),
-                      // (phone == '')?GestureDetector(
-                      //   onTap: (){
-                      //     // Navigator.push(
-                      //     //     context,
-                      //     //     PageTransition(
-                      //     //         type: PageTransitionType.rightToLeft,
-                      //     //         child: new ChatActivity(chatroom, userName, status)));
-                      //   },
-                      //   child: Center(
-                      //     child: Container(
-                      //       width: CustomSize.sizeWidth(context) / 1.1,
-                      //       height: CustomSize.sizeHeight(context) / 14,
-                      //       decoration: BoxDecoration(
-                      //           color: CustomColor.accent,
-                      //           borderRadius: BorderRadius.circular(50)
-                      //       ),
-                      //       child: Center(
-                      //         child: Padding(
-                      //           padding: const EdgeInsets.symmetric(horizontal: 20.0),
-                      //           child: CustomText.textTitle2(text: "Telpon Penjual", color: Colors.white),
-                      //         ),
-                      //       ),
-                      //     ),
-                      //   ),
-                      // ):SizedBox(),
-                      SizedBox(height: CustomSize.sizeHeight(context) / 48,),
-                      (chatroom != 'null')?GestureDetector(
-                        onTap: (){
-                          showModalBottomSheet(
-                              isScrollControlled: true,
-                              shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.only(topLeft: Radius.circular(20), topRight: Radius.circular(20))
-                              ),
-                              context: context,
-                              builder: (_){
-                                return Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  mainAxisSize: MainAxisSize.min,
-                                  children: [
-                                    SizedBox(height: CustomSize.sizeHeight(context) / 86,),
-                                    Padding(
-                                      padding: EdgeInsets.symmetric(horizontal: CustomSize.sizeWidth(context) / 2.4),
-                                      child: Divider(thickness: 4,),
-                                    ),
-                                    SizedBox(height: CustomSize.sizeHeight(context) / 106,),
-                                    Padding(
-                                      padding: EdgeInsets.symmetric(horizontal: CustomSize.sizeHeight(context) / 20),
-                                      child: Row(
-                                        crossAxisAlignment: CrossAxisAlignment.center,
-                                        mainAxisAlignment: MainAxisAlignment.spaceAround,
-                                        children: [
-                                          GestureDetector(
-                                            onTap: (){
-                                              Navigator.pop(context);
-                                              Navigator.pushReplacement(
-                                                  context,
-                                                  PageTransition(
-                                                      type: PageTransitionType.rightToLeft,
-                                                      child: new ChatActivity(chatroom, userName, status)));
-                                            },
-                                            child: Padding(
-                                              padding: const EdgeInsets.symmetric(vertical: 8.0),
-                                              child: Row(
-                                                // mainAxisAlignment: MainAxisAlignment.spaceAround ,
-                                                children: [
-                                                  Icon(FontAwesome.comments_o, color: CustomColor.accent, size: 31,),
-                                                  // SizedBox(width: CustomSize.sizeWidth(context) / 72,),
-                                                  Stack(
-                                                    children: [
-                                                      Padding(
-                                                        padding: const EdgeInsets.symmetric(horizontal: 19.0),
-                                                        child: CustomText.textHeading5(
-                                                            text: "Chat",
-                                                            minSize: 17,
-                                                            maxLines: 1,
-                                                            color: CustomColor.accent
-                                                        ),
-                                                      ),
-                                                      Positioned(  // draw a red marble
-                                                        top: 1,
-                                                        right: 0,
-                                                        child: Stack(
-                                                          alignment: Alignment.center,
-                                                          children: [
-                                                            Icon(Icons.circle, color: (chatUserCount != '0' && chatUserCount != 'null')?CustomColor.redBtn:Colors.transparent, size: 22,),
-                                                            CustomText.bodyMedium14(text: chatUserCount, color: (chatUserCount != '0' && chatUserCount != 'null')?Colors.white:Colors.transparent)
-                                                          ],
-                                                        ),
-                                                      )
-                                                    ],
-                                                  ),
-                                                ],
-                                              ),
-                                            ),
-                                          ),
-                                          GestureDetector(
-                                            onTap: (){
-                                              // Navigator.pop(context);
-                                              print(phone);
-                                              launch("tel:$phone");
-                                            },
-                                            child: Padding(
-                                              padding: const EdgeInsets.symmetric(vertical: 8.0),
-                                              child: Row(
-                                                children: [
-                                                  Icon(FontAwesome.phone, color: CustomColor.redBtn, size: 27.5,),
-                                                  SizedBox(width: CustomSize.sizeWidth(context) / 88,),
-                                                  CustomText.textHeading5(
-                                                      text: "Telpon",
-                                                      minSize: 17,
-                                                      maxLines: 1,
-                                                      color: CustomColor.redBtn
-                                                  ),
-                                                ],
-                                              ),
-                                            ),
-                                          ),
-                                        ],
-                                      ),
-                                    ),
-                                    SizedBox(height: CustomSize.sizeHeight(context) / 42,),
-                                  ],
-                                );
-                              }
-                          );
-                          // Navigator.push(
-                          //     context,
-                          //     PageTransition(
-                          //         type: PageTransitionType.rightToLeft,
-                          //         child: new ChatActivity(chatroom, userName, status)));
-                        },
-                        child: Container(
-                          width: CustomSize.sizeWidth(context) / 1.1,
-                          height: CustomSize.sizeHeight(context) / 14,
-                          decoration: BoxDecoration(
-                              color: CustomColor.primaryLight,
-                              borderRadius: BorderRadius.circular(50)
-                          ),
-                          child: Center(
+                    ),
+                  ),
+                  // Divider(thickness: 6, color: CustomColor.secondary,),
+                  // Padding(
+                  //   padding: EdgeInsets.symmetric(
+                  //       horizontal: CustomSize.sizeWidth(context) / 32,
+                  //       vertical: CustomSize.sizeHeight(context) / 55
+                  //   ),
+                  //   child: Container(
+                  //     width: CustomSize.sizeWidth(context),
+                  //     decoration: BoxDecoration(
+                  //         color: Colors.white
+                  //     ),
+                  //     child: Column(
+                  //       crossAxisAlignment: CrossAxisAlignment.start,
+                  //       children: [
+                  //         CustomText.textHeading7(text: "Data Usaha"),
+                  //         SizedBox(height: CustomSize.sizeHeight(context) * 0.01,),
+                  //         Container(
+                  //           padding: EdgeInsets.only(
+                  //             left: CustomSize.sizeWidth(context) / 25,
+                  //             right: CustomSize.sizeWidth(context) / 25,
+                  //           ),
+                  //           child: Column(
+                  //             crossAxisAlignment: CrossAxisAlignment.start,
+                  //             children: [
+                  //               (nameRestoTrans != '')?
+                  //               CustomText.bodyRegular17(text: "Nama Usaha: "+nameRestoTrans, maxLines: 4):
+                  //               Row(
+                  //                 children: [
+                  //                   CustomText.bodyRegular17(text: "Nama Usaha: ", maxLines: 2),
+                  //                   CustomText.bodyRegular17(text: "kosong", maxLines: 2, color: CustomColor.redBtn),
+                  //                 ],
+                  //               ),
+                  //               SizedBox(height: CustomSize.sizeHeight(context) * 0.005,),
+                  //
+                  //               (restoAddress != '')?
+                  //               Row(
+                  //                 children: [
+                  //                   CustomText.bodyRegular17(text: "Alamat Usaha: ", maxLines: 4),
+                  //                   GestureDetector(
+                  //                       onTap: (){
+                  //                         _launchURL();
+                  //                       },
+                  //                       child: Container(
+                  //                           width: CustomSize.sizeWidth(context) / 1.8,
+                  //                           child: CustomText.bodyRegular17(text: restoAddress, maxLines: 1, minSize: 15)
+                  //                       )
+                  //                   ),
+                  //                 ],
+                  //               ):
+                  //               Row(
+                  //                 children: [
+                  //                   CustomText.bodyRegular17(text: "Alamat Usaha: ", maxLines: 2),
+                  //                   CustomText.bodyRegular17(text: "kosong", maxLines: 2, color: CustomColor.redBtn),
+                  //                 ],
+                  //               ),
+                  //               SizedBox(height: CustomSize.sizeHeight(context) * 0.005,),
+                  //
+                  //               (emailTokoTrans != '')?
+                  //               Row(
+                  //                 children: [
+                  //                   CustomText.bodyRegular17(text: "Email Usaha: ", maxLines: 2),
+                  //                   GestureDetector(
+                  //                       onTap: (){
+                  //                         launch('mailto:$emailTokoTrans');
+                  //                       },
+                  //                       child: Container(
+                  //                           width: CustomSize.sizeWidth(context) / 1.8,
+                  //                           child: CustomText.bodyRegular17(text: emailTokoTrans, maxLines: 1)
+                  //                       )
+                  //                   ),
+                  //                 ],
+                  //               ):
+                  //               Row(
+                  //                 children: [
+                  //                   CustomText.bodyRegular17(text: "Email Usaha: ", maxLines: 2),
+                  //                   CustomText.bodyRegular17(text: "kosong", maxLines: 2, color: CustomColor.redBtn),
+                  //                 ],
+                  //               ),
+                  //               SizedBox(height: CustomSize.sizeHeight(context) * 0.005,),
+                  //
+                  //               (phoneRestoTrans != '')?
+                  //               Row(
+                  //                 children: [
+                  //                   CustomText.bodyRegular17(text: "Telepon Usaha: ", maxLines: 2),
+                  //                   GestureDetector(
+                  //                       onTap: (){
+                  //                         launch('tel:$phoneRestoTrans');
+                  //                       },
+                  //                       child: CustomText.bodyRegular17(text: phoneRestoTrans, maxLines: 2)
+                  //                   ),
+                  //                 ],
+                  //               ):
+                  //               Row(
+                  //                 children: [
+                  //                   CustomText.bodyRegular17(text: "Telepon Usaha: ", maxLines: 2),
+                  //                   CustomText.bodyRegular17(text: "kosong", maxLines: 2, color: CustomColor.redBtn),
+                  //                 ],
+                  //               ),
+                  //               SizedBox(height: CustomSize.sizeHeight(context) * 0.005,),
+                  //
+                  //               (ownerTokoTrans != '')?
+                  //               CustomText.bodyRegular17(text: "Nama Pemilik: "+ownerTokoTrans, maxLines: 2):
+                  //               Row(
+                  //                 children: [
+                  //                   CustomText.bodyRegular17(text: "Nama Pemilik: ", maxLines: 2),
+                  //                   CustomText.bodyRegular17(text: "kosong", maxLines: 2, color: CustomColor.redBtn),
+                  //                 ],
+                  //               ),
+                  //               SizedBox(height: CustomSize.sizeHeight(context) * 0.005,),
+                  //
+                  //               (pjTokoTrans != '')?
+                  //               CustomText.bodyRegular17(text: "Nama Penanggung Jawab: "+pjTokoTrans, maxLines: 2):
+                  //               Row(
+                  //                 children: [
+                  //                   CustomText.bodyRegular17(text: "Nama Penanggung Jawab: ", maxLines: 2),
+                  //                   CustomText.bodyRegular17(text: "kosong", maxLines: 2, color: CustomColor.redBtn),
+                  //                 ],
+                  //               ),
+                  //               SizedBox(height: CustomSize.sizeHeight(context) * 0.005,),
+                  //
+                  //               (nameNorekTokoTrans != '')?
+                  //               CustomText.bodyRegular17(text: "Nomor Rekening atas Nama: "+nameNorekTokoTrans, maxLines: 2):
+                  //               Row(
+                  //                 children: [
+                  //                   CustomText.bodyRegular17(text: "Nomor Rekening atas Nama: ", maxLines: 2),
+                  //                   CustomText.bodyRegular17(text: "kosong", maxLines: 2, color: CustomColor.redBtn),
+                  //                 ],
+                  //               ),
+                  //               SizedBox(height: CustomSize.sizeHeight(context) * 0.005,),
+                  //
+                  //               (bankTokoTrans != '')?
+                  //               CustomText.bodyRegular17(text: "Rekening Bank: "+bankTokoTrans, maxLines: 2):
+                  //               Row(
+                  //                 children: [
+                  //                   CustomText.bodyRegular17(text: "Rekening Bank: ", maxLines: 2),
+                  //                   CustomText.bodyRegular17(text: "kosong", maxLines: 2, color: CustomColor.redBtn),
+                  //                 ],
+                  //               ),
+                  //               SizedBox(height: CustomSize.sizeHeight(context) * 0.005,),
+                  //
+                  //               (norekTokoTrans != '')?
+                  //               CustomText.bodyRegular17(text: "Nomor Rekening: "+norekTokoTrans, maxLines: 2):
+                  //               Row(
+                  //                 children: [
+                  //                   CustomText.bodyRegular17(text: "Nomor Rekening: ", maxLines: 2),
+                  //                   CustomText.bodyRegular17(text: "kosong", maxLines: 2, color: CustomColor.redBtn),
+                  //                 ],
+                  //               ),
+                  //             ],
+                  //           ),
+                  //         ),
+                  //       ],
+                  //     ),
+                  //   ),
+                  // ),
+                  Container(
+                    width: CustomSize.sizeWidth(context),
+                    decoration: BoxDecoration(
+                        color: CustomColor.secondary
+                    ),
+                    child: Column(
+                      children: [
+                        SizedBox(height: CustomSize.sizeHeight(context) / 48,),
+                        Padding(
+                          padding: EdgeInsets.symmetric(horizontal: CustomSize.sizeWidth(context) / 22),
+                          child: Container(
+                            width: CustomSize.sizeWidth(context),
+                            height: CustomSize.sizeHeight(context) / 3.8,
+                            decoration: BoxDecoration(
+                              color: Colors.white,
+                              borderRadius: BorderRadius.circular(20),
+                            ),
                             child: Padding(
                               padding: const EdgeInsets.symmetric(horizontal: 20.0),
-                              child: Stack(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  Padding(
-                                    padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 2.5),
-                                    child: CustomText.textTitle2(text: "Hubungi Penjual", color: Colors.white),
+                                  SizedBox(height: CustomSize.sizeHeight(context) / 36,),
+                                  CustomText.textTitle3(text: "Rincian Pembayaran", sizeNew: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.04).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.04).toString())),
+                                  SizedBox(height: CustomSize.sizeHeight(context) / 50,),
+                                  Row(
+                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      CustomText.bodyLight16(text: "Harga", sizeNew: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.04).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.04).toString())),
+                                      CustomText.bodyLight16(text: NumberFormat.currency(locale: 'id', symbol: '', decimalDigits: 0).format(total), sizeNew: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.04).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.04).toString())),
+                                    ],
                                   ),
-                                  Positioned(  // draw a red marble
-                                    top: 0,
-                                    right: 0,
-                                    child: Stack(
-                                      alignment: Alignment.center,
-                                      children: [
-                                        Icon(Icons.circle, color: (chatUserCount != '0' && chatUserCount != 'null')?CustomColor.redBtn:Colors.transparent, size: 22,),
-                                        CustomText.bodyMedium14(text: chatUserCount, color: (chatUserCount != '0' && chatUserCount != 'null')?Colors.white:Colors.transparent)
-                                      ],
-                                    ),
-                                  )
+                                  SizedBox(height: (type == 'delivery')?CustomSize.sizeHeight(context) / 100:0,),
+                                  (type == 'delivery')?Row(mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      CustomText.bodyLight16(text: "Ongkir", sizeNew: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.04).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.04).toString())),
+                                      CustomText.bodyLight16(text: NumberFormat.currency(locale: 'id', symbol: '', decimalDigits: 0).format(ongkir), sizeNew: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.04).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.04).toString())),
+                                    ],
+                                  ):SizedBox(),
+                                  SizedBox(height: CustomSize.sizeHeight(context) / 64,),
+                                  Divider(thickness: 1,),
+                                  SizedBox(height: CustomSize.sizeHeight(context) / 120,),
+                                  Row(mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      CustomText.textTitle3(text: "Total Pembayaran", sizeNew: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.04).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.04).toString())),
+                                      CustomText.textTitle3(text: NumberFormat.currency(locale: 'id', symbol: '', decimalDigits: 0).format(totalAll), sizeNew: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.04).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.04).toString())),
+                                    ],
+                                  ),
+                                  // SizedBox(height: CustomSize.sizeHeight(context) / 34,),
                                 ],
                               ),
                             ),
                           ),
                         ),
-                      ):SizedBox(),
-                      (status == 'cancel')?SizedBox(height: CustomSize.sizeHeight(context) / 88,):SizedBox(),
-                      (status == 'cancel')?GestureDetector(
-                        onTap: (){
-                          if (inCart.toString() == '') {
+                        // SizedBox(height: CustomSize.sizeHeight(context) / 64,),
+                        // (phone == '')?GestureDetector(
+                        //   onTap: (){
+                        //     // Navigator.push(
+                        //     //     context,
+                        //     //     PageTransition(
+                        //     //         type: PageTransitionType.rightToLeft,
+                        //     //         child: new ChatActivity(chatroom, userName, status)));
+                        //   },
+                        //   child: Center(
+                        //     child: Container(
+                        //       width: CustomSize.sizeWidth(context) / 1.1,
+                        //       height: CustomSize.sizeHeight(context) / 14,
+                        //       decoration: BoxDecoration(
+                        //           color: CustomColor.accent,
+                        //           borderRadius: BorderRadius.circular(50)
+                        //       ),
+                        //       child: Center(
+                        //         child: Padding(
+                        //           padding: const EdgeInsets.symmetric(horizontal: 20.0),
+                        //           child: CustomText.textTitle2(text: "Telpon Penjual", color: Colors.white),
+                        //         ),
+                        //       ),
+                        //     ),
+                        //   ),
+                        // ):SizedBox(),
+                        SizedBox(height: CustomSize.sizeHeight(context) / 48,),
+                        (chatroom != 'null')?GestureDetector(
+                          onTap: (){
                             showModalBottomSheet(
                                 isScrollControlled: true,
                                 shape: RoundedRectangleBorder(
@@ -1206,463 +1068,605 @@ class _DetailTransactionState extends State<DetailTransaction> {
                                 ),
                                 context: context,
                                 builder: (_){
-                                  return Padding(
-                                    padding: EdgeInsets.symmetric(horizontal: CustomSize.sizeWidth(context) / 32),
-                                    child: Column(
-                                      crossAxisAlignment: CrossAxisAlignment.start,
-                                      mainAxisSize: MainAxisSize.min,
-                                      children: [
-                                        SizedBox(height: CustomSize.sizeHeight(context) / 86,),
-                                        Padding(
-                                          padding: EdgeInsets.symmetric(horizontal: CustomSize.sizeWidth(context) / 2.4),
-                                          child: Divider(thickness: 4,),
-                                        ),
-                                        SizedBox(height: CustomSize.sizeHeight(context) / 52,),
-                                        GestureDetector(
-                                          onTap: ()async{
-                                            SharedPreferences pref = await SharedPreferences.getInstance();
-                                            setState(() {
-                                              if (can_delivery == 'true') {
-                                                toCart().whenComplete((){
-                                                  Navigator.push(context, PageTransition(
-                                                      type: PageTransitionType.rightToLeft,
-                                                      child: CartActivity()));
-                                                });
-                                                setState(() {});
-
-                                                pref.setString("metodeBeli", '1');
-                                              } else {
-                                                Fluttertoast.showToast(msg: "Pesan antar tidak tersedia.");
-                                              }
-                                            });
-                                            Navigator.pop(_);
-                                          },
-                                          child: Row(
-                                            children: [
-                                              Container(
-                                                width: CustomSize.sizeWidth(context) / 8,
-                                                height: CustomSize.sizeWidth(context) / 8,
-                                                decoration: BoxDecoration(
-                                                    color: CustomColor.primaryLight,
-                                                    shape: BoxShape.circle
-                                                ),
-                                                child: Center(
-                                                  child: Icon(FontAwesome.motorcycle, color: Colors.white, size: 20,),
-                                                ),
-                                              ),
-                                              SizedBox(width: CustomSize.sizeWidth(context) / 32,),
-                                              CustomText.textHeading6(text: "Pesan Antar",),
-                                            ],
-                                          ),
-                                        ),
-                                        SizedBox(height: CustomSize.sizeHeight(context) / 86,),
-                                        GestureDetector(
-                                          onTap: ()async{
-                                            SharedPreferences pref = await SharedPreferences.getInstance();
-                                            setState(() {
-                                              if (can_takeaway == 'true') {
-                                                toCart().whenComplete((){
-                                                  Navigator.push(context, PageTransition(
-                                                      type: PageTransitionType.rightToLeft,
-                                                      child: CartActivity()));
-                                                });
-                                                setState(() {});
-
-                                                pref.setString("metodeBeli", '2');
-                                              } else {
-                                                Fluttertoast.showToast(msg: "Ambil langsung tidak tersedia.");
-                                              }
-                                            });
-                                            Navigator.pop(_);
-                                          },
-                                          child: Row(
-                                            children: [
-                                              Container(
-                                                width: CustomSize.sizeWidth(context) / 8,
-                                                height: CustomSize.sizeWidth(context) / 8,
-                                                decoration: BoxDecoration(
-                                                    color: CustomColor.primaryLight,
-                                                    shape: BoxShape.circle
-                                                ),
-                                                child: Center(
-                                                  child: Icon(MaterialCommunityIcons.shopping, color: Colors.white, size: 20,),
+                                  return Column(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      SizedBox(height: CustomSize.sizeHeight(context) / 86,),
+                                      Padding(
+                                        padding: EdgeInsets.symmetric(horizontal: CustomSize.sizeWidth(context) / 2.4),
+                                        child: Divider(thickness: 4,),
+                                      ),
+                                      SizedBox(height: CustomSize.sizeHeight(context) / 106,),
+                                      Padding(
+                                        padding: EdgeInsets.symmetric(horizontal: CustomSize.sizeHeight(context) / 20),
+                                        child: Row(
+                                          crossAxisAlignment: CrossAxisAlignment.center,
+                                          mainAxisAlignment: MainAxisAlignment.spaceAround,
+                                          children: [
+                                            GestureDetector(
+                                              onTap: (){
+                                                Navigator.pop(context);
+                                                Navigator.pushReplacement(
+                                                    context,
+                                                    PageTransition(
+                                                        type: PageTransitionType.rightToLeft,
+                                                        child: new ChatActivity(chatroom, userName, status)));
+                                              },
+                                              child: Padding(
+                                                padding: const EdgeInsets.symmetric(vertical: 8.0),
+                                                child: Row(
+                                                  // mainAxisAlignment: MainAxisAlignment.spaceAround ,
+                                                  children: [
+                                                    Icon(FontAwesome.comments_o, color: CustomColor.accent, size: 31,),
+                                                    // SizedBox(width: CustomSize.sizeWidth(context) / 72,),
+                                                    Stack(
+                                                      children: [
+                                                        Padding(
+                                                          padding: const EdgeInsets.symmetric(horizontal: 19.0),
+                                                          child: CustomText.textHeading5(
+                                                              text: "Chat",
+                                                              sizeNew: double.parse(((MediaQuery.of(context).size.width*0.06).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.06).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.06).toString()),
+                                                              maxLines: 1,
+                                                              color: CustomColor.accent
+                                                          ),
+                                                        ),
+                                                        Positioned(  // draw a red marble
+                                                          top: 1,
+                                                          right: 0,
+                                                          child: Stack(
+                                                            alignment: Alignment.center,
+                                                            children: [
+                                                              Icon(Icons.circle, color: (chatUserCount != '0' && chatUserCount != 'null')?CustomColor.redBtn:Colors.transparent, size: 22,),
+                                                              CustomText.bodyMedium14(text: chatUserCount, color: (chatUserCount != '0' && chatUserCount != 'null')?Colors.white:Colors.transparent, sizeNew: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.04).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.04).toString()))
+                                                            ],
+                                                          ),
+                                                        )
+                                                      ],
+                                                    ),
+                                                  ],
                                                 ),
                                               ),
-                                              SizedBox(width: CustomSize.sizeWidth(context) / 32,),
-                                              CustomText.textHeading6(text: "Ambil Langsung",),
-                                            ],
-                                          ),
-                                        ),
-                                        SizedBox(height: CustomSize.sizeHeight(context) / 86,),
-                                        GestureDetector(
-                                          onTap: ()async{
-                                            SharedPreferences pref = await SharedPreferences.getInstance();
-                                            toCart().whenComplete((){
-                                              Navigator.push(context, PageTransition(
-                                                  type: PageTransitionType.rightToLeft,
-                                                  child: CartActivity()));
-                                            });
-
-                                            setState(() {
-                                              pref.setString("metodeBeli", '3');
-                                            });
-                                            Navigator.pop(_);
-                                          },
-                                          child: Row(
-                                            children: [
-                                              Container(
-                                                width: CustomSize.sizeWidth(context) / 8,
-                                                height: CustomSize.sizeWidth(context) / 8,
-                                                decoration: BoxDecoration(
-                                                    color: CustomColor.primaryLight,
-                                                    shape: BoxShape.circle
-                                                ),
-                                                child: Center(
-                                                  child: Icon(Icons.restaurant, color: Colors.white, size: 20,),
+                                            ),
+                                            GestureDetector(
+                                              onTap: (){
+                                                // Navigator.pop(context);
+                                                print(phone);
+                                                launch("tel:$phone");
+                                              },
+                                              child: Padding(
+                                                padding: const EdgeInsets.symmetric(vertical: 8.0),
+                                                child: Row(
+                                                  children: [
+                                                    Icon(FontAwesome.phone, color: CustomColor.redBtn, size: 27.5,),
+                                                    SizedBox(width: CustomSize.sizeWidth(context) / 88,),
+                                                    CustomText.textHeading5(
+                                                        text: "Telpon",
+                                                        sizeNew: double.parse(((MediaQuery.of(context).size.width*0.06).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.06).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.06).toString()),
+                                                        maxLines: 1,
+                                                        color: CustomColor.redBtn
+                                                    ),
+                                                  ],
                                                 ),
                                               ),
-                                              SizedBox(width: CustomSize.sizeWidth(context) / 32,),
-                                              CustomText.textHeading6(text: "Makan Ditempat",),
-                                            ],
-                                          ),
+                                            ),
+                                          ],
                                         ),
-                                        SizedBox(height: CustomSize.sizeHeight(context) / 86,),
-                                      ],
-                                    ),
+                                      ),
+                                      SizedBox(height: CustomSize.sizeHeight(context) / 42,),
+                                    ],
                                   );
                                 }
                             );
-                          } else {
-                            showDialog(
-                              context: context,
-                              builder: (BuildContext context) {
-                                return AlertDialog(
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(20),
-                                  ),
-                                  title: new Text("Hapus cart"),
-                                  content: new Text("Apakah anda ingin mengganti item di cart dengan item yang baru ?"),
-                                  actions: <Widget>[
-                                    new FlatButton(
-                                      child: new Text("Batal", style: TextStyle(color: CustomColor.primaryLight)),
-                                      onPressed: () {
-                                        Navigator.of(context).pop();
-                                      },
+                            // Navigator.push(
+                            //     context,
+                            //     PageTransition(
+                            //         type: PageTransitionType.rightToLeft,
+                            //         child: new ChatActivity(chatroom, userName, status)));
+                          },
+                          child: Container(
+                            width: CustomSize.sizeWidth(context) / 1.1,
+                            height: CustomSize.sizeHeight(context) / 14,
+                            decoration: BoxDecoration(
+                                color: CustomColor.primaryLight,
+                                borderRadius: BorderRadius.circular(50)
+                            ),
+                            child: Center(
+                              child: Padding(
+                                padding: const EdgeInsets.symmetric(horizontal: 20.0),
+                                child: Stack(
+                                  children: [
+                                    Padding(
+                                      padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 2.5),
+                                      child: CustomText.textTitle2(text: "Hubungi Penjual", color: Colors.white, sizeNew: double.parse(((MediaQuery.of(context).size.width*0.045).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.045)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.045)).toString())),
                                     ),
-                                    new FlatButton(
-                                      child: new Text("Oke", style: TextStyle(color: CustomColor.primaryLight)),
-                                      onPressed: () async{
-                                        delCart().whenComplete((){
-                                          showModalBottomSheet(
-                                              isScrollControlled: true,
-                                              shape: RoundedRectangleBorder(
-                                                  borderRadius: BorderRadius.only(topLeft: Radius.circular(20), topRight: Radius.circular(20))
-                                              ),
-                                              context: context,
-                                              builder: (_){
-                                                return Padding(
-                                                  padding: EdgeInsets.symmetric(horizontal: CustomSize.sizeWidth(context) / 32),
-                                                  child: Column(
-                                                    crossAxisAlignment: CrossAxisAlignment.start,
-                                                    mainAxisSize: MainAxisSize.min,
-                                                    children: [
-                                                      SizedBox(height: CustomSize.sizeHeight(context) / 86,),
-                                                      Padding(
-                                                        padding: EdgeInsets.symmetric(horizontal: CustomSize.sizeWidth(context) / 2.4),
-                                                        child: Divider(thickness: 4,),
-                                                      ),
-                                                      SizedBox(height: CustomSize.sizeHeight(context) / 52,),
-                                                      GestureDetector(
-                                                        onTap: ()async{
-                                                          SharedPreferences pref = await SharedPreferences.getInstance();
-                                                          setState(() {
-                                                            if (can_delivery == 'true') {
-                                                              // Navigator.pop(_);
-                                                              toCart2().whenComplete((){
-                                                              });
-                                                              // Future.delayed(Duration(seconds: 2)).whenComplete((){
-                                                              //   Navigator.push(context, PageTransition(
-                                                              //       type: PageTransitionType.rightToLeft,
-                                                              //       child: CartActivity()));
-                                                              // });
-
-                                                              setState(() {});
-
-                                                              pref.setString("metodeBeli", '1');
-                                                            } else {
-                                                              Fluttertoast.showToast(msg: "Pesan antar tidak tersedia.");
-                                                            }
-                                                          });
-                                                        },
-                                                        child: Row(
-                                                          children: [
-                                                            Container(
-                                                              width: CustomSize.sizeWidth(context) / 8,
-                                                              height: CustomSize.sizeWidth(context) / 8,
-                                                              decoration: BoxDecoration(
-                                                                  color: CustomColor.primaryLight,
-                                                                  shape: BoxShape.circle
-                                                              ),
-                                                              child: Center(
-                                                                child: Icon(FontAwesome.motorcycle, color: Colors.white, size: 20,),
-                                                              ),
-                                                            ),
-                                                            SizedBox(width: CustomSize.sizeWidth(context) / 32,),
-                                                            CustomText.textHeading6(text: "Pesan Antar",),
-                                                          ],
-                                                        ),
-                                                      ),
-                                                      SizedBox(height: CustomSize.sizeHeight(context) / 86,),
-                                                      GestureDetector(
-                                                        onTap: ()async{
-                                                          SharedPreferences pref = await SharedPreferences.getInstance();
-                                                          setState(() {
-                                                            if (can_takeaway == 'true') {
-                                                              // Navigator.pop(_);
-                                                              toCart2().whenComplete((){
-                                                              });
-                                                              // Future.delayed(Duration(seconds: 2)).whenComplete((){
-                                                              //   Navigator.push(context, PageTransition(
-                                                              //       type: PageTransitionType.rightToLeft,
-                                                              //       child: CartActivity()));
-                                                              // });
-
-                                                              setState(() {});
-
-                                                              pref.setString("metodeBeli", '2');
-                                                            } else {
-                                                              Fluttertoast.showToast(msg: "Ambil langsung tidak tersedia.");
-                                                            }
-                                                          });
-                                                        },
-                                                        child: Row(
-                                                          children: [
-                                                            Container(
-                                                              width: CustomSize.sizeWidth(context) / 8,
-                                                              height: CustomSize.sizeWidth(context) / 8,
-                                                              decoration: BoxDecoration(
-                                                                  color: CustomColor.primaryLight,
-                                                                  shape: BoxShape.circle
-                                                              ),
-                                                              child: Center(
-                                                                child: Icon(MaterialCommunityIcons.shopping, color: Colors.white, size: 20,),
-                                                              ),
-                                                            ),
-                                                            SizedBox(width: CustomSize.sizeWidth(context) / 32,),
-                                                            CustomText.textHeading6(text: "Ambil Langsung",),
-                                                          ],
-                                                        ),
-                                                      ),
-                                                      SizedBox(height: CustomSize.sizeHeight(context) / 86,),
-                                                      GestureDetector(
-                                                        onTap: ()async{
-                                                          SharedPreferences pref = await SharedPreferences.getInstance();
-                                                          // Navigator.pop(_);
-                                                          toCart2().whenComplete((){
-                                                          });
-                                                          // Future.delayed(Duration(seconds: 2)).whenComplete((){
-                                                          //   Navigator.push(context, PageTransition(
-                                                          //       type: PageTransitionType.rightToLeft,
-                                                          //       child: CartActivity()));
-                                                          // });
-
-                                                          // setState(() {});
-
-                                                          setState(() {
-                                                            pref.setString("metodeBeli", '3');
-                                                          });
-                                                        },
-                                                        child: Row(
-                                                          children: [
-                                                            Container(
-                                                              width: CustomSize.sizeWidth(context) / 8,
-                                                              height: CustomSize.sizeWidth(context) / 8,
-                                                              decoration: BoxDecoration(
-                                                                  color: CustomColor.primaryLight,
-                                                                  shape: BoxShape.circle
-                                                              ),
-                                                              child: Center(
-                                                                child: Icon(Icons.restaurant, color: Colors.white, size: 20,),
-                                                              ),
-                                                            ),
-                                                            SizedBox(width: CustomSize.sizeWidth(context) / 32,),
-                                                            CustomText.textHeading6(text: "Makan Ditempat",),
-                                                          ],
-                                                        ),
-                                                      ),
-                                                      SizedBox(height: CustomSize.sizeHeight(context) / 86,),
-                                                    ],
-                                                  ),
-                                                );
-                                              }
-                                          );
-                                        });
-                                        // await Future.delayed(Duration(seconds: 2));
-                                        Navigator.of(context).pop();
-                                        // Navigator.pushReplacement(
-                                        //     context,
-                                        //     PageTransition(
-                                        //         type: PageTransitionType.rightToLeft,
-                                        //         child: new DetailResto(id)));
-                                        // pref.remove('inCart');
-                                        // pref.setString("menuJson", "");
-                                        // inCart = pref.getString("inCart");
-                                        // cart = pref.getString("inCart");
-                                        // qty.addAll([]);
-                                        // json2 = pref.getString("menuJson");
-                                        // pref.setString("qty", "");
-                                        // pref.remove("restoIdUsr");
-
-                                      },
-                                    ),
+                                    Positioned(  // draw a red marble
+                                      top: 0,
+                                      right: 0,
+                                      child: Stack(
+                                        alignment: Alignment.center,
+                                        children: [
+                                          Icon(Icons.circle, color: (chatUserCount != '0' && chatUserCount != 'null')?CustomColor.redBtn:Colors.transparent, size: 22,),
+                                          CustomText.bodyMedium14(text: chatUserCount, color: (chatUserCount != '0' && chatUserCount != 'null')?Colors.white:Colors.transparent, sizeNew: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.04).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.04).toString()))
+                                        ],
+                                      ),
+                                    )
                                   ],
-                                );
-                              },
-                            );
-                          }
-                        },
-                        child: Container(
-                          width: CustomSize.sizeWidth(context) / 1.1,
-                          height: CustomSize.sizeHeight(context) / 14,
-                          decoration: BoxDecoration(
-                              color: CustomColor.accent,
-                              borderRadius: BorderRadius.circular(50)
-                          ),
-                          child: Center(
-                            child: Padding(
-                              padding: const EdgeInsets.symmetric(horizontal: 20.0),
-                              child: Stack(
-                                children: [
-                                  Padding(
-                                    padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 2.5),
-                                    child: CustomText.textTitle2(text: "Lanjut Lagi", color: Colors.white),
-                                  ),
-                                  // Positioned(  // draw a red marble
-                                  //   top: 0,
-                                  //   right: 0,
-                                  //   child: Stack(
-                                  //     alignment: Alignment.center,
-                                  //     children: [
-                                  //       Icon(Icons.circle, color: (chatUserCount != '0')?CustomColor.redBtn:Colors.transparent, size: 22,),
-                                  //       CustomText.bodyMedium14(text: chatUserCount, color: (chatUserCount != '0')?Colors.white:Colors.transparent)
-                                  //     ],
-                                  //   ),
-                                  // )
-                                ],
+                                ),
                               ),
                             ),
                           ),
-                        ),
-                      ):SizedBox(),
-                      SizedBox(height: CustomSize.sizeHeight(context) / 48,),
-                    ],
+                        ):SizedBox(),
+                        (status == 'cancel')?SizedBox(height: CustomSize.sizeHeight(context) / 88,):SizedBox(),
+                        (status == 'cancel')?GestureDetector(
+                          onTap: (){
+                            if (inCart.toString() == '') {
+                              showModalBottomSheet(
+                                  isScrollControlled: true,
+                                  shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.only(topLeft: Radius.circular(20), topRight: Radius.circular(20))
+                                  ),
+                                  context: context,
+                                  builder: (_){
+                                    return Padding(
+                                      padding: EdgeInsets.symmetric(horizontal: CustomSize.sizeWidth(context) / 32),
+                                      child: Column(
+                                        crossAxisAlignment: CrossAxisAlignment.start,
+                                        mainAxisSize: MainAxisSize.min,
+                                        children: [
+                                          SizedBox(height: CustomSize.sizeHeight(context) / 86,),
+                                          Padding(
+                                            padding: EdgeInsets.symmetric(horizontal: CustomSize.sizeWidth(context) / 2.4),
+                                            child: Divider(thickness: 4,),
+                                          ),
+                                          SizedBox(height: CustomSize.sizeHeight(context) / 52,),
+                                          GestureDetector(
+                                            onTap: ()async{
+                                              SharedPreferences pref = await SharedPreferences.getInstance();
+                                              setState(() {
+                                                if (can_delivery == 'true') {
+                                                  toCart().whenComplete((){
+                                                    Navigator.push(context, PageTransition(
+                                                        type: PageTransitionType.rightToLeft,
+                                                        child: CartActivity()));
+                                                  });
+                                                  setState(() {});
+
+                                                  pref.setString("metodeBeli", '1');
+                                                } else {
+                                                  Fluttertoast.showToast(msg: "Pesan antar tidak tersedia.");
+                                                }
+                                              });
+                                              Navigator.pop(_);
+                                            },
+                                            child: Row(
+                                              children: [
+                                                Container(
+                                                  width: CustomSize.sizeWidth(context) / 8,
+                                                  height: CustomSize.sizeWidth(context) / 8,
+                                                  decoration: BoxDecoration(
+                                                      color: CustomColor.primaryLight,
+                                                      shape: BoxShape.circle
+                                                  ),
+                                                  child: Center(
+                                                    child: Icon(FontAwesome.motorcycle, color: Colors.white, size: 20,),
+                                                  ),
+                                                ),
+                                                SizedBox(width: CustomSize.sizeWidth(context) / 32,),
+                                                CustomText.textHeading6(text: "Pesan Antar", sizeNew: double.parse(((MediaQuery.of(context).size.width*0.035).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.035).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.035).toString())),
+                                              ],
+                                            ),
+                                          ),
+                                          SizedBox(height: CustomSize.sizeHeight(context) / 86,),
+                                          GestureDetector(
+                                            onTap: ()async{
+                                              SharedPreferences pref = await SharedPreferences.getInstance();
+                                              setState(() {
+                                                if (can_takeaway == 'true') {
+                                                  toCart().whenComplete((){
+                                                    Navigator.push(context, PageTransition(
+                                                        type: PageTransitionType.rightToLeft,
+                                                        child: CartActivity()));
+                                                  });
+                                                  setState(() {});
+
+                                                  pref.setString("metodeBeli", '2');
+                                                } else {
+                                                  Fluttertoast.showToast(msg: "Ambil langsung tidak tersedia.");
+                                                }
+                                              });
+                                              Navigator.pop(_);
+                                            },
+                                            child: Row(
+                                              children: [
+                                                Container(
+                                                  width: CustomSize.sizeWidth(context) / 8,
+                                                  height: CustomSize.sizeWidth(context) / 8,
+                                                  decoration: BoxDecoration(
+                                                      color: CustomColor.primaryLight,
+                                                      shape: BoxShape.circle
+                                                  ),
+                                                  child: Center(
+                                                    child: Icon(MaterialCommunityIcons.shopping, color: Colors.white, size: 20,),
+                                                  ),
+                                                ),
+                                                SizedBox(width: CustomSize.sizeWidth(context) / 32,),
+                                                CustomText.textHeading6(text: "Ambil Langsung", sizeNew: double.parse(((MediaQuery.of(context).size.width*0.035).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.035).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.035).toString())),
+                                              ],
+                                            ),
+                                          ),
+                                          SizedBox(height: CustomSize.sizeHeight(context) / 86,),
+                                          GestureDetector(
+                                            onTap: ()async{
+                                              SharedPreferences pref = await SharedPreferences.getInstance();
+                                              toCart().whenComplete((){
+                                                Navigator.push(context, PageTransition(
+                                                    type: PageTransitionType.rightToLeft,
+                                                    child: CartActivity()));
+                                              });
+
+                                              setState(() {
+                                                pref.setString("metodeBeli", '3');
+                                              });
+                                              Navigator.pop(_);
+                                            },
+                                            child: Row(
+                                              children: [
+                                                Container(
+                                                  width: CustomSize.sizeWidth(context) / 8,
+                                                  height: CustomSize.sizeWidth(context) / 8,
+                                                  decoration: BoxDecoration(
+                                                      color: CustomColor.primaryLight,
+                                                      shape: BoxShape.circle
+                                                  ),
+                                                  child: Center(
+                                                    child: Icon(Icons.restaurant, color: Colors.white, size: 20,),
+                                                  ),
+                                                ),
+                                                SizedBox(width: CustomSize.sizeWidth(context) / 32,),
+                                                CustomText.textHeading6(text: "Makan Ditempat", sizeNew: double.parse(((MediaQuery.of(context).size.width*0.035).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.035).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.035).toString())),
+                                              ],
+                                            ),
+                                          ),
+                                          SizedBox(height: CustomSize.sizeHeight(context) / 86,),
+                                        ],
+                                      ),
+                                    );
+                                  }
+                              );
+                            } else {
+                              showDialog(
+                                context: context,
+                                builder: (BuildContext context) {
+                                  return AlertDialog(
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(20),
+                                    ),
+                                    title: new Text("Hapus cart"),
+                                    content: new Text("Apakah anda ingin mengganti item di cart dengan item yang baru ?"),
+                                    actions: <Widget>[
+                                      new FlatButton(
+                                        child: new Text("Batal", style: TextStyle(color: CustomColor.primaryLight)),
+                                        onPressed: () {
+                                          Navigator.of(context).pop();
+                                        },
+                                      ),
+                                      new FlatButton(
+                                        child: new Text("Oke", style: TextStyle(color: CustomColor.primaryLight)),
+                                        onPressed: () async{
+                                          delCart().whenComplete((){
+                                            showModalBottomSheet(
+                                                isScrollControlled: true,
+                                                shape: RoundedRectangleBorder(
+                                                    borderRadius: BorderRadius.only(topLeft: Radius.circular(20), topRight: Radius.circular(20))
+                                                ),
+                                                context: context,
+                                                builder: (_){
+                                                  return Padding(
+                                                    padding: EdgeInsets.symmetric(horizontal: CustomSize.sizeWidth(context) / 32),
+                                                    child: Column(
+                                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                                      mainAxisSize: MainAxisSize.min,
+                                                      children: [
+                                                        SizedBox(height: CustomSize.sizeHeight(context) / 86,),
+                                                        Padding(
+                                                          padding: EdgeInsets.symmetric(horizontal: CustomSize.sizeWidth(context) / 2.4),
+                                                          child: Divider(thickness: 4,),
+                                                        ),
+                                                        SizedBox(height: CustomSize.sizeHeight(context) / 52,),
+                                                        GestureDetector(
+                                                          onTap: ()async{
+                                                            SharedPreferences pref = await SharedPreferences.getInstance();
+                                                            setState(() {
+                                                              if (can_delivery == 'true') {
+                                                                // Navigator.pop(_);
+                                                                toCart2().whenComplete((){
+                                                                });
+                                                                // Future.delayed(Duration(seconds: 2)).whenComplete((){
+                                                                //   Navigator.push(context, PageTransition(
+                                                                //       type: PageTransitionType.rightToLeft,
+                                                                //       child: CartActivity()));
+                                                                // });
+
+                                                                setState(() {});
+
+                                                                pref.setString("metodeBeli", '1');
+                                                              } else {
+                                                                Fluttertoast.showToast(msg: "Pesan antar tidak tersedia.");
+                                                              }
+                                                            });
+                                                          },
+                                                          child: Row(
+                                                            children: [
+                                                              Container(
+                                                                width: CustomSize.sizeWidth(context) / 8,
+                                                                height: CustomSize.sizeWidth(context) / 8,
+                                                                decoration: BoxDecoration(
+                                                                    color: CustomColor.primaryLight,
+                                                                    shape: BoxShape.circle
+                                                                ),
+                                                                child: Center(
+                                                                  child: Icon(FontAwesome.motorcycle, color: Colors.white, size: 20,),
+                                                                ),
+                                                              ),
+                                                              SizedBox(width: CustomSize.sizeWidth(context) / 32,),
+                                                              CustomText.textHeading6(text: "Pesan Antar", sizeNew: double.parse(((MediaQuery.of(context).size.width*0.035).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.035).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.035).toString())),
+                                                            ],
+                                                          ),
+                                                        ),
+                                                        SizedBox(height: CustomSize.sizeHeight(context) / 86,),
+                                                        GestureDetector(
+                                                          onTap: ()async{
+                                                            SharedPreferences pref = await SharedPreferences.getInstance();
+                                                            setState(() {
+                                                              if (can_takeaway == 'true') {
+                                                                // Navigator.pop(_);
+                                                                toCart2().whenComplete((){
+                                                                });
+                                                                // Future.delayed(Duration(seconds: 2)).whenComplete((){
+                                                                //   Navigator.push(context, PageTransition(
+                                                                //       type: PageTransitionType.rightToLeft,
+                                                                //       child: CartActivity()));
+                                                                // });
+
+                                                                setState(() {});
+
+                                                                pref.setString("metodeBeli", '2');
+                                                              } else {
+                                                                Fluttertoast.showToast(msg: "Ambil langsung tidak tersedia.");
+                                                              }
+                                                            });
+                                                          },
+                                                          child: Row(
+                                                            children: [
+                                                              Container(
+                                                                width: CustomSize.sizeWidth(context) / 8,
+                                                                height: CustomSize.sizeWidth(context) / 8,
+                                                                decoration: BoxDecoration(
+                                                                    color: CustomColor.primaryLight,
+                                                                    shape: BoxShape.circle
+                                                                ),
+                                                                child: Center(
+                                                                  child: Icon(MaterialCommunityIcons.shopping, color: Colors.white, size: 20,),
+                                                                ),
+                                                              ),
+                                                              SizedBox(width: CustomSize.sizeWidth(context) / 32,),
+                                                              CustomText.textHeading6(text: "Ambil Langsung", sizeNew: double.parse(((MediaQuery.of(context).size.width*0.035).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.035).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.035).toString())),
+                                                            ],
+                                                          ),
+                                                        ),
+                                                        SizedBox(height: CustomSize.sizeHeight(context) / 86,),
+                                                        GestureDetector(
+                                                          onTap: ()async{
+                                                            SharedPreferences pref = await SharedPreferences.getInstance();
+                                                            // Navigator.pop(_);
+                                                            toCart2().whenComplete((){
+                                                            });
+                                                            // Future.delayed(Duration(seconds: 2)).whenComplete((){
+                                                            //   Navigator.push(context, PageTransition(
+                                                            //       type: PageTransitionType.rightToLeft,
+                                                            //       child: CartActivity()));
+                                                            // });
+
+                                                            // setState(() {});
+
+                                                            setState(() {
+                                                              pref.setString("metodeBeli", '3');
+                                                            });
+                                                          },
+                                                          child: Row(
+                                                            children: [
+                                                              Container(
+                                                                width: CustomSize.sizeWidth(context) / 8,
+                                                                height: CustomSize.sizeWidth(context) / 8,
+                                                                decoration: BoxDecoration(
+                                                                    color: CustomColor.primaryLight,
+                                                                    shape: BoxShape.circle
+                                                                ),
+                                                                child: Center(
+                                                                  child: Icon(Icons.restaurant, color: Colors.white, size: 20,),
+                                                                ),
+                                                              ),
+                                                              SizedBox(width: CustomSize.sizeWidth(context) / 32,),
+                                                              CustomText.textHeading6(text: "Makan Ditempat", sizeNew: double.parse(((MediaQuery.of(context).size.width*0.035).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.035).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.035).toString())),
+                                                            ],
+                                                          ),
+                                                        ),
+                                                        SizedBox(height: CustomSize.sizeHeight(context) / 86,),
+                                                      ],
+                                                    ),
+                                                  );
+                                                }
+                                            );
+                                          });
+                                          // await Future.delayed(Duration(seconds: 2));
+                                          Navigator.of(context).pop();
+                                          // Navigator.pushReplacement(
+                                          //     context,
+                                          //     PageTransition(
+                                          //         type: PageTransitionType.rightToLeft,
+                                          //         child: new DetailResto(id)));
+                                          // pref.remove('inCart');
+                                          // pref.setString("menuJson", "");
+                                          // inCart = pref.getString("inCart");
+                                          // cart = pref.getString("inCart");
+                                          // qty.addAll([]);
+                                          // json2 = pref.getString("menuJson");
+                                          // pref.setString("qty", "");
+                                          // pref.remove("restoIdUsr");
+
+                                        },
+                                      ),
+                                    ],
+                                  );
+                                },
+                              );
+                            }
+                          },
+                          child: Container(
+                            width: CustomSize.sizeWidth(context) / 1.1,
+                            height: CustomSize.sizeHeight(context) / 14,
+                            decoration: BoxDecoration(
+                                color: CustomColor.accent,
+                                borderRadius: BorderRadius.circular(50)
+                            ),
+                            child: Center(
+                              child: Padding(
+                                padding: const EdgeInsets.symmetric(horizontal: 20.0),
+                                child: Stack(
+                                  children: [
+                                    Padding(
+                                      padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 2.5),
+                                      child: CustomText.textTitle2(text: "Lanjut Lagi", color: Colors.white, sizeNew: double.parse(((MediaQuery.of(context).size.width*0.045).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.045)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.045)).toString())),
+                                    ),
+                                    // Positioned(  // draw a red marble
+                                    //   top: 0,
+                                    //   right: 0,
+                                    //   child: Stack(
+                                    //     alignment: Alignment.center,
+                                    //     children: [
+                                    //       Icon(Icons.circle, color: (chatUserCount != '0')?CustomColor.redBtn:Colors.transparent, size: 22,),
+                                    //       CustomText.bodyMedium14(text: chatUserCount, color: (chatUserCount != '0')?Colors.white:Colors.transparent)
+                                    //     ],
+                                    //   ),
+                                    // )
+                                  ],
+                                ),
+                              ),
+                            ),
+                          ),
+                        ):SizedBox(),
+                        SizedBox(height: CustomSize.sizeHeight(context) / 48,),
+                      ],
+                    ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
           ),
+          // floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
+          // floatingActionButton: (chatroom != 'null')?GestureDetector(
+          //   onTap: (){
+          //     showModalBottomSheet(
+          //         isScrollControlled: true,
+          //         shape: RoundedRectangleBorder(
+          //             borderRadius: BorderRadius.only(topLeft: Radius.circular(20), topRight: Radius.circular(20))
+          //         ),
+          //         context: context,
+          //         builder: (_){
+          //           return Column(
+          //             crossAxisAlignment: CrossAxisAlignment.start,
+          //             mainAxisSize: MainAxisSize.min,
+          //             children: [
+          //               SizedBox(height: CustomSize.sizeHeight(context) / 86,),
+          //               Padding(
+          //                 padding: EdgeInsets.symmetric(horizontal: CustomSize.sizeWidth(context) / 2.4),
+          //                 child: Divider(thickness: 4,),
+          //               ),
+          //               SizedBox(height: CustomSize.sizeHeight(context) / 106,),
+          //               Padding(
+          //                 padding: EdgeInsets.symmetric(horizontal: CustomSize.sizeHeight(context) / 20),
+          //                 child: Row(
+          //                   crossAxisAlignment: CrossAxisAlignment.center,
+          //                   mainAxisAlignment: MainAxisAlignment.spaceAround,
+          //                   children: [
+          //                     GestureDetector(
+          //                       onTap: (){
+          //                         // Navigator.pop(context);
+          //                         Navigator.push(
+          //                             context,
+          //                             PageTransition(
+          //                                 type: PageTransitionType.rightToLeft,
+          //                                 child: new ChatActivity(chatroom, userName, status)));
+          //                       },
+          //                       child: Padding(
+          //                         padding: const EdgeInsets.symmetric(vertical: 8.0),
+          //                         child: Row(
+          //                           children: [
+          //                             Icon(FontAwesome.comments_o, color: CustomColor.accent, size: 31,),
+          //                             SizedBox(width: CustomSize.sizeWidth(context) / 72,),
+          //                             CustomText.textHeading5(
+          //                                 text: "Chat",
+          //                                 minSize: 17,
+          //                                 maxLines: 1,
+          //                                 color: CustomColor.accent
+          //                             ),
+          //                           ],
+          //                         ),
+          //                       ),
+          //                     ),
+          //                     GestureDetector(
+          //                       onTap: (){
+          //                         // Navigator.pop(context);
+          //                         launch("tel:$phone");
+          //                       },
+          //                       child: Padding(
+          //                         padding: const EdgeInsets.symmetric(vertical: 8.0),
+          //                         child: Row(
+          //                           children: [
+          //                             Icon(FontAwesome.phone, color: CustomColor.redBtn, size: 27.5,),
+          //                             SizedBox(width: CustomSize.sizeWidth(context) / 88,),
+          //                             CustomText.textHeading5(
+          //                                 text: "Telpon",
+          //                                 minSize: 17,
+          //                                 maxLines: 1,
+          //                                 color: CustomColor.redBtn
+          //                             ),
+          //                           ],
+          //                         ),
+          //                       ),
+          //                     ),
+          //                   ],
+          //                 ),
+          //               ),
+          //               SizedBox(height: CustomSize.sizeHeight(context) / 42,),
+          //             ],
+          //           );
+          //         }
+          //     );
+          //     // Navigator.push(
+          //     //     context,
+          //     //     PageTransition(
+          //     //         type: PageTransitionType.rightToLeft,
+          //     //         child: new ChatActivity(chatroom, userName, status)));
+          //   },
+          //   child: Container(
+          //     width: CustomSize.sizeWidth(context) / 1.1,
+          //     height: CustomSize.sizeHeight(context) / 14,
+          //     decoration: BoxDecoration(
+          //         color: CustomColor.accent,
+          //         borderRadius: BorderRadius.circular(50)
+          //     ),
+          //     child: Center(
+          //       child: Padding(
+          //         padding: const EdgeInsets.symmetric(horizontal: 20.0),
+          //         child: CustomText.textTitle2(text: "Hubungi Penjual", color: Colors.white),
+          //       ),
+          //     ),
+          //   ),
+          // ):SizedBox(),
         ),
-        // floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
-        // floatingActionButton: (chatroom != 'null')?GestureDetector(
-        //   onTap: (){
-        //     showModalBottomSheet(
-        //         isScrollControlled: true,
-        //         shape: RoundedRectangleBorder(
-        //             borderRadius: BorderRadius.only(topLeft: Radius.circular(20), topRight: Radius.circular(20))
-        //         ),
-        //         context: context,
-        //         builder: (_){
-        //           return Column(
-        //             crossAxisAlignment: CrossAxisAlignment.start,
-        //             mainAxisSize: MainAxisSize.min,
-        //             children: [
-        //               SizedBox(height: CustomSize.sizeHeight(context) / 86,),
-        //               Padding(
-        //                 padding: EdgeInsets.symmetric(horizontal: CustomSize.sizeWidth(context) / 2.4),
-        //                 child: Divider(thickness: 4,),
-        //               ),
-        //               SizedBox(height: CustomSize.sizeHeight(context) / 106,),
-        //               Padding(
-        //                 padding: EdgeInsets.symmetric(horizontal: CustomSize.sizeHeight(context) / 20),
-        //                 child: Row(
-        //                   crossAxisAlignment: CrossAxisAlignment.center,
-        //                   mainAxisAlignment: MainAxisAlignment.spaceAround,
-        //                   children: [
-        //                     GestureDetector(
-        //                       onTap: (){
-        //                         // Navigator.pop(context);
-        //                         Navigator.push(
-        //                             context,
-        //                             PageTransition(
-        //                                 type: PageTransitionType.rightToLeft,
-        //                                 child: new ChatActivity(chatroom, userName, status)));
-        //                       },
-        //                       child: Padding(
-        //                         padding: const EdgeInsets.symmetric(vertical: 8.0),
-        //                         child: Row(
-        //                           children: [
-        //                             Icon(FontAwesome.comments_o, color: CustomColor.accent, size: 31,),
-        //                             SizedBox(width: CustomSize.sizeWidth(context) / 72,),
-        //                             CustomText.textHeading5(
-        //                                 text: "Chat",
-        //                                 minSize: 17,
-        //                                 maxLines: 1,
-        //                                 color: CustomColor.accent
-        //                             ),
-        //                           ],
-        //                         ),
-        //                       ),
-        //                     ),
-        //                     GestureDetector(
-        //                       onTap: (){
-        //                         // Navigator.pop(context);
-        //                         launch("tel:$phone");
-        //                       },
-        //                       child: Padding(
-        //                         padding: const EdgeInsets.symmetric(vertical: 8.0),
-        //                         child: Row(
-        //                           children: [
-        //                             Icon(FontAwesome.phone, color: CustomColor.redBtn, size: 27.5,),
-        //                             SizedBox(width: CustomSize.sizeWidth(context) / 88,),
-        //                             CustomText.textHeading5(
-        //                                 text: "Telpon",
-        //                                 minSize: 17,
-        //                                 maxLines: 1,
-        //                                 color: CustomColor.redBtn
-        //                             ),
-        //                           ],
-        //                         ),
-        //                       ),
-        //                     ),
-        //                   ],
-        //                 ),
-        //               ),
-        //               SizedBox(height: CustomSize.sizeHeight(context) / 42,),
-        //             ],
-        //           );
-        //         }
-        //     );
-        //     // Navigator.push(
-        //     //     context,
-        //     //     PageTransition(
-        //     //         type: PageTransitionType.rightToLeft,
-        //     //         child: new ChatActivity(chatroom, userName, status)));
-        //   },
-        //   child: Container(
-        //     width: CustomSize.sizeWidth(context) / 1.1,
-        //     height: CustomSize.sizeHeight(context) / 14,
-        //     decoration: BoxDecoration(
-        //         color: CustomColor.accent,
-        //         borderRadius: BorderRadius.circular(50)
-        //     ),
-        //     child: Center(
-        //       child: Padding(
-        //         padding: const EdgeInsets.symmetric(horizontal: 20.0),
-        //         child: CustomText.textTitle2(text: "Hubungi Penjual", color: Colors.white),
-        //       ),
-        //     ),
-        //   ),
-        // ):SizedBox(),
+        data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0),
       ),
     );
   }

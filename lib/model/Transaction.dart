@@ -23,6 +23,7 @@ class Transaction{
   String? note;
   String chat_user = '';
   String is_opened = '';
+  String date_trans = '';
 
   Transaction(
         {required this.id,
@@ -53,7 +54,7 @@ class Transaction{
       {required this.id, required this.status, required this.username, required this.total, required this.chatroom, required this.type, required this.img, required this.chat_user});
 
   Transaction.resto3(
-      {required this.id, required this.status, required this.username, required this.total, required this.chatroom, required this.type, required this.img, required this.chat_user, required this.is_opened});
+      {required this.id, required this.status, required this.username, required this.total, required this.chatroom, required this.type, required this.img, required this.chat_user, required this.is_opened, required this.date_trans});
 
   Transaction.home(
       {required this.chat_user, required this.is_opened});

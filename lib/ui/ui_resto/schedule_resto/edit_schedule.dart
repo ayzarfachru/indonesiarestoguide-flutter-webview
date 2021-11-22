@@ -517,11 +517,28 @@ class _EditScheduleState extends State<EditSchedule> {
                     SizedBox(height: CustomSize.sizeHeight(context) / 38,),
                     Padding(
                       padding: EdgeInsets.symmetric(horizontal: CustomSize.sizeWidth(context) / 32),
-                      child: CustomText.textHeading3(
-                          text: "Jadwal Operasional",
-                          color: CustomColor.primary,
-                          sizeNew: double.parse(((MediaQuery.of(context).size.width*0.045).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.045)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.045)).toString()),
-                          maxLines: 1
+                      child: Row(
+                        children: [
+                          GestureDetector(
+                              onTap: (){
+                                Navigator.pop(context);
+                              },
+                              child: Icon(Icons.chevron_left, size: double.parse(((MediaQuery.of(context).size.width*0.075).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.075)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.075)).toString()), color: Colors.black,)
+                          ),
+                          SizedBox(
+                            width: CustomSize.sizeWidth(context) / 88,
+                          ),
+                          GestureDetector(
+                            onTap: (){
+                              Navigator.pop(context);
+                            },
+                            child: CustomText.textHeading4(
+                                text: "Edit Jadwal",
+                                sizeNew: double.parse(((MediaQuery.of(context).size.width*0.045).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.045)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.045)).toString()),
+                                maxLines: 1
+                            ),
+                          ),
+                        ],
                       ),
                     ),
                     SizedBox(height: CustomSize.sizeHeight(context) / 48,),

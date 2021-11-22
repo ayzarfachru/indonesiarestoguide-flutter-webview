@@ -499,6 +499,8 @@ class _HomeActivityState extends State<HomeActivity> with WidgetsBindingObserver
     });
   }
 
+  String page = '1';
+
   Future _page(String lat, String long)async{
     setState(() {
       isLoading2 = true;
@@ -526,7 +528,7 @@ class _HomeActivityState extends State<HomeActivity> with WidgetsBindingObserver
 
     SharedPreferences pref = await SharedPreferences.getInstance();
     String token = pref.getString("token") ?? "";
-    var apiResult = await http.get(Links.mainUrl + '/page/home?lat=$lat&long=$long', headers: {
+    var apiResult = await http.get(Links.mainUrl + '/page/home?lat=$lat&long=$long&page=$page', headers: {
       "Accept": "Application/json",
       "Authorization": "Bearer $token"
     });
@@ -534,9 +536,13 @@ class _HomeActivityState extends State<HomeActivity> with WidgetsBindingObserver
     var data = json.decode(apiResult.body);
     // print('all data'+data['tipename'].toString().split(',').length.toString());
     // print('all data'+data['tipe'][0].toString());
-    print('all data'+data['again'].toString());
-    print('all data'+lat.toString());
-    print('all data'+long.toString());
+    // print('all data'+data['again'].toString());
+    print('Puki');
+    print('all data2'+page.toString());
+    // print('all data2'+data.toString());
+    print('all data2'+data['tipe'].toString());
+    print('all data2'+data['tipename'].toString());
+    // print('all data2'+data['tipe'][0].toString());
     // print(data['resto']);
 
     // print('ini banner '+data['banner'].toString());
@@ -684,13 +690,11 @@ class _HomeActivityState extends State<HomeActivity> with WidgetsBindingObserver
     //   _randomRes.add(r);
     // }
 
-    // print('all data'+_randomRes.toString().contains('[').toString());
+    print('all data'+_randomRes.toString().contains('[').toString());
 
-    if (data.toString().contains('tipe')) {
-      if (randomRes8.toString() == '[]') {
-        print('woyo'+startCuisine.contains(data['tipename'].toString().split('[')[1].split(']')[0].split(',')[0].toString()).toString());
-        print('woyo'+data['tipename'].toString().split('[')[1].split(']')[0].split(',')[0].toString());
-        if (startCuisine.contains(data['tipename'].toString().split('[')[1].split(']')[0].split(',')[0].toString()) == false) {
+    if (data['tipe'].toString() != '[]') {
+      if (data.toString().contains('tipe')) {
+        if (data['tipename'].toString().split(',').length >= 1) {
           for(var v in data['tipe'][0]){
             Resto r = Resto.all(
                 id: v['id'],
@@ -702,36 +706,9 @@ class _HomeActivityState extends State<HomeActivity> with WidgetsBindingObserver
             );
             _randomRes1.add(r);
           }
-          startCuisine.add(data['tipename'].toString().split('[')[1].split(']')[0].split(',')[0].toString());
-          isLoading2 = false;
-        } else {
-          _page(lat, long);
-        } 
-      } else if (randomRes9.toString() == '[]') {
-        print('woyo'+startCuisine.contains(data['tipename'].toString().split('[')[1].split(']')[0].split(',')[0].toString()).toString());
-        print('woyo'+data['tipename'].toString().split('[')[1].split(']')[0].split(',')[0].toString());
-        if (startCuisine.contains(data['tipename'].toString().split('[')[1].split(']')[0].split(',')[0].toString()) == false) {
-          for(var v in data['tipe'][0]){
-            Resto r = Resto.all(
-                id: v['id'],
-                name: v['name'],
-                distance: double.parse(v['distance'].toString()),
-                img: ((v['img'].toString() != '[]')?v['img'][0]['img']:'').toString(),
-                status: v['status'].toString(),
-                isOpen: v['isOpen'].toString()
-            );
-            _randomRes1.add(r);
-          }
-          startCuisine.add(data['tipename'].toString().split('[')[1].split(']')[0].split(',')[0].toString());
-          isLoading2 = false;
-        } else {
-          _page(lat, long);
         }
-      } else if (randomRes10.toString() == '[]') {
-        print('woyo'+startCuisine.contains(data['tipename'].toString().split('[')[1].split(']')[0].split(',')[0].toString()).toString());
-        print('woyo'+data['tipename'].toString().split('[')[1].split(']')[0].split(',')[0].toString());
-        if (startCuisine.contains(data['tipename'].toString().split('[')[1].split(']')[0].split(',')[0].toString()) == false) {
-          for(var v in data['tipe'][0]){
+        if (data['tipename'].toString().split(',').length >= 2) {
+          for(var v in data['tipe'][1]){
             Resto r = Resto.all(
                 id: v['id'],
                 name: v['name'],
@@ -740,18 +717,11 @@ class _HomeActivityState extends State<HomeActivity> with WidgetsBindingObserver
                 status: v['status'].toString(),
                 isOpen: v['isOpen'].toString()
             );
-            _randomRes1.add(r);
+            _randomRes2.add(r);
           }
-          startCuisine.add(data['tipename'].toString().split('[')[1].split(']')[0].split(',')[0].toString());
-          isLoading2 = false;
-        } else {
-          _page(lat, long);
         }
-      } else if (randomRes11.toString() == '[]') {
-        print('woyo'+startCuisine.contains(data['tipename'].toString().split('[')[1].split(']')[0].split(',')[0].toString()).toString());
-        print('woyo'+data['tipename'].toString().split('[')[1].split(']')[0].split(',')[0].toString());
-        if (startCuisine.contains(data['tipename'].toString().split('[')[1].split(']')[0].split(',')[0].toString()) == false) {
-          for(var v in data['tipe'][0]){
+        if (data['tipename'].toString().split(',').length >= 3) {
+          for(var v in data['tipe'][2]){
             Resto r = Resto.all(
                 id: v['id'],
                 name: v['name'],
@@ -760,18 +730,11 @@ class _HomeActivityState extends State<HomeActivity> with WidgetsBindingObserver
                 status: v['status'].toString(),
                 isOpen: v['isOpen'].toString()
             );
-            _randomRes1.add(r);
+            _randomRes3.add(r);
           }
-          startCuisine.add(data['tipename'].toString().split('[')[1].split(']')[0].split(',')[0].toString());
-          isLoading2 = false;
-        } else {
-          _page(lat, long);
         }
-      } else if (randomRes12.toString() == '[]') {
-        print('woyo'+startCuisine.contains(data['tipename'].toString().split('[')[1].split(']')[0].split(',')[0].toString()).toString());
-        print('woyo'+data['tipename'].toString().split('[')[1].split(']')[0].split(',')[0].toString());
-        if (startCuisine.contains(data['tipename'].toString().split('[')[1].split(']')[0].split(',')[0].toString()) == false) {
-          for(var v in data['tipe'][0]){
+        if (data['tipename'].toString().split(',').length >= 4) {
+          for(var v in data['tipe'][3]){
             Resto r = Resto.all(
                 id: v['id'],
                 name: v['name'],
@@ -780,18 +743,11 @@ class _HomeActivityState extends State<HomeActivity> with WidgetsBindingObserver
                 status: v['status'].toString(),
                 isOpen: v['isOpen'].toString()
             );
-            _randomRes1.add(r);
+            _randomRes4.add(r);
           }
-          startCuisine.add(data['tipename'].toString().split('[')[1].split(']')[0].split(',')[0].toString());
-          isLoading2 = false;
-        } else {
-          _page(lat, long);
         }
-      } else if (randomRes13.toString() == '[]') {
-        print('woyo'+startCuisine.contains(data['tipename'].toString().split('[')[1].split(']')[0].split(',')[0].toString()).toString());
-        print('woyo'+data['tipename'].toString().split('[')[1].split(']')[0].split(',')[0].toString());
-        if (startCuisine.contains(data['tipename'].toString().split('[')[1].split(']')[0].split(',')[0].toString()) == false) {
-          for(var v in data['tipe'][0]){
+        if (data['tipename'].toString().split(',').length >= 5) {
+          for(var v in data['tipe'][4]){
             Resto r = Resto.all(
                 id: v['id'],
                 name: v['name'],
@@ -800,18 +756,11 @@ class _HomeActivityState extends State<HomeActivity> with WidgetsBindingObserver
                 status: v['status'].toString(),
                 isOpen: v['isOpen'].toString()
             );
-            _randomRes1.add(r);
+            _randomRes5.add(r);
           }
-          startCuisine.add(data['tipename'].toString().split('[')[1].split(']')[0].split(',')[0].toString());
-          isLoading2 = false;
-        } else {
-          _page(lat, long);
         }
-      } else if (randomRes13.toString() == '[]') {
-        print('woyo'+startCuisine.contains(data['tipename'].toString().split('[')[1].split(']')[0].split(',')[0].toString()).toString());
-        print('woyo'+data['tipename'].toString().split('[')[1].split(']')[0].split(',')[0].toString());
-        if (startCuisine.contains(data['tipename'].toString().split('[')[1].split(']')[0].split(',')[0].toString()) == false) {
-          for(var v in data['tipe'][0]){
+        if (data['tipename'].toString().split(',').length >= 6) {
+          for(var v in data['tipe'][5]){
             Resto r = Resto.all(
                 id: v['id'],
                 name: v['name'],
@@ -820,18 +769,11 @@ class _HomeActivityState extends State<HomeActivity> with WidgetsBindingObserver
                 status: v['status'].toString(),
                 isOpen: v['isOpen'].toString()
             );
-            _randomRes1.add(r);
+            _randomRes6.add(r);
           }
-          startCuisine.add(data['tipename'].toString().split('[')[1].split(']')[0].split(',')[0].toString());
-          isLoading2 = false;
-        } else {
-          _page(lat, long);
         }
-      } else if (randomRes14.toString() == '[]') {
-        print('woyo'+startCuisine.contains(data['tipename'].toString().split('[')[1].split(']')[0].split(',')[0].toString()).toString());
-        print('woyo'+data['tipename'].toString().split('[')[1].split(']')[0].split(',')[0].toString());
-        if (startCuisine.contains(data['tipename'].toString().split('[')[1].split(']')[0].split(',')[0].toString()) == false) {
-          for(var v in data['tipe'][0]){
+        if (data['tipename'].toString().split(',').length >= 7) {
+          for(var v in data['tipe'][6]){
             Resto r = Resto.all(
                 id: v['id'],
                 name: v['name'],
@@ -840,320 +782,139 @@ class _HomeActivityState extends State<HomeActivity> with WidgetsBindingObserver
                 status: v['status'].toString(),
                 isOpen: v['isOpen'].toString()
             );
-            _randomRes1.add(r);
+            _randomRes7.add(r);
           }
-          startCuisine.add(data['tipename'].toString().split('[')[1].split(']')[0].split(',')[0].toString());
-          isLoading2 = false;
-        } else {
-          _page(lat, long);
-        }
-      } else if (randomRes15.toString() == '[]') {
-        print('woyo'+startCuisine.contains(data['tipename'].toString().split('[')[1].split(']')[0].split(',')[0].toString()).toString());
-        print('woyo'+data['tipename'].toString().split('[')[1].split(']')[0].split(',')[0].toString());
-        if (startCuisine.contains(data['tipename'].toString().split('[')[1].split(']')[0].split(',')[0].toString()) == false) {
-          for(var v in data['tipe'][0]){
-            Resto r = Resto.all(
-                id: v['id'],
-                name: v['name'],
-                distance: double.parse(v['distance'].toString()),
-                img: ((v['img'].toString() != '[]')?v['img'][0]['img']:'').toString(),
-                status: v['status'].toString(),
-                isOpen: v['isOpen'].toString()
-            );
-            _randomRes1.add(r);
-          }
-          startCuisine.add(data['tipename'].toString().split('[')[1].split(']')[0].split(',')[0].toString());
-          isLoading2 = false;
-        } else {
-          _page(lat, long);
-        }
-      } else if (randomRes16.toString() == '[]') {
-        print('woyo'+startCuisine.contains(data['tipename'].toString().split('[')[1].split(']')[0].split(',')[0].toString()).toString());
-        print('woyo'+data['tipename'].toString().split('[')[1].split(']')[0].split(',')[0].toString());
-        if (startCuisine.contains(data['tipename'].toString().split('[')[1].split(']')[0].split(',')[0].toString()) == false) {
-          for(var v in data['tipe'][0]){
-            Resto r = Resto.all(
-                id: v['id'],
-                name: v['name'],
-                distance: double.parse(v['distance'].toString()),
-                img: ((v['img'].toString() != '[]')?v['img'][0]['img']:'').toString(),
-                status: v['status'].toString(),
-                isOpen: v['isOpen'].toString()
-            );
-            _randomRes1.add(r);
-          }
-          startCuisine.add(data['tipename'].toString().split('[')[1].split(']')[0].split(',')[0].toString());
-          isLoading2 = false;
-        } else {
-          _page(lat, long);
-        }
-      } else if (randomRes17.toString() == '[]') {
-        print('woyo'+startCuisine.contains(data['tipename'].toString().split('[')[1].split(']')[0].split(',')[0].toString()).toString());
-        print('woyo'+data['tipename'].toString().split('[')[1].split(']')[0].split(',')[0].toString());
-        if (startCuisine.contains(data['tipename'].toString().split('[')[1].split(']')[0].split(',')[0].toString()) == false) {
-          for(var v in data['tipe'][0]){
-            Resto r = Resto.all(
-                id: v['id'],
-                name: v['name'],
-                distance: double.parse(v['distance'].toString()),
-                img: ((v['img'].toString() != '[]')?v['img'][0]['img']:'').toString(),
-                status: v['status'].toString(),
-                isOpen: v['isOpen'].toString()
-            );
-            _randomRes1.add(r);
-          }
-          startCuisine.add(data['tipename'].toString().split('[')[1].split(']')[0].split(',')[0].toString());
-          isLoading2 = false;
-        } else {
-          _page(lat, long);
-        }
-      } else if (randomRes18.toString() == '[]') {
-        print('woyo'+startCuisine.contains(data['tipename'].toString().split('[')[1].split(']')[0].split(',')[0].toString()).toString());
-        print('woyo'+data['tipename'].toString().split('[')[1].split(']')[0].split(',')[0].toString());
-        if (startCuisine.contains(data['tipename'].toString().split('[')[1].split(']')[0].split(',')[0].toString()) == false) {
-          for(var v in data['tipe'][0]){
-            Resto r = Resto.all(
-                id: v['id'],
-                name: v['name'],
-                distance: double.parse(v['distance'].toString()),
-                img: ((v['img'].toString() != '[]')?v['img'][0]['img']:'').toString(),
-                status: v['status'].toString(),
-                isOpen: v['isOpen'].toString()
-            );
-            _randomRes1.add(r);
-          }
-          startCuisine.add(data['tipename'].toString().split('[')[1].split(']')[0].split(',')[0].toString());
-          isLoading2 = false;
-        } else {
-          _page(lat, long);
-        }
-      } else if (randomRes19.toString() == '[]') {
-        print('woyo'+startCuisine.contains(data['tipename'].toString().split('[')[1].split(']')[0].split(',')[0].toString()).toString());
-        print('woyo'+data['tipename'].toString().split('[')[1].split(']')[0].split(',')[0].toString());
-        if (startCuisine.contains(data['tipename'].toString().split('[')[1].split(']')[0].split(',')[0].toString()) == false) {
-          for(var v in data['tipe'][0]){
-            Resto r = Resto.all(
-                id: v['id'],
-                name: v['name'],
-                distance: double.parse(v['distance'].toString()),
-                img: ((v['img'].toString() != '[]')?v['img'][0]['img']:'').toString(),
-                status: v['status'].toString(),
-                isOpen: v['isOpen'].toString()
-            );
-            _randomRes1.add(r);
-          }
-          startCuisine.add(data['tipename'].toString().split('[')[1].split(']')[0].split(',')[0].toString());
-          isLoading2 = false;
-        } else {
-          _page(lat, long);
-        }
-      } else if (randomRes20.toString() == '[]') {
-        print('woyo'+startCuisine.contains(data['tipename'].toString().split('[')[1].split(']')[0].split(',')[0].toString()).toString());
-        print('woyo'+data['tipename'].toString().split('[')[1].split(']')[0].split(',')[0].toString());
-        if (startCuisine.contains(data['tipename'].toString().split('[')[1].split(']')[0].split(',')[0].toString()) == false) {
-          for(var v in data['tipe'][0]){
-            Resto r = Resto.all(
-                id: v['id'],
-                name: v['name'],
-                distance: double.parse(v['distance'].toString()),
-                img: ((v['img'].toString() != '[]')?v['img'][0]['img']:'').toString(),
-                status: v['status'].toString(),
-                isOpen: v['isOpen'].toString()
-            );
-            _randomRes1.add(r);
-          }
-          startCuisine.add(data['tipename'].toString().split('[')[1].split(']')[0].split(',')[0].toString());
-          isLoading2 = false;
-        } else {
-          _page(lat, long);
         }
       }
-      // if (data['tipename'].toString().split(',').length >= 2) {
-      //   for(var v in data['tipe'][1]){
-      //     Resto r = Resto.all(
-      //         id: v['id'],
-      //         name: v['name'],
-      //         distance: double.parse(v['distance'].toString()),
-      //         img: ((v['img'].toString() != '[]')?v['img'][0]['img']:'').toString(),
-      //         status: v['status'].toString(),
-      //         isOpen: v['isOpen'].toString()
-      //     );
-      //     _randomRes2.add(r);
-      //   }
-      // }
-      // if (data['tipename'].toString().split(',').length >= 3) {
-      //   for(var v in data['tipe'][2]){
-      //     Resto r = Resto.all(
-      //         id: v['id'],
-      //         name: v['name'],
-      //         distance: double.parse(v['distance'].toString()),
-      //         img: ((v['img'].toString() != '[]')?v['img'][0]['img']:'').toString(),
-      //         status: v['status'].toString(),
-      //         isOpen: v['isOpen'].toString()
-      //     );
-      //     _randomRes3.add(r);
-      //   }
-      // }
-      // if (data['tipename'].toString().split(',').length >= 4) {
-      //   for(var v in data['tipe'][3]){
-      //     Resto r = Resto.all(
-      //         id: v['id'],
-      //         name: v['name'],
-      //         distance: double.parse(v['distance'].toString()),
-      //         img: ((v['img'].toString() != '[]')?v['img'][0]['img']:'').toString(),
-      //         status: v['status'].toString(),
-      //         isOpen: v['isOpen'].toString()
-      //     );
-      //     _randomRes4.add(r);
-      //   }
-      // }
-      // if (data['tipename'].toString().split(',').length >= 5) {
-      //   for(var v in data['tipe'][4]){
-      //     Resto r = Resto.all(
-      //         id: v['id'],
-      //         name: v['name'],
-      //         distance: double.parse(v['distance'].toString()),
-      //         img: ((v['img'].toString() != '[]')?v['img'][0]['img']:'').toString(),
-      //         status: v['status'].toString(),
-      //         isOpen: v['isOpen'].toString()
-      //     );
-      //     _randomRes5.add(r);
-      //   }
-      // }
-      // if (data['tipename'].toString().split(',').length >= 6) {
-      //   for(var v in data['tipe'][5]){
-      //     Resto r = Resto.all(
-      //         id: v['id'],
-      //         name: v['name'],
-      //         distance: double.parse(v['distance'].toString()),
-      //         img: ((v['img'].toString() != '[]')?v['img'][0]['img']:'').toString(),
-      //         status: v['status'].toString(),
-      //         isOpen: v['isOpen'].toString()
-      //     );
-      //     _randomRes6.add(r);
-      //   }
-      // }
-      // if (data['tipename'].toString().split(',').length == 7) {
-      //   for(var v in data['tipe'][6]){
-      //     Resto r = Resto.all(
-      //         id: v['id'],
-      //         name: v['name'],
-      //         distance: double.parse(v['distance'].toString()),
-      //         img: ((v['img'].toString() != '[]')?v['img'][0]['img']:'').toString(),
-      //         status: v['status'].toString(),
-      //         isOpen: v['isOpen'].toString()
-      //     );
-      //     _randomRes7.add(r);
-      //   }
-      // }
+
+
+      setState(() {
+        print('CUOK');
+        if (randomRes8.toString() == '[]' && randomRes9.toString() == '[]' && randomRes10.toString() == '[]' && randomRes11.toString() == '[]' && randomRes12.toString() == '[]' && randomRes13.toString() == '[]' && randomRes14.toString() == '[]') {
+          tipe8 = (data['tipename'].toString().split('[')[1].split(']')[0].split(',').length >= 2 || data['tipename'].toString().split('[')[1].split(']')[0].split(',').length >= 3 || data['tipename'].toString().split('[')[1].split(']')[0].split(',').length >= 4 || data['tipename'].toString().split('[')[1].split(']')[0].split(',').length >= 5 || data['tipename'].toString().split('[')[1].split(']')[0].split(',').length >= 6 || data['tipename'].toString().split('[')[1].split(']')[0].split(',').length >= 7)?data['tipename'].toString().split('[')[1].split(']')[0].split(',')[0].toString():data['tipename'].toString().split('[')[1].split(']')[0].toString();
+          if (tipe != tipe8) {
+            randomRes8 = _randomRes1;
+            randomRes9 = _randomRes2;
+            randomRes10 = _randomRes3;
+            randomRes11 = _randomRes4;
+            randomRes12 = _randomRes5;
+            randomRes13 = _randomRes6;
+            randomRes14 = _randomRes7;
+            tipe8 = (data['tipename'].toString().split('[')[1].split(']')[0].split(',').length >= 2 || data['tipename'].toString().split('[')[1].split(']')[0].split(',').length >= 3 || data['tipename'].toString().split('[')[1].split(']')[0].split(',').length >= 4 || data['tipename'].toString().split('[')[1].split(']')[0].split(',').length >= 5 || data['tipename'].toString().split('[')[1].split(']')[0].split(',').length >= 6 || data['tipename'].toString().split('[')[1].split(']')[0].split(',').length >= 7)?data['tipename'].toString().split('[')[1].split(']')[0].split(',')[0].toString():data['tipename'].toString().split('[')[1].split(']')[0].toString();
+            tipe9 = (data['tipename'].toString().split('[')[1].split(']')[0].split(',').length >= 2)?data['tipename'].toString().split('[')[1].split(']')[0].split(', ')[1].toString():'';
+            tipe10 = (data['tipename'].toString().split('[')[1].split(']')[0].split(',').length >= 3)?data['tipename'].toString().split('[')[1].split(']')[0].split(', ')[2].toString():'';
+            tipe11 = (data['tipename'].toString().split('[')[1].split(']')[0].split(',').length >= 4)?data['tipename'].toString().split('[')[1].split(']')[0].split(', ')[3].toString():'';
+            tipe12 = (data['tipename'].toString().split('[')[1].split(']')[0].split(',').length >= 5)?data['tipename'].toString().split('[')[1].split(']')[0].split(', ')[4].toString():'';
+            tipe13 = (data['tipename'].toString().split('[')[1].split(']')[0].split(',').length >= 6)?data['tipename'].toString().split('[')[1].split(']')[0].split(', ')[5].toString():'';
+            tipe14 = (data['tipename'].toString().split('[')[1].split(']')[0].split(',').length >= 7)?data['tipename'].toString().split('[')[1].split(']')[0].split(', ')[6].toString():'';
+            startCuisine.add(tipe8);
+            startCuisine.add(tipe9);
+            startCuisine.add(tipe10);
+            startCuisine.add(tipe11);
+            startCuisine.add(tipe12);
+            startCuisine.add(tipe13);
+            startCuisine.add(tipe14);
+            page = '2';
+            print('CUOK');
+            isLoading2 = false;
+          } else {
+            print('CUOK2');
+            tipe8 = '';
+            isLoading2 = false;
+          }
+          print('CUOK3');
+        } else if (randomRes15.toString() == '[]' && randomRes16.toString() == '[]' && randomRes17.toString() == '[]' && randomRes18.toString() == '[]' && randomRes19.toString() == '[]' && randomRes20.toString() == '[]' && randomRes21.toString() == '[]') {
+          tipe15 = (data['tipename'].toString().split('[')[1].split(']')[0].split(',').length >= 2 || data['tipename'].toString().split('[')[1].split(']')[0].split(',').length >= 3 || data['tipename'].toString().split('[')[1].split(']')[0].split(',').length >= 4 || data['tipename'].toString().split('[')[1].split(']')[0].split(',').length >= 5 || data['tipename'].toString().split('[')[1].split(']')[0].split(',').length >= 6 || data['tipename'].toString().split('[')[1].split(']')[0].split(',').length >= 7)?data['tipename'].toString().split('[')[1].split(']')[0].split(',')[0].toString():data['tipename'].toString().split('[')[1].split(']')[0].toString();
+          if (tipe != tipe15) {
+            randomRes15 = _randomRes1;
+            randomRes16 = _randomRes2;
+            randomRes17 = _randomRes3;
+            randomRes18 = _randomRes4;
+            randomRes19 = _randomRes5;
+            randomRes20 = _randomRes6;
+            randomRes21 = _randomRes7;
+            tipe15 = (data['tipename'].toString().split('[')[1].split(']')[0].split(',').length >= 2 || data['tipename'].toString().split('[')[1].split(']')[0].split(',').length >= 3 || data['tipename'].toString().split('[')[1].split(']')[0].split(',').length >= 4 || data['tipename'].toString().split('[')[1].split(']')[0].split(',').length >= 5 || data['tipename'].toString().split('[')[1].split(']')[0].split(',').length >= 6 || data['tipename'].toString().split('[')[1].split(']')[0].split(',').length >= 7)?data['tipename'].toString().split('[')[1].split(']')[0].split(',')[0].toString():data['tipename'].toString().split('[')[1].split(']')[0].toString();
+            tipe16 = (data['tipename'].toString().split('[')[1].split(']')[0].split(',').length >= 2)?data['tipename'].toString().split('[')[1].split(']')[0].split(', ')[1].toString():'';
+            tipe17 = (data['tipename'].toString().split('[')[1].split(']')[0].split(',').length >= 3)?data['tipename'].toString().split('[')[1].split(']')[0].split(', ')[2].toString():'';
+            tipe18 = (data['tipename'].toString().split('[')[1].split(']')[0].split(',').length >= 4)?data['tipename'].toString().split('[')[1].split(']')[0].split(', ')[3].toString():'';
+            tipe19 = (data['tipename'].toString().split('[')[1].split(']')[0].split(',').length >= 5)?data['tipename'].toString().split('[')[1].split(']')[0].split(', ')[4].toString():'';
+            tipe20 = (data['tipename'].toString().split('[')[1].split(']')[0].split(',').length >= 6)?data['tipename'].toString().split('[')[1].split(']')[0].split(', ')[5].toString():'';
+            tipe21 = (data['tipename'].toString().split('[')[1].split(']')[0].split(',').length >= 7)?data['tipename'].toString().split('[')[1].split(']')[0].split(', ')[6].toString():'';
+            startCuisine.add(tipe15);
+            startCuisine.add(tipe16);
+            startCuisine.add(tipe17);
+            startCuisine.add(tipe18);
+            startCuisine.add(tipe19);
+            startCuisine.add(tipe20);
+            startCuisine.add(tipe21);
+            page = '3';
+            isLoading2 = false;
+          } else {
+            tipe15 = '';
+            isLoading2 = false;
+          }
+        } else if (randomRes22.toString() == '[]' && randomRes23.toString() == '[]' && randomRes24.toString() == '[]' && randomRes25.toString() == '[]' && randomRes26.toString() == '[]' && randomRes27.toString() == '[]' && randomRes28.toString() == '[]') {
+          tipe22 = (data['tipename'].toString().split('[')[1].split(']')[0].split(',').length >= 2 || data['tipename'].toString().split('[')[1].split(']')[0].split(',').length >= 3 || data['tipename'].toString().split('[')[1].split(']')[0].split(',').length >= 4 || data['tipename'].toString().split('[')[1].split(']')[0].split(',').length >= 5 || data['tipename'].toString().split('[')[1].split(']')[0].split(',').length >= 6 || data['tipename'].toString().split('[')[1].split(']')[0].split(',').length >= 7)?data['tipename'].toString().split('[')[1].split(']')[0].split(',')[0].toString():data['tipename'].toString().split('[')[1].split(']')[0].toString();
+          if (tipe != tipe22) {
+            randomRes22 = _randomRes1;
+            randomRes23 = _randomRes2;
+            randomRes24 = _randomRes3;
+            randomRes25 = _randomRes4;
+            randomRes26 = _randomRes5;
+            randomRes27 = _randomRes6;
+            randomRes28 = _randomRes7;
+            tipe22 = (data['tipename'].toString().split('[')[1].split(']')[0].split(',').length >= 2 || data['tipename'].toString().split('[')[1].split(']')[0].split(',').length >= 3 || data['tipename'].toString().split('[')[1].split(']')[0].split(',').length >= 4 || data['tipename'].toString().split('[')[1].split(']')[0].split(',').length >= 5 || data['tipename'].toString().split('[')[1].split(']')[0].split(',').length >= 6 || data['tipename'].toString().split('[')[1].split(']')[0].split(',').length >= 7)?data['tipename'].toString().split('[')[1].split(']')[0].split(',')[0].toString():data['tipename'].toString().split('[')[1].split(']')[0].toString();
+            tipe23 = (data['tipename'].toString().split('[')[1].split(']')[0].split(',').length >= 2)?data['tipename'].toString().split('[')[1].split(']')[0].split(', ')[1].toString():'';
+            tipe24 = (data['tipename'].toString().split('[')[1].split(']')[0].split(',').length >= 3)?data['tipename'].toString().split('[')[1].split(']')[0].split(', ')[2].toString():'';
+            tipe25 = (data['tipename'].toString().split('[')[1].split(']')[0].split(',').length >= 4)?data['tipename'].toString().split('[')[1].split(']')[0].split(', ')[3].toString():'';
+            tipe26 = (data['tipename'].toString().split('[')[1].split(']')[0].split(',').length >= 5)?data['tipename'].toString().split('[')[1].split(']')[0].split(', ')[4].toString():'';
+            tipe27 = (data['tipename'].toString().split('[')[1].split(']')[0].split(',').length >= 6)?data['tipename'].toString().split('[')[1].split(']')[0].split(', ')[5].toString():'';
+            tipe28 = (data['tipename'].toString().split('[')[1].split(']')[0].split(',').length >= 7)?data['tipename'].toString().split('[')[1].split(']')[0].split(', ')[6].toString():'';
+            startCuisine.add(tipe22);
+            startCuisine.add(tipe23);
+            startCuisine.add(tipe24);
+            startCuisine.add(tipe25);
+            startCuisine.add(tipe26);
+            startCuisine.add(tipe27);
+            startCuisine.add(tipe28);
+            page = 'null';
+            isLoading2 = false;
+          } else {
+            tipe22 = '';
+            isLoading2 = false;
+          }
+        }
+        print('Start2'+startCuisine.toString());
+        // randomRes9 = _randomRes2;
+        // randomRes10 = _randomRes3;
+        // randomRes4 = _randomRes4;
+        // randomRes5 = _randomRes5;
+        // randomRes6 = _randomRes6;
+        // randomRes7 = _randomRes7;
+        // tipe9 = (data['tipename'].toString().split('[')[1].split(']')[0].split(',').length >= 2)?data['tipename'].toString().split('[')[1].split(']')[0].split(',')[1].toString():'';
+        // tipe10 = (data['tipename'].toString().split('[')[1].split(']')[0].split(',').length >= 3)?data['tipename'].toString().split('[')[1].split(']')[0].split(',')[2].toString():'';
+        // tipe4 = (data['tipename'].toString().split('[')[1].split(']')[0].split(',').length >= 4)?data['tipename'].toString().split('[')[1].split(']')[0].split(',')[3].toString():'';
+        // tipe5 = (data['tipename'].toString().split('[')[1].split(']')[0].split(',').length >= 5)?data['tipename'].toString().split('[')[1].split(']')[0].split(',')[4].toString():'';
+        // tipe6 = (data['tipename'].toString().split('[')[1].split(']')[0].split(',').length >= 6)?data['tipename'].toString().split('[')[1].split(']')[0].split(',')[5].toString():'';
+        // tipe7 = (data['tipename'].toString().split('[')[1].split(']')[0].split(',').length.toString() == '7')?data['tipename'].toString().split('[')[1].split(']')[0].split(',')[6].toString():'';
+        // resto = _resto;
+        // kakilima = _kakilima;
+        // foodstall = _foodstall;
+        // foodtruck = _foodtruck;
+        // tokoroti = _tokoroti;
+        // tokooleh = _tokooleh;
+        // other = _other;
+        // again = _again;
+        // promo = _promo;
+      });
+    } else {
+      setState((){
+      isLoading2 = false;
+      page = 'null';
+      Fluttertoast.showToast(msg: "Tidak ada lagi.");
+      });
     }
 
-
-    // for(var v in data['promo']){
-    //   Menu m = Menu(
-    //       id: v['id'],
-    //       name: v['name'],
-    //       restoId: v['resto_id'].toString(),
-    //       restoName: v['resto_name'],
-    //       desc: v['desc']??'',
-    //       urlImg: v['img'],
-    //       price: Price.discounted(int.parse(v['price'].toString()), int.parse(v['discounted_price'].toString())),
-    //       distance: double.parse(v['resto_distance'].toString()), is_recommended: '', qty: '', delivery_price: null, type: ''
-    //   );
-    //   _promo.add(m);
-    // }
-    setState(() {
-      // images = _images;
-      // transaction = _transaction;
-      if (randomRes8.toString() == '[]') {
-        randomRes8 = _randomRes1;
-        tipe8 = (data['tipename'].toString().split('[')[1].split(']')[0].split(',').length >= 2 || data['tipename'].toString().split('[')[1].split(']')[0].split(',').length >= 3 || data['tipename'].toString().split('[')[1].split(']')[0].split(',').length >= 4 || data['tipename'].toString().split('[')[1].split(']')[0].split(',').length >= 5 || data['tipename'].toString().split('[')[1].split(']')[0].split(',').length >= 6 || data['tipename'].toString().split('[')[1].split(']')[0].split(',').length >= 7)?data['tipename'].toString().split('[')[1].split(']')[0].split(',')[0].toString():data['tipename'].toString().split('[')[1].split(']')[0].toString();
-        // startCuisine.add(tipe8);
-        // isLoading2 = false;
-      } else if (randomRes9.toString() == '[]') {
-        randomRes9 = _randomRes1;
-        tipe9 = (data['tipename'].toString().split('[')[1].split(']')[0].split(',').length >= 2 || data['tipename'].toString().split('[')[1].split(']')[0].split(',').length >= 3 || data['tipename'].toString().split('[')[1].split(']')[0].split(',').length >= 4 || data['tipename'].toString().split('[')[1].split(']')[0].split(',').length >= 5 || data['tipename'].toString().split('[')[1].split(']')[0].split(',').length >= 6 || data['tipename'].toString().split('[')[1].split(']')[0].split(',').length >= 7)?data['tipename'].toString().split('[')[1].split(']')[0].split(',')[0].toString():data['tipename'].toString().split('[')[1].split(']')[0].toString();
-        // startCuisine.add(tipe9);
-        // isLoading2 = false;
-      } else if (randomRes10.toString() == '[]') {
-        randomRes10 = _randomRes1;
-        tipe10 = (data['tipename'].toString().split('[')[1].split(']')[0].split(',').length >= 2 || data['tipename'].toString().split('[')[1].split(']')[0].split(',').length >= 3 || data['tipename'].toString().split('[')[1].split(']')[0].split(',').length >= 4 || data['tipename'].toString().split('[')[1].split(']')[0].split(',').length >= 5 || data['tipename'].toString().split('[')[1].split(']')[0].split(',').length >= 6 || data['tipename'].toString().split('[')[1].split(']')[0].split(',').length >= 7)?data['tipename'].toString().split('[')[1].split(']')[0].split(',')[0].toString():data['tipename'].toString().split('[')[1].split(']')[0].toString();
-        // startCuisine.add(tipe10);
-        // isLoading2 = false;
-      } else if (randomRes11.toString() == '[]') {
-        randomRes11 = _randomRes1;
-        tipe11 = (data['tipename'].toString().split('[')[1].split(']')[0].split(',').length >= 2 || data['tipename'].toString().split('[')[1].split(']')[0].split(',').length >= 3 || data['tipename'].toString().split('[')[1].split(']')[0].split(',').length >= 4 || data['tipename'].toString().split('[')[1].split(']')[0].split(',').length >= 5 || data['tipename'].toString().split('[')[1].split(']')[0].split(',').length >= 6 || data['tipename'].toString().split('[')[1].split(']')[0].split(',').length >= 7)?data['tipename'].toString().split('[')[1].split(']')[0].split(',')[0].toString():data['tipename'].toString().split('[')[1].split(']')[0].toString();
-        // startCuisine.add(tipe11);
-        // isLoading2 = false;
-      } else if (randomRes12.toString() == '[]') {
-        randomRes12 = _randomRes1;
-        tipe12 = (data['tipename'].toString().split('[')[1].split(']')[0].split(',').length >= 2 || data['tipename'].toString().split('[')[1].split(']')[0].split(',').length >= 3 || data['tipename'].toString().split('[')[1].split(']')[0].split(',').length >= 4 || data['tipename'].toString().split('[')[1].split(']')[0].split(',').length >= 5 || data['tipename'].toString().split('[')[1].split(']')[0].split(',').length >= 6 || data['tipename'].toString().split('[')[1].split(']')[0].split(',').length >= 7)?data['tipename'].toString().split('[')[1].split(']')[0].split(',')[0].toString():data['tipename'].toString().split('[')[1].split(']')[0].toString();
-        // startCuisine.add(tipe12);
-        // isLoading2 = false;
-      } else if (randomRes13.toString() == '[]') {
-        randomRes13 = _randomRes1;
-        tipe13 = (data['tipename'].toString().split('[')[1].split(']')[0].split(',').length >= 2 || data['tipename'].toString().split('[')[1].split(']')[0].split(',').length >= 3 || data['tipename'].toString().split('[')[1].split(']')[0].split(',').length >= 4 || data['tipename'].toString().split('[')[1].split(']')[0].split(',').length >= 5 || data['tipename'].toString().split('[')[1].split(']')[0].split(',').length >= 6 || data['tipename'].toString().split('[')[1].split(']')[0].split(',').length >= 7)?data['tipename'].toString().split('[')[1].split(']')[0].split(',')[0].toString():data['tipename'].toString().split('[')[1].split(']')[0].toString();
-        // startCuisine.add(tipe13);
-        // isLoading2 = false;
-      } else if (randomRes14.toString() == '[]') {
-        randomRes14 = _randomRes1;
-        tipe14 = (data['tipename'].toString().split('[')[1].split(']')[0].split(',').length >= 2 || data['tipename'].toString().split('[')[1].split(']')[0].split(',').length >= 3 || data['tipename'].toString().split('[')[1].split(']')[0].split(',').length >= 4 || data['tipename'].toString().split('[')[1].split(']')[0].split(',').length >= 5 || data['tipename'].toString().split('[')[1].split(']')[0].split(',').length >= 6 || data['tipename'].toString().split('[')[1].split(']')[0].split(',').length >= 7)?data['tipename'].toString().split('[')[1].split(']')[0].split(',')[0].toString():data['tipename'].toString().split('[')[1].split(']')[0].toString();
-        // startCuisine.add(tipe14);
-        // isLoading2 = false;
-      } else if (randomRes15.toString() == '[]') {
-        randomRes15 = _randomRes1;
-        tipe15 = (data['tipename'].toString().split('[')[1].split(']')[0].split(',').length >= 2 || data['tipename'].toString().split('[')[1].split(']')[0].split(',').length >= 3 || data['tipename'].toString().split('[')[1].split(']')[0].split(',').length >= 4 || data['tipename'].toString().split('[')[1].split(']')[0].split(',').length >= 5 || data['tipename'].toString().split('[')[1].split(']')[0].split(',').length >= 6 || data['tipename'].toString().split('[')[1].split(']')[0].split(',').length >= 7)?data['tipename'].toString().split('[')[1].split(']')[0].split(',')[0].toString():data['tipename'].toString().split('[')[1].split(']')[0].toString();
-        // startCuisine.add(tipe15);
-        // isLoading2 = false;
-      } else if (randomRes16.toString() == '[]') {
-        randomRes16 = _randomRes1;
-        tipe16 = (data['tipename'].toString().split('[')[1].split(']')[0].split(',').length >= 2 || data['tipename'].toString().split('[')[1].split(']')[0].split(',').length >= 3 || data['tipename'].toString().split('[')[1].split(']')[0].split(',').length >= 4 || data['tipename'].toString().split('[')[1].split(']')[0].split(',').length >= 5 || data['tipename'].toString().split('[')[1].split(']')[0].split(',').length >= 6 || data['tipename'].toString().split('[')[1].split(']')[0].split(',').length >= 7)?data['tipename'].toString().split('[')[1].split(']')[0].split(',')[0].toString():data['tipename'].toString().split('[')[1].split(']')[0].toString();
-        // startCuisine.add(tipe16);
-        // isLoading2 = false;
-      } else if (randomRes17.toString() == '[]') {
-        randomRes17 = _randomRes1;
-        tipe17 = (data['tipename'].toString().split('[')[1].split(']')[0].split(',').length >= 2 || data['tipename'].toString().split('[')[1].split(']')[0].split(',').length >= 3 || data['tipename'].toString().split('[')[1].split(']')[0].split(',').length >= 4 || data['tipename'].toString().split('[')[1].split(']')[0].split(',').length >= 5 || data['tipename'].toString().split('[')[1].split(']')[0].split(',').length >= 6 || data['tipename'].toString().split('[')[1].split(']')[0].split(',').length >= 7)?data['tipename'].toString().split('[')[1].split(']')[0].split(',')[0].toString():data['tipename'].toString().split('[')[1].split(']')[0].toString();
-        // startCuisine.add(tipe17);
-        // isLoading2 = false;
-      } else if (randomRes18.toString() == '[]') {
-        randomRes18 = _randomRes1;
-        tipe18 = (data['tipename'].toString().split('[')[1].split(']')[0].split(',').length >= 2 || data['tipename'].toString().split('[')[1].split(']')[0].split(',').length >= 3 || data['tipename'].toString().split('[')[1].split(']')[0].split(',').length >= 4 || data['tipename'].toString().split('[')[1].split(']')[0].split(',').length >= 5 || data['tipename'].toString().split('[')[1].split(']')[0].split(',').length >= 6 || data['tipename'].toString().split('[')[1].split(']')[0].split(',').length >= 7)?data['tipename'].toString().split('[')[1].split(']')[0].split(',')[0].toString():data['tipename'].toString().split('[')[1].split(']')[0].toString();
-        // startCuisine.add(tipe18);
-        // isLoading2 = false;
-      } else if (randomRes19.toString() == '[]') {
-        randomRes19 = _randomRes1;
-        tipe19 = (data['tipename'].toString().split('[')[1].split(']')[0].split(',').length >= 2 || data['tipename'].toString().split('[')[1].split(']')[0].split(',').length >= 3 || data['tipename'].toString().split('[')[1].split(']')[0].split(',').length >= 4 || data['tipename'].toString().split('[')[1].split(']')[0].split(',').length >= 5 || data['tipename'].toString().split('[')[1].split(']')[0].split(',').length >= 6 || data['tipename'].toString().split('[')[1].split(']')[0].split(',').length >= 7)?data['tipename'].toString().split('[')[1].split(']')[0].split(',')[0].toString():data['tipename'].toString().split('[')[1].split(']')[0].toString();
-        // startCuisine.add(tipe19);
-        // isLoading2 = false;
-      } else if (randomRes20.toString() == '[]') {
-        randomRes20 = _randomRes1;
-        tipe20 = (data['tipename'].toString().split('[')[1].split(']')[0].split(',').length >= 2 || data['tipename'].toString().split('[')[1].split(']')[0].split(',').length >= 3 || data['tipename'].toString().split('[')[1].split(']')[0].split(',').length >= 4 || data['tipename'].toString().split('[')[1].split(']')[0].split(',').length >= 5 || data['tipename'].toString().split('[')[1].split(']')[0].split(',').length >= 6 || data['tipename'].toString().split('[')[1].split(']')[0].split(',').length >= 7)?data['tipename'].toString().split('[')[1].split(']')[0].split(',')[0].toString():data['tipename'].toString().split('[')[1].split(']')[0].toString();
-        // startCuisine.add(tipe20);
-        // isLoading2 = false;
-      }
-      print('Start2'+startCuisine.toString());
-      // randomRes9 = _randomRes2;
-      // randomRes10 = _randomRes3;
-      // randomRes4 = _randomRes4;
-      // randomRes5 = _randomRes5;
-      // randomRes6 = _randomRes6;
-      // randomRes7 = _randomRes7;
-      // tipe9 = (data['tipename'].toString().split('[')[1].split(']')[0].split(',').length >= 2)?data['tipename'].toString().split('[')[1].split(']')[0].split(',')[1].toString():'';
-      // tipe10 = (data['tipename'].toString().split('[')[1].split(']')[0].split(',').length >= 3)?data['tipename'].toString().split('[')[1].split(']')[0].split(',')[2].toString():'';
-      // tipe4 = (data['tipename'].toString().split('[')[1].split(']')[0].split(',').length >= 4)?data['tipename'].toString().split('[')[1].split(']')[0].split(',')[3].toString():'';
-      // tipe5 = (data['tipename'].toString().split('[')[1].split(']')[0].split(',').length >= 5)?data['tipename'].toString().split('[')[1].split(']')[0].split(',')[4].toString():'';
-      // tipe6 = (data['tipename'].toString().split('[')[1].split(']')[0].split(',').length >= 6)?data['tipename'].toString().split('[')[1].split(']')[0].split(',')[5].toString():'';
-      // tipe7 = (data['tipename'].toString().split('[')[1].split(']')[0].split(',').length.toString() == '7')?data['tipename'].toString().split('[')[1].split(']')[0].split(',')[6].toString():'';
-      // resto = _resto;
-      // kakilima = _kakilima;
-      // foodstall = _foodstall;
-      // foodtruck = _foodtruck;
-      // tokoroti = _tokoroti;
-      // tokooleh = _tokooleh;
-      // other = _other;
-      // again = _again;
-      // promo = _promo;
-    });
   }
 
   //resto
@@ -1578,6 +1339,14 @@ class _HomeActivityState extends State<HomeActivity> with WidgetsBindingObserver
   String tipe18 = '';
   String tipe19 = '';
   String tipe20 = '';
+  String tipe21 = '';
+  String tipe22 = '';
+  String tipe23 = '';
+  String tipe24 = '';
+  String tipe25 = '';
+  String tipe26 = '';
+  String tipe27 = '';
+  String tipe28 = '';
   String kota1 = '';
   String facilityList2 = '';
   String dataRes1 = '';
@@ -1601,6 +1370,14 @@ class _HomeActivityState extends State<HomeActivity> with WidgetsBindingObserver
   List<Resto> randomRes18 = [];
   List<Resto> randomRes19 = [];
   List<Resto> randomRes20 = [];
+  List<Resto> randomRes21 = [];
+  List<Resto> randomRes22 = [];
+  List<Resto> randomRes23 = [];
+  List<Resto> randomRes24 = [];
+  List<Resto> randomRes25 = [];
+  List<Resto> randomRes26 = [];
+  List<Resto> randomRes27 = [];
+  List<Resto> randomRes28 = [];
   Future _search3(String q, String type)async{
     List<Menu> _menu = [];
     List<Resto> _resto = [];
@@ -2596,95 +2373,103 @@ class _HomeActivityState extends State<HomeActivity> with WidgetsBindingObserver
     // _search2('');
     _controller.addListener(() {
       if (_controller.position.atEdge) {
-        if (_controller.position.pixels != 0 && isLoading2 == true) {
+        if (_controller.position.pixels != 0 && isLoading2 == true && page != 'null') {
           print(startCuisine.toString().split(',').length.toString());
           print(totalCuisine.toString());
-          if (totalCuisine > startCuisine.toString().split(',').length) {
-            if (totalCuisine > 7) {
-              if (randomRes8.toString() == '[]') {
-                _page(lat,long);
-                setState(() {});
-                print(isLoading2.toString());
-                print(_controller.position.pixels.toString());
-                print("You're at the bottom.");
-              } else if (randomRes9.toString() == '[]') {
-                _page(lat,long);
-                setState(() {});
-                print(isLoading2.toString());
-                print(_controller.position.pixels.toString());
-                print("You're at the bottom.");
-              } else if (randomRes10.toString() == '[]') {
-                _page(lat,long);
-                setState(() {});
-                print(isLoading2.toString());
-                print(_controller.position.pixels.toString());
-                print("You're at the bottom.");
-              } else if (randomRes11.toString() == '[]') {
-                _page(lat,long);
-                setState(() {});
-                print(isLoading2.toString());
-                print(_controller.position.pixels.toString());
-                print("You're at the bottom.");
-              } else if (randomRes12.toString() == '[]') {
-                _page(lat,long);
-                setState(() {});
-                print(isLoading2.toString());
-                print(_controller.position.pixels.toString());
-                print("You're at the bottom.");
-              } else if (randomRes13.toString() == '[]') {
-                _page(lat,long);
-                setState(() {});
-                print(isLoading2.toString());
-                print(_controller.position.pixels.toString());
-                print("You're at the bottom.");
-              } else if (randomRes14.toString() == '[]') {
-                _page(lat,long);
-                setState(() {});
-                print(isLoading2.toString());
-                print(_controller.position.pixels.toString());
-                print("You're at the bottom.");
-              } else if (randomRes15.toString() == '[]') {
-                _page(lat,long);
-                setState(() {});
-                print(isLoading2.toString());
-                print(_controller.position.pixels.toString());
-                print("You're at the bottom.");
-              } else if (randomRes16.toString() == '[]') {
-                _page(lat,long);
-                setState(() {});
-                print(isLoading2.toString());
-                print(_controller.position.pixels.toString());
-                print("You're at the bottom.");
-              } else if (randomRes17.toString() == '[]') {
-                _page(lat,long);
-                setState(() {});
-                print(isLoading2.toString());
-                print(_controller.position.pixels.toString());
-                print("You're at the bottom.");
-              } else if (randomRes18.toString() == '[]') {
-                _page(lat,long);
-                setState(() {});
-                print(isLoading2.toString());
-                print(_controller.position.pixels.toString());
-                print("You're at the bottom.");
-              } else if (randomRes19.toString() == '[]') {
-                _page(lat,long);
-                setState(() {});
-                print(isLoading2.toString());
-                print(_controller.position.pixels.toString());
-                print("You're at the bottom.");
-              } else if (randomRes20.toString() == '[]') {
-                _page(lat,long);
-                setState(() {});
-                print(isLoading2.toString());
-                print(_controller.position.pixels.toString());
-                print("You're at the bottom.");
-              }
-            }
-          } else {
-            isLoading2 = false;
-            setState(() {});
-          }
+          _page(lat,long);
+          // if (page != 'null') {
+          //   _page(lat,long);
+          //   setState(() {});
+          // }  else {
+          //   isLoading2 = false;
+          //   setState(() {});
+          // }
+          // if (totalCuisine >= startCuisine.toString().split(',').length) {
+          //   if (totalCuisine >= 7) {
+          //     if (randomRes8.toString() == '[]') {
+          //       _page(lat,long);
+          //       setState(() {});
+          //       print(isLoading2.toString());
+          //       print(_controller.position.pixels.toString());
+          //       print("You're at the bottom.");
+          //     } else if (randomRes9.toString() == '[]') {
+          //       _page(lat,long);
+          //       setState(() {});
+          //       print(isLoading2.toString());
+          //       print(_controller.position.pixels.toString());
+          //       print("You're at the bottom.");
+          //     } else if (randomRes10.toString() == '[]') {
+          //       _page(lat,long);
+          //       setState(() {});
+          //       print(isLoading2.toString());
+          //       print(_controller.position.pixels.toString());
+          //       print("You're at the bottom.");
+          //     } else if (randomRes11.toString() == '[]') {
+          //       _page(lat,long);
+          //       setState(() {});
+          //       print(isLoading2.toString());
+          //       print(_controller.position.pixels.toString());
+          //       print("You're at the bottom.");
+          //     } else if (randomRes12.toString() == '[]') {
+          //       _page(lat,long);
+          //       setState(() {});
+          //       print(isLoading2.toString());
+          //       print(_controller.position.pixels.toString());
+          //       print("You're at the bottom.");
+          //     } else if (randomRes13.toString() == '[]') {
+          //       _page(lat,long);
+          //       setState(() {});
+          //       print(isLoading2.toString());
+          //       print(_controller.position.pixels.toString());
+          //       print("You're at the bottom.");
+          //     } else if (randomRes14.toString() == '[]') {
+          //       _page(lat,long);
+          //       setState(() {});
+          //       print(isLoading2.toString());
+          //       print(_controller.position.pixels.toString());
+          //       print("You're at the bottom.");
+          //     } else if (randomRes15.toString() == '[]') {
+          //       _page(lat,long);
+          //       setState(() {});
+          //       print(isLoading2.toString());
+          //       print(_controller.position.pixels.toString());
+          //       print("You're at the bottom.");
+          //     } else if (randomRes16.toString() == '[]') {
+          //       _page(lat,long);
+          //       setState(() {});
+          //       print(isLoading2.toString());
+          //       print(_controller.position.pixels.toString());
+          //       print("You're at the bottom.");
+          //     } else if (randomRes17.toString() == '[]') {
+          //       _page(lat,long);
+          //       setState(() {});
+          //       print(isLoading2.toString());
+          //       print(_controller.position.pixels.toString());
+          //       print("You're at the bottom.");
+          //     } else if (randomRes18.toString() == '[]') {
+          //       _page(lat,long);
+          //       setState(() {});
+          //       print(isLoading2.toString());
+          //       print(_controller.position.pixels.toString());
+          //       print("You're at the bottom.");
+          //     } else if (randomRes19.toString() == '[]') {
+          //       _page(lat,long);
+          //       setState(() {});
+          //       print(isLoading2.toString());
+          //       print(_controller.position.pixels.toString());
+          //       print("You're at the bottom.");
+          //     } else if (randomRes20.toString() == '[]') {
+          //       _page(lat,long);
+          //       setState(() {});
+          //       print(isLoading2.toString());
+          //       print(_controller.position.pixels.toString());
+          //       print("You're at the bottom.");
+          //     }
+          //   }
+          // } else {
+          //   isLoading2 = false;
+          //   setState(() {});
+          // }
         } else {
           isLoading2 = false;
           setState(() {});
@@ -7509,6 +7294,1294 @@ class _HomeActivityState extends State<HomeActivity> with WidgetsBindingObserver
                           ):Container(),
                           (randomRes20.toString() != '[]')?SizedBox(height: CustomSize.sizeHeight(context) / 48,):Container(),
 
+                          (randomRes21.toString() != '[]')?Padding(
+                            padding: EdgeInsets.symmetric(horizontal: CustomSize.sizeWidth(context) / 24),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                MediaQuery(
+                                  child: CustomText.textTitle2(
+                                    text: tipe21,
+                                    maxLines: 1,
+                                    sizeNew: double.parse(((MediaQuery.of(context).size.width*0.045).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.045)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.045)).toString()),
+                                  ),
+                                  data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0),
+                                ),
+                                GestureDetector(
+                                  onTap: ()async{
+                                    SharedPreferences pref = await SharedPreferences.getInstance();
+                                    pref.setString("pgtipe", tipe21);
+                                    Navigator.push(
+                                        context,
+                                        PageTransition(
+                                            type: PageTransitionType.rightToLeft,
+                                            child: new FoodTruckActivity()));
+                                  },
+                                  child: MediaQuery(
+                                    child: CustomText.bodyMedium12(
+                                      text: "Lebih banyak",
+                                      color: CustomColor.primary,
+                                      maxLines: 1,
+                                      sizeNew: double.parse(((MediaQuery.of(context).size.width*0.03).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.03)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.03)).toString()),
+                                    ),
+                                    data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ):Container(),
+                          (randomRes21.toString() != '[]')?Container(
+                            width: CustomSize.sizeWidth(context),
+                            height: CustomSize.sizeHeight(context) / 3.6,
+                            child: ListView.builder(
+                                scrollDirection: Axis.horizontal,
+                                itemCount: (randomRes21.length < 10)?randomRes21.length:10,
+                                itemBuilder: (_, index){
+                                  return Padding(
+                                    padding: EdgeInsets.only(
+                                        left: CustomSize.sizeWidth(context) / 20,
+                                        top: CustomSize.sizeHeight(context) / 86,
+                                        bottom: CustomSize.sizeHeight(context) / 86),
+                                    child: GestureDetector(
+                                      onTap: (){
+                                        // print(again[index].id.toString()+ 'ini id Pesan lagi');
+                                        Navigator.push(
+                                            context,
+                                            PageTransition(
+                                                type: PageTransitionType.rightToLeft,
+                                                child: new DetailResto(randomRes21[index].id.toString())));
+                                      },
+                                      child: Container(
+                                        width: CustomSize.sizeWidth(context) / 2.3,
+                                        height: CustomSize.sizeHeight(context) / 3.6,
+                                        decoration: BoxDecoration(
+                                          color: Colors.white,
+                                          borderRadius: BorderRadius.circular(20),
+                                          boxShadow: [
+                                            BoxShadow(
+                                              color: Colors.grey.withOpacity(0.5),
+                                              spreadRadius: 0,
+                                              blurRadius: 4,
+                                              offset: Offset(0, 3), // changes position of shadow
+                                            ),
+                                          ],
+                                        ),
+                                        child: Column(
+                                          crossAxisAlignment: CrossAxisAlignment.start,
+                                          children: [
+                                            (randomRes21[index].status.toString() == 'active')?(randomRes21[index].isOpen.toString() == 'true')?Container(
+                                              width: CustomSize.sizeWidth(context) / 2.3,
+                                              height: CustomSize.sizeHeight(context) / 5.8,
+                                              decoration: BoxDecoration(
+                                                color: (randomRes21[index].img != '')?Colors.transparent:CustomColor.primary,
+                                                image: (randomRes21[index].img != '')?DecorationImage(
+                                                    image: NetworkImage(Links.subUrl + randomRes21[index].img!),
+                                                    fit: BoxFit.cover
+                                                ):DecorationImage(
+                                                    image: AssetImage("assets/irgLogo.png"),
+                                                    fit: BoxFit.contain
+                                                ),
+                                                borderRadius: BorderRadius.circular(20),
+                                              ),
+                                            ):Container(
+                                              width: CustomSize.sizeWidth(context) / 2.3,
+                                              height: CustomSize.sizeHeight(context) / 5.8,
+                                              child: ClipRRect(
+                                                borderRadius: BorderRadius.circular(20),
+                                                child: ColorFiltered(
+                                                  colorFilter: ColorFilter.mode(
+                                                    Colors.grey,
+                                                    BlendMode.saturation,
+                                                  ),
+                                                  child: Container(
+                                                    decoration: BoxDecoration(
+                                                      color: (randomRes21[index].img != '')?Colors.transparent:CustomColor.primary,
+                                                      image: (randomRes21[index].img != '')?DecorationImage(
+                                                          image: NetworkImage(Links.subUrl + randomRes21[index].img!),
+                                                          fit: BoxFit.cover
+                                                      ):DecorationImage(
+                                                          image: AssetImage("assets/irgLogo.png"),
+                                                          fit: BoxFit.contain
+                                                      ),
+                                                      borderRadius: BorderRadius.circular(20),
+                                                    ),
+                                                  ),
+                                                ),
+                                              ),
+                                            ):Container(
+                                              width: CustomSize.sizeWidth(context) / 2.3,
+                                              height: CustomSize.sizeHeight(context) / 5.8,
+                                              child: ClipRRect(
+                                                borderRadius: BorderRadius.circular(20),
+                                                child: ColorFiltered(
+                                                  colorFilter: ColorFilter.mode(
+                                                    Colors.grey,
+                                                    BlendMode.saturation,
+                                                  ),
+                                                  child: Container(
+                                                    decoration: BoxDecoration(
+                                                      color: (randomRes21[index].img != '')?Colors.transparent:CustomColor.primary,
+                                                      image: (randomRes21[index].img != '')?DecorationImage(
+                                                          image: NetworkImage(Links.subUrl + randomRes21[index].img!),
+                                                          fit: BoxFit.cover
+                                                      ):DecorationImage(
+                                                          image: AssetImage("assets/irgLogo.png"),
+                                                          fit: BoxFit.contain
+                                                      ),
+                                                      borderRadius: BorderRadius.circular(20),
+                                                    ),
+                                                  ),
+                                                ),
+                                              ),
+                                            ),
+                                            SizedBox(height: CustomSize.sizeHeight(context) / 86,),
+                                            Padding(
+                                              padding: EdgeInsets.only(left: CustomSize.sizeWidth(context) / 24),
+                                              child: MediaQuery(child: CustomText.bodyRegular14(text: randomRes21[index].distance.toString() + " Km",sizeNew: double.parse(((MediaQuery.of(context).size.width*0.035).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.035).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.035).toString()),),
+                                                data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0),),
+                                            ),
+                                            Padding(
+                                              padding: EdgeInsets.only(left: CustomSize.sizeWidth(context) / 24),
+                                              child: MediaQuery(child: CustomText.bodyMedium16(text: randomRes21[index].name, sizeNew: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.04).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.04).toString())),
+                                                data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0),),
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                    ),
+                                  );
+                                }
+                            ),
+                          ):Container(),
+                          (randomRes21.toString() != '[]')?SizedBox(height: CustomSize.sizeHeight(context) / 48,):Container(),
+
+                          (randomRes22.toString() != '[]')?Padding(
+                            padding: EdgeInsets.symmetric(horizontal: CustomSize.sizeWidth(context) / 24),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                MediaQuery(
+                                  child: CustomText.textTitle2(
+                                    text: tipe22,
+                                    maxLines: 1,
+                                    sizeNew: double.parse(((MediaQuery.of(context).size.width*0.045).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.045)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.045)).toString()),
+                                  ),
+                                  data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0),
+                                ),
+                                GestureDetector(
+                                  onTap: ()async{
+                                    SharedPreferences pref = await SharedPreferences.getInstance();
+                                    pref.setString("pgtipe", tipe22);
+                                    Navigator.push(
+                                        context,
+                                        PageTransition(
+                                            type: PageTransitionType.rightToLeft,
+                                            child: new FoodTruckActivity()));
+                                  },
+                                  child: MediaQuery(
+                                    child: CustomText.bodyMedium12(
+                                      text: "Lebih banyak",
+                                      color: CustomColor.primary,
+                                      maxLines: 1,
+                                      sizeNew: double.parse(((MediaQuery.of(context).size.width*0.03).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.03)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.03)).toString()),
+                                    ),
+                                    data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ):Container(),
+                          (randomRes22.toString() != '[]')?Container(
+                            width: CustomSize.sizeWidth(context),
+                            height: CustomSize.sizeHeight(context) / 3.6,
+                            child: ListView.builder(
+                                scrollDirection: Axis.horizontal,
+                                itemCount: (randomRes22.length < 10)?randomRes22.length:10,
+                                itemBuilder: (_, index){
+                                  return Padding(
+                                    padding: EdgeInsets.only(
+                                        left: CustomSize.sizeWidth(context) / 20,
+                                        top: CustomSize.sizeHeight(context) / 86,
+                                        bottom: CustomSize.sizeHeight(context) / 86),
+                                    child: GestureDetector(
+                                      onTap: (){
+                                        // print(again[index].id.toString()+ 'ini id Pesan lagi');
+                                        Navigator.push(
+                                            context,
+                                            PageTransition(
+                                                type: PageTransitionType.rightToLeft,
+                                                child: new DetailResto(randomRes22[index].id.toString())));
+                                      },
+                                      child: Container(
+                                        width: CustomSize.sizeWidth(context) / 2.3,
+                                        height: CustomSize.sizeHeight(context) / 3.6,
+                                        decoration: BoxDecoration(
+                                          color: Colors.white,
+                                          borderRadius: BorderRadius.circular(20),
+                                          boxShadow: [
+                                            BoxShadow(
+                                              color: Colors.grey.withOpacity(0.5),
+                                              spreadRadius: 0,
+                                              blurRadius: 4,
+                                              offset: Offset(0, 3), // changes position of shadow
+                                            ),
+                                          ],
+                                        ),
+                                        child: Column(
+                                          crossAxisAlignment: CrossAxisAlignment.start,
+                                          children: [
+                                            (randomRes22[index].status.toString() == 'active')?(randomRes22[index].isOpen.toString() == 'true')?Container(
+                                              width: CustomSize.sizeWidth(context) / 2.3,
+                                              height: CustomSize.sizeHeight(context) / 5.8,
+                                              decoration: BoxDecoration(
+                                                color: (randomRes22[index].img != '')?Colors.transparent:CustomColor.primary,
+                                                image: (randomRes22[index].img != '')?DecorationImage(
+                                                    image: NetworkImage(Links.subUrl + randomRes22[index].img!),
+                                                    fit: BoxFit.cover
+                                                ):DecorationImage(
+                                                    image: AssetImage("assets/irgLogo.png"),
+                                                    fit: BoxFit.contain
+                                                ),
+                                                borderRadius: BorderRadius.circular(20),
+                                              ),
+                                            ):Container(
+                                              width: CustomSize.sizeWidth(context) / 2.3,
+                                              height: CustomSize.sizeHeight(context) / 5.8,
+                                              child: ClipRRect(
+                                                borderRadius: BorderRadius.circular(20),
+                                                child: ColorFiltered(
+                                                  colorFilter: ColorFilter.mode(
+                                                    Colors.grey,
+                                                    BlendMode.saturation,
+                                                  ),
+                                                  child: Container(
+                                                    decoration: BoxDecoration(
+                                                      color: (randomRes22[index].img != '')?Colors.transparent:CustomColor.primary,
+                                                      image: (randomRes22[index].img != '')?DecorationImage(
+                                                          image: NetworkImage(Links.subUrl + randomRes22[index].img!),
+                                                          fit: BoxFit.cover
+                                                      ):DecorationImage(
+                                                          image: AssetImage("assets/irgLogo.png"),
+                                                          fit: BoxFit.contain
+                                                      ),
+                                                      borderRadius: BorderRadius.circular(20),
+                                                    ),
+                                                  ),
+                                                ),
+                                              ),
+                                            ):Container(
+                                              width: CustomSize.sizeWidth(context) / 2.3,
+                                              height: CustomSize.sizeHeight(context) / 5.8,
+                                              child: ClipRRect(
+                                                borderRadius: BorderRadius.circular(20),
+                                                child: ColorFiltered(
+                                                  colorFilter: ColorFilter.mode(
+                                                    Colors.grey,
+                                                    BlendMode.saturation,
+                                                  ),
+                                                  child: Container(
+                                                    decoration: BoxDecoration(
+                                                      color: (randomRes22[index].img != '')?Colors.transparent:CustomColor.primary,
+                                                      image: (randomRes22[index].img != '')?DecorationImage(
+                                                          image: NetworkImage(Links.subUrl + randomRes22[index].img!),
+                                                          fit: BoxFit.cover
+                                                      ):DecorationImage(
+                                                          image: AssetImage("assets/irgLogo.png"),
+                                                          fit: BoxFit.contain
+                                                      ),
+                                                      borderRadius: BorderRadius.circular(20),
+                                                    ),
+                                                  ),
+                                                ),
+                                              ),
+                                            ),
+                                            SizedBox(height: CustomSize.sizeHeight(context) / 86,),
+                                            Padding(
+                                              padding: EdgeInsets.only(left: CustomSize.sizeWidth(context) / 24),
+                                              child: MediaQuery(child: CustomText.bodyRegular14(text: randomRes22[index].distance.toString() + " Km",sizeNew: double.parse(((MediaQuery.of(context).size.width*0.035).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.035).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.035).toString()),),
+                                                data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0),),
+                                            ),
+                                            Padding(
+                                              padding: EdgeInsets.only(left: CustomSize.sizeWidth(context) / 24),
+                                              child: MediaQuery(child: CustomText.bodyMedium16(text: randomRes22[index].name, sizeNew: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.04).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.04).toString())),
+                                                data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0),),
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                    ),
+                                  );
+                                }
+                            ),
+                          ):Container(),
+                          (randomRes22.toString() != '[]')?SizedBox(height: CustomSize.sizeHeight(context) / 48,):Container(),
+
+                          (randomRes23.toString() != '[]')?Padding(
+                            padding: EdgeInsets.symmetric(horizontal: CustomSize.sizeWidth(context) / 24),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                MediaQuery(
+                                  child: CustomText.textTitle2(
+                                    text: tipe23,
+                                    maxLines: 1,
+                                    sizeNew: double.parse(((MediaQuery.of(context).size.width*0.045).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.045)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.045)).toString()),
+                                  ),
+                                  data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0),
+                                ),
+                                GestureDetector(
+                                  onTap: ()async{
+                                    SharedPreferences pref = await SharedPreferences.getInstance();
+                                    pref.setString("pgtipe", tipe23);
+                                    Navigator.push(
+                                        context,
+                                        PageTransition(
+                                            type: PageTransitionType.rightToLeft,
+                                            child: new FoodTruckActivity()));
+                                  },
+                                  child: MediaQuery(
+                                    child: CustomText.bodyMedium12(
+                                      text: "Lebih banyak",
+                                      color: CustomColor.primary,
+                                      maxLines: 1,
+                                      sizeNew: double.parse(((MediaQuery.of(context).size.width*0.03).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.03)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.03)).toString()),
+                                    ),
+                                    data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ):Container(),
+                          (randomRes23.toString() != '[]')?Container(
+                            width: CustomSize.sizeWidth(context),
+                            height: CustomSize.sizeHeight(context) / 3.6,
+                            child: ListView.builder(
+                                scrollDirection: Axis.horizontal,
+                                itemCount: (randomRes23.length < 10)?randomRes23.length:10,
+                                itemBuilder: (_, index){
+                                  return Padding(
+                                    padding: EdgeInsets.only(
+                                        left: CustomSize.sizeWidth(context) / 20,
+                                        top: CustomSize.sizeHeight(context) / 86,
+                                        bottom: CustomSize.sizeHeight(context) / 86),
+                                    child: GestureDetector(
+                                      onTap: (){
+                                        // print(again[index].id.toString()+ 'ini id Pesan lagi');
+                                        Navigator.push(
+                                            context,
+                                            PageTransition(
+                                                type: PageTransitionType.rightToLeft,
+                                                child: new DetailResto(randomRes23[index].id.toString())));
+                                      },
+                                      child: Container(
+                                        width: CustomSize.sizeWidth(context) / 2.3,
+                                        height: CustomSize.sizeHeight(context) / 3.6,
+                                        decoration: BoxDecoration(
+                                          color: Colors.white,
+                                          borderRadius: BorderRadius.circular(20),
+                                          boxShadow: [
+                                            BoxShadow(
+                                              color: Colors.grey.withOpacity(0.5),
+                                              spreadRadius: 0,
+                                              blurRadius: 4,
+                                              offset: Offset(0, 3), // changes position of shadow
+                                            ),
+                                          ],
+                                        ),
+                                        child: Column(
+                                          crossAxisAlignment: CrossAxisAlignment.start,
+                                          children: [
+                                            (randomRes23[index].status.toString() == 'active')?(randomRes23[index].isOpen.toString() == 'true')?Container(
+                                              width: CustomSize.sizeWidth(context) / 2.3,
+                                              height: CustomSize.sizeHeight(context) / 5.8,
+                                              decoration: BoxDecoration(
+                                                color: (randomRes23[index].img != '')?Colors.transparent:CustomColor.primary,
+                                                image: (randomRes23[index].img != '')?DecorationImage(
+                                                    image: NetworkImage(Links.subUrl + randomRes23[index].img!),
+                                                    fit: BoxFit.cover
+                                                ):DecorationImage(
+                                                    image: AssetImage("assets/irgLogo.png"),
+                                                    fit: BoxFit.contain
+                                                ),
+                                                borderRadius: BorderRadius.circular(20),
+                                              ),
+                                            ):Container(
+                                              width: CustomSize.sizeWidth(context) / 2.3,
+                                              height: CustomSize.sizeHeight(context) / 5.8,
+                                              child: ClipRRect(
+                                                borderRadius: BorderRadius.circular(20),
+                                                child: ColorFiltered(
+                                                  colorFilter: ColorFilter.mode(
+                                                    Colors.grey,
+                                                    BlendMode.saturation,
+                                                  ),
+                                                  child: Container(
+                                                    decoration: BoxDecoration(
+                                                      color: (randomRes23[index].img != '')?Colors.transparent:CustomColor.primary,
+                                                      image: (randomRes23[index].img != '')?DecorationImage(
+                                                          image: NetworkImage(Links.subUrl + randomRes23[index].img!),
+                                                          fit: BoxFit.cover
+                                                      ):DecorationImage(
+                                                          image: AssetImage("assets/irgLogo.png"),
+                                                          fit: BoxFit.contain
+                                                      ),
+                                                      borderRadius: BorderRadius.circular(20),
+                                                    ),
+                                                  ),
+                                                ),
+                                              ),
+                                            ):Container(
+                                              width: CustomSize.sizeWidth(context) / 2.3,
+                                              height: CustomSize.sizeHeight(context) / 5.8,
+                                              child: ClipRRect(
+                                                borderRadius: BorderRadius.circular(20),
+                                                child: ColorFiltered(
+                                                  colorFilter: ColorFilter.mode(
+                                                    Colors.grey,
+                                                    BlendMode.saturation,
+                                                  ),
+                                                  child: Container(
+                                                    decoration: BoxDecoration(
+                                                      color: (randomRes23[index].img != '')?Colors.transparent:CustomColor.primary,
+                                                      image: (randomRes23[index].img != '')?DecorationImage(
+                                                          image: NetworkImage(Links.subUrl + randomRes23[index].img!),
+                                                          fit: BoxFit.cover
+                                                      ):DecorationImage(
+                                                          image: AssetImage("assets/irgLogo.png"),
+                                                          fit: BoxFit.contain
+                                                      ),
+                                                      borderRadius: BorderRadius.circular(20),
+                                                    ),
+                                                  ),
+                                                ),
+                                              ),
+                                            ),
+                                            SizedBox(height: CustomSize.sizeHeight(context) / 86,),
+                                            Padding(
+                                              padding: EdgeInsets.only(left: CustomSize.sizeWidth(context) / 24),
+                                              child: MediaQuery(child: CustomText.bodyRegular14(text: randomRes23[index].distance.toString() + " Km",sizeNew: double.parse(((MediaQuery.of(context).size.width*0.035).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.035).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.035).toString()),),
+                                                data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0),),
+                                            ),
+                                            Padding(
+                                              padding: EdgeInsets.only(left: CustomSize.sizeWidth(context) / 24),
+                                              child: MediaQuery(child: CustomText.bodyMedium16(text: randomRes23[index].name, sizeNew: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.04).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.04).toString())),
+                                                data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0),),
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                    ),
+                                  );
+                                }
+                            ),
+                          ):Container(),
+                          (randomRes23.toString() != '[]')?SizedBox(height: CustomSize.sizeHeight(context) / 48,):Container(),
+
+                          (randomRes24.toString() != '[]')?Padding(
+                            padding: EdgeInsets.symmetric(horizontal: CustomSize.sizeWidth(context) / 24),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                MediaQuery(
+                                  child: CustomText.textTitle2(
+                                    text: tipe24,
+                                    maxLines: 1,
+                                    sizeNew: double.parse(((MediaQuery.of(context).size.width*0.045).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.045)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.045)).toString()),
+                                  ),
+                                  data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0),
+                                ),
+                                GestureDetector(
+                                  onTap: ()async{
+                                    SharedPreferences pref = await SharedPreferences.getInstance();
+                                    pref.setString("pgtipe", tipe24);
+                                    Navigator.push(
+                                        context,
+                                        PageTransition(
+                                            type: PageTransitionType.rightToLeft,
+                                            child: new FoodTruckActivity()));
+                                  },
+                                  child: MediaQuery(
+                                    child: CustomText.bodyMedium12(
+                                      text: "Lebih banyak",
+                                      color: CustomColor.primary,
+                                      maxLines: 1,
+                                      sizeNew: double.parse(((MediaQuery.of(context).size.width*0.03).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.03)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.03)).toString()),
+                                    ),
+                                    data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ):Container(),
+                          (randomRes24.toString() != '[]')?Container(
+                            width: CustomSize.sizeWidth(context),
+                            height: CustomSize.sizeHeight(context) / 3.6,
+                            child: ListView.builder(
+                                scrollDirection: Axis.horizontal,
+                                itemCount: (randomRes24.length < 10)?randomRes24.length:10,
+                                itemBuilder: (_, index){
+                                  return Padding(
+                                    padding: EdgeInsets.only(
+                                        left: CustomSize.sizeWidth(context) / 20,
+                                        top: CustomSize.sizeHeight(context) / 86,
+                                        bottom: CustomSize.sizeHeight(context) / 86),
+                                    child: GestureDetector(
+                                      onTap: (){
+                                        // print(again[index].id.toString()+ 'ini id Pesan lagi');
+                                        Navigator.push(
+                                            context,
+                                            PageTransition(
+                                                type: PageTransitionType.rightToLeft,
+                                                child: new DetailResto(randomRes24[index].id.toString())));
+                                      },
+                                      child: Container(
+                                        width: CustomSize.sizeWidth(context) / 2.3,
+                                        height: CustomSize.sizeHeight(context) / 3.6,
+                                        decoration: BoxDecoration(
+                                          color: Colors.white,
+                                          borderRadius: BorderRadius.circular(20),
+                                          boxShadow: [
+                                            BoxShadow(
+                                              color: Colors.grey.withOpacity(0.5),
+                                              spreadRadius: 0,
+                                              blurRadius: 4,
+                                              offset: Offset(0, 3), // changes position of shadow
+                                            ),
+                                          ],
+                                        ),
+                                        child: Column(
+                                          crossAxisAlignment: CrossAxisAlignment.start,
+                                          children: [
+                                            (randomRes24[index].status.toString() == 'active')?(randomRes24[index].isOpen.toString() == 'true')?Container(
+                                              width: CustomSize.sizeWidth(context) / 2.3,
+                                              height: CustomSize.sizeHeight(context) / 5.8,
+                                              decoration: BoxDecoration(
+                                                color: (randomRes24[index].img != '')?Colors.transparent:CustomColor.primary,
+                                                image: (randomRes24[index].img != '')?DecorationImage(
+                                                    image: NetworkImage(Links.subUrl + randomRes24[index].img!),
+                                                    fit: BoxFit.cover
+                                                ):DecorationImage(
+                                                    image: AssetImage("assets/irgLogo.png"),
+                                                    fit: BoxFit.contain
+                                                ),
+                                                borderRadius: BorderRadius.circular(20),
+                                              ),
+                                            ):Container(
+                                              width: CustomSize.sizeWidth(context) / 2.3,
+                                              height: CustomSize.sizeHeight(context) / 5.8,
+                                              child: ClipRRect(
+                                                borderRadius: BorderRadius.circular(20),
+                                                child: ColorFiltered(
+                                                  colorFilter: ColorFilter.mode(
+                                                    Colors.grey,
+                                                    BlendMode.saturation,
+                                                  ),
+                                                  child: Container(
+                                                    decoration: BoxDecoration(
+                                                      color: (randomRes24[index].img != '')?Colors.transparent:CustomColor.primary,
+                                                      image: (randomRes24[index].img != '')?DecorationImage(
+                                                          image: NetworkImage(Links.subUrl + randomRes24[index].img!),
+                                                          fit: BoxFit.cover
+                                                      ):DecorationImage(
+                                                          image: AssetImage("assets/irgLogo.png"),
+                                                          fit: BoxFit.contain
+                                                      ),
+                                                      borderRadius: BorderRadius.circular(20),
+                                                    ),
+                                                  ),
+                                                ),
+                                              ),
+                                            ):Container(
+                                              width: CustomSize.sizeWidth(context) / 2.3,
+                                              height: CustomSize.sizeHeight(context) / 5.8,
+                                              child: ClipRRect(
+                                                borderRadius: BorderRadius.circular(20),
+                                                child: ColorFiltered(
+                                                  colorFilter: ColorFilter.mode(
+                                                    Colors.grey,
+                                                    BlendMode.saturation,
+                                                  ),
+                                                  child: Container(
+                                                    decoration: BoxDecoration(
+                                                      color: (randomRes24[index].img != '')?Colors.transparent:CustomColor.primary,
+                                                      image: (randomRes24[index].img != '')?DecorationImage(
+                                                          image: NetworkImage(Links.subUrl + randomRes24[index].img!),
+                                                          fit: BoxFit.cover
+                                                      ):DecorationImage(
+                                                          image: AssetImage("assets/irgLogo.png"),
+                                                          fit: BoxFit.contain
+                                                      ),
+                                                      borderRadius: BorderRadius.circular(20),
+                                                    ),
+                                                  ),
+                                                ),
+                                              ),
+                                            ),
+                                            SizedBox(height: CustomSize.sizeHeight(context) / 86,),
+                                            Padding(
+                                              padding: EdgeInsets.only(left: CustomSize.sizeWidth(context) / 24),
+                                              child: MediaQuery(child: CustomText.bodyRegular14(text: randomRes24[index].distance.toString() + " Km",sizeNew: double.parse(((MediaQuery.of(context).size.width*0.035).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.035).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.035).toString()),),
+                                                data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0),),
+                                            ),
+                                            Padding(
+                                              padding: EdgeInsets.only(left: CustomSize.sizeWidth(context) / 24),
+                                              child: MediaQuery(child: CustomText.bodyMedium16(text: randomRes24[index].name, sizeNew: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.04).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.04).toString())),
+                                                data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0),),
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                    ),
+                                  );
+                                }
+                            ),
+                          ):Container(),
+                          (randomRes24.toString() != '[]')?SizedBox(height: CustomSize.sizeHeight(context) / 48,):Container(),
+
+                          (randomRes25.toString() != '[]')?Padding(
+                            padding: EdgeInsets.symmetric(horizontal: CustomSize.sizeWidth(context) / 24),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                MediaQuery(
+                                  child: CustomText.textTitle2(
+                                    text: tipe25,
+                                    maxLines: 1,
+                                    sizeNew: double.parse(((MediaQuery.of(context).size.width*0.045).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.045)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.045)).toString()),
+                                  ),
+                                  data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0),
+                                ),
+                                GestureDetector(
+                                  onTap: ()async{
+                                    SharedPreferences pref = await SharedPreferences.getInstance();
+                                    pref.setString("pgtipe", tipe25);
+                                    Navigator.push(
+                                        context,
+                                        PageTransition(
+                                            type: PageTransitionType.rightToLeft,
+                                            child: new FoodTruckActivity()));
+                                  },
+                                  child: MediaQuery(
+                                    child: CustomText.bodyMedium12(
+                                      text: "Lebih banyak",
+                                      color: CustomColor.primary,
+                                      maxLines: 1,
+                                      sizeNew: double.parse(((MediaQuery.of(context).size.width*0.03).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.03)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.03)).toString()),
+                                    ),
+                                    data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ):Container(),
+                          (randomRes25.toString() != '[]')?Container(
+                            width: CustomSize.sizeWidth(context),
+                            height: CustomSize.sizeHeight(context) / 3.6,
+                            child: ListView.builder(
+                                scrollDirection: Axis.horizontal,
+                                itemCount: (randomRes25.length < 10)?randomRes25.length:10,
+                                itemBuilder: (_, index){
+                                  return Padding(
+                                    padding: EdgeInsets.only(
+                                        left: CustomSize.sizeWidth(context) / 20,
+                                        top: CustomSize.sizeHeight(context) / 86,
+                                        bottom: CustomSize.sizeHeight(context) / 86),
+                                    child: GestureDetector(
+                                      onTap: (){
+                                        // print(again[index].id.toString()+ 'ini id Pesan lagi');
+                                        Navigator.push(
+                                            context,
+                                            PageTransition(
+                                                type: PageTransitionType.rightToLeft,
+                                                child: new DetailResto(randomRes25[index].id.toString())));
+                                      },
+                                      child: Container(
+                                        width: CustomSize.sizeWidth(context) / 2.3,
+                                        height: CustomSize.sizeHeight(context) / 3.6,
+                                        decoration: BoxDecoration(
+                                          color: Colors.white,
+                                          borderRadius: BorderRadius.circular(20),
+                                          boxShadow: [
+                                            BoxShadow(
+                                              color: Colors.grey.withOpacity(0.5),
+                                              spreadRadius: 0,
+                                              blurRadius: 4,
+                                              offset: Offset(0, 3), // changes position of shadow
+                                            ),
+                                          ],
+                                        ),
+                                        child: Column(
+                                          crossAxisAlignment: CrossAxisAlignment.start,
+                                          children: [
+                                            (randomRes25[index].status.toString() == 'active')?(randomRes25[index].isOpen.toString() == 'true')?Container(
+                                              width: CustomSize.sizeWidth(context) / 2.3,
+                                              height: CustomSize.sizeHeight(context) / 5.8,
+                                              decoration: BoxDecoration(
+                                                color: (randomRes25[index].img != '')?Colors.transparent:CustomColor.primary,
+                                                image: (randomRes25[index].img != '')?DecorationImage(
+                                                    image: NetworkImage(Links.subUrl + randomRes25[index].img!),
+                                                    fit: BoxFit.cover
+                                                ):DecorationImage(
+                                                    image: AssetImage("assets/irgLogo.png"),
+                                                    fit: BoxFit.contain
+                                                ),
+                                                borderRadius: BorderRadius.circular(20),
+                                              ),
+                                            ):Container(
+                                              width: CustomSize.sizeWidth(context) / 2.3,
+                                              height: CustomSize.sizeHeight(context) / 5.8,
+                                              child: ClipRRect(
+                                                borderRadius: BorderRadius.circular(20),
+                                                child: ColorFiltered(
+                                                  colorFilter: ColorFilter.mode(
+                                                    Colors.grey,
+                                                    BlendMode.saturation,
+                                                  ),
+                                                  child: Container(
+                                                    decoration: BoxDecoration(
+                                                      color: (randomRes25[index].img != '')?Colors.transparent:CustomColor.primary,
+                                                      image: (randomRes25[index].img != '')?DecorationImage(
+                                                          image: NetworkImage(Links.subUrl + randomRes25[index].img!),
+                                                          fit: BoxFit.cover
+                                                      ):DecorationImage(
+                                                          image: AssetImage("assets/irgLogo.png"),
+                                                          fit: BoxFit.contain
+                                                      ),
+                                                      borderRadius: BorderRadius.circular(20),
+                                                    ),
+                                                  ),
+                                                ),
+                                              ),
+                                            ):Container(
+                                              width: CustomSize.sizeWidth(context) / 2.3,
+                                              height: CustomSize.sizeHeight(context) / 5.8,
+                                              child: ClipRRect(
+                                                borderRadius: BorderRadius.circular(20),
+                                                child: ColorFiltered(
+                                                  colorFilter: ColorFilter.mode(
+                                                    Colors.grey,
+                                                    BlendMode.saturation,
+                                                  ),
+                                                  child: Container(
+                                                    decoration: BoxDecoration(
+                                                      color: (randomRes25[index].img != '')?Colors.transparent:CustomColor.primary,
+                                                      image: (randomRes25[index].img != '')?DecorationImage(
+                                                          image: NetworkImage(Links.subUrl + randomRes25[index].img!),
+                                                          fit: BoxFit.cover
+                                                      ):DecorationImage(
+                                                          image: AssetImage("assets/irgLogo.png"),
+                                                          fit: BoxFit.contain
+                                                      ),
+                                                      borderRadius: BorderRadius.circular(20),
+                                                    ),
+                                                  ),
+                                                ),
+                                              ),
+                                            ),
+                                            SizedBox(height: CustomSize.sizeHeight(context) / 86,),
+                                            Padding(
+                                              padding: EdgeInsets.only(left: CustomSize.sizeWidth(context) / 24),
+                                              child: MediaQuery(child: CustomText.bodyRegular14(text: randomRes25[index].distance.toString() + " Km",sizeNew: double.parse(((MediaQuery.of(context).size.width*0.035).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.035).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.035).toString()),),
+                                                data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0),),
+                                            ),
+                                            Padding(
+                                              padding: EdgeInsets.only(left: CustomSize.sizeWidth(context) / 24),
+                                              child: MediaQuery(child: CustomText.bodyMedium16(text: randomRes25[index].name, sizeNew: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.04).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.04).toString())),
+                                                data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0),),
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                    ),
+                                  );
+                                }
+                            ),
+                          ):Container(),
+                          (randomRes25.toString() != '[]')?SizedBox(height: CustomSize.sizeHeight(context) / 48,):Container(),
+
+                          (randomRes26.toString() != '[]')?Padding(
+                            padding: EdgeInsets.symmetric(horizontal: CustomSize.sizeWidth(context) / 24),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                MediaQuery(
+                                  child: CustomText.textTitle2(
+                                    text: tipe26,
+                                    maxLines: 1,
+                                    sizeNew: double.parse(((MediaQuery.of(context).size.width*0.045).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.045)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.045)).toString()),
+                                  ),
+                                  data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0),
+                                ),
+                                GestureDetector(
+                                  onTap: ()async{
+                                    SharedPreferences pref = await SharedPreferences.getInstance();
+                                    pref.setString("pgtipe", tipe26);
+                                    Navigator.push(
+                                        context,
+                                        PageTransition(
+                                            type: PageTransitionType.rightToLeft,
+                                            child: new FoodTruckActivity()));
+                                  },
+                                  child: MediaQuery(
+                                    child: CustomText.bodyMedium12(
+                                      text: "Lebih banyak",
+                                      color: CustomColor.primary,
+                                      maxLines: 1,
+                                      sizeNew: double.parse(((MediaQuery.of(context).size.width*0.03).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.03)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.03)).toString()),
+                                    ),
+                                    data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ):Container(),
+                          (randomRes26.toString() != '[]')?Container(
+                            width: CustomSize.sizeWidth(context),
+                            height: CustomSize.sizeHeight(context) / 3.6,
+                            child: ListView.builder(
+                                scrollDirection: Axis.horizontal,
+                                itemCount: (randomRes26.length < 10)?randomRes26.length:10,
+                                itemBuilder: (_, index){
+                                  return Padding(
+                                    padding: EdgeInsets.only(
+                                        left: CustomSize.sizeWidth(context) / 20,
+                                        top: CustomSize.sizeHeight(context) / 86,
+                                        bottom: CustomSize.sizeHeight(context) / 86),
+                                    child: GestureDetector(
+                                      onTap: (){
+                                        // print(again[index].id.toString()+ 'ini id Pesan lagi');
+                                        Navigator.push(
+                                            context,
+                                            PageTransition(
+                                                type: PageTransitionType.rightToLeft,
+                                                child: new DetailResto(randomRes26[index].id.toString())));
+                                      },
+                                      child: Container(
+                                        width: CustomSize.sizeWidth(context) / 2.3,
+                                        height: CustomSize.sizeHeight(context) / 3.6,
+                                        decoration: BoxDecoration(
+                                          color: Colors.white,
+                                          borderRadius: BorderRadius.circular(20),
+                                          boxShadow: [
+                                            BoxShadow(
+                                              color: Colors.grey.withOpacity(0.5),
+                                              spreadRadius: 0,
+                                              blurRadius: 4,
+                                              offset: Offset(0, 3), // changes position of shadow
+                                            ),
+                                          ],
+                                        ),
+                                        child: Column(
+                                          crossAxisAlignment: CrossAxisAlignment.start,
+                                          children: [
+                                            (randomRes26[index].status.toString() == 'active')?(randomRes26[index].isOpen.toString() == 'true')?Container(
+                                              width: CustomSize.sizeWidth(context) / 2.3,
+                                              height: CustomSize.sizeHeight(context) / 5.8,
+                                              decoration: BoxDecoration(
+                                                color: (randomRes26[index].img != '')?Colors.transparent:CustomColor.primary,
+                                                image: (randomRes26[index].img != '')?DecorationImage(
+                                                    image: NetworkImage(Links.subUrl + randomRes26[index].img!),
+                                                    fit: BoxFit.cover
+                                                ):DecorationImage(
+                                                    image: AssetImage("assets/irgLogo.png"),
+                                                    fit: BoxFit.contain
+                                                ),
+                                                borderRadius: BorderRadius.circular(20),
+                                              ),
+                                            ):Container(
+                                              width: CustomSize.sizeWidth(context) / 2.3,
+                                              height: CustomSize.sizeHeight(context) / 5.8,
+                                              child: ClipRRect(
+                                                borderRadius: BorderRadius.circular(20),
+                                                child: ColorFiltered(
+                                                  colorFilter: ColorFilter.mode(
+                                                    Colors.grey,
+                                                    BlendMode.saturation,
+                                                  ),
+                                                  child: Container(
+                                                    decoration: BoxDecoration(
+                                                      color: (randomRes26[index].img != '')?Colors.transparent:CustomColor.primary,
+                                                      image: (randomRes26[index].img != '')?DecorationImage(
+                                                          image: NetworkImage(Links.subUrl + randomRes26[index].img!),
+                                                          fit: BoxFit.cover
+                                                      ):DecorationImage(
+                                                          image: AssetImage("assets/irgLogo.png"),
+                                                          fit: BoxFit.contain
+                                                      ),
+                                                      borderRadius: BorderRadius.circular(20),
+                                                    ),
+                                                  ),
+                                                ),
+                                              ),
+                                            ):Container(
+                                              width: CustomSize.sizeWidth(context) / 2.3,
+                                              height: CustomSize.sizeHeight(context) / 5.8,
+                                              child: ClipRRect(
+                                                borderRadius: BorderRadius.circular(20),
+                                                child: ColorFiltered(
+                                                  colorFilter: ColorFilter.mode(
+                                                    Colors.grey,
+                                                    BlendMode.saturation,
+                                                  ),
+                                                  child: Container(
+                                                    decoration: BoxDecoration(
+                                                      color: (randomRes26[index].img != '')?Colors.transparent:CustomColor.primary,
+                                                      image: (randomRes26[index].img != '')?DecorationImage(
+                                                          image: NetworkImage(Links.subUrl + randomRes26[index].img!),
+                                                          fit: BoxFit.cover
+                                                      ):DecorationImage(
+                                                          image: AssetImage("assets/irgLogo.png"),
+                                                          fit: BoxFit.contain
+                                                      ),
+                                                      borderRadius: BorderRadius.circular(20),
+                                                    ),
+                                                  ),
+                                                ),
+                                              ),
+                                            ),
+                                            SizedBox(height: CustomSize.sizeHeight(context) / 86,),
+                                            Padding(
+                                              padding: EdgeInsets.only(left: CustomSize.sizeWidth(context) / 24),
+                                              child: MediaQuery(child: CustomText.bodyRegular14(text: randomRes26[index].distance.toString() + " Km",sizeNew: double.parse(((MediaQuery.of(context).size.width*0.035).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.035).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.035).toString()),),
+                                                data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0),),
+                                            ),
+                                            Padding(
+                                              padding: EdgeInsets.only(left: CustomSize.sizeWidth(context) / 24),
+                                              child: MediaQuery(child: CustomText.bodyMedium16(text: randomRes26[index].name, sizeNew: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.04).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.04).toString())),
+                                                data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0),),
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                    ),
+                                  );
+                                }
+                            ),
+                          ):Container(),
+                          (randomRes26.toString() != '[]')?SizedBox(height: CustomSize.sizeHeight(context) / 48,):Container(),
+
+                          (randomRes27.toString() != '[]')?Padding(
+                            padding: EdgeInsets.symmetric(horizontal: CustomSize.sizeWidth(context) / 24),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                MediaQuery(
+                                  child: CustomText.textTitle2(
+                                    text: tipe27,
+                                    maxLines: 1,
+                                    sizeNew: double.parse(((MediaQuery.of(context).size.width*0.045).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.045)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.045)).toString()),
+                                  ),
+                                  data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0),
+                                ),
+                                GestureDetector(
+                                  onTap: ()async{
+                                    SharedPreferences pref = await SharedPreferences.getInstance();
+                                    pref.setString("pgtipe", tipe27);
+                                    Navigator.push(
+                                        context,
+                                        PageTransition(
+                                            type: PageTransitionType.rightToLeft,
+                                            child: new FoodTruckActivity()));
+                                  },
+                                  child: MediaQuery(
+                                    child: CustomText.bodyMedium12(
+                                      text: "Lebih banyak",
+                                      color: CustomColor.primary,
+                                      maxLines: 1,
+                                      sizeNew: double.parse(((MediaQuery.of(context).size.width*0.03).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.03)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.03)).toString()),
+                                    ),
+                                    data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ):Container(),
+                          (randomRes27.toString() != '[]')?Container(
+                            width: CustomSize.sizeWidth(context),
+                            height: CustomSize.sizeHeight(context) / 3.6,
+                            child: ListView.builder(
+                                scrollDirection: Axis.horizontal,
+                                itemCount: (randomRes27.length < 10)?randomRes27.length:10,
+                                itemBuilder: (_, index){
+                                  return Padding(
+                                    padding: EdgeInsets.only(
+                                        left: CustomSize.sizeWidth(context) / 20,
+                                        top: CustomSize.sizeHeight(context) / 86,
+                                        bottom: CustomSize.sizeHeight(context) / 86),
+                                    child: GestureDetector(
+                                      onTap: (){
+                                        // print(again[index].id.toString()+ 'ini id Pesan lagi');
+                                        Navigator.push(
+                                            context,
+                                            PageTransition(
+                                                type: PageTransitionType.rightToLeft,
+                                                child: new DetailResto(randomRes27[index].id.toString())));
+                                      },
+                                      child: Container(
+                                        width: CustomSize.sizeWidth(context) / 2.3,
+                                        height: CustomSize.sizeHeight(context) / 3.6,
+                                        decoration: BoxDecoration(
+                                          color: Colors.white,
+                                          borderRadius: BorderRadius.circular(20),
+                                          boxShadow: [
+                                            BoxShadow(
+                                              color: Colors.grey.withOpacity(0.5),
+                                              spreadRadius: 0,
+                                              blurRadius: 4,
+                                              offset: Offset(0, 3), // changes position of shadow
+                                            ),
+                                          ],
+                                        ),
+                                        child: Column(
+                                          crossAxisAlignment: CrossAxisAlignment.start,
+                                          children: [
+                                            (randomRes27[index].status.toString() == 'active')?(randomRes27[index].isOpen.toString() == 'true')?Container(
+                                              width: CustomSize.sizeWidth(context) / 2.3,
+                                              height: CustomSize.sizeHeight(context) / 5.8,
+                                              decoration: BoxDecoration(
+                                                color: (randomRes27[index].img != '')?Colors.transparent:CustomColor.primary,
+                                                image: (randomRes27[index].img != '')?DecorationImage(
+                                                    image: NetworkImage(Links.subUrl + randomRes27[index].img!),
+                                                    fit: BoxFit.cover
+                                                ):DecorationImage(
+                                                    image: AssetImage("assets/irgLogo.png"),
+                                                    fit: BoxFit.contain
+                                                ),
+                                                borderRadius: BorderRadius.circular(20),
+                                              ),
+                                            ):Container(
+                                              width: CustomSize.sizeWidth(context) / 2.3,
+                                              height: CustomSize.sizeHeight(context) / 5.8,
+                                              child: ClipRRect(
+                                                borderRadius: BorderRadius.circular(20),
+                                                child: ColorFiltered(
+                                                  colorFilter: ColorFilter.mode(
+                                                    Colors.grey,
+                                                    BlendMode.saturation,
+                                                  ),
+                                                  child: Container(
+                                                    decoration: BoxDecoration(
+                                                      color: (randomRes27[index].img != '')?Colors.transparent:CustomColor.primary,
+                                                      image: (randomRes27[index].img != '')?DecorationImage(
+                                                          image: NetworkImage(Links.subUrl + randomRes27[index].img!),
+                                                          fit: BoxFit.cover
+                                                      ):DecorationImage(
+                                                          image: AssetImage("assets/irgLogo.png"),
+                                                          fit: BoxFit.contain
+                                                      ),
+                                                      borderRadius: BorderRadius.circular(20),
+                                                    ),
+                                                  ),
+                                                ),
+                                              ),
+                                            ):Container(
+                                              width: CustomSize.sizeWidth(context) / 2.3,
+                                              height: CustomSize.sizeHeight(context) / 5.8,
+                                              child: ClipRRect(
+                                                borderRadius: BorderRadius.circular(20),
+                                                child: ColorFiltered(
+                                                  colorFilter: ColorFilter.mode(
+                                                    Colors.grey,
+                                                    BlendMode.saturation,
+                                                  ),
+                                                  child: Container(
+                                                    decoration: BoxDecoration(
+                                                      color: (randomRes27[index].img != '')?Colors.transparent:CustomColor.primary,
+                                                      image: (randomRes27[index].img != '')?DecorationImage(
+                                                          image: NetworkImage(Links.subUrl + randomRes27[index].img!),
+                                                          fit: BoxFit.cover
+                                                      ):DecorationImage(
+                                                          image: AssetImage("assets/irgLogo.png"),
+                                                          fit: BoxFit.contain
+                                                      ),
+                                                      borderRadius: BorderRadius.circular(20),
+                                                    ),
+                                                  ),
+                                                ),
+                                              ),
+                                            ),
+                                            SizedBox(height: CustomSize.sizeHeight(context) / 86,),
+                                            Padding(
+                                              padding: EdgeInsets.only(left: CustomSize.sizeWidth(context) / 24),
+                                              child: MediaQuery(child: CustomText.bodyRegular14(text: randomRes27[index].distance.toString() + " Km",sizeNew: double.parse(((MediaQuery.of(context).size.width*0.035).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.035).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.035).toString()),),
+                                                data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0),),
+                                            ),
+                                            Padding(
+                                              padding: EdgeInsets.only(left: CustomSize.sizeWidth(context) / 24),
+                                              child: MediaQuery(child: CustomText.bodyMedium16(text: randomRes27[index].name, sizeNew: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.04).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.04).toString())),
+                                                data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0),),
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                    ),
+                                  );
+                                }
+                            ),
+                          ):Container(),
+                          (randomRes27.toString() != '[]')?SizedBox(height: CustomSize.sizeHeight(context) / 48,):Container(),
+
+                          (randomRes28.toString() != '[]')?Padding(
+                            padding: EdgeInsets.symmetric(horizontal: CustomSize.sizeWidth(context) / 24),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                MediaQuery(
+                                  child: CustomText.textTitle2(
+                                    text: tipe28,
+                                    maxLines: 1,
+                                    sizeNew: double.parse(((MediaQuery.of(context).size.width*0.045).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.045)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.045)).toString()),
+                                  ),
+                                  data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0),
+                                ),
+                                GestureDetector(
+                                  onTap: ()async{
+                                    SharedPreferences pref = await SharedPreferences.getInstance();
+                                    pref.setString("pgtipe", tipe28);
+                                    Navigator.push(
+                                        context,
+                                        PageTransition(
+                                            type: PageTransitionType.rightToLeft,
+                                            child: new FoodTruckActivity()));
+                                  },
+                                  child: MediaQuery(
+                                    child: CustomText.bodyMedium12(
+                                      text: "Lebih banyak",
+                                      color: CustomColor.primary,
+                                      maxLines: 1,
+                                      sizeNew: double.parse(((MediaQuery.of(context).size.width*0.03).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.03)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.03)).toString()),
+                                    ),
+                                    data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ):Container(),
+                          (randomRes28.toString() != '[]')?Container(
+                            width: CustomSize.sizeWidth(context),
+                            height: CustomSize.sizeHeight(context) / 3.6,
+                            child: ListView.builder(
+                                scrollDirection: Axis.horizontal,
+                                itemCount: (randomRes28.length < 10)?randomRes28.length:10,
+                                itemBuilder: (_, index){
+                                  return Padding(
+                                    padding: EdgeInsets.only(
+                                        left: CustomSize.sizeWidth(context) / 20,
+                                        top: CustomSize.sizeHeight(context) / 86,
+                                        bottom: CustomSize.sizeHeight(context) / 86),
+                                    child: GestureDetector(
+                                      onTap: (){
+                                        // print(again[index].id.toString()+ 'ini id Pesan lagi');
+                                        Navigator.push(
+                                            context,
+                                            PageTransition(
+                                                type: PageTransitionType.rightToLeft,
+                                                child: new DetailResto(randomRes28[index].id.toString())));
+                                      },
+                                      child: Container(
+                                        width: CustomSize.sizeWidth(context) / 2.3,
+                                        height: CustomSize.sizeHeight(context) / 3.6,
+                                        decoration: BoxDecoration(
+                                          color: Colors.white,
+                                          borderRadius: BorderRadius.circular(20),
+                                          boxShadow: [
+                                            BoxShadow(
+                                              color: Colors.grey.withOpacity(0.5),
+                                              spreadRadius: 0,
+                                              blurRadius: 4,
+                                              offset: Offset(0, 3), // changes position of shadow
+                                            ),
+                                          ],
+                                        ),
+                                        child: Column(
+                                          crossAxisAlignment: CrossAxisAlignment.start,
+                                          children: [
+                                            (randomRes28[index].status.toString() == 'active')?(randomRes28[index].isOpen.toString() == 'true')?Container(
+                                              width: CustomSize.sizeWidth(context) / 2.3,
+                                              height: CustomSize.sizeHeight(context) / 5.8,
+                                              decoration: BoxDecoration(
+                                                color: (randomRes28[index].img != '')?Colors.transparent:CustomColor.primary,
+                                                image: (randomRes28[index].img != '')?DecorationImage(
+                                                    image: NetworkImage(Links.subUrl + randomRes28[index].img!),
+                                                    fit: BoxFit.cover
+                                                ):DecorationImage(
+                                                    image: AssetImage("assets/irgLogo.png"),
+                                                    fit: BoxFit.contain
+                                                ),
+                                                borderRadius: BorderRadius.circular(20),
+                                              ),
+                                            ):Container(
+                                              width: CustomSize.sizeWidth(context) / 2.3,
+                                              height: CustomSize.sizeHeight(context) / 5.8,
+                                              child: ClipRRect(
+                                                borderRadius: BorderRadius.circular(20),
+                                                child: ColorFiltered(
+                                                  colorFilter: ColorFilter.mode(
+                                                    Colors.grey,
+                                                    BlendMode.saturation,
+                                                  ),
+                                                  child: Container(
+                                                    decoration: BoxDecoration(
+                                                      color: (randomRes28[index].img != '')?Colors.transparent:CustomColor.primary,
+                                                      image: (randomRes28[index].img != '')?DecorationImage(
+                                                          image: NetworkImage(Links.subUrl + randomRes28[index].img!),
+                                                          fit: BoxFit.cover
+                                                      ):DecorationImage(
+                                                          image: AssetImage("assets/irgLogo.png"),
+                                                          fit: BoxFit.contain
+                                                      ),
+                                                      borderRadius: BorderRadius.circular(20),
+                                                    ),
+                                                  ),
+                                                ),
+                                              ),
+                                            ):Container(
+                                              width: CustomSize.sizeWidth(context) / 2.3,
+                                              height: CustomSize.sizeHeight(context) / 5.8,
+                                              child: ClipRRect(
+                                                borderRadius: BorderRadius.circular(20),
+                                                child: ColorFiltered(
+                                                  colorFilter: ColorFilter.mode(
+                                                    Colors.grey,
+                                                    BlendMode.saturation,
+                                                  ),
+                                                  child: Container(
+                                                    decoration: BoxDecoration(
+                                                      color: (randomRes28[index].img != '')?Colors.transparent:CustomColor.primary,
+                                                      image: (randomRes28[index].img != '')?DecorationImage(
+                                                          image: NetworkImage(Links.subUrl + randomRes28[index].img!),
+                                                          fit: BoxFit.cover
+                                                      ):DecorationImage(
+                                                          image: AssetImage("assets/irgLogo.png"),
+                                                          fit: BoxFit.contain
+                                                      ),
+                                                      borderRadius: BorderRadius.circular(20),
+                                                    ),
+                                                  ),
+                                                ),
+                                              ),
+                                            ),
+                                            SizedBox(height: CustomSize.sizeHeight(context) / 86,),
+                                            Padding(
+                                              padding: EdgeInsets.only(left: CustomSize.sizeWidth(context) / 24),
+                                              child: MediaQuery(child: CustomText.bodyRegular14(text: randomRes28[index].distance.toString() + " Km",sizeNew: double.parse(((MediaQuery.of(context).size.width*0.035).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.035).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.035).toString()),),
+                                                data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0),),
+                                            ),
+                                            Padding(
+                                              padding: EdgeInsets.only(left: CustomSize.sizeWidth(context) / 24),
+                                              child: MediaQuery(child: CustomText.bodyMedium16(text: randomRes28[index].name, sizeNew: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.04).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.04).toString())),
+                                                data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0),),
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                    ),
+                                  );
+                                }
+                            ),
+                          ):Container(),
+                          (randomRes28.toString() != '[]')?SizedBox(height: CustomSize.sizeHeight(context) / 48,):Container(),
+
                           // (randomRes7.toString() != '[]')?Padding(
                           //   padding: EdgeInsets.symmetric(horizontal: CustomSize.sizeWidth(context) / 24),
                           //   child: Row(
@@ -7836,7 +8909,7 @@ class _HomeActivityState extends State<HomeActivity> with WidgetsBindingObserver
                           ):Container(),
                         ],
                       ),
-                      (again.toString() != '[]')?SizedBox(height: CustomSize.sizeHeight(context) / 8,):SizedBox(height: CustomSize.sizeHeight(context) / 10,)
+                      (again.toString() != '[]')?SizedBox(height: CustomSize.sizeHeight(context) / 14,):SizedBox(height: CustomSize.sizeHeight(context) / 10,)
                     ],
                   ),
                 ],

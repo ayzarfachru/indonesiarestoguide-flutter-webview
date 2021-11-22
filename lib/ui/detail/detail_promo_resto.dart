@@ -465,14 +465,48 @@ class _DetailPromoResto extends State<DetailPromoResto> {
                       SizedBox(
                         height: CustomSize.sizeHeight(context) / 32,
                       ),
-                      (homepg != "1")?MediaQuery(
-                        child: CustomText.textHeading3(
-                            text: "Promo",
-                            color: CustomColor.primary,
-                            sizeNew: double.parse(((MediaQuery.of(context).size.width*0.06).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.06)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.06)).toString()),
-                            maxLines: 1
-                        ),
-                          data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0)
+                      (homepg != "1")?Row(
+                        children: [
+                          GestureDetector(
+                              onTap: () async{
+                                SharedPreferences pref = await SharedPreferences.getInstance();
+                                pref.setString("homepg", "");
+                                pref.setString("idresto", "");
+                                Navigator.pushReplacement(context, MaterialPageRoute(builder: (context)=> DetailResto(id)));
+                              },
+                              child: Container(
+                                  width: CustomSize.sizeWidth(context) / 7,
+                                  height: CustomSize.sizeWidth(context) / 7,
+                                  decoration: BoxDecoration(
+                                    color: Colors.white,
+                                    shape: BoxShape.circle,
+                                    boxShadow: [
+                                      BoxShadow(
+                                        color: Colors.grey.withOpacity(0.5),
+                                        spreadRadius: 0,
+                                        blurRadius: 7,
+                                        offset: Offset(0, 0), // changes position of shadow
+                                      ),
+                                    ],
+                                  ),
+                                  child: Center(child: Icon(Icons.chevron_left, size: 38,)))
+                          ),
+                          SizedBox(
+                            width: CustomSize.sizeWidth(context) / 48,
+                          ),
+                          Container(
+                            width: CustomSize.sizeWidth(context) / 1.5,
+                            child: MediaQuery(
+                              child: CustomText.textHeading3(
+                                  text: "Promo",
+                                  color: CustomColor.primary,
+                                  sizeNew: double.parse(((MediaQuery.of(context).size.width*0.06).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.06)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.06)).toString()),
+                                  maxLines: 2
+                              ),
+                                data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0)
+                            ),
+                          ),
+                        ],
                       ):MediaQuery(
                         child: CustomText.textHeading3(
                             text: "Promo di Restoranmu",

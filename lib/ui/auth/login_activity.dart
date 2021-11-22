@@ -158,9 +158,11 @@ class _LoginActivityState extends State<LoginActivity> {
     return Future.value(true);
   }
 
+  bool terms = false;
+
   @override
   void initState() {
-    idPlayer();
+    // idPlayer();
     super.initState();
   }
 
@@ -210,7 +212,9 @@ class _LoginActivityState extends State<LoginActivity> {
                     height: CustomSize.sizeHeight(context) / 22,
                   ),
                   GestureDetector(
-                    onDoubleTap: (){_login('admin@admin.com', 'adminadmin');},
+                    onDoubleTap: (){
+                      // _login('admin@admin.com', 'adminadmin');
+                      },
                     child: Container(
                         alignment: Alignment.center,
                         child: MediaQuery(child: CustomText.textHeading2(text: "Sign in and explore !", sizeNew: double.parse(((MediaQuery.of(context).size.width*0.08).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.08).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.08).toString())),
@@ -409,11 +413,127 @@ class _LoginActivityState extends State<LoginActivity> {
                     height: CustomSize.sizeHeight(context) * 0.005,
                   ),
                   Divider(),
-                  SizedBox(
-                    height: CustomSize.sizeHeight(context) * 0.005,
+                  // SizedBox(
+                  //   height: CustomSize.sizeHeight(context) * 0.005,
+                  // ),
+                  Row(
+                    mainAxisSize: MainAxisSize.max,
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    children: [
+                      Checkbox(
+                        value: terms,
+                        onChanged: (bool? value) {
+                          setState(() {
+                            terms = value!;
+                          });
+                        },
+                      ),
+                      GestureDetector(
+                        onTap: (){
+                          showDialog(
+                              context: context,
+                              builder: (context) {
+                                return AlertDialog(
+                                  contentPadding: EdgeInsets.only(left: 25, right: 25, top: 15, bottom: 5),
+                                  shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.all(Radius.circular(10))
+                                  ),
+                                  title: Center(child: Text('Terms Conditions', style: TextStyle(color: CustomColor.redBtn, fontSize: double.parse(((MediaQuery.of(context).size.width*0.06).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.06)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.06)).toString())))),
+                                  content: Container(
+                                    height: CustomSize.sizeHeight(context) / 2,
+                                    width: CustomSize.sizeWidth(context) / 1.5,
+                                    child: ListView(
+                                      physics: AlwaysScrollableScrollPhysics(),
+                                      padding: EdgeInsets.zero,
+                                      shrinkWrap: true,
+                                      children: [
+                                        Text('Pendahuluan', style: TextStyle(fontSize: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.04)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.04)).toString()), fontWeight: FontWeight.w500), textAlign: TextAlign.start),
+                                        Text('', style: TextStyle(fontSize: double.parse(((MediaQuery.of(context).size.width*0.03).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.03)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.03)).toString()), fontWeight: FontWeight.w500), textAlign: TextAlign.start),
+                                        Text('PT Imaji Cipta (mempunyai produk yang disebut “Indonesia Resto Guide”) ialah suatu perseroan terbatas yang salah satu jenis usahanya berkecimpung pada bidang portal penjualan di bidang kuliner. Indonesia Resto Guide. PT Imaji Cipta dalam hal ini menyediakan Platform penjualan elektronik (e-commerce) di mana Pengguna dapat melakukan transaksi jual-beli, menggunakan berbagai fitur serta layanan yang tersedia. Setiap pihak yang berada pada wilayah Negara Kesatuan Republik Indonesia bisa mengakses Platform Indonesia Resto Guide untuk membuka lapangan penjualan di bidang kuliner, menggunakan layanan, atau hanya sekedar mengakses / mengunjungi. \n\nSyarat & ketentuan yang telah ditetapkan untuk mengatur pemakaian jasa yang ditawarkan oleh PT. Imaji Cipta terkait penggunaan perangkat lunak Indonesia Resto Guide. Pengguna disarankan membaca dengan seksama karena dapat berdampak pada hak dan kewajiban Pengguna di bawah aturan. dengan mendaftar akun Indonesia Resto Guide dan /atau memakai Platform Indonesia Resto Guide, maka Pengguna dianggap sudah membaca, mengerti, tahu serta menyetujui seluruh isi pada aturan Penggunaan. Jika pengguna tidak menyetujui salah satu, pesebagian, atau semua isi syarat & ketentuan, maka pengguna tidak diperkenankan memakai layanan Indonesia Resto Guide.', style: TextStyle(fontSize: double.parse(((MediaQuery.of(context).size.width*0.035).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.035)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.035)).toString()), fontWeight: FontWeight.w400), textAlign: TextAlign.start),
+                                        Text('', style: TextStyle(fontSize: double.parse(((MediaQuery.of(context).size.width*0.03).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.03)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.03)).toString()), fontWeight: FontWeight.w500), textAlign: TextAlign.start),
+                                        Text('Definisi', style: TextStyle(fontSize: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.04)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.04)).toString()), fontWeight: FontWeight.w500), textAlign: TextAlign.start),
+                                        Text('', style: TextStyle(fontSize: double.parse(((MediaQuery.of(context).size.width*0.03).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.03)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.03)).toString()), fontWeight: FontWeight.w500), textAlign: TextAlign.start),
+                                        Text('Dalam Aturan Penggunaan istilah-istilah di bawah ini mempunyai arti sebagai berikut:', style: TextStyle(fontSize: double.parse(((MediaQuery.of(context).size.width*0.03).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.03)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.03)).toString()), fontWeight: FontWeight.w500), textAlign: TextAlign.start),
+                                        Text('', style: TextStyle(fontSize: double.parse(((MediaQuery.of(context).size.width*0.03).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.03)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.03)).toString()), fontWeight: FontWeight.w500), textAlign: TextAlign.start),
+                                        Text('1.)	PT. Imaji Cipta (Indonesia Resto Guide) adalah suatu perseroan terbatas yang menjalankan kegiatan usaha jasa aplikasi Indonesia Resto Guide, yakni aplikasi pencarian lapak dan Kuliner yang dijual oleh penjual terdaftar. Yang selanjutnya disebut Indonesia Resto Guide. \n\n2.)	Akun adalah data tentang Pengguna, minimum terdiri dari nama, password, nomor telepon, dan email yang wajib diisi oleh Pengguna Terdaftar. \n\n3.)	Platform Indonesia Resto Guide adalah situs resmi indonesiarestoguide.com dan seluruh website resmi beserta aplikasi resmi Indonesia Resto Guide (berbasis Android dan iOS) yang dapat diakses melalui perangkat komputer dan/atau perangkat seluler Pengguna. \n\n4.)	Pembeli adalah Pengguna terdaftar yang melakukan permintaan atas Makanan atau minuman yang dijual oleh Penjual di Aplikasi Indonesia Resto Guide. \n\n5.)	Penjual adalah Pengguna terdaftar yang melakukan kegiatan buka toko dan/atau melakukan penawaran atas suatu Makanan dan minuman kepada para Pengguna dan /atau Pembeli. \n\n6.)	Layanan adalah secara kolektif: (i) Platform Indonesia Resto Guide; (ii) Konten, fitur, layanan, dan fungsi apa pun yang tersedia di atau melalui Platform oleh atau atas nama Indonesia Resto Guide, termasuk Layanan Partner; dan pemberitahuan email, tombol, widget, dan iklan.', style: TextStyle(fontSize: double.parse(((MediaQuery.of(context).size.width*0.035).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.035)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.035)).toString()), fontWeight: FontWeight.w400), textAlign: TextAlign.justify, ),
+                                        Text('', style: TextStyle(fontSize: double.parse(((MediaQuery.of(context).size.width*0.03).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.03)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.03)).toString()), fontWeight: FontWeight.w500), textAlign: TextAlign.start),
+                                        Text('Pengguna, Penjual, Akun, Password & Keamanan', style: TextStyle(fontSize: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.04)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.04)).toString()), fontWeight: FontWeight.w500), textAlign: TextAlign.start),
+                                        Text('', style: TextStyle(fontSize: double.parse(((MediaQuery.of(context).size.width*0.03).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.03)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.03)).toString()), fontWeight: FontWeight.w500), textAlign: TextAlign.start),
+                                        Text('1.)	Pengguna wajib berusia minimal 18 tahun (kecuali ditentukan lain oleh peraturan perundang-undangan yang berlaku di Indonesia). Pengguna yang belum genap berusia 18 tahun wajib memperoleh persetujuan dari orang tua atau wali untuk menggunakan dan /atau mengakses layanan di Platform Indonesia Resto Guide dan bertanggung jawab atas segala biaya yang timbul terkait penggunaan layanan di Platform Indonesia Resto Guide. \n\n2.)	Pengguna harus memahami bahwa 1 (satu) nomor telepon hanya dapat digunakan untuk mendaftar 1 (satu) akun Pengguna Indonesia Resto Guide, kecuali bagi Pengguna yang telah memiliki beberapa akun dengan 1 (satu) nomor telepon sebelumnya \n\n3.)	Pengguna yang telah mendaftar berhak bertindak sebagai: Pembeli dan Penjual. \n\n4.)	Penjual diwajibkan membayar biaya pembukaan toko. Penjual berhak melakukan pengaturan terhadap barang yang akan diperdagangkan di lapak pribadi Penjual. \n\n5.)	Indonesia Resto Guide memiliki hak untuk melakukan tindakan yang perlu atas setiap dugaan pelanggaran Syarat & ketentuan sesuai dengan hukum yang berlaku, yakni tindakan berupa penghapusan Barang, penutupan toko, suspensi akun, sampai penghapusan akun pengguna. \n\n6.)	Pengguna menyetujui untuk tidak menggunakan dan/atau mengakses sistem Indonesia Resto Guide secara langsung atau tidak langsung, baik keseluruhan atau sebagian dengan virus, perangkat lunak, atau teknologi lainnya yang dapat mengakibatkan melemahkan, merusak, mengganggu dan menghambat, membatasi, mengambil alih fungsionalitas serta integritas dari sistem perangkat lunak atau perangkat keras, jaringan, dan/atau data pada Aplikasi Indonesia Resto Guide. \n\n7.)	Pengguna wajib mengetahui bahwa detail informasi berupa data diri nama, alamat usaha, nomor telepon akun milik Pengguna akan diterima oleh pihak Penjual dalam kemudahan bertransaksi dan berfungsi sebagai database penjual sendiri \n\n8.)	Penjual harus mengetahui bahwa detail informasi milik Pengguna adalah rahasia, dan karenanya Penjual tidak akan mengungkapkan detail informasi akun Pengguna kepada Pihak Ketiga mana pun kecuali untuk kegiatan jual beli dalam aplikasi Indonesia Resto Guide. \n\n9.)	Penjual setuju untuk menanggung setiap risiko terkait pengungkapan informasi Akun Pengguna kepada Pihak Ketiga mana pun dan bertanggung jawab penuh atas setiap konsekuensi yang berkaitan dengan hal tersebut. \n\n10.)	Pengguna dilarang menggunakan Platform Indonesia Resto Guide untuk melanggar peraturan yang ditetapkan oleh hukum di Indonesia maupun di negara lainnya. \n\n11.)	Pengguna dilarang mendistribusikan virus atau teknologi lainnya yang dapat membahayakan aplikasi Indonesia Resto Guide, kepentingan dan/atau properti dari Pengguna lain, maupun instansi Pemerintahan. \n\n12.)	Pengguna dilarang menggunakan Platform Indonesia Resto Guide untuk tujuan komersial dan melakukan transfer/menjual akun Pengguna ke Pengguna lain atau ke pihak lain dengan tujuan apapun. \n\n13.)	Pengguna wajib menghargai hak-hak Pengguna lainnya dengan tidak memberikan informasi pribadi ke pihak lain tanpa izin pihak yang bersangkutan. \n\n14.)	Pengguna wajib membaca, memahami serta mengikuti semua ketentuan yang diatur dalam Aturan Penggunaan ini.', style: TextStyle(fontSize: double.parse(((MediaQuery.of(context).size.width*0.035).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.035)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.035)).toString()), fontWeight: FontWeight.w400), textAlign: TextAlign.justify, ),
+                                        Text('', style: TextStyle(fontSize: double.parse(((MediaQuery.of(context).size.width*0.03).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.03)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.03)).toString()), fontWeight: FontWeight.w500), textAlign: TextAlign.start),
+                                        Text('Ketentuan Lain', style: TextStyle(fontSize: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.04)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.04)).toString()), fontWeight: FontWeight.w500), textAlign: TextAlign.start),
+                                        Text('', style: TextStyle(fontSize: double.parse(((MediaQuery.of(context).size.width*0.03).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.03)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.03)).toString()), fontWeight: FontWeight.w500), textAlign: TextAlign.start),
+                                        Text('1.)	Apabila pengguna mempergunakan fitur/layanan yang tersedia dalam Website/Aplikasi Indonesia Resto Guide, maka Pengguna dengan ini menyatakan telah memahami dan menyetujui segala syarat dan ketentuan yang diatur khusus sehubungan dengan fitur/layanan yang digunakan. \n\n2.)	Segala hal yang belum dan/atau tidak diatur dalam syarat dan ketentuan khusus dalam fitur tersebut maka akan sepenuhnya merujuk pada syarat dan ketentuan Indonesia Resto Guide secara umum. \n\n3.)	Dengan menyetujui Syarat dan Ketentuan, maka Pengguna telah dianggap paham dan mengikuti Kebijakan Privasi Indonesia Resto Guide.', style: TextStyle(fontSize: double.parse(((MediaQuery.of(context).size.width*0.035).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.035)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.035)).toString()), fontWeight: FontWeight.w400), textAlign: TextAlign.justify, ),
+                                        Text('', style: TextStyle(fontSize: double.parse(((MediaQuery.of(context).size.width*0.03).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.03)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.03)).toString()), fontWeight: FontWeight.w500), textAlign: TextAlign.start),
+                                        Text('Pembaruan & Perubahan Aturan Penggunaan', style: TextStyle(fontSize: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.04)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.04)).toString()), fontWeight: FontWeight.w500), textAlign: TextAlign.start),
+                                        Text('', style: TextStyle(fontSize: double.parse(((MediaQuery.of(context).size.width*0.03).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.03)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.03)).toString()), fontWeight: FontWeight.w500), textAlign: TextAlign.start),
+                                        Text('Indonesia Resto Guide memiliki hak untuk melakukan pembaruan dan/atau perubahan Aturan Penggunaan dari waktu ke waktu jika diperlukan demi keamanan dan kenyamanan Pengguna di Platform Indonesia Resto Guide. Pengguna harus setuju untuk membaca secara saksama dan memeriksa Aturan Penggunaan ini dari waktu ke waktu untuk mengetahui pembaruan dan/atau perubahan apapun. Dengan tetap mengakses dan menggunakan layanan Indonesia Resto Guide, maka pengguna dianggap menyetujui perubahan-perubahan dalam Syarat & Ketentuan kami.', style: TextStyle(fontSize: double.parse(((MediaQuery.of(context).size.width*0.035).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.035)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.035)).toString()), fontWeight: FontWeight.w400), textAlign: TextAlign.start, ),
+                                      ],
+                                    ),
+                                  ),
+                                  actions: <Widget>[
+                                    Center(
+                                      child: Row(
+                                        mainAxisAlignment: MainAxisAlignment.spaceAround,
+                                        children: [
+                                          // FlatButton(
+                                          //   // minWidth: CustomSize.sizeWidth(context),
+                                          //   color: CustomColor.redBtn,
+                                          //   textColor: Colors.white,
+                                          //   shape: RoundedRectangleBorder(
+                                          //       borderRadius: BorderRadius.all(Radius.circular(10))
+                                          //   ),
+                                          //   child: Text('Batal'),
+                                          //   onPressed: () async{
+                                          //     setState(() {
+                                          //       // codeDialog = valueText;
+                                          //       Navigator.pop(context);
+                                          //     });
+                                          //   },
+                                          // ),
+                                          FlatButton(
+                                            color: CustomColor.primaryLight,
+                                            textColor: Colors.white,
+                                            shape: RoundedRectangleBorder(
+                                                borderRadius: BorderRadius.all(Radius.circular(10))
+                                            ),
+                                            child: Text('Setuju'),
+                                            onPressed: () async{
+                                              Navigator.pop(context);
+                                              terms = true;
+                                              setState(() {});
+                                            },
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+
+                                  ],
+                                );
+                              });
+                        },
+                        child: CustomText.bodyMedium16(
+                            text: "Terms Conditions",
+                            maxLines: 1,
+                            minSize: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.04)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.04)).toString()),
+                            color: Colors.black,
+                            decoration: TextDecoration.underline
+                        ),
+                      ),
+                    ],
                   ),
                   GestureDetector(
-                    onTap: _handleSignIn,
+                    onTap: (){
+                      if (terms == false) {
+                        Fluttertoast.showToast(msg: "Baca lalu setujui Terms Conditions untuk melanjutkan.");
+                      } else {
+                        idPlayer().whenComplete(() {
+                          terms = true;
+                          setState(() {});
+                          _handleSignIn();
+                        });
+                      }
+                    },
                     child: Container(
                       height: CustomSize.sizeHeight(context) / 12,
                       width: CustomSize.sizeWidth(context) ,

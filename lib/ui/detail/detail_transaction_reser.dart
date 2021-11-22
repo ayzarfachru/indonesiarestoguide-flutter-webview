@@ -176,6 +176,7 @@ class _DetailTransactionReserState extends State<DetailTransactionReser> {
     var data = json.decode(apiResult.body);
 
     print('id e '+idResto.toString());
+    print('id e2 '+data['badan_usaha'].toString());
     // for(var v in data['menu']){
     //   Menu p = Menu(
     //       id: v['id'],
@@ -190,6 +191,7 @@ class _DetailTransactionReserState extends State<DetailTransactionReser> {
     //   _menu.add(p);
     // }
     setState(() {
+      badanRestoTrans = data['badan_usaha'].toString();
       emailTokoTrans = data['email'].toString();
       ownerTokoTrans = data['name_owner'].toString();
       pjTokoTrans = data['name_pj'].toString();
@@ -515,7 +517,48 @@ class _DetailTransactionReserState extends State<DetailTransactionReser> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  SizedBox(height: CustomSize.sizeHeight(context) * 0.0075),
+                  SizedBox(height: CustomSize.sizeHeight(context) / 98,),
+                  Padding(
+                    padding: EdgeInsets.symmetric(horizontal: CustomSize.sizeWidth(context) / 24),
+                    child: Row(
+                      children: [
+                        GestureDetector(
+                            onTap: (){
+                              Navigator.pushReplacement(context, MaterialPageRoute(builder: (context)=> HomeActivity()));
+                            },
+                            child: Container(
+                                width: CustomSize.sizeWidth(context) / 7,
+                                height: CustomSize.sizeWidth(context) / 7,
+                                decoration: BoxDecoration(
+                                  color: Colors.white,
+                                  shape: BoxShape.circle,
+                                  boxShadow: [
+                                    BoxShadow(
+                                      color: Colors.grey.withOpacity(0.5),
+                                      spreadRadius: 0,
+                                      blurRadius: 7,
+                                      offset: Offset(0, 0), // changes position of shadow
+                                    ),
+                                  ],
+                                ),
+                                child: Center(child: Icon(Icons.chevron_left, size: 38,)))
+                        ),
+                        SizedBox(
+                          width: CustomSize.sizeWidth(context) / 48,
+                        ),
+                        Container(
+                          width: CustomSize.sizeWidth(context) / 1.5,
+                          child: CustomText.textHeading3(
+                              text: "Detail Reservation",
+                              color: CustomColor.primary,
+                              sizeNew: double.parse(((MediaQuery.of(context).size.width*0.06).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.06)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.06)).toString()),
+                              maxLines: 2
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  SizedBox(height: CustomSize.sizeHeight(context) / 32,),
                   Padding(
                     padding: EdgeInsets.only(
                       left: CustomSize.sizeWidth(context) / 32,
@@ -723,7 +766,7 @@ class _DetailTransactionReserState extends State<DetailTransactionReser> {
                                 SizedBox(height: CustomSize.sizeHeight(context) * 0.005,),
 
                                 (badanRestoTrans != '' && badanRestoTrans != 'null')?
-                                CustomText.bodyRegular17(text: "Badan Usaha: "+nameRestoTrans, maxLines: 4, sizeNew: double.parse(((MediaQuery.of(context).size.width*0.038).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.038).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.038).toString())):
+                                CustomText.bodyRegular17(text: "Badan Usaha: "+badanRestoTrans, maxLines: 4, sizeNew: double.parse(((MediaQuery.of(context).size.width*0.038).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.038).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.038).toString())):
                                 Row(
                                   children: [
                                     CustomText.bodyRegular17(text: "Badan Usaha: ", maxLines: 2, sizeNew: double.parse(((MediaQuery.of(context).size.width*0.038).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.038).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.038).toString())),

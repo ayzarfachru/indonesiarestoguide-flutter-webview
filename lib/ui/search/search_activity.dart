@@ -669,11 +669,49 @@ class _SearchActivityState extends State<SearchActivity> {
           child: SingleChildScrollView(
             controller: _scrollController,
             child: Padding(
-              padding: EdgeInsets.symmetric(horizontal: CustomSize.sizeWidth(context) / 48),
+              padding: EdgeInsets.symmetric(horizontal: CustomSize.sizeWidth(context) / 24),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  SizedBox(height: CustomSize.sizeHeight(context) / 86,),
+                  SizedBox(height: CustomSize.sizeHeight(context) / 98,),
+                  Row(
+                    children: [
+                      GestureDetector(
+                          onTap: (){
+                            Navigator.pop(context);
+                          },
+                          child: Container(
+                              width: CustomSize.sizeWidth(context) / 7,
+                              height: CustomSize.sizeWidth(context) / 7,
+                              decoration: BoxDecoration(
+                                color: Colors.white,
+                                shape: BoxShape.circle,
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: Colors.grey.withOpacity(0.5),
+                                    spreadRadius: 0,
+                                    blurRadius: 7,
+                                    offset: Offset(0, 0), // changes position of shadow
+                                  ),
+                                ],
+                              ),
+                              child: Center(child: Icon(Icons.chevron_left, size: 38,)))
+                      ),
+                      SizedBox(
+                        width: CustomSize.sizeWidth(context) / 48,
+                      ),
+                      Container(
+                        width: CustomSize.sizeWidth(context) / 1.5,
+                        child: CustomText.textHeading3(
+                            text: "Search",
+                            color: CustomColor.primary,
+                            sizeNew: double.parse(((MediaQuery.of(context).size.width*0.06).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.06)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.06)).toString()),
+                            maxLines: 2
+                        ),
+                      ),
+                    ],
+                  ),
+                  SizedBox(height: CustomSize.sizeHeight(context) / 72,),
                   Container(
                     width: CustomSize.sizeWidth(context),
                     height: CustomSize.sizeHeight(context) / 16,
@@ -832,205 +870,202 @@ class _SearchActivityState extends State<SearchActivity> {
                       ):Container(),
                     ],
                   ),
-                  (isSearch != true)?Padding(
-                    padding: EdgeInsets.symmetric(horizontal: CustomSize.sizeWidth(context) / 32),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        SizedBox(height: CustomSize.sizeHeight(context) / 48,),
-                        CustomText.textHeading4(
-                            text: "Paling banyak Dicari",
-                            sizeNew: double.parse(((MediaQuery.of(context).size.width*0.045).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.045)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.045)).toString())
-                        ),
-                        SizedBox(height: CustomSize.sizeHeight(context) / 48,),
-                        Container(
-                          height: CustomSize.sizeHeight(context) / 18,
-                          child: ListView.builder(
-                              scrollDirection: Axis.horizontal,
-                              shrinkWrap: true,
-                              physics: BouncingScrollPhysics(),
-                              itemCount: recomMenu.length,
-                              itemBuilder: (_, index){
-                                return Padding(
-                                  padding: EdgeInsets.symmetric(horizontal: CustomSize.sizeWidth(context) / 86),
-                                  child: GestureDetector(
-                                    onTap: (){
-                                      _search(recomMenu[index], '');
-                                      _loginTextName.text = recomMenu[index];
-                                      setState(() {
-                                        isSearch = true;
-                                      });
-                                    },
-                                    child: Container(
-                                      height: CustomSize.sizeHeight(context) / 19,
-                                      decoration: BoxDecoration(
-                                          borderRadius: BorderRadius.circular(20),
-                                          border: Border.all(color: Colors.white),
-                                          color: CustomColor.primaryLight
-                                      ),
-                                      child: Padding(
-                                        padding: EdgeInsets.symmetric(horizontal: CustomSize.sizeWidth(context) / 48),
-                                        child: Center(
-                                          child: CustomText.bodyRegular14(
-                                              text: recomMenu[index],
-                                              color: Colors.white,
-                                              sizeNew: double.parse(((MediaQuery.of(context).size.width*0.035).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.035)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.035)).toString())
-                                          ),
+                  (isSearch != true)?Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      SizedBox(height: CustomSize.sizeHeight(context) / 48,),
+                      CustomText.textHeading4(
+                          text: "Paling banyak Dicari",
+                          sizeNew: double.parse(((MediaQuery.of(context).size.width*0.045).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.045)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.045)).toString())
+                      ),
+                      SizedBox(height: CustomSize.sizeHeight(context) / 48,),
+                      Container(
+                        height: CustomSize.sizeHeight(context) / 18,
+                        child: ListView.builder(
+                            scrollDirection: Axis.horizontal,
+                            shrinkWrap: true,
+                            physics: BouncingScrollPhysics(),
+                            itemCount: recomMenu.length,
+                            itemBuilder: (_, index){
+                              return Padding(
+                                padding: EdgeInsets.symmetric(horizontal: CustomSize.sizeWidth(context) / 86),
+                                child: GestureDetector(
+                                  onTap: (){
+                                    _search(recomMenu[index], '');
+                                    _loginTextName.text = recomMenu[index];
+                                    setState(() {
+                                      isSearch = true;
+                                    });
+                                  },
+                                  child: Container(
+                                    height: CustomSize.sizeHeight(context) / 19,
+                                    decoration: BoxDecoration(
+                                        borderRadius: BorderRadius.circular(20),
+                                        border: Border.all(color: Colors.white),
+                                        color: CustomColor.primaryLight
+                                    ),
+                                    child: Padding(
+                                      padding: EdgeInsets.symmetric(horizontal: CustomSize.sizeWidth(context) / 48),
+                                      child: Center(
+                                        child: CustomText.bodyRegular14(
+                                            text: recomMenu[index],
+                                            color: Colors.white,
+                                            sizeNew: double.parse(((MediaQuery.of(context).size.width*0.035).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.035)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.035)).toString())
                                         ),
                                       ),
                                     ),
                                   ),
-                                );
-                              }
-                          ),
+                                ),
+                              );
+                            }
                         ),
-                        SizedBox(height: CustomSize.sizeHeight(context) / 48,),
-                        CustomText.textHeading4(
-                            text: "Jelajahi",
-                            sizeNew: double.parse(((MediaQuery.of(context).size.width*0.045).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.045)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.045)).toString())
-                        ),
-                        SizedBox(height: CustomSize.sizeHeight(context) / 48,),
-                        Container(
-                          height: CustomSize.sizeHeight(context) / 6,
-                          child: ListView.builder(
-                              scrollDirection: Axis.horizontal,
-                              shrinkWrap: true,
-                              physics: BouncingScrollPhysics(),
-                              itemCount: cuisine.length,
-                              itemBuilder: (_, index){
-                                return Container(
-                                  width: CustomSize.sizeWidth(context) / 2.7,
-                                  child: GestureDetector(
-                                    onTap: (){
-                                      _search('', '');
-                                      tipe = cuisine[index].name;
-                                      setState(() {
-                                        isSearch = true;
-                                      });
-                                    },
-                                    child: Column(
-                                      children: [
-                                        Container(
-                                          width: CustomSize.sizeWidth(context) / 6,
-                                          height: CustomSize.sizeWidth(context) / 6,
-                                          decoration: BoxDecoration(
-                                              shape: BoxShape.circle,
-                                              color: CustomColor.secondary,
-                                              image: DecorationImage(
-                                                  image: AssetImage("assets/type/"+cuisine[index].name.replaceAll('food', 'Food').replaceAll('Food ', 'Food').replaceAll('Modern Melayu', 'Malay Food').replaceAll('Cafe', 'Coffee')+".png"),
-                                                  fit: BoxFit.cover
-                                              )
-                                          ),
-                                        ),
-                                        SizedBox(height: CustomSize.sizeHeight(context) / 86,),
-                                        CustomText.bodyMedium16(
-                                          text: cuisine[index].name,
-                                          sizeNew: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.04)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.04)).toString()),
-                                          maxLines: 1,
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                );
-                              }
-                          ),
-                        ),
-                        SizedBox(height: CustomSize.sizeHeight(context) / 48,),
-                        CustomText.textHeading4(
-                            text: "Rekomendasi",
-                            sizeNew: double.parse(((MediaQuery.of(context).size.width*0.045).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.045)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.045)).toString())
-                        ),
-                        ListView.builder(
-                          shrinkWrap: true,
-                          controller: _scrollController,
-                          physics: NeverScrollableScrollPhysics(),
-                          itemCount: promo.length,
-                          itemBuilder: (_, index){
-                            return Padding(
-                              padding: EdgeInsets.only(top: CustomSize.sizeHeight(context) / 48),
-                              child: GestureDetector(
-                                onTap: (){
-                                  Navigator.push(
-                                      context,
-                                      PageTransition(
-                                          type: PageTransitionType.rightToLeft,
-                                          child: new DetailResto(promo[index].restoId.toString())));
-                                },
-                                child: Container(
-                                  width: CustomSize.sizeWidth(context),
-                                  height: CustomSize.sizeWidth(context) / 2.6,
-                                  decoration: BoxDecoration(
-                                    color: Colors.white,
-                                    borderRadius: BorderRadius.circular(20),
-                                    boxShadow: [
-                                      BoxShadow(
-                                        color: Colors.grey.withOpacity(0.5),
-                                        spreadRadius: 0,
-                                        blurRadius: 7,
-                                        offset: Offset(0, 7), // changes position of shadow
-                                      ),
-                                    ],
-                                  ),
-                                  child: Row(
+                      ),
+                      SizedBox(height: CustomSize.sizeHeight(context) / 48,),
+                      CustomText.textHeading4(
+                          text: "Jelajahi",
+                          sizeNew: double.parse(((MediaQuery.of(context).size.width*0.045).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.045)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.045)).toString())
+                      ),
+                      SizedBox(height: CustomSize.sizeHeight(context) / 48,),
+                      Container(
+                        height: CustomSize.sizeHeight(context) / 6,
+                        child: ListView.builder(
+                            scrollDirection: Axis.horizontal,
+                            shrinkWrap: true,
+                            physics: BouncingScrollPhysics(),
+                            itemCount: cuisine.length,
+                            itemBuilder: (_, index){
+                              return Container(
+                                width: CustomSize.sizeWidth(context) / 2.7,
+                                child: GestureDetector(
+                                  onTap: (){
+                                    _search('', '');
+                                    tipe = cuisine[index].name;
+                                    setState(() {
+                                      isSearch = true;
+                                    });
+                                  },
+                                  child: Column(
                                     children: [
                                       Container(
-                                        width: CustomSize.sizeWidth(context) / 2.6,
-                                        height: CustomSize.sizeWidth(context) / 2.6,
+                                        width: CustomSize.sizeWidth(context) / 6,
+                                        height: CustomSize.sizeWidth(context) / 6,
                                         decoration: BoxDecoration(
-                                          image: DecorationImage(
-                                            image: NetworkImage(Links.subUrl + promo[index].urlImg),
-                                            fit: BoxFit.cover
-                                          ),
-                                          borderRadius: BorderRadius.circular(20),
-                                        ),
-                                      ),
-                                      SizedBox(
-                                        width: CustomSize.sizeWidth(context) / 32,
-                                      ),
-                                      Container(
-                                        width: CustomSize.sizeWidth(context) / 2.1,
-                                        child: Column(
-                                          mainAxisAlignment: MainAxisAlignment.center,
-                                          crossAxisAlignment: CrossAxisAlignment.start,
-                                          children: [
-                                            CustomText.bodyLight12(
-                                                text: promo[index].distance.toString() + " km",
-                                                maxLines: 1,
-                                                sizeNew: double.parse(((MediaQuery.of(context).size.width*0.03).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.03)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.03)).toString())
-                                            ),
-                                            SizedBox(height: CustomSize.sizeHeight(context) / 86,),
-                                            CustomText.textHeading4(
-                                                text: promo[index].name,
-                                                sizeNew: double.parse(((MediaQuery.of(context).size.width*0.045).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.045)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.045)).toString()),
-                                                maxLines: 1
-                                            ),
-                                            SizedBox(height: CustomSize.sizeHeight(context) / 86,),
-                                            CustomText.bodyMedium12(
-                                                text: promo[index].restoName,
-                                                maxLines: 1,
-                                                sizeNew: double.parse(((MediaQuery.of(context).size.width*0.03).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.03).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.03).toString())
-                                            ),
-                                            SizedBox(height: CustomSize.sizeHeight(context) / 48,),
-                                            Row(
-                                              children: [
-                                                CustomText.bodyRegular12(text: NumberFormat.currency(locale: 'id', symbol: '', decimalDigits: 0).format(promo[index].price!.original), sizeNew: double.parse(((MediaQuery.of(context).size.width*0.03).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.03).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.03).toString()),
-                                                    decoration: TextDecoration.lineThrough),
-                                                SizedBox(width: CustomSize.sizeWidth(context) / 48,),
-                                                CustomText.bodyRegular12(text: NumberFormat.currency(locale: 'id', symbol: '', decimalDigits: 0).format(promo[index].price!.discounted), sizeNew: double.parse(((MediaQuery.of(context).size.width*0.03).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.03).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.03).toString())),
-                                              ],
+                                            shape: BoxShape.circle,
+                                            color: CustomColor.secondary,
+                                            image: DecorationImage(
+                                                image: AssetImage("assets/type/"+cuisine[index].name.replaceAll('food', 'Food').replaceAll('Food ', 'Food').replaceAll('Modern Melayu', 'Malay Food').replaceAll('Cafe', 'Coffee')+".png"),
+                                                fit: BoxFit.cover
                                             )
-                                          ],
                                         ),
-                                      )
+                                      ),
+                                      SizedBox(height: CustomSize.sizeHeight(context) / 86,),
+                                      CustomText.bodyMedium16(
+                                        text: cuisine[index].name,
+                                        sizeNew: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.04)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.04)).toString()),
+                                        maxLines: 1,
+                                      ),
                                     ],
                                   ),
                                 ),
-                              ),
-                            );
-                          },
+                              );
+                            }
                         ),
-                      ],
-                    ),
+                      ),
+                      SizedBox(height: CustomSize.sizeHeight(context) / 48,),
+                      CustomText.textHeading4(
+                          text: "Rekomendasi",
+                          sizeNew: double.parse(((MediaQuery.of(context).size.width*0.045).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.045)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.045)).toString())
+                      ),
+                      ListView.builder(
+                        shrinkWrap: true,
+                        controller: _scrollController,
+                        physics: NeverScrollableScrollPhysics(),
+                        itemCount: promo.length,
+                        itemBuilder: (_, index){
+                          return Padding(
+                            padding: EdgeInsets.only(top: CustomSize.sizeHeight(context) / 48),
+                            child: GestureDetector(
+                              onTap: (){
+                                Navigator.push(
+                                    context,
+                                    PageTransition(
+                                        type: PageTransitionType.rightToLeft,
+                                        child: new DetailResto(promo[index].restoId.toString())));
+                              },
+                              child: Container(
+                                width: CustomSize.sizeWidth(context),
+                                height: CustomSize.sizeWidth(context) / 2.6,
+                                decoration: BoxDecoration(
+                                  color: Colors.white,
+                                  borderRadius: BorderRadius.circular(20),
+                                  boxShadow: [
+                                    BoxShadow(
+                                      color: Colors.grey.withOpacity(0.5),
+                                      spreadRadius: 0,
+                                      blurRadius: 7,
+                                      offset: Offset(0, 7), // changes position of shadow
+                                    ),
+                                  ],
+                                ),
+                                child: Row(
+                                  children: [
+                                    Container(
+                                      width: CustomSize.sizeWidth(context) / 2.6,
+                                      height: CustomSize.sizeWidth(context) / 2.6,
+                                      decoration: BoxDecoration(
+                                        image: DecorationImage(
+                                          image: NetworkImage(Links.subUrl + promo[index].urlImg),
+                                          fit: BoxFit.cover
+                                        ),
+                                        borderRadius: BorderRadius.circular(20),
+                                      ),
+                                    ),
+                                    SizedBox(
+                                      width: CustomSize.sizeWidth(context) / 32,
+                                    ),
+                                    Container(
+                                      width: CustomSize.sizeWidth(context) / 2.1,
+                                      child: Column(
+                                        mainAxisAlignment: MainAxisAlignment.center,
+                                        crossAxisAlignment: CrossAxisAlignment.start,
+                                        children: [
+                                          CustomText.bodyLight12(
+                                              text: promo[index].distance.toString() + " km",
+                                              maxLines: 1,
+                                              sizeNew: double.parse(((MediaQuery.of(context).size.width*0.03).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.03)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.03)).toString())
+                                          ),
+                                          SizedBox(height: CustomSize.sizeHeight(context) / 86,),
+                                          CustomText.textHeading4(
+                                              text: promo[index].name,
+                                              sizeNew: double.parse(((MediaQuery.of(context).size.width*0.045).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.045)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.045)).toString()),
+                                              maxLines: 1
+                                          ),
+                                          SizedBox(height: CustomSize.sizeHeight(context) / 86,),
+                                          CustomText.bodyMedium12(
+                                              text: promo[index].restoName,
+                                              maxLines: 1,
+                                              sizeNew: double.parse(((MediaQuery.of(context).size.width*0.03).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.03).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.03).toString())
+                                          ),
+                                          SizedBox(height: CustomSize.sizeHeight(context) / 48,),
+                                          Row(
+                                            children: [
+                                              CustomText.bodyRegular12(text: NumberFormat.currency(locale: 'id', symbol: '', decimalDigits: 0).format(promo[index].price!.original), sizeNew: double.parse(((MediaQuery.of(context).size.width*0.03).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.03).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.03).toString()),
+                                                  decoration: TextDecoration.lineThrough),
+                                              SizedBox(width: CustomSize.sizeWidth(context) / 48,),
+                                              CustomText.bodyRegular12(text: NumberFormat.currency(locale: 'id', symbol: '', decimalDigits: 0).format(promo[index].price!.discounted), sizeNew: double.parse(((MediaQuery.of(context).size.width*0.03).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.03).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.03).toString())),
+                                            ],
+                                          )
+                                        ],
+                                      ),
+                                    )
+                                  ],
+                                ),
+                              ),
+                            ),
+                          );
+                        },
+                      ),
+                    ],
                   )
                       :Column(
                     crossAxisAlignment: CrossAxisAlignment.start,

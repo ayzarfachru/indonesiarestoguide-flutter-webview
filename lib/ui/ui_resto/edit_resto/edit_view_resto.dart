@@ -155,10 +155,28 @@ class _EditViewRestoState extends State<EditViewResto> {
                 SizedBox(height: CustomSize.sizeHeight(context) / 38,),
                 Padding(
                   padding: EdgeInsets.symmetric(horizontal: CustomSize.sizeWidth(context) / 32),
-                  child: CustomText.textHeading4(
-                      text: "Edit data restomu",
-                      sizeNew: double.parse(((MediaQuery.of(context).size.width*0.045).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.045).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.045).toString()),
-                      maxLines: 1
+                  child: Row(
+                    children: [
+                      GestureDetector(
+                          onTap: (){
+                            Navigator.pop(context);
+                          },
+                          child: Icon(Icons.chevron_left, size: double.parse(((MediaQuery.of(context).size.width*0.075).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.075)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.075)).toString()),)
+                      ),
+                      SizedBox(
+                        width: CustomSize.sizeWidth(context) / 88,
+                      ),
+                      GestureDetector(
+                        onTap: (){
+                          Navigator.pop(context);
+                        },
+                        child: CustomText.textHeading4(
+                            text: "Edit data restomu",
+                            sizeNew: double.parse(((MediaQuery.of(context).size.width*0.045).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.045)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.045)).toString()),
+                            maxLines: 1
+                        ),
+                      ),
+                    ],
                   ),
                 ),
                 SizedBox(height: CustomSize.sizeHeight(context) / 86,),

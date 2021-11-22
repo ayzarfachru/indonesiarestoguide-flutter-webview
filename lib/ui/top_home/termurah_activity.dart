@@ -381,126 +381,163 @@ class _TermurahActivityState extends State<TermurahActivity> {
               onLoading: _onLoading,
               child: SingleChildScrollView(
                 controller: _scrollController,
-                child: Padding(
-                  padding: EdgeInsets.symmetric(horizontal: CustomSize.sizeWidth(context) / 24),
-                  child: (kosong.toString() != 'true')?Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      SizedBox(
-                        height: CustomSize.sizeHeight(context) / 32,
+                child: (kosong.toString() != 'true')?Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    SizedBox(
+                      height: CustomSize.sizeHeight(context) / 32,
+                    ),
+                    (homepg != "1")?Padding(
+                      padding: EdgeInsets.symmetric(horizontal: CustomSize.sizeWidth(context) / 24),
+                      child: Row(
+                        children: [
+                          GestureDetector(
+                              onTap: (){
+                                Navigator.pop(context);
+                              },
+                              child: Container(
+                                  width: CustomSize.sizeWidth(context) / 7,
+                                  height: CustomSize.sizeWidth(context) / 7,
+                                  decoration: BoxDecoration(
+                                    color: Colors.white,
+                                    shape: BoxShape.circle,
+                                    boxShadow: [
+                                      BoxShadow(
+                                        color: Colors.grey.withOpacity(0.5),
+                                        spreadRadius: 0,
+                                        blurRadius: 7,
+                                        offset: Offset(0, 0), // changes position of shadow
+                                      ),
+                                    ],
+                                  ),
+                                  child: Center(child: Icon(Icons.chevron_left, size: 38,)))
+                          ),
+                          SizedBox(
+                            width: CustomSize.sizeWidth(context) / 48,
+                          ),
+                          Container(
+                            width: CustomSize.sizeWidth(context) / 1.5,
+                            child: CustomText.textHeading3(
+                                text: "Berdasarkan Resto Terbaru",
+                                color: CustomColor.primary,
+                                sizeNew: double.parse(((MediaQuery.of(context).size.width*0.06).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.06).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.06).toString()),
+                                maxLines: 2
+                            ),
+                          ),
+                        ],
                       ),
-                      (homepg != "1")?CustomText.textHeading3(
-                          text: "Berdasarkan Resto",
-                          color: CustomColor.primary,
-                          sizeNew: double.parse(((MediaQuery.of(context).size.width*0.045).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.045).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.045).toString()),
-                          maxLines: 1
-                      ):CustomText.textHeading3(
+                    ):Padding(
+                      padding: EdgeInsets.symmetric(horizontal: CustomSize.sizeWidth(context) / 24),
+                      child: CustomText.textHeading3(
                           text: "Promo di Tokomu",
                           color: CustomColor.primary,
                           sizeNew: double.parse(((MediaQuery.of(context).size.width*0.045).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.045).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.045).toString()),
                           maxLines: 1
                       ),
-                      (homepg != "1")?CustomText.textHeading3(
-                          text: "Terbaru",
-                          color: CustomColor.primary,
-                          sizeNew: double.parse(((MediaQuery.of(context).size.width*0.045).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.045).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.045).toString()),
-                          maxLines: 1
-                      ):Container(),
-                      StaggeredGridView.countBuilder(
-                        staggeredTileBuilder: (index) {
-                          return StaggeredTile.count(1, 1.2);
-                        },
-                        crossAxisCount: 2,
-                        controller: _scrollController,
-                        physics: NeverScrollableScrollPhysics(),
-                        shrinkWrap: true,
-                        itemCount: promo.length,
-                        itemBuilder: (_, index){
-                          return Padding(
-                            padding: EdgeInsets.all(CustomSize.sizeWidth(context) / 48),
-                            child: GestureDetector(
-                              onTap: (){
-                                Navigator.push(
-                                    context,
-                                    PageTransition(
-                                        type: PageTransitionType.rightToLeft,
-                                        child: new DetailResto(promo[index].id.toString())));
-                              },
-                              child: Container(
-                                width: CustomSize.sizeWidth(context) / 2.3,
-                                height: CustomSize.sizeHeight(context) / 3,
-                                decoration: BoxDecoration(
-                                  color: Colors.white,
-                                  borderRadius: BorderRadius.circular(20),
-                                  boxShadow: [
-                                    BoxShadow(
-                                      color: Colors.grey.withOpacity(0.5),
-                                      spreadRadius: 0,
-                                      blurRadius: 4,
-                                      offset: Offset(0, 3), // changes position of shadow
-                                    ),
-                                  ],
-                                ),
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Container(
-                                      width: CustomSize.sizeWidth(context),
-                                      height: CustomSize.sizeHeight(context) / 5.8,
-                                      decoration: (promo[index].img != null)?BoxDecoration(
-                                        image: DecorationImage(
-                                            image: NetworkImage(Links.subUrl + promo[index].img!),
-                                            fit: BoxFit.cover
-                                        ),
-                                        borderRadius: BorderRadius.circular(20),
-                                      ):BoxDecoration(
-                                          color: CustomColor.primaryLight
+                    ),
+                    // (homepg != "1")?Padding(
+                    //   padding: EdgeInsets.symmetric(horizontal: CustomSize.sizeWidth(context) / 24),
+                    //   child: CustomText.textHeading3(
+                    //       text: "Terbaru",
+                    //       color: CustomColor.primary,
+                    //       sizeNew: double.parse(((MediaQuery.of(context).size.width*0.045).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.045).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.045).toString()),
+                    //       maxLines: 1
+                    //   ),
+                    // ):Container(),
+                    StaggeredGridView.countBuilder(
+                      staggeredTileBuilder: (index) {
+                        return StaggeredTile.count(1, 1.2);
+                      },
+                      crossAxisCount: 2,
+                      controller: _scrollController,
+                      physics: NeverScrollableScrollPhysics(),
+                      shrinkWrap: true,
+                      itemCount: promo.length,
+                      itemBuilder: (_, index){
+                        return Padding(
+                          padding: EdgeInsets.all(CustomSize.sizeWidth(context) / 48),
+                          child: GestureDetector(
+                            onTap: (){
+                              Navigator.push(
+                                  context,
+                                  PageTransition(
+                                      type: PageTransitionType.rightToLeft,
+                                      child: new DetailResto(promo[index].id.toString())));
+                            },
+                            child: Container(
+                              width: CustomSize.sizeWidth(context) / 2.3,
+                              height: CustomSize.sizeHeight(context) / 3,
+                              decoration: BoxDecoration(
+                                color: Colors.white,
+                                borderRadius: BorderRadius.circular(20),
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: Colors.grey.withOpacity(0.5),
+                                    spreadRadius: 0,
+                                    blurRadius: 4,
+                                    offset: Offset(0, 3), // changes position of shadow
+                                  ),
+                                ],
+                              ),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Container(
+                                    width: CustomSize.sizeWidth(context),
+                                    height: CustomSize.sizeHeight(context) / 5.8,
+                                    decoration: (promo[index].img != null)?BoxDecoration(
+                                      image: DecorationImage(
+                                          image: NetworkImage(Links.subUrl + promo[index].img!),
+                                          fit: BoxFit.cover
                                       ),
+                                      borderRadius: BorderRadius.circular(20),
+                                    ):BoxDecoration(
+                                        color: CustomColor.primaryLight
                                     ),
-                                    SizedBox(height: CustomSize.sizeHeight(context) / 86,),
-                                    Padding(
-                                      padding: EdgeInsets.only(left: CustomSize.sizeWidth(context) / 24),
-                                      child: CustomText.bodyRegular14(text: promo[index].distance.toString() + " Km", sizeNew: double.parse(((MediaQuery.of(context).size.width*0.03).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.03).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.03).toString())),
-                                    ),
-                                    Padding(
-                                      padding: EdgeInsets.only(left: CustomSize.sizeWidth(context) / 24),
-                                      child: CustomText.bodyMedium16(text: promo[index].name, sizeNew: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.04).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.04).toString())),
-                                    ),
-                                  ],
-                                ),
+                                  ),
+                                  SizedBox(height: CustomSize.sizeHeight(context) / 86,),
+                                  Padding(
+                                    padding: EdgeInsets.only(left: CustomSize.sizeWidth(context) / 24),
+                                    child: CustomText.bodyRegular14(text: promo[index].distance.toString() + " Km", sizeNew: double.parse(((MediaQuery.of(context).size.width*0.03).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.03).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.03).toString())),
+                                  ),
+                                  Padding(
+                                    padding: EdgeInsets.only(left: CustomSize.sizeWidth(context) / 24),
+                                    child: CustomText.bodyMedium16(text: promo[index].name, sizeNew: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.04).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.04).toString())),
+                                  ),
+                                ],
                               ),
                             ),
-                          );
-                        },
-                      ),
-                      SizedBox(height: CustomSize.sizeHeight(context) / 8,)
-                    ],
-                  ):Stack(
-                    children: [
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          SizedBox(
-                            height: CustomSize.sizeHeight(context) / 32,
                           ),
-                          CustomText.textHeading3(
-                              text: "Promo di Tokomu",
-                              color: CustomColor.primary,
-                              sizeNew: double.parse(((MediaQuery.of(context).size.width*0.045).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.045).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.045).toString()),
-                              maxLines: 1
-                          ),
-                        ],
-                      ),
-                      Container(height: CustomSize.sizeHeight(context), child: Center(
-                        child: CustomText.bodyRegular14(
-                            text: 'Promo kosong.',
-                            maxLines: 1,
-                            sizeNew: double.parse(((MediaQuery.of(context).size.width*0.03).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.03).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.03).toString()),
-                            color: Colors.grey
+                        );
+                      },
+                    ),
+                    SizedBox(height: CustomSize.sizeHeight(context) / 8,)
+                  ],
+                ):Stack(
+                  children: [
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        SizedBox(
+                          height: CustomSize.sizeHeight(context) / 32,
                         ),
-                      ),),
-                    ],
-                  ),
+                        CustomText.textHeading3(
+                            text: "Promo di Tokomu",
+                            color: CustomColor.primary,
+                            sizeNew: double.parse(((MediaQuery.of(context).size.width*0.045).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.045).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.045).toString()),
+                            maxLines: 1
+                        ),
+                      ],
+                    ),
+                    Container(height: CustomSize.sizeHeight(context), child: Center(
+                      child: CustomText.bodyRegular14(
+                          text: 'Promo kosong.',
+                          maxLines: 1,
+                          sizeNew: double.parse(((MediaQuery.of(context).size.width*0.03).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.03).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.03).toString()),
+                          color: Colors.grey
+                      ),
+                    ),),
+                  ],
                 ),
               ),
             ):Stack(
@@ -513,23 +550,48 @@ class _TermurahActivityState extends State<TermurahActivity> {
                       SizedBox(
                         height: CustomSize.sizeHeight(context) / 32,
                       ),
-                      (homepg != "1")?CustomText.textHeading3(
-                          text: "Berdasarkan Produk",
-                          color: CustomColor.primary,
-                          sizeNew: double.parse(((MediaQuery.of(context).size.width*0.045).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.045).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.045).toString()),
-                          maxLines: 1
+                      (homepg != "1")?Row(
+                        children: [
+                          GestureDetector(
+                              onTap: (){
+                                Navigator.pop(context);
+                              },
+                              child: Container(
+                                  width: CustomSize.sizeWidth(context) / 7,
+                                  height: CustomSize.sizeWidth(context) / 7,
+                                  decoration: BoxDecoration(
+                                    color: Colors.white,
+                                    shape: BoxShape.circle,
+                                    boxShadow: [
+                                      BoxShadow(
+                                        color: Colors.grey.withOpacity(0.5),
+                                        spreadRadius: 0,
+                                        blurRadius: 7,
+                                        offset: Offset(0, 0), // changes position of shadow
+                                      ),
+                                    ],
+                                  ),
+                                  child: Center(child: Icon(Icons.chevron_left, size: 38,)))
+                          ),
+                          SizedBox(
+                            width: CustomSize.sizeWidth(context) / 48,
+                          ),
+                          Container(
+                            width: CustomSize.sizeWidth(context) / 1.5,
+                            child: CustomText.textHeading3(
+                                text: "Berdasarkan Resto Terbaru",
+                                color: CustomColor.primary,
+                                sizeNew: double.parse(((MediaQuery.of(context).size.width*0.06).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.06).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.06).toString()),
+                                maxLines: 2
+                            ),
+                          ),
+                        ],
                       ):CustomText.textHeading3(
                           text: "Promo di Tokomu",
                           color: CustomColor.primary,
                           sizeNew: double.parse(((MediaQuery.of(context).size.width*0.045).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.045).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.045).toString()),
                           maxLines: 1
                       ),
-                      (homepg != "1")?CustomText.textHeading3(
-                          text: "Terbaru",
-                          color: CustomColor.primary,
-                          sizeNew: double.parse(((MediaQuery.of(context).size.width*0.045).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.045).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.045).toString()),
-                          maxLines: 1
-                      ):Container(),
                     ],
                   ),
                 ),

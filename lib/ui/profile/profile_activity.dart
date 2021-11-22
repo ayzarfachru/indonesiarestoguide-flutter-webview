@@ -248,10 +248,28 @@ class _ProfileActivityState extends State<ProfileActivity> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     SizedBox(height: CustomSize.sizeHeight(context) / 38,),
-                    CustomText.textHeading4(
-                        text: "Profile",
-                        sizeNew: double.parse(((MediaQuery.of(context).size.width*0.045).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.045)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.045)).toString()),
-                        maxLines: 1
+                    Row(
+                      children: [
+                        GestureDetector(
+                            onTap: (){
+                              Navigator.pop(context);
+                            },
+                            child: Icon(Icons.chevron_left, size: double.parse(((MediaQuery.of(context).size.width*0.075).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.075)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.075)).toString()),)
+                        ),
+                        SizedBox(
+                          width: CustomSize.sizeWidth(context) / 88,
+                        ),
+                        GestureDetector(
+                          onTap: (){
+                            Navigator.pop(context);
+                          },
+                          child: CustomText.textHeading4(
+                              text: "Profile",
+                              sizeNew: double.parse(((MediaQuery.of(context).size.width*0.045).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.045)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.045)).toString()),
+                              maxLines: 1
+                          ),
+                        ),
+                      ],
                     ),
                     SizedBox(height: CustomSize.sizeHeight(context) / 38,),
                     Row(

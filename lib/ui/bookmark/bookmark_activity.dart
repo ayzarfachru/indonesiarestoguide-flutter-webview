@@ -215,12 +215,43 @@ class _BookmarkActivityState extends State<BookmarkActivity> {
                 Padding(
                   padding: EdgeInsets.symmetric(horizontal: CustomSize.sizeWidth(context) / 24),
                   child: MediaQuery(
-                    child: CustomText.textHeading3(
-                        text: "Restoran Favoritmu nih !",
-                        color: CustomColor.primary,
-                        // minSize: 18,
-                        sizeNew: double.parse(((MediaQuery.of(context).size.width*0.06).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.06).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.06).toString()),
-                        maxLines: 1
+                    child: Row(
+                      children: [
+                        GestureDetector(
+                            onTap: (){
+                              Navigator.pop(context);
+                            },
+                            child: Container(
+                                width: CustomSize.sizeWidth(context) / 7,
+                                height: CustomSize.sizeWidth(context) / 7,
+                                decoration: BoxDecoration(
+                                  color: Colors.white,
+                                  shape: BoxShape.circle,
+                                  boxShadow: [
+                                    BoxShadow(
+                                      color: Colors.grey.withOpacity(0.5),
+                                      spreadRadius: 0,
+                                      blurRadius: 7,
+                                      offset: Offset(0, 0), // changes position of shadow
+                                    ),
+                                  ],
+                                ),
+                                child: Center(child: Icon(Icons.chevron_left, size: 38,)))
+                        ),
+                        SizedBox(
+                          width: CustomSize.sizeWidth(context) / 48,
+                        ),
+                        Container(
+                          width: CustomSize.sizeWidth(context) / 1.5,
+                          child: CustomText.textHeading3(
+                              text: "Restoran Favoritmu nih !",
+                              color: CustomColor.primary,
+                              // minSize: 18,
+                              sizeNew: double.parse(((MediaQuery.of(context).size.width*0.06).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.06).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.06).toString()),
+                              maxLines: 2
+                          ),
+                        ),
+                      ],
                     ),
                     data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0),
                   ),
@@ -313,12 +344,43 @@ class _BookmarkActivityState extends State<BookmarkActivity> {
                     Padding(
                       padding: EdgeInsets.symmetric(horizontal: CustomSize.sizeWidth(context) / 24),
                       child: MediaQuery(
-                        child: CustomText.textHeading3(
-                            text: "Restoran Favoritmu nih !",
-                            color: CustomColor.primary,
-                            // minSize: 18,
-                            sizeNew: double.parse(((MediaQuery.of(context).size.width*0.06).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.06).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.06).toString()),
-                            maxLines: 1
+                        child: Row(
+                          children: [
+                            GestureDetector(
+                                onTap: (){
+                                  Navigator.pop(context);
+                                },
+                                child: Container(
+                                    width: CustomSize.sizeWidth(context) / 7,
+                                    height: CustomSize.sizeWidth(context) / 7,
+                                    decoration: BoxDecoration(
+                                      color: Colors.white,
+                                      shape: BoxShape.circle,
+                                      boxShadow: [
+                                        BoxShadow(
+                                          color: Colors.grey.withOpacity(0.5),
+                                          spreadRadius: 0,
+                                          blurRadius: 7,
+                                          offset: Offset(0, 0), // changes position of shadow
+                                        ),
+                                      ],
+                                    ),
+                                    child: Center(child: Icon(Icons.chevron_left, size: 38,)))
+                            ),
+                            SizedBox(
+                              width: CustomSize.sizeWidth(context) / 48,
+                            ),
+                            Container(
+                              width: CustomSize.sizeWidth(context) / 1.5,
+                              child: CustomText.textHeading3(
+                                  text: "Restoran Favoritmu nih !",
+                                  color: CustomColor.primary,
+                                  // minSize: 18,
+                                  sizeNew: double.parse(((MediaQuery.of(context).size.width*0.06).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.06).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.06).toString()),
+                                  maxLines: 1
+                              ),
+                            ),
+                          ],
                         ),
                         data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0),
                       ),

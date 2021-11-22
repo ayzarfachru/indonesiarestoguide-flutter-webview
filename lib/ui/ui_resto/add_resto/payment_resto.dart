@@ -914,10 +914,131 @@ class _PaymentRestoState extends State<PaymentResto> {
                               //   width: CustomSize.sizeWidth(context) / 18,
                               // ),
                               Expanded(
-                                child: CustomText.textHeading4(
-                                  color: Colors.white,
-                                  text: "Aktivasi Resto",
-                                  sizeNew: double.parse(((MediaQuery.of(context).size.width*0.045).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.045).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.045).toString()),
+                                child: Row(
+                                  children: [
+                                    GestureDetector(
+                                        onTap: (){
+                                          showDialog(
+                                              context: context,
+                                              builder: (context) {
+                                                return AlertDialog(
+                                                  contentPadding: EdgeInsets.only(left: 25, right: 25, top: 15, bottom: 5),
+                                                  shape: RoundedRectangleBorder(
+                                                      borderRadius: BorderRadius.all(Radius.circular(10))
+                                                  ),
+                                                  title: Center(child: Text('Perhatian!', style: TextStyle(color: CustomColor.redBtn))),
+                                                  content: Text('Apakah yakin ingin meninggalkan halaman aktivasi pembayaran?', style: TextStyle(fontSize: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.04)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.04)).toString()), fontWeight: FontWeight.w500), textAlign: TextAlign.center),
+                                                  actions: <Widget>[
+                                                    Center(
+                                                      child: Row(
+                                                        mainAxisAlignment: MainAxisAlignment.spaceAround,
+                                                        children: [
+                                                          FlatButton(
+                                                            // minWidth: CustomSize.sizeWidth(context),
+                                                            color: CustomColor.redBtn,
+                                                            textColor: Colors.white,
+                                                            shape: RoundedRectangleBorder(
+                                                                borderRadius: BorderRadius.all(Radius.circular(10))
+                                                            ),
+                                                            child: Text('Batal'),
+                                                            onPressed: () async{
+                                                              setState(() {
+                                                                // codeDialog = valueText;
+                                                                Navigator.pop(context);
+                                                              });
+                                                            },
+                                                          ),
+                                                          FlatButton(
+                                                            color: CustomColor.primaryLight,
+                                                            textColor: Colors.white,
+                                                            shape: RoundedRectangleBorder(
+                                                                borderRadius: BorderRadius.all(Radius.circular(10))
+                                                            ),
+                                                            child: Text('Iya'),
+                                                            onPressed: () async{
+                                                              if (homepg != "1") {
+                                                                Navigator.pushReplacement(context, PageTransition(type: PageTransitionType.fade, child: HomeActivity()));
+                                                              } else if (homepg == "1") {
+                                                                Navigator.pushReplacement(context, PageTransition(type: PageTransitionType.fade, child: HomeActivityResto()));
+                                                              }
+                                                            },
+                                                          ),
+                                                        ],
+                                                      ),
+                                                    ),
+
+                                                  ],
+                                                );
+                                              });
+                                        },
+                                        child: Icon(Icons.chevron_left, size: double.parse(((MediaQuery.of(context).size.width*0.075).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.075)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.075)).toString()), color: Colors.white,)
+                                    ),
+                                    SizedBox(
+                                      width: CustomSize.sizeWidth(context) / 88,
+                                    ),
+                                    GestureDetector(
+                                      onTap: (){
+                                        showDialog(
+                                            context: context,
+                                            builder: (context) {
+                                              return AlertDialog(
+                                                contentPadding: EdgeInsets.only(left: 25, right: 25, top: 15, bottom: 5),
+                                                shape: RoundedRectangleBorder(
+                                                    borderRadius: BorderRadius.all(Radius.circular(10))
+                                                ),
+                                                title: Center(child: Text('Perhatian!', style: TextStyle(color: CustomColor.redBtn))),
+                                                content: Text('Apakah yakin ingin meninggalkan halaman aktivasi pembayaran?', style: TextStyle(fontSize: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.04)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.04)).toString()), fontWeight: FontWeight.w500), textAlign: TextAlign.center),
+                                                actions: <Widget>[
+                                                  Center(
+                                                    child: Row(
+                                                      mainAxisAlignment: MainAxisAlignment.spaceAround,
+                                                      children: [
+                                                        FlatButton(
+                                                          // minWidth: CustomSize.sizeWidth(context),
+                                                          color: CustomColor.redBtn,
+                                                          textColor: Colors.white,
+                                                          shape: RoundedRectangleBorder(
+                                                              borderRadius: BorderRadius.all(Radius.circular(10))
+                                                          ),
+                                                          child: Text('Batal'),
+                                                          onPressed: () async{
+                                                            setState(() {
+                                                              // codeDialog = valueText;
+                                                              Navigator.pop(context);
+                                                            });
+                                                          },
+                                                        ),
+                                                        FlatButton(
+                                                          color: CustomColor.primaryLight,
+                                                          textColor: Colors.white,
+                                                          shape: RoundedRectangleBorder(
+                                                              borderRadius: BorderRadius.all(Radius.circular(10))
+                                                          ),
+                                                          child: Text('Iya'),
+                                                          onPressed: () async{
+                                                            if (homepg != "1") {
+                                                              Navigator.pushReplacement(context, PageTransition(type: PageTransitionType.fade, child: HomeActivity()));
+                                                            } else if (homepg == "1") {
+                                                              Navigator.pushReplacement(context, PageTransition(type: PageTransitionType.fade, child: HomeActivityResto()));
+                                                            }
+                                                          },
+                                                        ),
+                                                      ],
+                                                    ),
+                                                  ),
+
+                                                ],
+                                              );
+                                            });
+                                      },
+                                      child: CustomText.textHeading4(
+                                          text: "Aktivasi Resto",
+                                          sizeNew: double.parse(((MediaQuery.of(context).size.width*0.045).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.045)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.045)).toString()),
+                                          maxLines: 1,
+                                        color: Colors.white
+                                      ),
+                                    ),
+                                  ],
                                 ),
                               ),
                             ],

@@ -165,10 +165,28 @@ class _EditDataUsahaState extends State<EditDataUsaha> {
                 SizedBox(height: CustomSize.sizeHeight(context) / 38,),
                 Padding(
                   padding: EdgeInsets.symmetric(horizontal: CustomSize.sizeWidth(context) / 32),
-                  child: CustomText.textHeading4(
-                      text: "Edit data restomu",
-                      sizeNew: double.parse(((MediaQuery.of(context).size.width*0.045).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.045).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.045).toString()),
-                      maxLines: 1
+                  child: Row(
+                    children: [
+                      GestureDetector(
+                          onTap: (){
+                            Navigator.pop(context);
+                          },
+                          child: Icon(Icons.chevron_left, size: double.parse(((MediaQuery.of(context).size.width*0.075).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.075)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.075)).toString()),)
+                      ),
+                      SizedBox(
+                        width: CustomSize.sizeWidth(context) / 88,
+                      ),
+                      GestureDetector(
+                        onTap: (){
+                          Navigator.pop(context);
+                        },
+                        child: CustomText.textHeading4(
+                            text: "Edit data restomu",
+                            sizeNew: double.parse(((MediaQuery.of(context).size.width*0.045).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.045)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.045)).toString()),
+                            maxLines: 1
+                        ),
+                      ),
+                    ],
                   ),
                 ),
                 SizedBox(height: CustomSize.sizeHeight(context) / 86,),
@@ -188,10 +206,10 @@ class _EditDataUsahaState extends State<EditDataUsaha> {
                       ),
                       TextField(
                         // readOnly: (btnAddress == true)?true:false,
-                        // onTap: (){
-                        //   Fluttertoast.showToast(msg: 'Anda tidak dapat merubah apapun di halaman ini.',);
-                        // },
-                        // readOnly: true,
+                        onTap: (){
+                          Fluttertoast.showToast(msg: 'Anda tidak dapat merubah apapun di halaman ini.',);
+                        },
+                        readOnly: true,
                         controller: _NameBadanUsaha,
                         keyboardType: TextInputType.text,
                         cursorColor: Colors.black,
@@ -221,10 +239,10 @@ class _EditDataUsahaState extends State<EditDataUsaha> {
                         height: CustomSize.sizeHeight(context) * 0.005,
                       ),
                       TextField(
-                        // onTap: (){
-                        //   Fluttertoast.showToast(msg: 'Anda tidak dapat merubah apapun di halaman ini.',);
-                        // },
-                        // readOnly: true,
+                        onTap: (){
+                          Fluttertoast.showToast(msg: 'Anda tidak dapat merubah apapun di halaman ini.',);
+                        },
+                        readOnly: true,
                         controller: _NamePemilik,
                         keyboardType: TextInputType.text,
                         cursorColor: Colors.black,
@@ -254,10 +272,10 @@ class _EditDataUsahaState extends State<EditDataUsaha> {
                         height: CustomSize.sizeHeight(context) * 0.005,
                       ),
                       TextField(
-                        // onTap: (){
-                        //   Fluttertoast.showToast(msg: 'Anda tidak dapat merubah apapun di halaman ini.',);
-                        // },
-                        // readOnly: true,
+                        onTap: (){
+                          Fluttertoast.showToast(msg: 'Anda tidak dapat merubah apapun di halaman ini.',);
+                        },
+                        readOnly: true,
                         // readOnly: (btnAddress == true)?true:false,
                         controller: _NamePenanggungJawab,
                         keyboardType: TextInputType.text,
@@ -436,10 +454,10 @@ class _EditDataUsahaState extends State<EditDataUsaha> {
                         height: CustomSize.sizeHeight(context) * 0.005,
                       ),
                       TextField(
-                        // onTap: (){
-                        //   Fluttertoast.showToast(msg: 'Anda tidak dapat merubah apapun di halaman ini.',);
-                        // },
-                        // readOnly: true,
+                        onTap: (){
+                          Fluttertoast.showToast(msg: 'Anda tidak dapat merubah apapun di halaman ini.',);
+                        },
+                        readOnly: true,
                         // readOnly: (btnAddress == true)?true:false,
                         controller: _NameRekening,
                         keyboardType: TextInputType.text,
@@ -470,10 +488,10 @@ class _EditDataUsahaState extends State<EditDataUsaha> {
                         height: CustomSize.sizeHeight(context) * 0.005,
                       ),
                       TextField(
-                        // onTap: (){
-                        //   Fluttertoast.showToast(msg: 'Anda tidak dapat merubah apapun di halaman ini.',);
-                        // },
-                        // readOnly: true,
+                        onTap: (){
+                          Fluttertoast.showToast(msg: 'Anda tidak dapat merubah apapun di halaman ini.',);
+                        },
+                        readOnly: true,
                         // readOnly: (btnAddress == true)?true:false,
                         controller: _NameBank,
                         keyboardType: TextInputType.text,
@@ -504,10 +522,10 @@ class _EditDataUsahaState extends State<EditDataUsaha> {
                         height: CustomSize.sizeHeight(context) * 0.005,
                       ),
                       TextField(
-                        // onTap: (){
-                        //   Fluttertoast.showToast(msg: 'Anda tidak dapat merubah apapun di halaman ini.',);
-                        // },
-                        // readOnly: true,
+                        onTap: (){
+                          Fluttertoast.showToast(msg: 'Anda tidak dapat merubah apapun di halaman ini.',);
+                        },
+                        readOnly: true,
                         // readOnly: (btnAddress == true)?true:false,
                         controller: _NoRekeningBank,
                         keyboardType: TextInputType.number,
@@ -1008,10 +1026,28 @@ class _EditDataUsahaState extends State<EditDataUsaha> {
                             SizedBox(height: CustomSize.sizeHeight(context) / 38,),
                             Padding(
                               padding: EdgeInsets.symmetric(horizontal: CustomSize.sizeWidth(context) / 32),
-                              child: CustomText.textHeading4(
-                                  text: "Edit data restomu",
-                                  sizeNew: double.parse(((MediaQuery.of(context).size.width*0.045).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.045).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.045).toString()),
-                                  maxLines: 1
+                              child: Row(
+                                children: [
+                                  GestureDetector(
+                                      onTap: (){
+                                        Navigator.pop(context);
+                                      },
+                                      child: Icon(Icons.chevron_left, size: double.parse(((MediaQuery.of(context).size.width*0.075).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.075)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.075)).toString()),)
+                                  ),
+                                  SizedBox(
+                                    width: CustomSize.sizeWidth(context) / 88,
+                                  ),
+                                  GestureDetector(
+                                    onTap: (){
+                                      Navigator.pop(context);
+                                    },
+                                    child: CustomText.textHeading4(
+                                        text: "Edit data restomu",
+                                        sizeNew: double.parse(((MediaQuery.of(context).size.width*0.045).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.045)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.045)).toString()),
+                                        maxLines: 1
+                                    ),
+                                  ),
+                                ],
                               ),
                             ),
                             SizedBox(height: CustomSize.sizeHeight(context) / 86,),

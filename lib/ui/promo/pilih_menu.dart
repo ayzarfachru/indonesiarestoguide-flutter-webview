@@ -182,11 +182,28 @@ class _PilihMenuActivityState extends State<PilihMenuActivity> {
                     SizedBox(
                       height: CustomSize.sizeHeight(context) / 32,
                     ),
-                    CustomText.textHeading3(
-                        text: "Pilih untuk Promo",
-                        color: CustomColor.primary,
-                        sizeNew: double.parse(((MediaQuery.of(context).size.width*0.045).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.045)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.045)).toString()),
-                        maxLines: 1
+                    Row(
+                      children: [
+                        GestureDetector(
+                            onTap: (){
+                              Navigator.pop(context);
+                            },
+                            child: Icon(Icons.chevron_left, size: double.parse(((MediaQuery.of(context).size.width*0.075).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.075)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.075)).toString()),)
+                        ),
+                        SizedBox(
+                          width: CustomSize.sizeWidth(context) / 88,
+                        ),
+                        GestureDetector(
+                          onTap: (){
+                            Navigator.pop(context);
+                          },
+                          child: CustomText.textHeading4(
+                              text: "Pilih menu",
+                              sizeNew: double.parse(((MediaQuery.of(context).size.width*0.045).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.045)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.045)).toString()),
+                              maxLines: 1
+                          ),
+                        ),
+                      ],
                     ),
                     ListView.builder(
                         shrinkWrap: true,

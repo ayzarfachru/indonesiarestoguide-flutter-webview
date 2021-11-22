@@ -598,7 +598,51 @@ class _CartActivityState extends State<CartActivity> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                SizedBox(height: CustomSize.sizeHeight(context) / 32,),
+                SizedBox(height: CustomSize.sizeHeight(context) / 88,),
+                Padding(
+                  padding: EdgeInsets.symmetric(horizontal: CustomSize.sizeWidth(context) / 24),
+                  child: Row(
+                    children: [
+                      SizedBox(height: CustomSize.sizeHeight(context) / 98,),
+                      GestureDetector(
+                          onTap: (){
+                            Navigator.pop(context);
+                          },
+                          child: Container(
+                              width: CustomSize.sizeWidth(context) / 7,
+                              height: CustomSize.sizeWidth(context) / 7,
+                              decoration: BoxDecoration(
+                                color: Colors.white,
+                                shape: BoxShape.circle,
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: Colors.grey.withOpacity(0.5),
+                                    spreadRadius: 0,
+                                    blurRadius: 7,
+                                    offset: Offset(0, 0), // changes position of shadow
+                                  ),
+                                ],
+                              ),
+                              child: Center(child: Icon(Icons.chevron_left, size: 38,)))
+                      ),
+                      SizedBox(
+                        width: CustomSize.sizeWidth(context) / 48,
+                      ),
+                      Container(
+                        width: CustomSize.sizeWidth(context) / 1.5,
+                        child: CustomText.textHeading3(
+                            text: "Cart",
+                            color: CustomColor.primary,
+                            sizeNew: double.parse(((MediaQuery.of(context).size.width*0.06).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.06)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.06)).toString()),
+                            maxLines: 2
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                SizedBox(height: CustomSize.sizeHeight(context) / 88,),
+                Divider(thickness: 6, color: CustomColor.secondary,),
+                SizedBox(height: CustomSize.sizeHeight(context) / 48,),
                 Padding(
                   padding: EdgeInsets.symmetric(horizontal: CustomSize.sizeWidth(context) / 24),
                   child: Row(
@@ -970,337 +1014,340 @@ class _CartActivityState extends State<CartActivity> {
                             padding: EdgeInsets.zero,
                             shrinkWrap: true,
                             children: [
-                              Row(
-                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                children: [
-                                  Container(
-                                    width: CustomSize.sizeWidth(context) / 1.65,
-                                    height: CustomSize.sizeWidth(context) / 3,
-                                    child: Column(
-                                      crossAxisAlignment: CrossAxisAlignment.start,
-                                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                      children: [
-                                        Column(
-                                          crossAxisAlignment: CrossAxisAlignment.start,
-                                          mainAxisAlignment: MainAxisAlignment.start,
-                                          children: [
-                                            MediaQuery(
-                                              child: CustomText.textHeading4(
-                                                  text: menuJson[index].name,
-                                                  sizeNew: double.parse(((MediaQuery.of(context).size.width*0.045).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.045)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.045)).toString()),
-                                                  maxLines: 1
-                                              ),
-                                                data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0)
-                                            ),
-                                            MediaQuery(
-                                              child: CustomText.bodyRegular14(
-                                                  text: menuJson[index].desc,
-                                                  maxLines: 2,
-                                                  sizeNew: double.parse(((MediaQuery.of(context).size.width*0.035).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.035)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.035)).toString()),
-                                              ),
-                                                data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0)
-                                            ),
-                                            // CustomText.bodyRegular16(text: (noted[index].split(': ')[1] != 'kam5ia_null}')?noted[index].split('{')[1].split('}')[0]:''),
-                                            SizedBox(height: CustomSize.sizeHeight(context) / 48,),
-                                      (menuJson[index].discount == null || menuJson[index].discount == 'null' || menuJson[index].discount == '')?MediaQuery(
-                                        child: CustomText.bodyMedium14(
-                                                  text: NumberFormat.currency(locale: 'id', symbol: '', decimalDigits: 0).format(int.parse(menuJson[index].price)),
-                                                  maxLines: 1,
-                                            sizeNew: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.04)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.04)).toString())
-                                              ),
-                                          data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0)
-                                      )
-                                          :Row(
-                                              children: [
-                                                MediaQuery(
-                                                  child: CustomText.bodyMedium14(
-                                                      text: NumberFormat.currency(locale: 'id', symbol: '', decimalDigits: 0).format(int.parse(menuJson[index].price)),
-                                                      maxLines: 1,
-                                                      sizeNew: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.04)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.04)).toString()),
-                                                      decoration: TextDecoration.lineThrough
-                                                  ),
-                                                    data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0)
+                              Container(
+                                height: CustomSize.sizeHeight(context) / 4,
+                                child: Row(
+                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    Container(
+                                      width: CustomSize.sizeWidth(context) / 1.65,
+                                      height: CustomSize.sizeWidth(context) / 3,
+                                      child: Column(
+                                        crossAxisAlignment: CrossAxisAlignment.start,
+                                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                        children: [
+                                          Column(
+                                            crossAxisAlignment: CrossAxisAlignment.start,
+                                            mainAxisAlignment: MainAxisAlignment.start,
+                                            children: [
+                                              MediaQuery(
+                                                child: CustomText.textHeading4(
+                                                    text: menuJson[index].name,
+                                                    sizeNew: double.parse(((MediaQuery.of(context).size.width*0.045).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.045)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.045)).toString()),
+                                                    maxLines: 1
                                                 ),
-                                                SizedBox(width: CustomSize.sizeWidth(context) / 48,),
-                                                MediaQuery(
-                                                  child: CustomText.bodyMedium14(
-                                                      text: NumberFormat.currency(locale: 'id', symbol: '', decimalDigits: 0).format(int.parse(menuJson[index].discount!)),
-                                                      maxLines: 1,
-                                                      sizeNew: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.04)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.04)).toString())
-                                                  ),
-                                                    data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0)
+                                                  data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0)
+                                              ),
+                                              MediaQuery(
+                                                child: CustomText.bodyRegular14(
+                                                    text: menuJson[index].desc,
+                                                    maxLines: 2,
+                                                    sizeNew: double.parse(((MediaQuery.of(context).size.width*0.035).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.035)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.035)).toString()),
                                                 ),
-                                              ],
-                                            ),
-                                          ],
-                                        ),
-                                        // (menuReady[index])?Container():CustomText.bodyMedium14(
-                                        //     text: "Menu tidak tersedia.",
-                                        //     maxLines: 1,
-                                        //     color: Colors.red
-                                        // ),
-                                        (noted[index].split(': ')[1] != 'kam5ia_null}')?Container():GestureDetector(
-                                          onTap: (){
-                                            showDialog(
-                                                context: context,
-                                                builder: (context) {
-                                                  return AlertDialog(
-                                                    shape: RoundedRectangleBorder(
-                                                        borderRadius: BorderRadius.all(Radius.circular(10))
+                                                  data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0)
+                                              ),
+                                              // CustomText.bodyRegular16(text: (noted[index].split(': ')[1] != 'kam5ia_null}')?noted[index].split('{')[1].split('}')[0]:''),
+                                              SizedBox(height: CustomSize.sizeHeight(context) / 48,),
+                                        (menuJson[index].discount == null || menuJson[index].discount == 'null' || menuJson[index].discount == '')?MediaQuery(
+                                          child: CustomText.bodyMedium14(
+                                                    text: NumberFormat.currency(locale: 'id', symbol: '', decimalDigits: 0).format(int.parse(menuJson[index].price)),
+                                                    maxLines: 1,
+                                              sizeNew: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.04)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.04)).toString())
+                                                ),
+                                            data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0)
+                                        )
+                                            :Row(
+                                                children: [
+                                                  MediaQuery(
+                                                    child: CustomText.bodyMedium14(
+                                                        text: NumberFormat.currency(locale: 'id', symbol: '', decimalDigits: 0).format(int.parse(menuJson[index].price)),
+                                                        maxLines: 1,
+                                                        sizeNew: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.04)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.04)).toString()),
+                                                        decoration: TextDecoration.lineThrough
                                                     ),
-                                                    title: CustomText.bodyMedium14(text: 'Catatan', sizeNew: double.parse(((MediaQuery.of(context).size.width*0.045).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.045)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.045)).toString())),
-                                                    content: TextField(
-                                                      autofocus: true,
-                                                      keyboardType: TextInputType.text,
-                                                      controller: note,
-                                                      decoration: InputDecoration(
-                                                        hintText: "Untuk pesananmu",
-                                                        hintStyle: TextStyle(fontSize: double.parse(((MediaQuery.of(context).size.width*0.035).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.035)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.035)).toString())),
-                                                        border: OutlineInputBorder(
-                                                          borderRadius: BorderRadius.circular(10.0),
-                                                        ),
-                                                        enabledBorder: OutlineInputBorder(
-                                                          borderSide: const BorderSide(color: Colors.grey, width: 1.0),
-                                                        ),
-                                                        focusedBorder: OutlineInputBorder(
-                                                          borderSide: const BorderSide(color: Colors.grey, width: 2.0),
-                                                        ),
+                                                      data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0)
+                                                  ),
+                                                  SizedBox(width: CustomSize.sizeWidth(context) / 48,),
+                                                  MediaQuery(
+                                                    child: CustomText.bodyMedium14(
+                                                        text: NumberFormat.currency(locale: 'id', symbol: '', decimalDigits: 0).format(int.parse(menuJson[index].discount!)),
+                                                        maxLines: 1,
+                                                        sizeNew: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.04)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.04)).toString())
+                                                    ),
+                                                      data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0)
+                                                  ),
+                                                ],
+                                              ),
+                                            ],
+                                          ),
+                                          // (menuReady[index])?Container():CustomText.bodyMedium14(
+                                          //     text: "Menu tidak tersedia.",
+                                          //     maxLines: 1,
+                                          //     color: Colors.red
+                                          // ),
+                                          (noted[index].split(': ')[1] != 'kam5ia_null}')?Container():GestureDetector(
+                                            onTap: (){
+                                              showDialog(
+                                                  context: context,
+                                                  builder: (context) {
+                                                    return AlertDialog(
+                                                      shape: RoundedRectangleBorder(
+                                                          borderRadius: BorderRadius.all(Radius.circular(10))
                                                       ),
-                                                    ),
-                                                    actions: <Widget>[
-                                                      Center(
-                                                        child: Padding(
-                                                          padding: const EdgeInsets.only(left: 10.0, right: 10.0, bottom: 8.0),
-                                                          child: FlatButton(
-                                                            minWidth: CustomSize.sizeWidth(context),
-                                                            color: CustomColor.primaryLight,
-                                                            textColor: Colors.white,
-                                                            shape: RoundedRectangleBorder(
-                                                                borderRadius: BorderRadius.all(Radius.circular(10))
-                                                            ),
-                                                            child: CustomText.bodyMedium14(text: 'Simpan', color: Colors.white, sizeNew: double.parse(((MediaQuery.of(context).size.width*0.035).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.035)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.035)).toString())),
-                                                            onPressed: () async{
-                                                              String s = noted[restoId.indexOf(menuJson[index].id.toString())];
-                                                              String i = s.replaceAll(noted[restoId.indexOf(menuJson[index].id.toString())].split(': ')[1], (note.text != '')?note.text+'}':'kam5ia_null'+'}') ;
-                                                              print(i);
-                                                              noted[restoId.indexOf(menuJson[index].id.toString())] = i.toString();
-                                                              // int i = int.parse(s) + 1;
-                                                              // print(i);
-                                                              // noted.add(note.text);
-                                                              SharedPreferences pref = await SharedPreferences.getInstance();
-                                                              pref.setStringList("note", noted);
-                                                              noteProduct = '';
-                                                              // _getData();
-                                                              getNote();
-                                                              setState(() {
-                                                                // codeDialog = valueText;
-                                                                Navigator.pop(context);
-                                                                Navigator.push(context, PageTransition(
-                                                                    type: PageTransitionType.fade,
-                                                                    child: CartActivity()));
-                                                              });
-                                                            },
+                                                      title: CustomText.bodyMedium14(text: 'Catatan', sizeNew: double.parse(((MediaQuery.of(context).size.width*0.045).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.045)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.045)).toString())),
+                                                      content: TextField(
+                                                        autofocus: true,
+                                                        keyboardType: TextInputType.text,
+                                                        controller: note,
+                                                        decoration: InputDecoration(
+                                                          hintText: "Untuk pesananmu",
+                                                          hintStyle: TextStyle(fontSize: double.parse(((MediaQuery.of(context).size.width*0.035).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.035)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.035)).toString())),
+                                                          border: OutlineInputBorder(
+                                                            borderRadius: BorderRadius.circular(10.0),
+                                                          ),
+                                                          enabledBorder: OutlineInputBorder(
+                                                            borderSide: const BorderSide(color: Colors.grey, width: 1.0),
+                                                          ),
+                                                          focusedBorder: OutlineInputBorder(
+                                                            borderSide: const BorderSide(color: Colors.grey, width: 2.0),
                                                           ),
                                                         ),
                                                       ),
+                                                      actions: <Widget>[
+                                                        Center(
+                                                          child: Padding(
+                                                            padding: const EdgeInsets.only(left: 10.0, right: 10.0, bottom: 8.0),
+                                                            child: FlatButton(
+                                                              minWidth: CustomSize.sizeWidth(context),
+                                                              color: CustomColor.primaryLight,
+                                                              textColor: Colors.white,
+                                                              shape: RoundedRectangleBorder(
+                                                                  borderRadius: BorderRadius.all(Radius.circular(10))
+                                                              ),
+                                                              child: CustomText.bodyMedium14(text: 'Simpan', color: Colors.white, sizeNew: double.parse(((MediaQuery.of(context).size.width*0.035).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.035)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.035)).toString())),
+                                                              onPressed: () async{
+                                                                String s = noted[restoId.indexOf(menuJson[index].id.toString())];
+                                                                String i = s.replaceAll(noted[restoId.indexOf(menuJson[index].id.toString())].split(': ')[1], (note.text != '')?note.text+'}':'kam5ia_null'+'}') ;
+                                                                print(i);
+                                                                noted[restoId.indexOf(menuJson[index].id.toString())] = i.toString();
+                                                                // int i = int.parse(s) + 1;
+                                                                // print(i);
+                                                                // noted.add(note.text);
+                                                                SharedPreferences pref = await SharedPreferences.getInstance();
+                                                                pref.setStringList("note", noted);
+                                                                noteProduct = '';
+                                                                // _getData();
+                                                                getNote();
+                                                                setState(() {
+                                                                  // codeDialog = valueText;
+                                                                  Navigator.pop(context);
+                                                                  Navigator.push(context, PageTransition(
+                                                                      type: PageTransitionType.fade,
+                                                                      child: CartActivity()));
+                                                                });
+                                                              },
+                                                            ),
+                                                          ),
+                                                        ),
 
-                                                    ],
-                                                  );
-                                                });
-                                          },
-                                          child: Container(
-                                            height: CustomSize.sizeHeight(context) / 28,
-                                            width: CustomSize.sizeWidth(context) / 3,
-                                            decoration: BoxDecoration(
-                                                borderRadius: BorderRadius.circular(20),
-                                                border: Border.all(color: Colors.grey)
-                                            ),
-                                            child: Padding(
-                                              padding: EdgeInsets.symmetric(horizontal: CustomSize.sizeWidth(context) / 35),
-                                              child: Center(
-                                                child: MediaQuery(
-                                                  child: CustomText.bodyRegular14(
-                                                      text: 'Tambah catatan',
-                                                      color: Colors.grey,
-                                                      sizeNew: double.parse(((MediaQuery.of(context).size.width*0.035).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.035)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.035)).toString())
+                                                      ],
+                                                    );
+                                                  });
+                                            },
+                                            child: Container(
+                                              height: CustomSize.sizeHeight(context) / 28,
+                                              width: CustomSize.sizeWidth(context) / 3,
+                                              decoration: BoxDecoration(
+                                                  borderRadius: BorderRadius.circular(20),
+                                                  border: Border.all(color: Colors.grey)
+                                              ),
+                                              child: Padding(
+                                                padding: EdgeInsets.symmetric(horizontal: CustomSize.sizeWidth(context) / 35),
+                                                child: Center(
+                                                  child: MediaQuery(
+                                                    child: CustomText.bodyRegular14(
+                                                        text: 'Tambah catatan',
+                                                        color: Colors.grey,
+                                                        sizeNew: double.parse(((MediaQuery.of(context).size.width*0.035).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.035)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.035)).toString())
+                                                    ),
+                                                      data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0)
                                                   ),
-                                                    data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0)
                                                 ),
                                               ),
                                             ),
                                           ),
-                                        ),
-                                      ],
+                                        ],
+                                      ),
                                     ),
-                                  ),
-                                  Container(
-                                    height: CustomSize.sizeWidth(context) / 2.5,
-                                    child: Column(
-                                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                      crossAxisAlignment: CrossAxisAlignment.end,
-                                      children: [
-                                        GestureDetector(
-                                          onTap: (){
-                                            Navigator.push(
-                                                context,
-                                                PageTransition(
-                                                    type: PageTransitionType.rightToLeft,
-                                                    child: new DetailResto(checkId)));
-                                          },
-                                          child: FullScreenWidget(
-                                            child: Container(
-                                              width: CustomSize.sizeWidth(context) / 3.4,
-                                              height: CustomSize.sizeWidth(context) / 3.4,
-                                              child: ClipRRect(
-                                                borderRadius: BorderRadius.circular(10),
-                                                child: Image.network(Links.subUrl + menuJson[index].urlImg, fit: BoxFit.fitWidth),
+                                    Container(
+                                      height: CustomSize.sizeWidth(context) / 2.5,
+                                      child: Column(
+                                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                        crossAxisAlignment: CrossAxisAlignment.end,
+                                        children: [
+                                          GestureDetector(
+                                            onTap: (){
+                                              Navigator.push(
+                                                  context,
+                                                  PageTransition(
+                                                      type: PageTransitionType.rightToLeft,
+                                                      child: new DetailResto(checkId)));
+                                            },
+                                            child: FullScreenWidget(
+                                              child: Container(
+                                                width: CustomSize.sizeWidth(context) / 3.4,
+                                                height: CustomSize.sizeWidth(context) / 3.4,
+                                                child: ClipRRect(
+                                                  borderRadius: BorderRadius.circular(10),
+                                                  child: Image.network(Links.subUrl + menuJson[index].urlImg, fit: BoxFit.fitWidth),
+                                                ),
                                               ),
-                                            ),
-                                          )
-                                          // child: Container(
-                                          //   width: CustomSize.sizeWidth(context) / 3.4,
-                                          //   height: CustomSize.sizeWidth(context) / 3.4,
-                                          //   decoration: BoxDecoration(
-                                          //       image: DecorationImage(
-                                          //           image: NetworkImage(Links.subUrl + menuJson[index].urlImg),
-                                          //           fit: BoxFit.cover
-                                          //       ),
-                                          //       borderRadius: BorderRadius.circular(20)
-                                          //   ),
-                                          // ),
-                                        ),
-                                        Row(
-                                          children: [
-                                            GestureDetector(
-                                              onTap: ()async{
-                                                print(index);
-                                                String s = qty[restoId.indexOf(menuJson[index].id.toString())];
-                                                int i = int.parse(s) - 1;
-                                                print(i);
-                                                qty[restoId.indexOf(menuJson[index].id.toString())] = i.toString();
-                                                SharedPreferences pref = await SharedPreferences.getInstance();
-                                                pref.setStringList("qty", qty);
-                                                _qty = qty.toString().split('[')[1].split(']')[0].replaceAll(' ', '');
-                                                harga = (menuJson[restoId.indexOf(menuJson[index].id.toString())].discount.toString() == null || menuJson[restoId.indexOf(menuJson[index].id.toString())].discount.toString() == 'null' || menuJson[restoId.indexOf(menuJson[index].id.toString())].discount.toString() == '')?harga - int.parse(menuJson[restoId.indexOf(menuJson[index].id.toString())].price):harga - int.parse(menuJson[restoId.indexOf(menuJson[index].id.toString())].discount!);
-                                                int _total = (menuJson[restoId.indexOf(menuJson[index].id.toString())].discount.toString() == null || menuJson[restoId.indexOf(menuJson[index].id.toString())].discount.toString() == 'null' || menuJson[restoId.indexOf(menuJson[index].id.toString())].discount.toString() == '')?int.parse(totalHarga) - int.parse(menuJson[restoId.indexOf(menuJson[index].id.toString())].price):int.parse(totalHarga) - int.parse(menuJson[restoId.indexOf(menuJson[index].id.toString())].discount!);
-                                                totalHarga = _total.toString();
-
-                                                if (harga == 0) {
-                                                  Navigator.pushReplacement(context, MaterialPageRoute(builder: (context)=> HomeActivity()));
-                                                  print('ini name '+name.toString());
-                                                  pref.remove('inCart');
-                                                  pref.setString("menuJson", "");
-                                                  pref.setString("restoId", "");
-                                                  pref.setString("qty", "");
-                                                  pref.setString("note", "");
-                                                  pref.remove("restoIdUsr");
-                                                  pref.remove("addressDelivTrans");
-                                                  pref.remove("distan");
-                                                  // pref.remove("restoId");
-                                                  // pref.remove("qty");
-                                                }
-
-                                                if(i == 0){
-                                                  qty.removeAt(index);
-                                                  noted.removeAt(index);
-                                                  menuJson.removeAt(index);
-                                                  restoId.removeAt(index);
-                                                  String json = jsonEncode(menuJson.map((m) => m.toJson()).toList());
-                                                  print(json);
+                                            )
+                                            // child: Container(
+                                            //   width: CustomSize.sizeWidth(context) / 3.4,
+                                            //   height: CustomSize.sizeWidth(context) / 3.4,
+                                            //   decoration: BoxDecoration(
+                                            //       image: DecorationImage(
+                                            //           image: NetworkImage(Links.subUrl + menuJson[index].urlImg),
+                                            //           fit: BoxFit.cover
+                                            //       ),
+                                            //       borderRadius: BorderRadius.circular(20)
+                                            //   ),
+                                            // ),
+                                          ),
+                                          Row(
+                                            children: [
+                                              GestureDetector(
+                                                onTap: ()async{
+                                                  print(index);
+                                                  String s = qty[restoId.indexOf(menuJson[index].id.toString())];
+                                                  int i = int.parse(s) - 1;
+                                                  print(i);
+                                                  qty[restoId.indexOf(menuJson[index].id.toString())] = i.toString();
                                                   SharedPreferences pref = await SharedPreferences.getInstance();
-                                                  pref.setString("menuJson", json);
-                                                  pref.setStringList("restoId", restoId);
                                                   pref.setStringList("qty", qty);
-                                                  pref.setStringList("note", noted);
-                                                  // Navigator.push(context, PageTransition(
-                                                  //     type: PageTransitionType.fade,
-                                                  //     child: CartActivity()));
+                                                  _qty = qty.toString().split('[')[1].split(']')[0].replaceAll(' ', '');
+                                                  harga = (menuJson[restoId.indexOf(menuJson[index].id.toString())].discount.toString() == null || menuJson[restoId.indexOf(menuJson[index].id.toString())].discount.toString() == 'null' || menuJson[restoId.indexOf(menuJson[index].id.toString())].discount.toString() == '')?harga - int.parse(menuJson[restoId.indexOf(menuJson[index].id.toString())].price):harga - int.parse(menuJson[restoId.indexOf(menuJson[index].id.toString())].discount!);
+                                                  int _total = (menuJson[restoId.indexOf(menuJson[index].id.toString())].discount.toString() == null || menuJson[restoId.indexOf(menuJson[index].id.toString())].discount.toString() == 'null' || menuJson[restoId.indexOf(menuJson[index].id.toString())].discount.toString() == '')?int.parse(totalHarga) - int.parse(menuJson[restoId.indexOf(menuJson[index].id.toString())].price):int.parse(totalHarga) - int.parse(menuJson[restoId.indexOf(menuJson[index].id.toString())].discount!);
+                                                  totalHarga = _total.toString();
 
-                                                  if(_tempMenu.length == 0){
-                                                    pref.setString("inCart", '');
-                                                    pref.setString('restaurantId', '');
+                                                  if (harga == 0) {
+                                                    Navigator.pushReplacement(context, MaterialPageRoute(builder: (context)=> HomeActivity()));
+                                                    print('ini name '+name.toString());
+                                                    pref.remove('inCart');
+                                                    pref.setString("menuJson", "");
+                                                    pref.setString("restoId", "");
+                                                    pref.setString("qty", "");
+                                                    pref.setString("note", "");
+                                                    pref.remove("restoIdUsr");
+                                                    pref.remove("addressDelivTrans");
+                                                    pref.remove("distan");
+                                                    // pref.remove("restoId");
+                                                    // pref.remove("qty");
                                                   }
-                                                }
-                                                print(harga);
-                                                setState(() {});
-                                                // if(deleteAnimation[index] != true){
-                                                // if(int.parse(qty[restoId.indexOf(menuJson[index].id.toString())]) > 1){
 
-                                                // }else{
-                                                // setState(() {
-                                                //   deleteAnimation[index] = true;
-                                                // });
-                                                // print(deleteAnimation);
-                                                // _tempQty.removeAt(_tempRestoId.indexOf(menuJson[index].id.toString()));
-                                                // _tempMenu.removeAt(_tempRestoId.indexOf(menuJson[index].id.toString()));
-                                                // _tempRestoId.removeAt(_tempRestoId.indexOf(menuJson[index].id.toString()));
-                                                // String json = jsonEncode(_tempMenu.map((m) => m.toJson()).toList());
-                                                // print(json);
-                                                // SharedPreferences pref = await SharedPreferences.getInstance();
-                                                // pref.setString("menuJson", json);
-                                                // pref.setStringList("restoId", _tempRestoId);
-                                                // pref.setStringList("qty", _tempQty);
-                                                //
-                                                // if(_tempMenu.length == 0){
-                                                //   pref.setString("inCart", '');
-                                                // }
-                                                // }
-                                                // }
-                                              },
-                                              child: Container(
-                                                width: CustomSize.sizeWidth(context) / 12,
-                                                height: CustomSize.sizeWidth(context) / 12,
-                                                decoration: BoxDecoration(
-                                                    color: Colors.grey[200],
-                                                    shape: BoxShape.circle
+                                                  if(i == 0){
+                                                    qty.removeAt(index);
+                                                    noted.removeAt(index);
+                                                    menuJson.removeAt(index);
+                                                    restoId.removeAt(index);
+                                                    String json = jsonEncode(menuJson.map((m) => m.toJson()).toList());
+                                                    print(json);
+                                                    SharedPreferences pref = await SharedPreferences.getInstance();
+                                                    pref.setString("menuJson", json);
+                                                    pref.setStringList("restoId", restoId);
+                                                    pref.setStringList("qty", qty);
+                                                    pref.setStringList("note", noted);
+                                                    // Navigator.push(context, PageTransition(
+                                                    //     type: PageTransitionType.fade,
+                                                    //     child: CartActivity()));
+
+                                                    if(_tempMenu.length == 0){
+                                                      pref.setString("inCart", '');
+                                                      pref.setString('restaurantId', '');
+                                                    }
+                                                  }
+                                                  print(harga);
+                                                  setState(() {});
+                                                  // if(deleteAnimation[index] != true){
+                                                  // if(int.parse(qty[restoId.indexOf(menuJson[index].id.toString())]) > 1){
+
+                                                  // }else{
+                                                  // setState(() {
+                                                  //   deleteAnimation[index] = true;
+                                                  // });
+                                                  // print(deleteAnimation);
+                                                  // _tempQty.removeAt(_tempRestoId.indexOf(menuJson[index].id.toString()));
+                                                  // _tempMenu.removeAt(_tempRestoId.indexOf(menuJson[index].id.toString()));
+                                                  // _tempRestoId.removeAt(_tempRestoId.indexOf(menuJson[index].id.toString()));
+                                                  // String json = jsonEncode(_tempMenu.map((m) => m.toJson()).toList());
+                                                  // print(json);
+                                                  // SharedPreferences pref = await SharedPreferences.getInstance();
+                                                  // pref.setString("menuJson", json);
+                                                  // pref.setStringList("restoId", _tempRestoId);
+                                                  // pref.setStringList("qty", _tempQty);
+                                                  //
+                                                  // if(_tempMenu.length == 0){
+                                                  //   pref.setString("inCart", '');
+                                                  // }
+                                                  // }
+                                                  // }
+                                                },
+                                                child: Container(
+                                                  width: CustomSize.sizeWidth(context) / 12,
+                                                  height: CustomSize.sizeWidth(context) / 12,
+                                                  decoration: BoxDecoration(
+                                                      color: Colors.grey[200],
+                                                      shape: BoxShape.circle
+                                                  ),
+                                                  child: Center(child: MediaQuery(
+                                                      child: CustomText.textHeading1(text: "-", color: Colors.grey, sizeNew: double.parse(((MediaQuery.of(context).size.width*0.08).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.08)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.08)).toString())),
+                                                      data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0)
+                                                  )),
                                                 ),
-                                                child: Center(child: MediaQuery(
-                                                    child: CustomText.textHeading1(text: "-", color: Colors.grey, sizeNew: double.parse(((MediaQuery.of(context).size.width*0.08).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.08)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.08)).toString())),
-                                                    data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0)
-                                                )),
                                               ),
-                                            ),
-                                            SizedBox(width: CustomSize.sizeWidth(context) / 24,),
-                                            MediaQuery(
-                                                child: CustomText.bodyRegular16(text: qty[index], sizeNew: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.04)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.04)).toString())),
-                                                data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0)
-                                            ),
-                                            SizedBox(width: CustomSize.sizeWidth(context) / 24,),
-                                            GestureDetector(
-                                              onTap: ()async{
-                                                String s = qty[restoId.indexOf(menuJson[index].id.toString())];
-                                                print(s);
-                                                int i = int.parse(s) + 1;
-                                                print(i);
-                                                qty[restoId.indexOf(menuJson[index].id.toString())] = i.toString();
-                                                SharedPreferences pref = await SharedPreferences.getInstance();
-                                                pref.setStringList("qty", qty);
-                                                _qty = qty.toString().split('[')[1].split(']')[0].replaceAll(' ', '');
-                                                harga = (menuJson[restoId.indexOf(menuJson[index].id.toString())].discount.toString() == null || menuJson[restoId.indexOf(menuJson[index].id.toString())].discount.toString() == 'null' || menuJson[restoId.indexOf(menuJson[index].id.toString())].discount.toString() == '')?harga + int.parse(menuJson[restoId.indexOf(menuJson[index].id.toString())].price):harga + int.parse(menuJson[restoId.indexOf(menuJson[index].id.toString())].discount!);
-                                                int _total = (menuJson[restoId.indexOf(menuJson[index].id.toString())].discount.toString() == null || menuJson[restoId.indexOf(menuJson[index].id.toString())].discount.toString() == 'null' || menuJson[restoId.indexOf(menuJson[index].id.toString())].discount.toString() == '')?int.parse(totalHarga) + int.parse(menuJson[restoId.indexOf(menuJson[index].id.toString())].price):int.parse(totalHarga) + int.parse(menuJson[restoId.indexOf(menuJson[index].id.toString())].discount!);
-                                                totalHarga = _total.toString();
-                                                print(harga);
-                                                setState(() {});
-                                              },
-                                              child: Container(
-                                                width: CustomSize.sizeWidth(context) / 12,
-                                                height: CustomSize.sizeWidth(context) / 12,
-                                                decoration: BoxDecoration(
-                                                    color: Colors.grey[200],
-                                                    shape: BoxShape.circle
+                                              SizedBox(width: CustomSize.sizeWidth(context) / 24,),
+                                              MediaQuery(
+                                                  child: CustomText.bodyRegular16(text: qty[index], sizeNew: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.04)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.04)).toString())),
+                                                  data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0)
+                                              ),
+                                              SizedBox(width: CustomSize.sizeWidth(context) / 24,),
+                                              GestureDetector(
+                                                onTap: ()async{
+                                                  String s = qty[restoId.indexOf(menuJson[index].id.toString())];
+                                                  print(s);
+                                                  int i = int.parse(s) + 1;
+                                                  print(i);
+                                                  qty[restoId.indexOf(menuJson[index].id.toString())] = i.toString();
+                                                  SharedPreferences pref = await SharedPreferences.getInstance();
+                                                  pref.setStringList("qty", qty);
+                                                  _qty = qty.toString().split('[')[1].split(']')[0].replaceAll(' ', '');
+                                                  harga = (menuJson[restoId.indexOf(menuJson[index].id.toString())].discount.toString() == null || menuJson[restoId.indexOf(menuJson[index].id.toString())].discount.toString() == 'null' || menuJson[restoId.indexOf(menuJson[index].id.toString())].discount.toString() == '')?harga + int.parse(menuJson[restoId.indexOf(menuJson[index].id.toString())].price):harga + int.parse(menuJson[restoId.indexOf(menuJson[index].id.toString())].discount!);
+                                                  int _total = (menuJson[restoId.indexOf(menuJson[index].id.toString())].discount.toString() == null || menuJson[restoId.indexOf(menuJson[index].id.toString())].discount.toString() == 'null' || menuJson[restoId.indexOf(menuJson[index].id.toString())].discount.toString() == '')?int.parse(totalHarga) + int.parse(menuJson[restoId.indexOf(menuJson[index].id.toString())].price):int.parse(totalHarga) + int.parse(menuJson[restoId.indexOf(menuJson[index].id.toString())].discount!);
+                                                  totalHarga = _total.toString();
+                                                  print(harga);
+                                                  setState(() {});
+                                                },
+                                                child: Container(
+                                                  width: CustomSize.sizeWidth(context) / 12,
+                                                  height: CustomSize.sizeWidth(context) / 12,
+                                                  decoration: BoxDecoration(
+                                                      color: Colors.grey[200],
+                                                      shape: BoxShape.circle
+                                                  ),
+                                                  child: Center(child: MediaQuery(
+                                                      child: CustomText.textHeading1(text: "+", color: Colors.grey, sizeNew: double.parse(((MediaQuery.of(context).size.width*0.08).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.08)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.08)).toString())),
+                                                      data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0)
+                                                  )),
                                                 ),
-                                                child: Center(child: MediaQuery(
-                                                    child: CustomText.textHeading1(text: "+", color: Colors.grey, sizeNew: double.parse(((MediaQuery.of(context).size.width*0.08).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.08)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.08)).toString())),
-                                                    data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0)
-                                                )),
                                               ),
-                                            ),
-                                          ],
-                                        )
-                                      ],
+                                            ],
+                                          )
+                                        ],
+                                      ),
                                     ),
-                                  ),
-                                ],
+                                  ],
+                                ),
                               ),
                               SizedBox(height: CustomSize.sizeHeight(context) / 68,),
                               Divider()

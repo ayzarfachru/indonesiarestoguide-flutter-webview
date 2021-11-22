@@ -354,11 +354,42 @@ class _LagiDiskonActivityState extends State<LagiDiskonActivity> {
                       SizedBox(
                         height: CustomSize.sizeHeight(context) / 32,
                       ),
-                      (homepg != "1")?CustomText.textHeading3(
-                          text: "Lagi Diskon",
-                          color: CustomColor.primary,
-                          sizeNew: double.parse(((MediaQuery.of(context).size.width*0.045).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.045)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.045)).toString()),
-                          maxLines: 1
+                      (homepg != "1")?Row(
+                        children: [
+                          GestureDetector(
+                              onTap: (){
+                                Navigator.pop(context);
+                              },
+                              child: Container(
+                                  width: CustomSize.sizeWidth(context) / 7,
+                                  height: CustomSize.sizeWidth(context) / 7,
+                                  decoration: BoxDecoration(
+                                    color: Colors.white,
+                                    shape: BoxShape.circle,
+                                    boxShadow: [
+                                      BoxShadow(
+                                        color: Colors.grey.withOpacity(0.5),
+                                        spreadRadius: 0,
+                                        blurRadius: 7,
+                                        offset: Offset(0, 0), // changes position of shadow
+                                      ),
+                                    ],
+                                  ),
+                                  child: Center(child: Icon(Icons.chevron_left, size: 38,)))
+                          ),
+                          SizedBox(
+                            width: CustomSize.sizeWidth(context) / 48,
+                          ),
+                          Container(
+                            width: CustomSize.sizeWidth(context) / 1.5,
+                            child: CustomText.textHeading3(
+                                text: "Lagi Diskon",
+                                color: CustomColor.primary,
+                                sizeNew: double.parse(((MediaQuery.of(context).size.width*0.06).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.06)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.06)).toString()),
+                                maxLines: 2
+                            ),
+                          ),
+                        ],
                       ):CustomText.textHeading3(
                           text: "Promo di Tokomu",
                           color: CustomColor.primary,
@@ -595,17 +626,48 @@ class _LagiDiskonActivityState extends State<LagiDiskonActivity> {
                           SizedBox(
                             height: CustomSize.sizeHeight(context) / 32,
                           ),
-                          CustomText.textHeading3(
-                              text: "Promo di Tokomu",
-                              color: CustomColor.primary,
-                              sizeNew: double.parse(((MediaQuery.of(context).size.width*0.045).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.045)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.045)).toString()),
-                              maxLines: 1
+                          Row(
+                            children: [
+                              GestureDetector(
+                                  onTap: (){
+                                    Navigator.pop(context);
+                                  },
+                                  child: Container(
+                                      width: CustomSize.sizeWidth(context) / 7,
+                                      height: CustomSize.sizeWidth(context) / 7,
+                                      decoration: BoxDecoration(
+                                        color: Colors.white,
+                                        shape: BoxShape.circle,
+                                        boxShadow: [
+                                          BoxShadow(
+                                            color: Colors.grey.withOpacity(0.5),
+                                            spreadRadius: 0,
+                                            blurRadius: 7,
+                                            offset: Offset(0, 0), // changes position of shadow
+                                          ),
+                                        ],
+                                      ),
+                                      child: Center(child: Icon(Icons.chevron_left, size: 38,)))
+                              ),
+                              SizedBox(
+                                width: CustomSize.sizeWidth(context) / 48,
+                              ),
+                              Container(
+                                width: CustomSize.sizeWidth(context) / 1.5,
+                                child: CustomText.textHeading3(
+                                    text: "Lagi Diskon",
+                                    color: CustomColor.primary,
+                                    sizeNew: double.parse(((MediaQuery.of(context).size.width*0.06).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.06)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.06)).toString()),
+                                    maxLines: 2
+                                ),
+                              ),
+                            ],
                           ),
                         ],
                       ),
                       Container(height: CustomSize.sizeHeight(context), child: Center(
                         child: CustomText.bodyRegular14(
-                            text: 'Promo kosong.',
+                            text: 'kosong.',
                             maxLines: 1,
                             sizeNew: double.parse(((MediaQuery.of(context).size.width*0.03).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.03).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.03).toString()),
                             color: Colors.grey

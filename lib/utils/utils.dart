@@ -456,7 +456,7 @@ class CustomText{
     );
   }
 
-  static Widget bodyRegular12({String? text, Color? color,
+  static Widget bodyRegular12({String? text, Color? color, context,
     double? minSize, double? sizeNew, int? maxLines, TextDecoration? decoration}){
     return AutoSizeText(
       text,

@@ -211,15 +211,50 @@ class _HistoryActivityState extends State<HistoryActivity> {
                     color: Colors.white,
                     child: Padding(
                       padding: EdgeInsets.symmetric(horizontal: CustomSize.sizeWidth(context) / 24),
-                      child: (homepg != "1")?CustomText.textHeading3(
-                          text: "Riwayat",
-                          sizeNew: double.parse(((MediaQuery.of(context).size.width*0.045).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.045)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.045)).toString()),
-                          maxLines: 1
-                      ):CustomText.textHeading3(
-                          text: "Riwayat Penjualan",
-                          color: CustomColor.primary,
-                          sizeNew: double.parse(((MediaQuery.of(context).size.width*0.045).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.045)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.045)).toString()),
-                          maxLines: 1
+                      child: (homepg != "1")?Row(
+                        children: [
+                          GestureDetector(
+                              onTap: (){
+                                Navigator.pop(context);
+                              },
+                              child: Icon(Icons.chevron_left, size: double.parse(((MediaQuery.of(context).size.width*0.075).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.075)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.075)).toString()),)
+                          ),
+                          SizedBox(
+                            width: CustomSize.sizeWidth(context) / 88,
+                          ),
+                          GestureDetector(
+                            onTap: (){
+                              Navigator.pop(context);
+                            },
+                            child: CustomText.textHeading4(
+                                text: "Riwayat",
+                                sizeNew: double.parse(((MediaQuery.of(context).size.width*0.045).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.045)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.045)).toString()),
+                                maxLines: 1
+                            ),
+                          ),
+                        ],
+                      ):Row(
+                        children: [
+                          GestureDetector(
+                              onTap: (){
+                                Navigator.pop(context);
+                              },
+                              child: Icon(Icons.chevron_left, size: double.parse(((MediaQuery.of(context).size.width*0.075).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.075)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.075)).toString()), color: Colors.black,)
+                          ),
+                          SizedBox(
+                            width: CustomSize.sizeWidth(context) / 88,
+                          ),
+                          GestureDetector(
+                            onTap: (){
+                              Navigator.pop(context);
+                            },
+                            child: CustomText.textHeading4(
+                                text: "Riwayat Penjualan",
+                                sizeNew: double.parse(((MediaQuery.of(context).size.width*0.045).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.045)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.045)).toString()),
+                                maxLines: 1
+                            ),
+                          ),
+                        ],
                       ),
                     ),
                   ),
@@ -303,7 +338,7 @@ class _HistoryActivityState extends State<HistoryActivity> {
                                                     borderRadius: BorderRadius.circular(20),
                                                     border: Border.all(color: CustomColor.accent)
                                                 ),
-                                                child: Center(child: CustomText.bodyRegular14(text: "Pesan Lagi", color: CustomColor.accent, sizeNew: double.parse(((MediaQuery.of(context).size.width*0.045).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.045)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.045)).toString())),),
+                                                child: Center(child: CustomText.bodyRegular14(text: "Pesan Lagi", color: CustomColor.accent, sizeNew: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.04)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.04)).toString())),),
                                               ):Container(),
                                             ],
                                           )
@@ -336,10 +371,28 @@ class _HistoryActivityState extends State<HistoryActivity> {
                         color: Colors.white,
                         child: Padding(
                           padding: EdgeInsets.symmetric(horizontal: CustomSize.sizeWidth(context) / 24),
-                          child: (homepg != "1")?CustomText.textHeading3(
-                              text: "Riwayat",
-                              sizeNew: double.parse(((MediaQuery.of(context).size.width*0.045).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.045)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.045)).toString()),
-                              maxLines: 1
+                          child: (homepg != "1")?Row(
+                            children: [
+                              GestureDetector(
+                                  onTap: (){
+                                    Navigator.pop(context);
+                                  },
+                                  child: Icon(Icons.chevron_left, size: double.parse(((MediaQuery.of(context).size.width*0.075).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.075)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.075)).toString()),)
+                              ),
+                              SizedBox(
+                                width: CustomSize.sizeWidth(context) / 88,
+                              ),
+                              GestureDetector(
+                                onTap: (){
+                                  Navigator.pop(context);
+                                },
+                                child: CustomText.textHeading4(
+                                    text: "Riwayat",
+                                    sizeNew: double.parse(((MediaQuery.of(context).size.width*0.045).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.045)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.045)).toString()),
+                                    maxLines: 1
+                                ),
+                              ),
+                            ],
                           ):CustomText.textHeading3(
                               text: "Riwayat Pembelian",
                               color: CustomColor.primary,
@@ -428,7 +481,7 @@ class _HistoryActivityState extends State<HistoryActivity> {
                                                         borderRadius: BorderRadius.circular(20),
                                                         border: Border.all(color: CustomColor.accent)
                                                     ),
-                                                    child: Center(child: CustomText.bodyRegular14(text: "Pesan Lagi", color: CustomColor.accent, sizeNew: double.parse(((MediaQuery.of(context).size.width*0.045).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.045)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.045)).toString()))),
+                                                    child: Center(child: CustomText.bodyRegular14(text: "Pesan Lagi", color: CustomColor.accent, sizeNew: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.04)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.04)).toString()))),
                                                   ):Container(),
                                                 ],
                                               )

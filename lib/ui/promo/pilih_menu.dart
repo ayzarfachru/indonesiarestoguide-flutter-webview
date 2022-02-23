@@ -67,6 +67,8 @@ class _PilihMenuActivityState extends State<PilihMenuActivity> {
               id: a['id'],
               name: a['name'],
               desc: a['desc'],
+              is_available: a['is_available'],
+              // is_available: '0',
               price: Price.delivery(a['price'], a['delivery_price']),
               urlImg: a['img'], type: '', restoId: '', delivery_price: null, distance: null, restoName: '', qty: '', is_recommended: ''
           );
@@ -105,6 +107,8 @@ class _PilihMenuActivityState extends State<PilihMenuActivity> {
           desc: v['desc'],
           urlImg: v['img'],
           type: v['type'],
+          is_available: v['is_available'],
+          // is_available: '0',
           is_recommended: v['is_recommended'],
           price: Price(original: int.parse(v['price'].toString()), discounted: null, delivery: null),
           delivery_price: Price(original: int.parse(v['price']), delivery: null, discounted: null), restoId: '', distance: null, restoName: '', qty: ''
@@ -245,7 +249,7 @@ class _PilihMenuActivityState extends State<PilihMenuActivity> {
                                 ),
                                 child: Row(
                                   children: [
-                                    Container(
+                                    (menu[index].is_available != '0')?Container(
                                       width: CustomSize.sizeWidth(context) / 2.6,
                                       height: CustomSize.sizeWidth(context) / 2.6,
                                       decoration: BoxDecoration(
@@ -254,6 +258,20 @@ class _PilihMenuActivityState extends State<PilihMenuActivity> {
                                             fit: BoxFit.cover
                                         ),
                                         borderRadius: BorderRadius.circular(20),
+                                      ),
+                                    ):Container(
+                                      width: CustomSize.sizeWidth(context) / 2.6,
+                                      height: CustomSize.sizeWidth(context) / 2.6,
+                                      decoration: BoxDecoration(
+                                          image: DecorationImage(
+                                              colorFilter: ColorFilter.mode(
+                                                Colors.grey,
+                                                BlendMode.saturation,
+                                              ),
+                                              image: NetworkImage(Links.subUrl + menu[index].urlImg),
+                                              fit: BoxFit.fitWidth
+                                          ),
+                                          borderRadius: BorderRadius.circular(20)
                                       ),
                                     ),
                                     SizedBox(

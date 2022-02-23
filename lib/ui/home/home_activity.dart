@@ -454,6 +454,7 @@ class _HomeActivityState extends State<HomeActivity> with WidgetsBindingObserver
           restoName: v['resto_name'],
           desc: v['desc']??'',
           urlImg: v['img'],
+          is_available: '',
           price: Price.discounted(int.parse(v['price'].toString()), int.parse(v['discounted_price'].toString())),
           distance: double.parse(v['resto_distance'].toString()), is_recommended: '', qty: '', delivery_price: null, type: ''
       );
@@ -911,7 +912,7 @@ class _HomeActivityState extends State<HomeActivity> with WidgetsBindingObserver
       setState((){
       isLoading2 = false;
       page = 'null';
-      Fluttertoast.showToast(msg: "Tidak ada lagi.");
+      Fluttertoast.showToast(msg: "Kategori habis");
       });
     }
 
@@ -1141,6 +1142,7 @@ class _HomeActivityState extends State<HomeActivity> with WidgetsBindingObserver
         restoId: x['resto_id'].toString(),
         restoName: x['resto_name'],
         urlImg: x['img'],
+        is_available: '',
         price: Price.discounted(x['price'], x['discounted_price']),
         distance: double.parse(x['resto_distance'].toString()), is_recommended: '', qty: '', desc: '', type: '', delivery_price: null,
       );
@@ -1191,6 +1193,7 @@ class _HomeActivityState extends State<HomeActivity> with WidgetsBindingObserver
           restoId: x['resto_id'].toString(),
           restoName: x['resto_name'],
           urlImg: x['img'],
+          is_available: '',
           price: Price.discounted(x['price'], x['discounted_price']),
           distance: double.parse(x['resto_distance'].toString()), desc: '', qty: '', is_recommended: '', type: '', delivery_price: null,
         );
@@ -1401,6 +1404,7 @@ class _HomeActivityState extends State<HomeActivity> with WidgetsBindingObserver
           restoId: v['resto_id'].toString(),
           restoName: v['resto_name'],
           urlImg: v['img'],
+          is_available: '',
           price: Price.discounted(v['price'], v['discounted_price']),
           distance: double.parse(v['resto_distance'].toString()), type: '', delivery_price: null, desc: '', is_recommended: '', qty: '',
         );
@@ -1452,6 +1456,7 @@ class _HomeActivityState extends State<HomeActivity> with WidgetsBindingObserver
           name: v['name'],
           restoId: v['resto_id'].toString(),
           restoName: v['resto_name'],
+          is_available: '',
           urlImg: v['img'],
           price: Price.discounted(v['price'], v['discounted_price']),
           distance: double.parse(v['resto_distance'].toString()), type: '', delivery_price: null, desc: '', is_recommended: '', qty: '',
@@ -1504,6 +1509,7 @@ class _HomeActivityState extends State<HomeActivity> with WidgetsBindingObserver
           name: v['name'],
           restoId: v['resto_id'].toString(),
           restoName: v['resto_name'],
+          is_available: '',
           urlImg: v['img'],
           price: Price.discounted(v['price'], v['discounted_price']),
           distance: double.parse(v['resto_distance'].toString()), type: '', delivery_price: null, desc: '', is_recommended: '', qty: '',
@@ -1556,6 +1562,7 @@ class _HomeActivityState extends State<HomeActivity> with WidgetsBindingObserver
           name: v['name'],
           restoId: v['resto_id'].toString(),
           restoName: v['resto_name'],
+          is_available: '',
           urlImg: v['img'],
           price: Price.discounted(v['price'], v['discounted_price']),
           distance: double.parse(v['resto_distance'].toString()), type: '', delivery_price: null, desc: '', is_recommended: '', qty: '',
@@ -1608,6 +1615,7 @@ class _HomeActivityState extends State<HomeActivity> with WidgetsBindingObserver
           name: v['name'],
           restoId: v['resto_id'].toString(),
           restoName: v['resto_name'],
+          is_available: '',
           urlImg: v['img'],
           price: Price.discounted(v['price'], v['discounted_price']),
           distance: double.parse(v['resto_distance'].toString()), type: '', delivery_price: null, desc: '', is_recommended: '', qty: '',
@@ -1660,6 +1668,7 @@ class _HomeActivityState extends State<HomeActivity> with WidgetsBindingObserver
           name: v['name'],
           restoId: v['resto_id'].toString(),
           restoName: v['resto_name'],
+          is_available: '',
           urlImg: v['img'],
           price: Price.discounted(v['price'], v['discounted_price']),
           distance: double.parse(v['resto_distance'].toString()), type: '', delivery_price: null, desc: '', is_recommended: '', qty: '',
@@ -1712,6 +1721,7 @@ class _HomeActivityState extends State<HomeActivity> with WidgetsBindingObserver
           name: v['name'],
           restoId: v['resto_id'].toString(),
           restoName: v['resto_name'],
+          is_available: '',
           urlImg: v['img'],
           price: Price.discounted(v['price'], v['discounted_price']),
           distance: double.parse(v['resto_distance'].toString()), type: '', delivery_price: null, desc: '', is_recommended: '', qty: '',
@@ -1764,6 +1774,7 @@ class _HomeActivityState extends State<HomeActivity> with WidgetsBindingObserver
           name: v['name'],
           restoId: v['resto_id'].toString(),
           restoName: v['resto_name'],
+          is_available: '',
           urlImg: v['img'],
           price: Price.discounted(v['price'], v['discounted_price']),
           distance: double.parse(v['resto_distance'].toString()), type: '', delivery_price: null, desc: '', is_recommended: '', qty: '',
@@ -1816,6 +1827,7 @@ class _HomeActivityState extends State<HomeActivity> with WidgetsBindingObserver
           name: v['name'],
           restoId: v['resto_id'].toString(),
           restoName: v['resto_name'],
+          is_available: '',
           urlImg: v['img'],
           price: Price.discounted(v['price'], v['discounted_price']),
           distance: double.parse(v['resto_distance'].toString()), type: '', delivery_price: null, desc: '', is_recommended: '', qty: '',
@@ -1868,6 +1880,7 @@ class _HomeActivityState extends State<HomeActivity> with WidgetsBindingObserver
           name: v['name'],
           restoId: v['resto_id'].toString(),
           restoName: v['resto_name'],
+          is_available: '',
           urlImg: v['img'],
           price: Price.discounted(v['price'], v['discounted_price']),
           distance: double.parse(v['resto_distance'].toString()), type: '', delivery_price: null, desc: '', is_recommended: '', qty: '',
@@ -2965,7 +2978,7 @@ class _HomeActivityState extends State<HomeActivity> with WidgetsBindingObserver
                                                                 color: (transaction[index].status != 'cancel')?(transaction[index].status != 'pending')?(transaction[index].status != 'process')?(transaction[index].status != 'ready')?CustomColor.primary:CustomColor.primary:Colors.green:Colors.blue:CustomColor.redBtn),
                                                             data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0),
                                                           ),
-                                                          MediaQuery(child: CustomText.bodyMedium14(text: NumberFormat.currency(locale: 'id', symbol: '', decimalDigits: 0).format(transaction[index].total), sizeNew: double.parse(((MediaQuery.of(context).size.width*0.035).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.035)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.035)).toString())),
+                                                          MediaQuery(child: CustomText.bodyMedium14(text: NumberFormat.currency(locale: 'id', symbol: '', decimalDigits: 0).format((transaction[index].type!.startsWith('Reservasi'))?(transaction[index].total!+1000):(transaction[index].total!+1000)), sizeNew: double.parse(((MediaQuery.of(context).size.width*0.035).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.035)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.035)).toString())),
                                                             data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0),),
                                                         ],
                                                       )
@@ -8960,14 +8973,15 @@ class _HomeActivityState extends State<HomeActivity> with WidgetsBindingObserver
                       if(_cart != ''){
                         Navigator.push(context, PageTransition(
                             type: PageTransitionType.rightToLeft,
-                            child: CartActivity())).then((_) {
-                          // This block runs when you have returned back to the 1st Page from 2nd.
-                          setState(() {
-                            Navigator.pushReplacement(context, PageTransition(
-                                type: PageTransitionType.fade,
-                                child: HomeActivity()));
-                          });
-                        });
+                            child: CartActivity()));
+                        // .then((_) {
+                        //   // This block runs when you have returned back to the 1st Page from 2nd.
+                        //   setState(() {
+                        //     Navigator.pushReplacement(context, PageTransition(
+                        //         type: PageTransitionType.fade,
+                        //         child: HomeActivity()));
+                        //   });
+                        // });
                       }else{
                         Fluttertoast.showToast(
                           msg: "Tidak ada pesanan di keranjang anda", fontSize: double.parse(((MediaQuery.of(context).size.width*0.03).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.03)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.03)).toString()));

@@ -288,6 +288,7 @@ class _FoodTruckActivityState extends State<FoodTruckActivity> {
           restoName: v['resto_name'],
           desc: v['desc']??'',
           urlImg: v['img'],
+          is_available: '',
           price: Price.discounted(int.parse(v['price'].toString()), int.parse(v['discounted_price'].toString())),
           distance: double.parse(v['resto_distance'].toString()), delivery_price: null, type: '', is_recommended: '', qty: ''
       );
@@ -334,6 +335,7 @@ class _FoodTruckActivityState extends State<FoodTruckActivity> {
             desc: v['desc'],
             distance: double.parse(v['distance'].toString()),
             urlImg: v['img'],
+            is_available: '',
             price: Price.discounted(int.parse(v['price']), v['discounted_price']), type: '', delivery_price: null, restoId: '', restoName: '', is_recommended: '', qty: ''
         ), word: '', discountedPrice: null, id: null,
       );
@@ -376,6 +378,7 @@ class _FoodTruckActivityState extends State<FoodTruckActivity> {
             name: a['menus']['name'],
             desc: a['menus']['desc'],
             urlImg: a['menus']['img'],
+            is_available: '',
             price: Price.promo(
                 a['menus']['price'].toString(), a['menus']['delivery_price'].toString()),
             restoName: '', type: '', restoId: '', delivery_price: null, distance: null, qty: '', is_recommended: ''
@@ -516,6 +519,7 @@ class _FoodTruckActivityState extends State<FoodTruckActivity> {
           restoId: v['resto_id'].toString(),
           restoName: v['resto_name'],
           urlImg: v['img'],
+          is_available: '',
           price: Price.discounted(v['price'], v['discounted_price']),
           distance: double.parse(v['resto_distance'].toString()), type: '', delivery_price: null, desc: '', is_recommended: '', qty: '',
         );

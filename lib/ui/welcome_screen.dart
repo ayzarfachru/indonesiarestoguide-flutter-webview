@@ -59,12 +59,12 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
                   height: CustomSize.sizeHeight(context) / 48,
                 ),
                 CustomText.bodyMedium16(
-                    text: "Get your favourite food from your",
+                    text: "Your Guidance to find the perfect",
                     maxLines: 1,
                     sizeNew: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.04).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.04).toString())
                 ),
                 CustomText.bodyMedium16(
-                    text: "favourite restaurant the fastest way",
+                    text: "Restaurant in Indonesia",
                     maxLines: 1,
                     sizeNew: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.04).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.04).toString())
                 ),

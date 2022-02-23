@@ -86,6 +86,8 @@ class _DetailTransactionReserState extends State<DetailTransactionReser> {
           "Authorization": "Bearer $token"
         });
     print(apiResult.body);
+    print('WOL');
+    print(id);
     var data = json.decode(apiResult.body);
 
     // for(var v in data['menu']){
@@ -200,13 +202,12 @@ class _DetailTransactionReserState extends State<DetailTransactionReser> {
       nameRekening = data['nama_norek'].toString();
       nameBank = data['bank_norek'].toString();
       norekTokoTrans = data['norek'].toString();
-      phone = data['resto']['phone_number'].toString();
-      addressRes = data['resto']['address'].toString();
-      nameRestoTrans = data['resto']['name'];
-      restoAddress = data['resto']['address'];
-      can_delivery = (data['resto']['can_delivery'].toString() == '1')?'true':'false';
-      can_takeaway = (data['resto']['can_take_away'].toString() == '1')?'true':'false';
-      isLoading = false;
+      // phone = data['resto']['phone_number'].toString();
+      // addressRes = data['resto']['address'].toString();
+      // nameRestoTrans = data['resto']['name'];
+      // restoAddress = data['resto']['address'];
+      _getDetail(idResto);
+      // isLoading = false;
     });
 
     // if (apiResult.statusCode == 200 && menu.toString() == '[]') {
@@ -375,11 +376,14 @@ class _DetailTransactionReserState extends State<DetailTransactionReser> {
 
 
     setState(() {
-      idnyaResto = data['data']['id'].toString();
-      nameResto = data['data']['name'];
-      address = data['data']['address'];
-      phone = data['data']['phone_number'];
       print('iniphone '+phone.toString());
+      isLoading = false;
+      idnyaResto = data['data']['id'].toString();
+      nameRestoTrans = data['data']['name'];
+      restoAddress = data['data']['address'];
+      phone = data['data']['phone_number'];
+      can_delivery = data['data']['can_delivery'].toString();
+      can_takeaway = data['data']['can_take_away'].toString();
       // can_delivery = data['data']['can_delivery'].toString();
       // can_takeaway = data['data']['can_take_away'].toString();
       isOpen = data['data']['isOpen'].toString();
@@ -485,7 +489,6 @@ class _DetailTransactionReserState extends State<DetailTransactionReser> {
 
   @override
   void initState() {
-    _getUserDataResto();
     _getUserDataResto();
     getUser();
     getData();

@@ -210,6 +210,7 @@ class _HistoryOrderActivityState extends State<HistoryOrderActivity> {
           restoName: v['resto_name'],
           desc: v['desc']??'',
           urlImg: v['img'],
+          is_available: '',
           price: Price.discounted(int.parse(v['price'].toString()), int.parse(v['discounted_price'].toString())),
           distance: double.parse(v['resto_distance'].toString()), type: '', delivery_price: null, is_recommended: '', qty: ''
       );
@@ -250,6 +251,7 @@ class _HistoryOrderActivityState extends State<HistoryOrderActivity> {
             desc: v['desc'],
             distance: double.parse(v['distance'].toString()),
             urlImg: v['img'],
+            is_available: '',
             price: Price.discounted(int.parse(v['price']), v['discounted_price']), delivery_price: null, restoId: '', type: '', is_recommended: '', qty: '', restoName: ''
         ), word: '', discountedPrice: null, id: null,
       );
@@ -292,6 +294,7 @@ class _HistoryOrderActivityState extends State<HistoryOrderActivity> {
             name: a['menus']['name'],
             desc: a['menus']['desc'],
             urlImg: a['menus']['img'],
+            is_available: '',
             price: Price.promo(
                 a['menus']['price'].toString(), a['menus']['delivery_price'].toString()),
             type: '', distance: null, restoName: '', is_recommended: '', qty: '', delivery_price: null, restoId: ''
@@ -601,7 +604,7 @@ class _HistoryOrderActivityState extends State<HistoryOrderActivity> {
                                                 children: [
                                                   CustomText.bodyLight12(text: transaction[index].status??'Selesai', sizeNew: double.parse(((MediaQuery.of(context).size.width*0.03).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.03).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.03).toString()),
                                                       color: (transaction[index].status == 'Menunggu')?Colors.amberAccent:(transaction[index].status != 'Diproses')?Colors.green:Colors.blue),
-                                                  CustomText.bodyMedium14(text: NumberFormat.currency(locale: 'id', symbol: '', decimalDigits: 0).format(transaction[index].total), sizeNew: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.04).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.04).toString())),
+                                                  CustomText.bodyMedium14(text: NumberFormat.currency(locale: 'id', symbol: '', decimalDigits: 0).format(transaction[index].total!+1000), sizeNew: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.04).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.04).toString())),
                                                 ],
                                               )
                                             ],

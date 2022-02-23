@@ -5,8 +5,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_datetime_picker/flutter_datetime_picker.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:full_screen_image/full_screen_image.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:kam5ia/ui/cart/final_trans.dart';
+import 'package:kam5ia/ui/cart/final_trans_reser.dart';
 import 'package:kam5ia/ui/home/home_activity.dart';
 import 'package:kam5ia/ui/profile/profile_activity.dart';
 import 'package:kam5ia/utils/utils.dart';
@@ -42,6 +43,10 @@ class _ReservationActivityState extends State<ReservationActivity> {
   String time ='';
   String total ='0';
 
+  List<bool> menuReady = [];
+  String qr_available = "false";
+  String nameRestoTrans = '';
+
   Future<void> makeReservation()async{
     String t = (time != '')?time:_time.toString().split('(')[1].split(')')[0];
 
@@ -60,6 +65,10 @@ class _ReservationActivityState extends State<ReservationActivity> {
             "Accept": "Application/json",
             "Authorization": "Bearer $token"
           });
+      print(_textPerson.text);
+      print(id);
+      print(tgl + " " + time.toString().replaceAll(' AM', '').replaceAll(' PM', ''));
+      print(total);
       print(apiResult.body);
       var data = json.decode(apiResult.body);
 
@@ -71,6 +80,17 @@ class _ReservationActivityState extends State<ReservationActivity> {
         //     PageTransition(
         //         type: PageTransitionType.rightToLeft,
         //         child: HomeActivity()));
+        SharedPreferences pref = await SharedPreferences.getInstance();
+        pref.setString("jmlhMeja", _textPerson.text.toString());
+        pref.setString("tglReser", tgl);
+        pref.setString("jamReser", (time != '')?time.replaceAll(' AM', '').replaceAll(' PM', '').toString():DateFormat('kk:mm').format(now));
+        pref.setString("hargaReser", reservationFee);
+        pref.setString("totalReser", total);
+        Navigator.push(
+            context,
+            PageTransition(
+                type: PageTransitionType.fade,
+                child: FinalTransReser()));
       }
     }else{
       Fluttertoast.showToast(
@@ -114,7 +134,8 @@ class _ReservationActivityState extends State<ReservationActivity> {
   getPref() async {
     SharedPreferences pref = await SharedPreferences.getInstance();
     setState(() {
-      notelp = (pref.getString('notelp') == '')?'null':pref.getString('notelp');
+      nameRestoTrans = pref.getString("restoNameTrans");
+      notelp = pref.getString('notelp')??'';
       print(notelp+' telp');
     });
   }
@@ -213,7 +234,7 @@ class _ReservationActivityState extends State<ReservationActivity> {
                           int t = int.parse(reservationFee) * i;
                           setState(() {
                             // _textPerson = TextEditingController(text: (_textPerson.text != '')?v:"0");
-                            total = t.toString();
+                            total = (t + 1000).toString();
                           });
                         },
                         style: GoogleFonts.poppins(
@@ -337,7 +358,15 @@ class _ReservationActivityState extends State<ReservationActivity> {
                                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                   children: [
                                     CustomText.bodyLight16(text: "Harga" + " x " +_textPerson.text, sizeNew: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.04).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.04).toString())),
-                                    CustomText.bodyLight16(text: NumberFormat.currency(locale: 'id', symbol: '', decimalDigits: 0).format(int.parse(reservationFee))+" (1)", sizeNew: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.04).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.04).toString())),
+                                    CustomText.bodyLight16(text: NumberFormat.currency(locale: 'id', symbol: '', decimalDigits: 0).format(int.parse(reservationFee.toString()))+" (1)", sizeNew: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.04).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.04).toString())),
+                                  ],
+                                ),
+                                SizedBox(height: CustomSize.sizeHeight(context) / 50,),
+                                Row(
+                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    CustomText.bodyLight16(text: "Platform Fee", sizeNew: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.04).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.04).toString())),
+                                    CustomText.bodyLight16(text: NumberFormat.currency(locale: 'id', symbol: '', decimalDigits: 0).format(1000), sizeNew: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.04).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.04).toString())),
                                   ],
                                 ),
                                 // (_transCode == 1)?SizedBox(height: CustomSize.sizeHeight(context) / 100,):SizedBox(),
@@ -373,66 +402,168 @@ class _ReservationActivityState extends State<ReservationActivity> {
                                     msg: "Isi nomor telepon anda terlebih dahulu!",);
                                   Navigator.push(context, PageTransition(type: PageTransitionType.fade, child: new ProfileActivity()));
                                 } else {
-                                  showDialog(
-                                      context: context,
-                                      builder: (context) {
-                                        return AlertDialog(
-                                          contentPadding: EdgeInsets.only(left: 25, right: 25, top: 15, bottom: 5),
-                                          shape: RoundedRectangleBorder(
-                                              borderRadius: BorderRadius.all(Radius.circular(10))
-                                          ),
-                                          title: Center(child: Text('Peringatan!', style: TextStyle(color: CustomColor.redBtn))),
-                                          content: Text('Semua proses pembayaran dan transaksi di luar tanggung jawab IRG!', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500), textAlign: TextAlign.center),
-                                          actions: <Widget>[
-                                            Center(
-                                              child: Row(
-                                                mainAxisAlignment: MainAxisAlignment.spaceAround,
-                                                children: [
-                                                  FlatButton(
-                                                    // minWidth: CustomSize.sizeWidth(context),
-                                                    color: CustomColor.redBtn,
-                                                    textColor: Colors.white,
-                                                    shape: RoundedRectangleBorder(
-                                                        borderRadius: BorderRadius.all(Radius.circular(10))
-                                                    ),
-                                                    child: Text('Batal'),
-                                                    onPressed: () async{
-                                                      setState(() {
-                                                        // codeDialog = valueText;
-                                                        Navigator.pop(context);
-                                                      });
-                                                    },
-                                                  ),
-                                                  FlatButton(
-                                                    color: CustomColor.accent,
-                                                    textColor: Colors.white,
-                                                    shape: RoundedRectangleBorder(
-                                                        borderRadius: BorderRadius.all(Radius.circular(10))
-                                                    ),
-                                                    child: Text('Setuju'),
-                                                    onPressed: () async{
-                                                      Navigator.pop(context);
-                                                      makeReservation();
-                                                      SharedPreferences pref = await SharedPreferences.getInstance();
-                                                      pref.setString("jmlhMeja", _textPerson.text.toString());
-                                                      pref.setString("tglReser", tgl);
-                                                      pref.setString("jamReser", (time != '')?time.replaceAll(' AM', '').replaceAll(' PM', '').toString():DateFormat('kk:mm').format(now));
-                                                      pref.setString("hargaReser", reservationFee);
-                                                      pref.setString("totalReser", total);
-                                                      Navigator.push(
-                                                          context,
-                                                          PageTransition(
-                                                              type: PageTransitionType.fade,
-                                                              child: FinalTrans()));
-                                                    },
-                                                  ),
-                                                ],
+                                  print('qr_available');
+                                  print(qr_available);
+                                  if (qr_available == 'true') {
+                                    showModalBottomSheet(
+                                        isScrollControlled: true,
+                                        shape: RoundedRectangleBorder(
+                                            borderRadius: BorderRadius.only(topLeft: Radius.circular(20), topRight: Radius.circular(20))
+                                        ),
+                                        context: context,
+                                        builder: (_){
+                                          return Column(
+                                            crossAxisAlignment: CrossAxisAlignment.start,
+                                            mainAxisSize: MainAxisSize.min,
+                                            children: [
+                                              SizedBox(height: CustomSize.sizeHeight(context) / 86,),
+                                              Padding(
+                                                padding: EdgeInsets.symmetric(horizontal: CustomSize.sizeWidth(context) / 2.4),
+                                                child: Divider(thickness: 4,),
                                               ),
+                                              SizedBox(height: CustomSize.sizeHeight(context) / 106,),
+                                              Center(
+                                                child: CustomText.textHeading2(
+                                                    text: "Qris",
+                                                    minSize: double.parse(((MediaQuery.of(context).size.width*0.05).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.05)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.05)).toString()),
+                                                    maxLines: 1
+                                                ),
+                                              ),
+                                              SizedBox(height: CustomSize.sizeHeight(context) * 0.003,),
+                                              Center(
+                                                child: FullScreenWidget(
+                                                  child: Image.asset("assets/imajilogo.png",
+                                                    width: CustomSize.sizeWidth(context) / 1.2,
+                                                    height: CustomSize.sizeWidth(context) / 1.2,
+                                                  ),
+                                                  backgroundColor: Colors.white,
+                                                ),
+                                              ),
+                                              SizedBox(height: CustomSize.sizeHeight(context) / 106,),
+                                              Center(
+                                                child: Container(
+                                                  alignment: Alignment.center,
+                                                  width: CustomSize.sizeWidth(context) / 1.2,
+                                                  child: Row(
+                                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                                    children: [
+                                                      CustomText.textTitle2(
+                                                          text: 'Total harga:',
+                                                          minSize: double.parse(((MediaQuery.of(context).size.width*0.045).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.045)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.045)).toString()),
+                                                          maxLines: 1
+                                                      ),
+                                                      CustomText.textTitle2(
+                                                          text: 'Rp '+NumberFormat.currency(locale: 'id', symbol: '', decimalDigits: 0).format(int.parse(total)),
+                                                          minSize: double.parse(((MediaQuery.of(context).size.width*0.045).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.045)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.045)).toString()),
+                                                          maxLines: 1
+                                                      ),
+                                                    ],
+                                                  ),
+                                                ),
+                                              ),
+                                              SizedBox(height: CustomSize.sizeHeight(context) * 0.005,),
+                                              Center(
+                                                child: Container(
+                                                  alignment: Alignment.center,
+                                                  width: CustomSize.sizeWidth(context) / 1.2,
+                                                  child: CustomText.textTitle1(
+                                                      text: 'Scan disini untuk melakukan pembayaran',
+                                                      minSize: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.04)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.04)).toString()),
+                                                      maxLines: 1
+                                                  ),
+                                                ),
+                                              ),
+                                              Center(
+                                                child: Container(
+                                                  alignment: Alignment.center,
+                                                  width: CustomSize.sizeWidth(context) / 1.2,
+                                                  child: CustomText.textTitle1(
+                                                      text: 'ke $nameRestoTrans!',
+                                                      minSize: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.04)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.04)).toString()),
+                                                      maxLines: 3
+                                                  ),
+                                                ),
+                                              ),
+                                              SizedBox(height: CustomSize.sizeHeight(context) / 48,),
+                                              GestureDetector(
+                                                onTap: ()async{
+                                                  Fluttertoast.showToast(
+                                                    msg: "Anda belum membayar!",);
+                                                },
+                                                child: Center(
+                                                  child: Container(
+                                                    width: CustomSize.sizeWidth(context) / 1.1,
+                                                    height: CustomSize.sizeHeight(context) / 14,
+                                                    decoration: BoxDecoration(
+                                                        color: (menuReady.contains(false))?CustomColor.textBody:CustomColor.primaryLight,
+                                                        borderRadius: BorderRadius.circular(50)
+                                                    ),
+                                                    child: Center(
+                                                      child: Padding(
+                                                        padding: const EdgeInsets.symmetric(horizontal: 20.0),
+                                                        child: CustomText.textTitle3(text: "Sudah Membayar", color: Colors.white, minSize: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.04)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.04)).toString())),
+                                                      ),
+                                                    ),
+                                                  ),
+                                                ),
+                                              ),
+                                              SizedBox(height: CustomSize.sizeHeight(context) / 54,),
+                                              // SizedBox(height: CustomSize.sizeHeight(context) / 106,),
+                                            ],
+                                          );
+                                        }
+                                    );
+                                  } else {
+                                    showDialog(
+                                        context: context,
+                                        builder: (context) {
+                                          return AlertDialog(
+                                            contentPadding: EdgeInsets.only(left: 25, right: 25, top: 15, bottom: 5),
+                                            shape: RoundedRectangleBorder(
+                                                borderRadius: BorderRadius.all(Radius.circular(10))
                                             ),
+                                            title: Center(child: Text('Peringatan!', style: TextStyle(color: CustomColor.redBtn))),
+                                            content: Text('Silahkan hubungi penjual melalui fitur chat pada aplikasi kami untuk menyelesaikan proses pembayaran. \n \nSemua proses pembayaran dan transaksi di luar tanggung jawab IRG!', style: TextStyle(fontSize: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.04)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.04)).toString()), fontWeight: FontWeight.w500), textAlign: TextAlign.center),
+                                            actions: <Widget>[
+                                              Center(
+                                                child: Row(
+                                                  mainAxisAlignment: MainAxisAlignment.spaceAround,
+                                                  children: [
+                                                    FlatButton(
+                                                      // minWidth: CustomSize.sizeWidth(context),
+                                                      color: CustomColor.redBtn,
+                                                      textColor: Colors.white,
+                                                      shape: RoundedRectangleBorder(
+                                                          borderRadius: BorderRadius.all(Radius.circular(10))
+                                                      ),
+                                                      child: Text('Batal'),
+                                                      onPressed: () async{
+                                                        setState(() {
+                                                          // codeDialog = valueText;
+                                                          Navigator.pop(context);
+                                                        });
+                                                      },
+                                                    ),
+                                                    FlatButton(
+                                                      color: CustomColor.accent,
+                                                      textColor: Colors.white,
+                                                      shape: RoundedRectangleBorder(
+                                                          borderRadius: BorderRadius.all(Radius.circular(10))
+                                                      ),
+                                                      child: Text('Setuju'),
+                                                      onPressed: () async{
+                                                        Navigator.pop(context);
+                                                        makeReservation();
+                                                      },
+                                                    ),
+                                                  ],
+                                                ),
+                                              ),
 
-                                          ],
-                                        );
-                                      });
+                                            ],
+                                          );
+                                        });
+                                  }
                                 }
                               } else {
                                 Fluttertoast.showToast(

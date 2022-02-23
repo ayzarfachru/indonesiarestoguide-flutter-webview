@@ -19,6 +19,7 @@ import 'package:kam5ia/ui/ui_resto/detail/detail_resto.dart';
 import 'package:kam5ia/ui/ui_resto/employees/employees_activity.dart';
 import 'package:kam5ia/ui/ui_resto/menu/menu_activity.dart';
 import 'package:kam5ia/ui/ui_resto/order/order_activity.dart';
+import 'package:kam5ia/ui/ui_resto/owner/add_owner.dart';
 import 'package:kam5ia/ui/ui_resto/reservation_resto/reservation_activity.dart';
 import 'package:kam5ia/ui/ui_resto/reservation_resto/reservation_pending_page.dart';
 import 'package:kam5ia/model/Meja.dart';
@@ -40,6 +41,97 @@ class _HomeActivityRestoState extends State<HomeActivityResto> with WidgetsBindi
   String img = "";
   String homepg = "";
   int id = 0;
+  String owner = "";
+  String nameOwner = "";
+  String emailOwner = "";
+  int ownerId = 0;
+  bool wait = false;
+
+  getOwner() async {
+    SharedPreferences pref = await SharedPreferences.getInstance();
+    setState(() {
+      owner = (pref.getString('owner'));
+      nameOwner = (pref.getString('nameOwner'));
+      emailOwner = (pref.getString('emailOwner'));
+      print(owner);
+      print('POOO');
+    });
+    if (owner != 'true') {
+      _getUserResto();
+    } else {
+      // _getOwnerResto();
+      _getUserResto();
+      SharedPreferences pref = await SharedPreferences.getInstance();
+      print('PUKIII 1');
+      id = pref.getInt("ownerId");
+    }
+  }
+
+  Future _getOwnerOut()async{
+    // List<History> _history = [];
+
+    // setState(() {
+    //   isLoading = true;
+    // });
+    SharedPreferences pref = await SharedPreferences.getInstance();
+    String token = pref.getString("token") ?? "";
+    int idRes = pref.getInt("ownerId") ?? 0;
+    var apiResult = await http.get(Links.mainUrl + '/owner/deactivate', headers: {
+      "Accept": "Application/json",
+      "Authorization": "Bearer $token"
+    });
+    print(apiResult.body);
+    print('iki loh rekk');
+    print(idRes);
+    var data = json.decode(apiResult.body);
+
+    // SharedPreferences pref = await SharedPreferences.getInstance();
+    pref.remove('ownerId');
+    pref.remove('owner');
+    pref.setString("homepg", "");
+
+    // for(var v in data['trans']){
+    //   History h = History(
+    //       id: v['id'],
+    //       name: v['resto_name'],
+    //       time: v['time'],
+    //       price: v['price'],
+    //       img: v['resto_img'],
+    //       type: v['type']
+    //   );
+    //   _history.add(h);
+    // }
+
+    setState(() {
+      // id = (data['msg'].toString() == "User tidak punya resto")?'':data['resto']['id'].toString();
+      // restoName = (data['msg'].toString() == "User tidak punya resto")?'':data['resto']['name'];
+      // // history = _history;
+      // openAndClose = (data['status'].toString() == "closed")?'1':'0';
+      // isLoading = false;
+    });
+
+    // if(openAndClose == '0'){
+    //   SharedPreferences pref = await SharedPreferences.getInstance();
+    //   pref.setString("openclose", '1');
+    // }else if(openAndClose == '1'){
+    //   SharedPreferences pref = await SharedPreferences.getInstance();
+    //   pref.setString("openclose", '0');
+    // }
+
+    if (apiResult.statusCode == 200) {
+      if (data['msg'].toString() == "success") {
+        Navigator.pushReplacement(context, MaterialPageRoute(builder: (context)=> ProfileActivity()));
+        // Navigator.pushReplacement(context, MaterialPageRoute(builder: (context)=> HomeActivity()));
+        // kosong = '1';
+      }
+      // else if (data['resto']['id'] == null || id == 'null' || id == '') {
+      //   kosong = '1';
+      // }
+      else {
+        // Navigator.pushReplacement(context, PageTransition(type: PageTransitionType.fade, child: HomeActivityResto()));
+      }
+    }
+  }
 
   getImg() async {
     SharedPreferences pref = await SharedPreferences.getInstance();
@@ -146,8 +238,9 @@ class _HomeActivityRestoState extends State<HomeActivityResto> with WidgetsBindi
     setState(() {
       restoName = data['resto']['name'];
       id = data['resto']['id'];
+      pref.setString('idHomeResto', id.toString());
       idResto();
-      idUserRest = int.parse(data['resto']['users_id']);
+      idUserRest = (owner != 'true')?int.parse(data['resto']['users_id']):idUser;
       // history = _history;
       openAndClose = (data['resto']['status'].toString() == "closed" || data['resto']['status'].toString() == "")?'0':'1';
       isLoading = false;
@@ -162,6 +255,8 @@ class _HomeActivityRestoState extends State<HomeActivityResto> with WidgetsBindi
     }
 
     if (idUserRest.toString() == idUser.toString()) {
+      pref.setString("karyawan", '1');
+    } else if (owner == 'true') {
       pref.setString("karyawan", '1');
     } else {
       pref.setString("karyawan", '0');
@@ -210,11 +305,16 @@ class _HomeActivityRestoState extends State<HomeActivityResto> with WidgetsBindi
         SharedPreferences pref = await SharedPreferences.getInstance();
         pref.setString("isOpen", '1');
         pref.setString("resProm", data['data']['name'].toString());
+        print('Name Rest '+pref.getString("resProm").toString());
       }else if(isOpen == 'false'){
         SharedPreferences pref = await SharedPreferences.getInstance();
         pref.setString("isOpen", '0');
       }
         pref.setString("jUsaha", _facility.toString().split('[')[1].split(']')[0].replaceAll(new RegExp(r",\s+"), ","));
+      Future.delayed(Duration(seconds: 1), () async{
+        wait = true;
+        setState((){});
+      });
     }
   }
 
@@ -282,9 +382,8 @@ class _HomeActivityRestoState extends State<HomeActivityResto> with WidgetsBindi
     });
     // print(apiResult.body);
     var data = json.decode(apiResult.body);
-
-
-
+    print('OILO');
+    print(data['trx']['process']);
 
     if (apiResult.statusCode == 200) {
       // print('PPP '+data['trx']['pending'].toString());
@@ -293,7 +392,7 @@ class _HomeActivityRestoState extends State<HomeActivityResto> with WidgetsBindi
         if (data['trx'].toString().contains('pending')) {
           for(var v in data['trx']['pending']){
             Transaction r = Transaction.home(
-                chat_user: v['trans']['chat_user'],
+                chat_user: v['chat_user'],
                 is_opened: v['is_opened']
             );
             _transaction.add(r);
@@ -305,8 +404,8 @@ class _HomeActivityRestoState extends State<HomeActivityResto> with WidgetsBindi
         if (data['trx'].toString().contains('process')) {
           for(var v in data['trx']['process']){
             Transaction r = Transaction.home(
-                chat_user: v['trans']['chat_user'],
-                is_opened: v['trans']['is_opened']
+                chat_user: v['chat_user'],
+                is_opened: v['is_opened']
             );
             _transaction2.add(r);
           }
@@ -317,8 +416,8 @@ class _HomeActivityRestoState extends State<HomeActivityResto> with WidgetsBindi
         if (data['trx'].toString().contains('ready')) {
           for(var v in data['trx']['ready']){
             Transaction r = Transaction.home(
-                chat_user: v['trans']['chat_user'],
-                is_opened: v['trans']['is_opened']
+                chat_user: v['chat_user'],
+                is_opened: v['is_opened']
             );
             _transaction3.add(r);
           }
@@ -530,7 +629,8 @@ class _HomeActivityRestoState extends State<HomeActivityResto> with WidgetsBindi
   void initState() {
     WidgetsBinding.instance!.addObserver(this);
     super.initState();
-    _getUserResto();
+    getOwner();
+    // _getUserResto();
     // _getDetail();
     initDynamicLinks();
     _getTrans();
@@ -560,10 +660,80 @@ class _HomeActivityRestoState extends State<HomeActivityResto> with WidgetsBindi
     return Future.value(true);
   }
 
+  Future<bool> onWillPop2() async{
+    // DateTime now = DateTime.now();
+    // if (currentBackPressTime == null ||
+    //     now.difference(currentBackPressTime!) > Duration(seconds: 2)) {
+    //   currentBackPressTime = now;
+    //   Fluttertoast.showToast(msg: 'Tekan sekali lagi untuk keluar');
+    //   return Future.value(false);
+    // }
+//    SystemNavigator.pop();
+    SharedPreferences pref = await SharedPreferences.getInstance();
+    String token = pref.getString("token") ?? "";
+    int idRes = pref.getInt("ownerId") ?? 0;
+    var apiResult = await http.get(Links.mainUrl + '/owner/deactivate', headers: {
+      "Accept": "Application/json",
+      "Authorization": "Bearer $token"
+    });
+    print(apiResult.body);
+    print('iki loh rekk');
+    print(idRes);
+    var data = json.decode(apiResult.body);
+
+    // SharedPreferences pref = await SharedPreferences.getInstance();
+    pref.remove('ownerId');
+    pref.remove('owner');
+    pref.setString("homepg", "");
+
+    // for(var v in data['trans']){
+    //   History h = History(
+    //       id: v['id'],
+    //       name: v['resto_name'],
+    //       time: v['time'],
+    //       price: v['price'],
+    //       img: v['resto_img'],
+    //       type: v['type']
+    //   );
+    //   _history.add(h);
+    // }
+
+    setState(() {
+      // id = (data['msg'].toString() == "User tidak punya resto")?'':data['resto']['id'].toString();
+      // restoName = (data['msg'].toString() == "User tidak punya resto")?'':data['resto']['name'];
+      // // history = _history;
+      // openAndClose = (data['status'].toString() == "closed")?'1':'0';
+      // isLoading = false;
+    });
+
+    // if(openAndClose == '0'){
+    //   SharedPreferences pref = await SharedPreferences.getInstance();
+    //   pref.setString("openclose", '1');
+    // }else if(openAndClose == '1'){
+    //   SharedPreferences pref = await SharedPreferences.getInstance();
+    //   pref.setString("openclose", '0');
+    // }
+
+    if (apiResult.statusCode == 200) {
+      if (data['msg'].toString() == "success") {
+        // Navigator.pop(context);
+        Navigator.pushReplacement(context, MaterialPageRoute(builder: (context)=> ProfileActivity()));
+        // kosong = '1';
+      }
+      // else if (data['resto']['id'] == null || id == 'null' || id == '') {
+      //   kosong = '1';
+      // }
+      else {
+        // Navigator.pushReplacement(context, PageTransition(type: PageTransitionType.fade, child: HomeActivityResto()));
+      }
+    }
+    return Future.value(true);
+  }
+
   @override
   Widget build(BuildContext context) {
     return WillPopScope(
-      onWillPop: onWillPop,
+      onWillPop: (owner != 'true')?onWillPop:onWillPop2,
       child: MediaQuery(
         child: Scaffold(
           body: Stack(
@@ -588,11 +758,19 @@ class _HomeActivityRestoState extends State<HomeActivityResto> with WidgetsBindi
                         children: [
                           GestureDetector(
                               onTap: () async{
-                                SharedPreferences pref = await SharedPreferences.getInstance();
-                                pref.setString("homepg", "");
-                                setState(() {
-                                  Navigator.push(context, PageTransition(type: PageTransitionType.fade, child: new HomeActivity()));
-                                });
+                                if (owner == 'true') {
+                                  SharedPreferences pref = await SharedPreferences.getInstance();
+                                  pref.remove('ownerId');
+                                  pref.remove('owner');
+                                  pref.setString("homepg", "");
+                                  _getOwnerOut();
+                                } else {
+                                  SharedPreferences pref = await SharedPreferences.getInstance();
+                                  pref.setString("homepg", "");
+                                  setState(() {
+                                    Navigator.push(context, PageTransition(type: PageTransitionType.fade, child: new HomeActivity()));
+                                  });
+                                }
                               },
                               child: Icon(FontAwesome.sign_out, color: Colors.white, size: 32,)
                           ),
@@ -735,7 +913,7 @@ class _HomeActivityRestoState extends State<HomeActivityResto> with WidgetsBindi
                           onRefresh: _onRefresh,
                           onLoading: _onLoading,
                           child: SingleChildScrollView(
-                            child: Column(
+                            child: (wait == true)?Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 SizedBox(height: CustomSize.sizeHeight(context) / 90,),
@@ -1494,9 +1672,131 @@ class _HomeActivityRestoState extends State<HomeActivityResto> with WidgetsBindi
                                   height: CustomSize.sizeWidth(context) / 3.8,),
                               ],
                             ),
+                                (idUserRest == idUser)?SizedBox(height: CustomSize.sizeHeight(context) / 48,):Container(),
+                                (idUserRest == idUser)?Row(
+                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    (idUserRest == idUser)?GestureDetector(
+                                      onTap: (){
+                                        setState(() {
+                                          print(owner);
+                                          if (owner != 'true') {
+                                            Navigator.push(context, PageTransition(type: PageTransitionType.fade, child: new AddOwnerActivity(id.toString())));
+                                          } else if (owner == 'true') {
+                                            showModalBottomSheet(
+                                                isScrollControlled: true,
+                                                shape: RoundedRectangleBorder(
+                                                    borderRadius: BorderRadius.only(topLeft: Radius.circular(20), topRight: Radius.circular(20))
+                                                ),
+                                                context: context,
+                                                builder: (_){
+                                                  return Column(
+                                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                                    mainAxisSize: MainAxisSize.min,
+                                                    children: [
+                                                      SizedBox(height: CustomSize.sizeHeight(context) / 86,),
+                                                      Padding(
+                                                        padding: EdgeInsets.symmetric(horizontal: CustomSize.sizeWidth(context) / 2.4),
+                                                        child: Divider(thickness: 4,),
+                                                      ),
+                                                      SizedBox(height: CustomSize.sizeHeight(context) / 106,),
+                                                      Center(
+                                                        child: CustomText.textHeading2(
+                                                            text: "Owner",
+                                                            minSize: double.parse(((MediaQuery.of(context).size.width*0.05).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.05)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.05)).toString()),
+                                                            maxLines: 1
+                                                        ),
+                                                      ),
+                                                      SizedBox(height: CustomSize.sizeHeight(context) * 0.003,),
+                                                      Center(
+                                                        child: Container(
+                                                          width: CustomSize.sizeWidth(context) / 4,
+                                                          height: CustomSize.sizeWidth(context) / 4,
+                                                          decoration: (img == "" || img == null)?BoxDecoration(
+                                                              color: CustomColor.primary,
+                                                              shape: BoxShape.circle
+                                                          ):BoxDecoration(
+                                                            shape: BoxShape.circle,
+                                                            image: ("$img".substring(0, 8) == '/storage')?DecorationImage(
+                                                                image: NetworkImage(Links.subUrl +
+                                                                    "$img"),
+                                                                fit: BoxFit.cover
+                                                            ):DecorationImage(
+                                                                image: Image.memory(Base64Decoder().convert(img)).image,
+                                                                fit: BoxFit.cover
+                                                            ),
+                                                          ),
+                                                          child: (img == "" || img == null)?Center(
+                                                            child: CustomText.text(
+                                                                size: 26,
+                                                                weight: FontWeight.w800,
+                                                                text: initial,
+                                                                color: Colors.white
+                                                            ),
+                                                          ):Container(),
+                                                        ),
+                                                      ),
+                                                      SizedBox(height: CustomSize.sizeHeight(context) / 106,),
+                                                      Center(
+                                                        child: CustomText.textTitle2(
+                                                            text: nameOwner,
+                                                            minSize: double.parse(((MediaQuery.of(context).size.width*0.05).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.05)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.05)).toString()),
+                                                            maxLines: 1
+                                                        ),
+                                                      ),
+                                                      SizedBox(height: CustomSize.sizeHeight(context) * 0.0015,),
+                                                      Center(
+                                                        child: CustomText.textTitle1(
+                                                            text: emailOwner,
+                                                            minSize: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.04)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.04)).toString()),
+                                                            maxLines: 1
+                                                        ),
+                                                      ),
+                                                      SizedBox(height: CustomSize.sizeHeight(context) / 48,),
+                                                      SizedBox(height: CustomSize.sizeHeight(context) / 106,),
+                                                    ],
+                                                  );
+                                                }
+                                            );
+                                          }
+                                        });
+                                      },
+                                      child: Container(
+                                        width: CustomSize.sizeWidth(context) / 3.8,
+                                        height: CustomSize.sizeWidth(context) / 3.8,
+                                        decoration: BoxDecoration(
+                                          color: Colors.white,
+                                          borderRadius: BorderRadius.circular(20),
+                                          boxShadow: [
+                                            BoxShadow(
+                                              color: Colors.grey.withOpacity(0.5),
+                                              spreadRadius: 0,
+                                              blurRadius: 7,
+                                              offset: Offset(0, 7),
+                                            ),
+                                          ],
+                                        ),
+                                        child: Column(
+                                          mainAxisAlignment: MainAxisAlignment.center,
+                                          crossAxisAlignment: CrossAxisAlignment.center,
+                                          children: [
+                                            Icon(Icons.supervised_user_circle, color: CustomColor.primaryLight, size: 32,),
+                                            CustomText.bodyMedium14(
+                                                text: "Owner",
+                                                minSize: double.parse(((MediaQuery.of(context).size.width*0.035).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.035)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.035)).toString()),
+                                                maxLines: 1
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                    ):Container(
+                                      width: CustomSize.sizeWidth(context) / 3.8,
+                                      height: CustomSize.sizeWidth(context) / 3.8,),
+                                  ],
+                                ):Container(),
                                 SizedBox(height: CustomSize.sizeHeight(context) / 59,),
-                    ],
-                  ),
+                              ],
+                            ):Container(),
                           ),
                         ),
                       ),

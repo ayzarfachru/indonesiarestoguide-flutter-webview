@@ -75,6 +75,7 @@ class _DetailHistoryState extends State<DetailHistory> {
             qty: v['qty'].toString(),
             price: Price(original: v['price'], discounted: null, delivery: null),
             name: v['name'],
+            is_available: '',
             urlImg: v['img'],
             desc: v['desc'], delivery_price: null, restoId: '', type: '', distance: null, restoName: '', is_recommended: ''
         );
@@ -255,101 +256,97 @@ class _DetailHistoryState extends State<DetailHistory> {
                         duration: Duration(milliseconds: 500),
                         width: CustomSize.sizeWidth(context),
                         height: CustomSize.sizeHeight(context) / 5.8,
-                        child: SingleChildScrollView(
-                          child: Column(
-                            children: [
-                              SingleChildScrollView(
-                                child: Container(
-                                  height: CustomSize.sizeHeight(context) / 4,
-                                  child: Row(
-                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                    children: [
-                                      Container(
-                                        width: CustomSize.sizeWidth(context) / 1.65,
-                                        child: Column(
+                        child: Column(
+                          children: [
+                            Container(
+                              // height: CustomSize.sizeHeight(context) / 4,
+                              child: Row(
+                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                children: [
+                                  Container(
+                                    width: CustomSize.sizeWidth(context) / 1.65,
+                                    child: Column(
+                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                      children: [
+                                        Column(
                                           crossAxisAlignment: CrossAxisAlignment.start,
-                                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                           children: [
-                                            Column(
-                                              crossAxisAlignment: CrossAxisAlignment.start,
+                                            MediaQuery(
+                                              child: CustomText.textHeading4(
+                                                  text: (menu.toString() != '[]')?menu[index].name:'Kosong',
+                                                  sizeNew: double.parse(((MediaQuery.of(context).size.width*0.045).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.045)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.045)).toString()),
+                                                  maxLines: 1
+                                              ),
+                                              data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0),
+                                            ),
+                                            MediaQuery(
+                                              child: CustomText.bodyRegular14(
+                                                  text: (menu.toString() != '[]')?menu[index].desc:'Menu tidak ditemukan.',
+                                                  maxLines: 2,
+                                                  sizeNew: double.parse(((MediaQuery.of(context).size.width*0.035).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.035).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.035).toString())
+                                              ),
+                                              data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0),
+                                            ),
+                                            SizedBox(height: CustomSize.sizeHeight(context) / 48,),
+                                            Row(
                                               children: [
+                                                // CustomText.bodyMedium14(
+                                                //     text: NumberFormat.currency(locale: 'id', symbol: '', decimalDigits: 0).format(menu[index].price!.original) ,
+                                                //     maxLines: 1,
+                                                //     minSize: 16
+                                                // ),
+                                                // CustomText.bodyLight14(
+                                                //     text: "  x  ",
+                                                //     maxLines: 1,
+                                                //     minSize: 14
+                                                // ),
                                                 MediaQuery(
-                                                  child: CustomText.textHeading4(
-                                                      text: (menu.toString() != '[]')?menu[index].name:'Kosong',
-                                                      sizeNew: double.parse(((MediaQuery.of(context).size.width*0.045).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.045)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.045)).toString()),
-                                                      maxLines: 1
+                                                  child: CustomText.bodyMedium14(
+                                                      text: (menu.toString() != '[]')?menu[index].qty.toString()+' Items':'',
+                                                      maxLines: 1,
+                                                      sizeNew: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.04).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.04).toString())
                                                   ),
                                                   data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0),
-                                                ),
-                                                MediaQuery(
-                                                  child: CustomText.bodyRegular14(
-                                                      text: (menu.toString() != '[]')?menu[index].desc:'Menu tidak ditemukan.',
-                                                      maxLines: 2,
-                                                      sizeNew: double.parse(((MediaQuery.of(context).size.width*0.035).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.035).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.035).toString())
-                                                  ),
-                                                  data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0),
-                                                ),
-                                                SizedBox(height: CustomSize.sizeHeight(context) / 48,),
-                                                Row(
-                                                  children: [
-                                                    // CustomText.bodyMedium14(
-                                                    //     text: NumberFormat.currency(locale: 'id', symbol: '', decimalDigits: 0).format(menu[index].price!.original) ,
-                                                    //     maxLines: 1,
-                                                    //     minSize: 16
-                                                    // ),
-                                                    // CustomText.bodyLight14(
-                                                    //     text: "  x  ",
-                                                    //     maxLines: 1,
-                                                    //     minSize: 14
-                                                    // ),
-                                                    MediaQuery(
-                                                      child: CustomText.bodyMedium14(
-                                                          text: (menu.toString() != '[]')?menu[index].qty.toString()+' Items':'',
-                                                          maxLines: 1,
-                                                          sizeNew: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.04).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.04).toString())
-                                                      ),
-                                                      data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0),
-                                                    ),
-                                                  ],
                                                 ),
                                               ],
                                             ),
                                           ],
                                         ),
-                                      ),
-                                      Column(
-                                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                        crossAxisAlignment: CrossAxisAlignment.end,
-                                        children: [
-                                          FullScreenWidget(
-                                            child: Container(
-                                              width: CustomSize.sizeWidth(context) / 3.8,
-                                              height: CustomSize.sizeWidth(context) / 3.8,
-                                              child: ClipRRect(
-                                                borderRadius: BorderRadius.circular(20),
-                                                child: (menu.toString() != '[]')?Image.network(Links.subUrl + menu[index].urlImg, fit: BoxFit.fitWidth):Container(color: CustomColor.primary,),
-                                              ),
-                                            ),
+                                      ],
+                                    ),
+                                  ),
+                                  Column(
+                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                    crossAxisAlignment: CrossAxisAlignment.end,
+                                    children: [
+                                      FullScreenWidget(
+                                        child: Container(
+                                          width: CustomSize.sizeWidth(context) / 3.8,
+                                          height: CustomSize.sizeWidth(context) / 3.8,
+                                          child: ClipRRect(
+                                            borderRadius: BorderRadius.circular(20),
+                                            child: (menu.toString() != '[]')?Image.network(Links.subUrl + menu[index].urlImg, fit: BoxFit.fitWidth):Container(color: CustomColor.primary,),
                                           ),
-                                          // Container(
-                                          //   width: CustomSize.sizeWidth(context) / 3.8,
-                                          //   height: CustomSize.sizeWidth(context) / 3.8,
-                                          //   decoration: BoxDecoration(
-                                          //       image: DecorationImage(
-                                          //           image: NetworkImage(Links.subUrl + menu[index].urlImg),
-                                          //           fit: BoxFit.cover
-                                          //       ),
-                                          //       borderRadius: BorderRadius.circular(20)
-                                          //   ),
-                                          // ),
-                                        ],
+                                        ),
                                       ),
+                                      // Container(
+                                      //   width: CustomSize.sizeWidth(context) / 3.8,
+                                      //   height: CustomSize.sizeWidth(context) / 3.8,
+                                      //   decoration: BoxDecoration(
+                                      //       image: DecorationImage(
+                                      //           image: NetworkImage(Links.subUrl + menu[index].urlImg),
+                                      //           fit: BoxFit.cover
+                                      //       ),
+                                      //       borderRadius: BorderRadius.circular(20)
+                                      //   ),
+                                      // ),
                                     ],
                                   ),
-                                ),
+                                ],
                               ),
-                            ],
-                          ),
+                            ),
+                          ],
                         ),
                       ),
                     );
@@ -367,7 +364,7 @@ class _DetailHistoryState extends State<DetailHistory> {
                       padding: EdgeInsets.symmetric(horizontal: CustomSize.sizeWidth(context) / 22),
                       child: Container(
                         width: CustomSize.sizeWidth(context),
-                        height: CustomSize.sizeHeight(context) / 3.8,
+                        height: (type != 'Pesan antar')?(type != 'Ambil Langsung')?CustomSize.sizeHeight(context) / 3.8:CustomSize.sizeHeight(context) / 3.8:CustomSize.sizeHeight(context) / 3.4,
                         decoration: BoxDecoration(
                           boxShadow: [
                             BoxShadow(
@@ -417,6 +414,19 @@ class _DetailHistoryState extends State<DetailHistory> {
                                   ),
                                 ],
                               ):SizedBox(),
+                              SizedBox(height: CustomSize.sizeHeight(context) / 100),
+                              Row(mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                children: [
+                                  MediaQuery(
+                                    child: CustomText.bodyLight16(text: "Platform Fee", sizeNew: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.04).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.04).toString())),
+                                    data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0),
+                                  ),
+                                  MediaQuery(
+                                    child: CustomText.bodyLight16(text: NumberFormat.currency(locale: 'id', symbol: '', decimalDigits: 0).format(1000), sizeNew: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.04).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.04).toString())),
+                                    data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0),
+                                  ),
+                                ],
+                              ),
                               SizedBox(height: CustomSize.sizeHeight(context) / 64,),
                               Divider(thickness: 1,),
                               SizedBox(height: CustomSize.sizeHeight(context) / 120,),
@@ -427,7 +437,7 @@ class _DetailHistoryState extends State<DetailHistory> {
                                     data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0),
                                   ),
                                   MediaQuery(
-                                      child: CustomText.textTitle3(text: NumberFormat.currency(locale: 'id', symbol: '', decimalDigits: 0).format(total), sizeNew: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.04).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.04).toString())),
+                                      child: CustomText.textTitle3(text: NumberFormat.currency(locale: 'id', symbol: '', decimalDigits: 0).format((type != 'Pesan antar')?(type != 'Ambil Langsung')?total:(total+1000):(total+1000)), sizeNew: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.04).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.04).toString())),
                                     data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0),
                                   ),
                                 ],

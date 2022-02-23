@@ -57,7 +57,13 @@ class _SearchActivityState extends State<SearchActivity> {
     SharedPreferences pref = await SharedPreferences.getInstance();
     var token = pref.getString("token") ?? "";
     print("kota1 = $kota1 ");
-    var apiResult = await http.get(Links.mainUrl + '/page/search?q=$q&type=$tipe&lat=$lat&long=$long&limit=0&city=$kota1&facility=$facilityList2',
+    kota2 = kota1.contains(" ") ? kota1.split(' ')[1] : "";
+    print("kota2 = $kota2 ");
+    if (q == 'null') {
+      q = '';
+    }
+    print("q = $q ");
+    var apiResult = await http.get(Links.mainUrl + '/page/search?q=$q&type=$tipe&lat=$lat&long=$long&limit=0&city=$kota2&facility=$facilityList2',
         headers: {
           "Accept": "Application/json",
           "Authorization": "Bearer $token"
@@ -73,6 +79,8 @@ class _SearchActivityState extends State<SearchActivity> {
           restoId: v['resto_id'].toString(),
           restoName: v['resto_name'],
           urlImg: v['img'],
+          is_available: v['is_available'],
+          // is_available: '0',
           price: Price.discounted(v['price'], v['discounted_price']),
           distance: double.parse(v['resto_distance'].toString()), type: '', delivery_price: null, desc: '', is_recommended: '', qty: '',
         );
@@ -131,6 +139,7 @@ class _SearchActivityState extends State<SearchActivity> {
   }
 
   String provinsi = '';
+  String q2 = '';
   String fasilitas = '';
   String idFasilitas = '';
   String idProv = '';
@@ -212,6 +221,7 @@ class _SearchActivityState extends State<SearchActivity> {
 
   List<String> kota = [];
   String kota1 = '';
+  String kota2 = '';
   Future getKota()async{
     List<String> _kota = [];
 
@@ -921,10 +931,10 @@ class _SearchActivityState extends State<SearchActivity> {
                         ),
                       ),
                       SizedBox(height: CustomSize.sizeHeight(context) / 48,),
-                      CustomText.textHeading4(
+                      (cuisine.toString() != '[]')?CustomText.textHeading4(
                           text: "Jelajahi",
                           sizeNew: double.parse(((MediaQuery.of(context).size.width*0.045).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.045)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.045)).toString())
-                      ),
+                      ):Container(),
                       SizedBox(height: CustomSize.sizeHeight(context) / 48,),
                       Container(
                         height: CustomSize.sizeHeight(context) / 6,
@@ -972,10 +982,10 @@ class _SearchActivityState extends State<SearchActivity> {
                         ),
                       ),
                       SizedBox(height: CustomSize.sizeHeight(context) / 48,),
-                      CustomText.textHeading4(
+                      (promo.toString() != '[]')?CustomText.textHeading4(
                           text: "Rekomendasi",
                           sizeNew: double.parse(((MediaQuery.of(context).size.width*0.045).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.045)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.045)).toString())
-                      ),
+                      ):Container(),
                       ListView.builder(
                         shrinkWrap: true,
                         controller: _scrollController,
@@ -1134,7 +1144,7 @@ class _SearchActivityState extends State<SearchActivity> {
                                     ),
                                     child: Row(
                                       children: [
-                                        Container(
+                                        (menu[index].is_available != '0')?Container(
                                           width: CustomSize.sizeWidth(context) / 3,
                                           height: CustomSize.sizeHeight(context) / 5,
                                           decoration: BoxDecoration(
@@ -1143,6 +1153,20 @@ class _SearchActivityState extends State<SearchActivity> {
                                                 fit: BoxFit.cover
                                             ),
                                             borderRadius: BorderRadius.circular(20),
+                                          ),
+                                        ):Container(
+                                          width: CustomSize.sizeWidth(context) / 3,
+                                          height: CustomSize.sizeHeight(context) / 5,
+                                          decoration: BoxDecoration(
+                                              image: DecorationImage(
+                                                  colorFilter: ColorFilter.mode(
+                                                    Colors.grey,
+                                                    BlendMode.saturation,
+                                                  ),
+                                                  image: NetworkImage(Links.subUrl + menu[index].urlImg),
+                                                  fit: BoxFit.fitWidth
+                                              ),
+                                              borderRadius: BorderRadius.circular(20)
                                           ),
                                         ),
                                         SizedBox(width: CustomSize.sizeWidth(context) / 32,),

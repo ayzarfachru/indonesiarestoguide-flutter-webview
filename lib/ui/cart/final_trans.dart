@@ -149,11 +149,6 @@ class _FinalTransState extends State<FinalTrans> {
   String delivAddress = "";
   String delivTotalOngkir = "";
   String totalHargaTrans = "";
-  String jmlhMeja = "";
-  String tglReser = "";
-  String jamReser = "";
-  String hargaReser = "";
-  String totalReser = "";
   Future _getData()async{
     List<MenuJson> _menuJson = [];
     List<String> _menuId = [];
@@ -168,11 +163,6 @@ class _FinalTransState extends State<FinalTrans> {
     totalHargaTrans = (pref2.getString('totalHargaTrans')??"");
     harga2 = (pref2.getString('totalHarga')??"");
     name = (pref2.getString('menuJson')??"");
-    jmlhMeja = (pref2.getString('jmlhMeja')??"");
-    tglReser = (pref2.getString('tglReser')??"");
-    jamReser = (pref2.getString('jamReser')??"");
-    hargaReser = (pref2.getString('hargaReser')??"");
-    totalReser = (pref2.getString('totalReser')??"");
     nameUser = (pref2.getString('name')??"");
     playerId = (pref2.getString('playerId')??"");
     restoAddress = (pref2.getString('alamateResto')??"");
@@ -188,33 +178,27 @@ class _FinalTransState extends State<FinalTrans> {
     print('iki noted '+noted2.toString());
     _tempRestoId.addAll(pref2.getStringList('restoId')??[]);
     _tempQty.addAll(pref2.getStringList('qty')??[]);
-    if (name != '') {
-      var data = json.decode(name);
-      print('ini data bos '+noted.toString());
-      print('ini data bo3 ');
+    var data = json.decode(name);
+    print('ini data bos '+noted.toString());
 
-      for(var v in data){
-        _menuId.add(v['id'].toString());
-        MenuJson j = MenuJson(
-            id: v['id'],
-            name: v['name'],
-            restoName: v['restoName'],
-            desc: v['desc'],
-            distance: v['distance'],
-            price: v['price'],
-            pricePlus: v['pricePlus'],
-            discount: v['discount'],
-            urlImg: v['urlImg'], restoId: ''
-        );
-        _menuJson.add(j);
-        print('hrg '+v.toString());
-        print('hrg2 '+int.parse(qty[restoId.indexOf(v['id'].toString())]).toString());
-        print('hrg3');
-        harga = (v['discount'].toString() == '' || v['discount'].toString() == 'null' || v['discount'].toString() == v['price'].toString())?(harga + int.parse(v['price']) * int.parse(qty[restoId.indexOf(v['id'].toString())])):(harga + int.parse(v['discount']) * int.parse(qty[restoId.indexOf(v['id'].toString())]));
-        totalHarga = harga.toString();
-      }
+    for(var v in data){
+      _menuId.add(v['id'].toString());
+      MenuJson j = MenuJson(
+          id: v['id'],
+          name: v['name'],
+          restoName: v['restoName'],
+          desc: v['desc'],
+          distance: v['distance'],
+          price: v['price'],
+          pricePlus: v['pricePlus'],
+          discount: v['discount'],
+          urlImg: v['urlImg'], restoId: ''
+      );
+      _menuJson.add(j);
+      print('hrg '+v.toString());
+      harga = (v['discount'].toString() == '' || v['discount'].toString() == 'null' || v['discount'].toString() == v['price'].toString())?(harga + int.parse(v['price']) * int.parse(qty[restoId.indexOf(v['id'].toString())])):(harga + int.parse(v['discount']) * int.parse(qty[restoId.indexOf(v['id'].toString())]));
+      totalHarga = harga.toString();
     }
-
     print(_menuId.toString().split('[')[1].split(']')[0].replaceAll(' ', ''));
 
     SharedPreferences pref = await SharedPreferences.getInstance();
@@ -250,6 +234,16 @@ class _FinalTransState extends State<FinalTrans> {
       _restId = _menuId.toString().split('[')[1].split(']')[0].replaceAll(' ', '');
       _qty = qty.toString().split('[')[1].split(']')[0].replaceAll(' ', '');
     });
+    SharedPreferences preferences = await SharedPreferences.getInstance();
+    await preferences.remove('menuJson');
+    await preferences.remove('restoId');
+    await preferences.remove('qty');
+    await preferences.remove('note');
+    await preferences.remove('address');
+    await preferences.remove('inCart');
+    await pref.remove('restoIdUsr');
+    pref.remove("addressDelivTrans");
+    pref.remove("distan");
 
     // if (apiResult.statusCode == 200) {
     //   noted2.removeWhere((element) => element.contains('kam5ia_null}'));
@@ -445,7 +439,7 @@ class _FinalTransState extends State<FinalTrans> {
     id.add(device);
     await OneSignal.shared.postNotification(OSCreateNotification(
       playerIds: id,
-      heading: "$nameUser telah memesan barang di resto Anda",
+      heading: "$nameUser telah memesan barang di toko Anda",
       content: "Cek sekarang !",
       androidChannelId: "2482eb14-bcdf-4045-b69e-422011d9e6ef",
     ));
@@ -462,12 +456,6 @@ class _FinalTransState extends State<FinalTrans> {
     //   return Future.value(false);
     // }
 //    SystemNavigator.pop();
-    SharedPreferences preferences = await SharedPreferences.getInstance();
-    await preferences.remove('jmlhMeja');
-    await preferences.remove('tglReser');
-    await preferences.remove('jamReser');
-    await preferences.remove('hargaReser');
-    await preferences.remove('totalReser');
     Navigator.pushReplacement(context, MaterialPageRoute(builder: (context)=> HomeActivity()));
     return Future.value(true);
   }
@@ -544,1459 +532,1133 @@ class _FinalTransState extends State<FinalTrans> {
   Widget build(BuildContext context) {
     return WillPopScope(
       onWillPop: onWillPop,
-      child: Scaffold(
-        body: SafeArea(
-          child: (isLoading)?Container(
-              width: CustomSize.sizeWidth(context),
-              height: CustomSize.sizeHeight(context),
-              child: Center(child: CircularProgressIndicator(
-                color: CustomColor.primaryLight,
-              ))):SingleChildScrollView(
-            controller: _scrollController,
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                SizedBox(height: CustomSize.sizeHeight(context) / 32,),
-                Padding(
-                  padding: EdgeInsets.symmetric(horizontal: CustomSize.sizeWidth(context) / 24),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Row(
-                        children: [
-                          // Container(
-                          //   width: CustomSize.sizeWidth(context) / 8,
-                          //   height: CustomSize.sizeWidth(context) / 8,
-                          //   decoration: BoxDecoration(
-                          //       color: CustomColor.primaryLight,
-                          //       shape: BoxShape.circle
-                          //   ),
-                          //   child: Center(
-                          //     child: Icon((_transCode == 1)?FontAwesome.motorcycle:(_transCode == 2)?MaterialCommunityIcons.shopping:Icons.restaurant, color: Colors.white, size: 20,),
-                          //   ),
-                          // ),
-                          // SizedBox(width: CustomSize.sizeWidth(context) / 32,),
-
-                          // CustomText.textHeading6(text: (_transCode == 1)?"Pesan Antar":(_transCode == 2)?"Ambil Langsung":"Makan Ditempat",),
-                          MediaQuery(
-                              child: CustomText.textHeading4(text: "Nota Transaksi", sizeNew: double.parse(((MediaQuery.of(context).size.width*0.045).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.045)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.045)).toString())),
-                              data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0)
-                          ),
-                        ],
-                      ),
-                      // Padding(
-                      //   padding: EdgeInsets.symmetric(horizontal: CustomSize.sizeWidth(context) / 86),
-                      //   child: GestureDetector(
-                      //     onTap: (){
-                      //       showModalBottomSheet(
-                      //           isScrollControlled: true,
-                      //           shape: RoundedRectangleBorder(
-                      //               borderRadius: BorderRadius.only(topLeft: Radius.circular(20), topRight: Radius.circular(20))
-                      //           ),
-                      //           context: context,
-                      //           builder: (_){
-                      //             return Padding(
-                      //               padding: EdgeInsets.symmetric(horizontal: CustomSize.sizeWidth(context) / 32),
-                      //               child: Column(
-                      //                 crossAxisAlignment: CrossAxisAlignment.start,
-                      //                 mainAxisSize: MainAxisSize.min,
-                      //                 children: [
-                      //                   SizedBox(height: CustomSize.sizeHeight(context) / 86,),
-                      //                   Padding(
-                      //                     padding: EdgeInsets.symmetric(horizontal: CustomSize.sizeWidth(context) / 2.4),
-                      //                     child: Divider(thickness: 4,),
-                      //                   ),
-                      //                   SizedBox(height: CustomSize.sizeHeight(context) / 52,),
-                      //                   GestureDetector(
-                      //                     onTap: ()async{
-                      //                       SharedPreferences pref = await SharedPreferences.getInstance();
-                      //                       setState(() {
-                      //                         if (can_delivery == 'true') {
-                      //                           _transCode = 1;
-                      //                           pref.setString("metodeBeli", '1');
-                      //                           // Navigator.pop(context);
-                      //                           Navigator.pushReplacement(context, PageTransition(
-                      //                               type: PageTransitionType.fade,
-                      //                               child: FinalTrans()));
-                      //                         } else {
-                      //                           Fluttertoast.showToast(msg: "Pesan antar tidak tersedia.");
-                      //                         }
-                      //                       });
-                      //                     },
-                      //                     child: Row(
-                      //                       children: [
-                      //                         Container(
-                      //                           width: CustomSize.sizeWidth(context) / 8,
-                      //                           height: CustomSize.sizeWidth(context) / 8,
-                      //                           decoration: BoxDecoration(
-                      //                               color: CustomColor.primaryLight,
-                      //                               shape: BoxShape.circle
-                      //                           ),
-                      //                           child: Center(
-                      //                             child: Icon(FontAwesome.motorcycle, color: Colors.white, size: 20,),
-                      //                           ),
-                      //                         ),
-                      //                         SizedBox(width: CustomSize.sizeWidth(context) / 32,),
-                      //                         CustomText.textHeading6(text: "Pesan Antar",),
-                      //                       ],
-                      //                     ),
-                      //                   ),
-                      //                   SizedBox(height: CustomSize.sizeHeight(context) / 86,),
-                      //                   GestureDetector(
-                      //                     onTap: ()async{
-                      //                       SharedPreferences pref = await SharedPreferences.getInstance();
-                      //                       setState(() {
-                      //                         if (can_takeaway == 'true') {
-                      //                           _transCode = 2;
-                      //                           pref.setString("metodeBeli", '2');
-                      //                           // Navigator.pop(context);
-                      //                           Navigator.pushReplacement(context, PageTransition(
-                      //                               type: PageTransitionType.fade,
-                      //                               child: FinalTrans()));
-                      //                         } else {
-                      //                           Fluttertoast.showToast(msg: "Ambil langsung tidak tersedia.");
-                      //                         }
-                      //                       });
-                      //                     },
-                      //                     child: Row(
-                      //                       children: [
-                      //                         Container(
-                      //                           width: CustomSize.sizeWidth(context) / 8,
-                      //                           height: CustomSize.sizeWidth(context) / 8,
-                      //                           decoration: BoxDecoration(
-                      //                               color: CustomColor.primaryLight,
-                      //                               shape: BoxShape.circle
-                      //                           ),
-                      //                           child: Center(
-                      //                             child: Icon(MaterialCommunityIcons.shopping, color: Colors.white, size: 20,),
-                      //                           ),
-                      //                         ),
-                      //                         SizedBox(width: CustomSize.sizeWidth(context) / 32,),
-                      //                         CustomText.textHeading6(text: "Ambil Langsung",),
-                      //                       ],
-                      //                     ),
-                      //                   ),
-                      //                   SizedBox(height: CustomSize.sizeHeight(context) / 86,),
-                      //                   GestureDetector(
-                      //                     onTap: ()async{
-                      //                       SharedPreferences pref = await SharedPreferences.getInstance();
-                      //                       setState(() {
-                      //                         _transCode = 3;
-                      //                         pref.setString("metodeBeli", '3');
-                      //                         // Navigator.pop(context);
-                      //                         Navigator.pushReplacement(context, PageTransition(
-                      //                             type: PageTransitionType.fade,
-                      //                             child: FinalTrans()));
-                      //                       });
-                      //                     },
-                      //                     child: Row(
-                      //                       children: [
-                      //                         Container(
-                      //                           width: CustomSize.sizeWidth(context) / 8,
-                      //                           height: CustomSize.sizeWidth(context) / 8,
-                      //                           decoration: BoxDecoration(
-                      //                               color: CustomColor.primaryLight,
-                      //                               shape: BoxShape.circle
-                      //                           ),
-                      //                           child: Center(
-                      //                             child: Icon(Icons.restaurant, color: Colors.white, size: 20,),
-                      //                           ),
-                      //                         ),
-                      //                         SizedBox(width: CustomSize.sizeWidth(context) / 32,),
-                      //                         CustomText.textHeading6(text: "Makan Ditempat",),
-                      //                       ],
-                      //                     ),
-                      //                   ),
-                      //                   SizedBox(height: CustomSize.sizeHeight(context) / 86,),
-                      //                 ],
-                      //               ),
-                      //             );
-                      //           }
-                      //       );
-                      //     },
-                      //   ),
-                      // )
-                    ],
-                  ),
-                ),
-                SizedBox(height: CustomSize.sizeHeight(context) / 88,),
-                (_transCode == 1 || _transCode == 2 || _transCode == 3)?Divider(thickness: 6, color: CustomColor.secondary,):SizedBox(),
-                // SizedBox(height: CustomSize.sizeHeight(context) / 88,),
-                Padding(
-                  padding: EdgeInsets.only(
-                    left: CustomSize.sizeWidth(context) / 32,
-                    right: CustomSize.sizeWidth(context) / 32,
-                  ),
-                  child: MediaQuery(
-                      child: CustomText.bodyRegular18(text: "*Semua proses pembayaran dan transaksi di luar tanggung jawab IRG!", color: CustomColor.redBtn, sizeNew: double.parse(((MediaQuery.of(context).size.width*0.038).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.038).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.038).toString()), maxLines: 3),
-                      data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0)
-                  ),
-                ),
-                (_transCode == 1 || _transCode == 2 || _transCode == 3)?Divider(thickness: 6, color: Colors.transparent):SizedBox(),
-                (jmlhMeja.toString() == '')?Padding(
-                  padding: EdgeInsets.only(
-                    left: CustomSize.sizeWidth(context) / 32,
-                    right: CustomSize.sizeWidth(context) / 32,
-                  ),
-                  child: MediaQuery(
-                      child: CustomText.textHeading4(text: "Daftar Pembelian", sizeNew: double.parse(((MediaQuery.of(context).size.width*0.045).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.045)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.045)).toString())),
-                      data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0)
-                  ),
-                ):Padding(
-                  padding: EdgeInsets.only(
-                    left: CustomSize.sizeWidth(context) / 32,
-                    right: CustomSize.sizeWidth(context) / 32,
-                  ),
-                  child: MediaQuery(
-                      child: CustomText.textHeading4(text: "Data Reservasi", sizeNew: double.parse(((MediaQuery.of(context).size.width*0.045).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.045)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.045)).toString())),
-                      data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0)
-                  ),
-                ),
-                (jmlhMeja.toString() == '')?SizedBox(height: CustomSize.sizeHeight(context) * 0.0048,):SizedBox(height: CustomSize.sizeHeight(context) * 0.0048,),
-                (jmlhMeja.toString() == '')?ListView.builder(
-                    shrinkWrap: true,
-                    physics: NeverScrollableScrollPhysics(),
-                    controller: _scrollController,
-                    itemCount: menuJson.length,
-                    padding: EdgeInsets.zero,
-                    itemBuilder: (_, index){
-                      return Padding(
-                        padding: EdgeInsets.only(
-                          top: CustomSize.sizeWidth(context) / 68,
-                          left: CustomSize.sizeWidth(context) / 18,
-                          right: CustomSize.sizeWidth(context) / 18,
-                        ),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      child: MediaQuery(
+        child: Scaffold(
+          body: SafeArea(
+            child: (isLoading)?Container(
+                width: CustomSize.sizeWidth(context),
+                height: CustomSize.sizeHeight(context),
+                child: Center(child: CircularProgressIndicator(
+                  color: CustomColor.primaryLight,
+                ))):SingleChildScrollView(
+              controller: _scrollController,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  SizedBox(height: CustomSize.sizeHeight(context) / 32,),
+                  Padding(
+                    padding: EdgeInsets.symmetric(horizontal: CustomSize.sizeWidth(context) / 24),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Row(
                           children: [
-                            Container(
-                              width: CustomSize.sizeWidth(context) / 1.65,
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                // mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                children: [
-                                  MediaQuery(
-                                    child: CustomText.textHeading7(
-                                        text: menuJson[index].name,
-                                        sizeNew: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.04).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.04).toString()),
-                                        maxLines: 1
-                                    ),
-                                      data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0)
-                                  ),
-                                  MediaQuery(
-                                    child: CustomText.bodyRegular14(
-                                        text: menuJson[index].desc,
-                                        maxLines: 2,
-                                        sizeNew: double.parse(((MediaQuery.of(context).size.width*0.035).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.035).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.035).toString())
-                                    ),
-                                      data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0)
-                                  ),
-                                  // CustomText.bodyRegular16(text: (noted[index].split(': ')[1] != 'kam5ia_null}')?noted[index].split('{')[1].split('}')[0]:''),
-                                  // SizedBox(height: CustomSize.sizeHeight(context) / 88,),
-                                  (menuJson[index].discount == null || menuJson[index].discount == 'null' || menuJson[index].discount == '')?MediaQuery(
-                                    child: CustomText.bodyMedium14(
-                                        text: NumberFormat.currency(locale: 'id', symbol: '', decimalDigits: 0).format(int.parse(menuJson[index].price)),
-                                        maxLines: 1,
-                                        sizeNew: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.04)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.04)).toString())
-                                    ),
-                                      data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0)
-                                  )
-                                      :Row(
-                                    children: [
-                                      MediaQuery(
-                                        child: CustomText.bodyMedium14(
-                                            text: NumberFormat.currency(locale: 'id', symbol: '', decimalDigits: 0).format(int.parse(menuJson[index].price)),
-                                            maxLines: 1,
-                                            sizeNew: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.04)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.04)).toString()),
-                                            decoration: TextDecoration.lineThrough
-                                        ),
-                                          data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0)
-                                      ),
-                                      SizedBox(width: CustomSize.sizeWidth(context) / 48,),
-                                      MediaQuery(
-                                        child: CustomText.bodyMedium14(
-                                            text: NumberFormat.currency(locale: 'id', symbol: '', decimalDigits: 0).format(int.parse(menuJson[index].discount!)),
-                                            maxLines: 1,
-                                            sizeNew: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.04)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.04)).toString())
-                                        ),
-                                          data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0)
-                                      ),
-                                    ],
-                                  ),
-                                  // (menuReady[index])?Container():CustomText.bodyMedium14(
-                                  //     text: "Menu tidak tersedia.",
-                                  //     maxLines: 1,
-                                  //     color: Colors.red
-                                  // ),
-                                ],
-                              ),
-                            ),
-                            Column(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              crossAxisAlignment: CrossAxisAlignment.end,
-                              children: [
-                                Row(
-                                  children: [
-                                    MediaQuery(
-                                        child: CustomText.bodyRegular16(text: qty[index], sizeNew: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.04)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.04)).toString())),
-                                        data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0)
-                                    ),
-                                    MediaQuery(
-                                        child: CustomText.bodyRegular16(text: ' Item', sizeNew: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.04)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.04)).toString())),
-                                        data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0)
-                                    ),
-                                  ],
-                                )
-                              ],
-                            ),
-                          ],
-                        ),
-                      );
-                    }
-                ):Padding(
-                  padding: EdgeInsets.only(
-                    left: CustomSize.sizeWidth(context) / 18,
-                    right: CustomSize.sizeWidth(context) / 18,
-                    bottom: CustomSize.sizeHeight(context) * 0.0075,
-                  ),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      // CustomText.textHeading7(text: (noted2[index].split(': ')[1] != 'kam5ia_null}')?noted2[index].split('{')[1].split('}')[0].split(':')[0]+': ':'',  maxLines: 4),
-                      Container(
-                          width: CustomSize.sizeWidth(context) / 1.4,
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              MediaQuery(
-                                  child: CustomText.textTitle3(text: 'Jumlah Meja: '+jmlhMeja,  maxLines: 10, sizeNew: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.04)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.04)).toString())),
-                                  data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0)
-                              ),
-                              MediaQuery(
-                                  child: CustomText.textTitle3(text: 'Tanggal: '+tglReser,  maxLines: 10, sizeNew: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.04)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.04)).toString())),
-                                  data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0)
-                              ),
-                              MediaQuery(
-                                  child: CustomText.textTitle3(text: 'Jam: '+jamReser,  maxLines: 10, sizeNew: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.04)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.04)).toString())),
-                                  data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0)
-                              ),
-                            ],
-                          )
-                      ),
-                      // (noted2[index].split(': ')[1] == 'kam5ia_null}' || noted2[index].split(': ')[1] == '}')?Container():GestureDetector(
-                      //   onTap: (){
-                      //     if (noted2[index].contains(noted2[index]) == true) {
-                      //       // noteProduct = noted[restoId.indexOf(promo[index].menu!.id.toString())].toString();
-                      //       noteProduct = noted2[index].toString();
-                      //       getNote();
-                      //       setState(() {});
-                      //     } else {
-                      //       noteProduct = '';
-                      //       getNote2();
-                      //       setState(() {});
-                      //     }
-                      //     showDialog(
-                      //         context: context,
-                      //         builder: (context) {
-                      //           return AlertDialog(
-                      //             shape: RoundedRectangleBorder(
-                      //                 borderRadius: BorderRadius.all(Radius.circular(10))
-                      //             ),
-                      //             title: Text('Catatan'),
-                      //             content: TextField(
-                      //               autofocus: true,
-                      //               keyboardType: TextInputType.text,
-                      //               controller: note,
-                      //               decoration: InputDecoration(
-                      //                 hintText: "Untuk pesananmu",
-                      //                 border: OutlineInputBorder(
-                      //                   borderRadius: BorderRadius.circular(10.0),
-                      //                 ),
-                      //                 enabledBorder: OutlineInputBorder(
-                      //                   borderSide: const BorderSide(color: Colors.grey, width: 1.0),
-                      //                 ),
-                      //                 focusedBorder: OutlineInputBorder(
-                      //                   borderSide: const BorderSide(color: Colors.grey, width: 2.0),
-                      //                 ),
-                      //               ),
-                      //             ),
-                      //             actions: <Widget>[
-                      //               Center(
-                      //                 child: Row(
-                      //                   mainAxisAlignment: MainAxisAlignment.spaceAround,
-                      //                   children: [
-                      //                     FlatButton(
-                      //                       // minWidth: CustomSize.sizeWidth(context),
-                      //                       color: CustomColor.redBtn,
-                      //                       textColor: Colors.white,
-                      //                       shape: RoundedRectangleBorder(
-                      //                           borderRadius: BorderRadius.all(Radius.circular(10))
-                      //                       ),
-                      //                       child: Text('Hapus'),
-                      //                       onPressed: () async{
-                      //                         String s = noted[noted.indexOf(noted2[index].toString())];
-                      //                         String i = s.replaceAll(noted[noted.indexOf(noted2[index].toString())].split(': ')[1], 'kam5ia_null'+'}') ;
-                      //                         print(i);
-                      //                         noted[noted.indexOf(noted2[index].toString())] = i.toString();
-                      //                         // int i = int.parse(s) + 1;
-                      //                         // print(i);
-                      //                         // noted.add(note.text);
-                      //                         SharedPreferences pref = await SharedPreferences.getInstance();
-                      //                         pref.setStringList("note", noted);
-                      //                         noteProduct = '';
-                      //                         // _getData();
-                      //                         getNote();
-                      //                         setState(() {
-                      //                           // codeDialog = valueText;
-                      //                           Navigator.pop(context);
-                      //                           Navigator.push(context, PageTransition(
-                      //                               type: PageTransitionType.fade,
-                      //                               child: FinalTrans()));
-                      //                         });
-                      //                       },
-                      //                     ),
-                      //                     FlatButton(
-                      //                       // minWidth: CustomSize.sizeWidth(context),
-                      //                       color: CustomColor.primaryLight,
-                      //                       textColor: Colors.white,
-                      //                       shape: RoundedRectangleBorder(
-                      //                           borderRadius: BorderRadius.all(Radius.circular(10))
-                      //                       ),
-                      //                       child: Text('Simpan'),
-                      //                       onPressed: () async{
-                      //                         String s = noted[noted.indexOf(noted2[index].toString())];
-                      //                         String i = s.replaceAll(noted[noted.indexOf(noted2[index].toString())].split(': ')[1], (note.text != '')?note.text+'}':'kam5ia_null'+'}') ;
-                      //                         print(i);
-                      //                         noted[noted.indexOf(noted2[index].toString())] = i.toString();
-                      //                         // int i = int.parse(s) + 1;
-                      //                         // print(i);
-                      //                         // noted.add(note.text);
-                      //                         SharedPreferences pref = await SharedPreferences.getInstance();
-                      //                         pref.setStringList("note", noted);
-                      //                         noteProduct = '';
-                      //                         // _getData();
-                      //                         getNote();
-                      //                         setState(() {
-                      //                           // codeDialog = valueText;
-                      //                           Navigator.pop(context);
-                      //                           Navigator.push(context, PageTransition(
-                      //                               type: PageTransitionType.fade,
-                      //                               child: FinalTrans()));
-                      //                         });
-                      //                       },
-                      //                     ),
-                      //                   ],
-                      //                 ),
-                      //               ),
-                      //
-                      //             ],
-                      //           );
-                      //         });
-                      //   },
-                      //   child: Container(
-                      //     // height: CustomSize.sizeHeight(context) / 28,
-                      //     // width: CustomSize.sizeWidth(context) / 3,
-                      //     // decoration: BoxDecoration(
-                      //     //     borderRadius: BorderRadius.circular(20),
-                      //     //     border: Border.all(color: Colors.grey)
-                      //     // ),
-                      //     child: Icon(Icons.edit),
-                      //   ),
-                      // ),
-                    ],
-                  ),
-                ),
-
-                // (noted2.toString() != '[]')?SizedBox(height: CustomSize.sizeHeight(context) / 48,):SizedBox(),
-                (noted2.toString() != '[]')?Divider(thickness: 6, color: CustomColor.secondary,):SizedBox(),
-                // (noted2.toString() != '[]')?SizedBox(height: CustomSize.sizeHeight(context) / 48,):SizedBox(),
-                (noted2.toString() != '[]')?Padding(
-                  padding: EdgeInsets.only(
-                    left: CustomSize.sizeWidth(context) / 32,
-                    right: CustomSize.sizeWidth(context) / 32,
-                  ),
-                  child: MediaQuery(
-                      child: CustomText.textHeading4(text: "Catatan Pesananmu", sizeNew: double.parse(((MediaQuery.of(context).size.width*0.045).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.045)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.045)).toString())),
-                      data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0)
-                  ),
-                ):Container(),
-                (noted2.toString() != '[]')?SizedBox(height: CustomSize.sizeHeight(context) * 0.0048,):Container(),
-                (noted2.toString() != '[]')?ListView.builder(
-                    shrinkWrap: true,
-                    physics: NeverScrollableScrollPhysics(),
-                    controller: _scrollController,
-                    itemCount: noted2.length,
-                    itemBuilder: (_, index){
-                      return Padding(
-                        padding: EdgeInsets.only(
-                          left: CustomSize.sizeWidth(context) / 18,
-                          right: CustomSize.sizeWidth(context) / 18,
-                          bottom: CustomSize.sizeHeight(context) * 0.0075,
-                        ),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            // CustomText.textHeading7(text: (noted2[index].split(': ')[1] != 'kam5ia_null}')?noted2[index].split('{')[1].split('}')[0].split(':')[0]+': ':'',  maxLines: 4),
-                            Container(
-                                width: CustomSize.sizeWidth(context) / 1.4,
-                                child: MediaQuery(
-                                    child: CustomText.textTitle3(text: (noted2[index].split(': ')[1] != 'kam5ia_null}')?noted2[index].split('{')[1].split('}')[0]:'',  maxLines: 10, sizeNew: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.04)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.04)).toString())),
-                                    data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0)
-                                )
-                            ),
-                            // (noted2[index].split(': ')[1] == 'kam5ia_null}' || noted2[index].split(': ')[1] == '}')?Container():GestureDetector(
-                            //   onTap: (){
-                            //     if (noted2[index].contains(noted2[index]) == true) {
-                            //       // noteProduct = noted[restoId.indexOf(promo[index].menu!.id.toString())].toString();
-                            //       noteProduct = noted2[index].toString();
-                            //       getNote();
-                            //       setState(() {});
-                            //     } else {
-                            //       noteProduct = '';
-                            //       getNote2();
-                            //       setState(() {});
-                            //     }
-                            //     showDialog(
-                            //         context: context,
-                            //         builder: (context) {
-                            //           return AlertDialog(
-                            //             shape: RoundedRectangleBorder(
-                            //                 borderRadius: BorderRadius.all(Radius.circular(10))
-                            //             ),
-                            //             title: Text('Catatan'),
-                            //             content: TextField(
-                            //               autofocus: true,
-                            //               keyboardType: TextInputType.text,
-                            //               controller: note,
-                            //               decoration: InputDecoration(
-                            //                 hintText: "Untuk pesananmu",
-                            //                 border: OutlineInputBorder(
-                            //                   borderRadius: BorderRadius.circular(10.0),
-                            //                 ),
-                            //                 enabledBorder: OutlineInputBorder(
-                            //                   borderSide: const BorderSide(color: Colors.grey, width: 1.0),
-                            //                 ),
-                            //                 focusedBorder: OutlineInputBorder(
-                            //                   borderSide: const BorderSide(color: Colors.grey, width: 2.0),
-                            //                 ),
-                            //               ),
-                            //             ),
-                            //             actions: <Widget>[
-                            //               Center(
-                            //                 child: Row(
-                            //                   mainAxisAlignment: MainAxisAlignment.spaceAround,
-                            //                   children: [
-                            //                     FlatButton(
-                            //                       // minWidth: CustomSize.sizeWidth(context),
-                            //                       color: CustomColor.redBtn,
-                            //                       textColor: Colors.white,
-                            //                       shape: RoundedRectangleBorder(
-                            //                           borderRadius: BorderRadius.all(Radius.circular(10))
-                            //                       ),
-                            //                       child: Text('Hapus'),
-                            //                       onPressed: () async{
-                            //                         String s = noted[noted.indexOf(noted2[index].toString())];
-                            //                         String i = s.replaceAll(noted[noted.indexOf(noted2[index].toString())].split(': ')[1], 'kam5ia_null'+'}') ;
-                            //                         print(i);
-                            //                         noted[noted.indexOf(noted2[index].toString())] = i.toString();
-                            //                         // int i = int.parse(s) + 1;
-                            //                         // print(i);
-                            //                         // noted.add(note.text);
-                            //                         SharedPreferences pref = await SharedPreferences.getInstance();
-                            //                         pref.setStringList("note", noted);
-                            //                         noteProduct = '';
-                            //                         // _getData();
-                            //                         getNote();
-                            //                         setState(() {
-                            //                           // codeDialog = valueText;
-                            //                           Navigator.pop(context);
-                            //                           Navigator.push(context, PageTransition(
-                            //                               type: PageTransitionType.fade,
-                            //                               child: FinalTrans()));
-                            //                         });
-                            //                       },
-                            //                     ),
-                            //                     FlatButton(
-                            //                       // minWidth: CustomSize.sizeWidth(context),
-                            //                       color: CustomColor.primaryLight,
-                            //                       textColor: Colors.white,
-                            //                       shape: RoundedRectangleBorder(
-                            //                           borderRadius: BorderRadius.all(Radius.circular(10))
-                            //                       ),
-                            //                       child: Text('Simpan'),
-                            //                       onPressed: () async{
-                            //                         String s = noted[noted.indexOf(noted2[index].toString())];
-                            //                         String i = s.replaceAll(noted[noted.indexOf(noted2[index].toString())].split(': ')[1], (note.text != '')?note.text+'}':'kam5ia_null'+'}') ;
-                            //                         print(i);
-                            //                         noted[noted.indexOf(noted2[index].toString())] = i.toString();
-                            //                         // int i = int.parse(s) + 1;
-                            //                         // print(i);
-                            //                         // noted.add(note.text);
-                            //                         SharedPreferences pref = await SharedPreferences.getInstance();
-                            //                         pref.setStringList("note", noted);
-                            //                         noteProduct = '';
-                            //                         // _getData();
-                            //                         getNote();
-                            //                         setState(() {
-                            //                           // codeDialog = valueText;
-                            //                           Navigator.pop(context);
-                            //                           Navigator.push(context, PageTransition(
-                            //                               type: PageTransitionType.fade,
-                            //                               child: FinalTrans()));
-                            //                         });
-                            //                       },
-                            //                     ),
-                            //                   ],
-                            //                 ),
-                            //               ),
-                            //
-                            //             ],
-                            //           );
-                            //         });
-                            //   },
-                            //   child: Container(
-                            //     // height: CustomSize.sizeHeight(context) / 28,
-                            //     // width: CustomSize.sizeWidth(context) / 3,
-                            //     // decoration: BoxDecoration(
-                            //     //     borderRadius: BorderRadius.circular(20),
-                            //     //     border: Border.all(color: Colors.grey)
-                            //     // ),
-                            //     child: Icon(Icons.edit),
+                            // Container(
+                            //   width: CustomSize.sizeWidth(context) / 8,
+                            //   height: CustomSize.sizeWidth(context) / 8,
+                            //   decoration: BoxDecoration(
+                            //       color: CustomColor.primaryLight,
+                            //       shape: BoxShape.circle
+                            //   ),
+                            //   child: Center(
+                            //     child: Icon((_transCode == 1)?FontAwesome.motorcycle:(_transCode == 2)?MaterialCommunityIcons.shopping:Icons.restaurant, color: Colors.white, size: 20,),
                             //   ),
                             // ),
+                            // SizedBox(width: CustomSize.sizeWidth(context) / 32,),
+
+                            // CustomText.textHeading6(text: (_transCode == 1)?"Pesan Antar":(_transCode == 2)?"Ambil Langsung":"Makan Ditempat",),
+                            CustomText.textHeading4(text: "Nota Transaksi", minSize: double.parse(((MediaQuery.of(context).size.width*0.045).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.045)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.045)).toString())),
                           ],
                         ),
-                      );
-                    }
-                ):Container(),
-
-                Divider(thickness: 6, color: CustomColor.secondary,),
-                Padding(
-                  padding: EdgeInsets.only(
-                    left: CustomSize.sizeWidth(context) / 32,
-                    right: CustomSize.sizeWidth(context) / 32,
-                  ),
-                  child: MediaQuery(
-                      child: CustomText.textHeading4(text: (jmlhMeja.toString() == '')?"Tipe Pembelian":'Tipe Pemesanan', sizeNew: double.parse(((MediaQuery.of(context).size.width*0.045).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.045)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.045)).toString())),
-                      data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0)
-                  ),
-                ),
-                SizedBox(height: CustomSize.sizeHeight(context) * 0.0048,),
-                Padding(
-                  padding: EdgeInsets.only(
-                    left: CustomSize.sizeWidth(context) / 18,
-                    right: CustomSize.sizeWidth(context) / 18,
-                  ),
-                  child: MediaQuery(
-                      child: CustomText.textHeading6(text: (jmlhMeja.toString() == '')?(_transCode == 1)?"Pesan Antar":(_transCode == 2)?"Ambil Langsung":"Makan Ditempat":'Reservation', sizeNew: double.parse(((MediaQuery.of(context).size.width*0.035).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.035).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.035).toString())),
-                      data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0)
-                  ),
-                ),
-                SizedBox(height: CustomSize.sizeHeight(context) * 0.0075),
-                (jmlhMeja.toString() == '')?(_transCode != 3)?Divider(thickness: 6, color: CustomColor.secondary,):SizedBox():SizedBox(),
-                (jmlhMeja.toString() == '')?(_transCode == 2)?Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    // SizedBox(height: CustomSize.sizeHeight(context) / 32,),
-                    Padding(
-                      padding: EdgeInsets.only(
-                        left: CustomSize.sizeWidth(context) / 32,
-                        right: CustomSize.sizeWidth(context) / 32,
-                      ),
-                      child: MediaQuery(
-                          child: CustomText.textHeading4(text: "Alamat Resto", sizeNew: double.parse(((MediaQuery.of(context).size.width*0.045).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.045)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.045)).toString())),
-                          data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0)
-                      ),
-                    ),
-                    SizedBox(height: CustomSize.sizeHeight(context) * 0.0048,),
-                    Padding(
-                      padding: EdgeInsets.only(
-                        left: CustomSize.sizeWidth(context) / 18,
-                        right: CustomSize.sizeWidth(context) / 18,
-                      ),
-                      child: MediaQuery(
-                        child: CustomText.textHeading6(
-                            text: restoAddress,
-                            sizeNew: double.parse(((MediaQuery.of(context).size.width*0.035).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.035).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.035).toString()),
-                            maxLines: 14
-                        ),
-                          data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0)
-                      ),
-                    ),
-                  ],
-                ):SizedBox():SizedBox(),
-                (jmlhMeja.toString() == '')?(_transCode == 1)?Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    // SizedBox(height: CustomSize.sizeHeight(context) / 32,),
-                    Padding(
-                      padding: EdgeInsets.only(
-                        left: CustomSize.sizeWidth(context) / 32,
-                        right: CustomSize.sizeWidth(context) / 32,
-                      ),
-                      child: MediaQuery(
-                          child: CustomText.textHeading4(text: "Alamat Pengiriman", sizeNew: double.parse(((MediaQuery.of(context).size.width*0.045).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.045)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.045)).toString())),
-                          data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0)
-                      ),
-                    ),
-                    SizedBox(height: CustomSize.sizeHeight(context) * 0.0048,),
-                    Padding(
-                      padding: EdgeInsets.only(
-                        left: CustomSize.sizeWidth(context) / 18,
-                        right: CustomSize.sizeWidth(context) / 18,
-                      ),
-                      child: MediaQuery(
-                        child: CustomText.textHeading6(
-                            text: delivAddress.toString(),
-                            sizeNew: double.parse(((MediaQuery.of(context).size.width*0.035).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.035).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.035).toString()),
-                            maxLines: 10
-                        ),
-                          data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0)
-                      ),
-                    )
-                    // SizedBox(height: CustomSize.sizeHeight(context) * 0.008,),
-                    // Row(
-                    //   children: [
-                    //     // (_srchAddress.text != '')?GestureDetector(
-                    //     //   onTap: () async{
-                    //     //     SharedPreferences pref2 = await SharedPreferences.getInstance();
-                    //     //     if (srchAddress == false) {
-                    //     //       srchAddress = true;
-                    //     //     } else {
-                    //     //       srchAddress = false;
-                    //     //       List<Placemark> placemark = await Geolocator().placemarkFromAddress(_srchAddress.text);
-                    //     //       double distan = await Geolocator().distanceBetween( double.parse(pref2.getString('latResto')), double.parse(pref2.getString('longResto')), placemark[0].position.latitude, placemark[0].position.longitude);
-                    //     //       int _ongkir = int.parse(ongkir!);
-                    //     //       String dist = NumberFormat.currency(locale: 'id', symbol: '', decimalDigits: 0).format(int.parse(distan.toString().split('.')[0]));
-                    //     //       int _distan = int.parse(dist.split('.')[0]);
-                    //     //       if (_distan != 0) {
-                    //     //         int _totalOngkir = _ongkir * _distan;
-                    //     //         totalOngkir = _totalOngkir.toString();
-                    //     //         int _totalHarga = harga + _totalOngkir;
-                    //     //         totalHarga = _totalHarga.toString();
-                    //     //       } else {
-                    //     //         totalOngkir = ongkir!;
-                    //     //         int _totalHarga = harga + int.parse(totalOngkir);
-                    //     //         totalHarga = _totalHarga.toString();
-                    //     //       }
-                    //     //     }
-                    //     //     setState(() {});
-                    //     //   },
-                    //     //   child: Container(
-                    //     //     width: CustomSize.sizeWidth(context) / 3,
-                    //     //     height: CustomSize.sizeHeight(context) / 22,
-                    //     //     decoration: BoxDecoration(
-                    //     //         borderRadius: BorderRadius.circular(20),
-                    //     //         border: Border.all(color: Colors.black, width: 0.5)
-                    //     //     ),
-                    //     //     child: Center(
-                    //     //       child: Row(
-                    //     //         mainAxisAlignment: MainAxisAlignment.center,
-                    //     //         crossAxisAlignment: CrossAxisAlignment.center,
-                    //     //         children: [
-                    //     //           (srchAddress != true)?Icon(Octicons.pencil, size: 14,):Container(),
-                    //     //           (srchAddress != true)?SizedBox(width: CustomSize.sizeWidth(context) / 86,):Container(),
-                    //     //           (srchAddress != true)?CustomText.bodyMedium12(text: "Ganti Alamat"):CustomText.bodyMedium12(text: "Simpan")
-                    //     //         ],
-                    //     //       ),
-                    //     //     ),
-                    //     //   ),
-                    //     // ):Container(),
-                    //     // (_srchAddress.text != '')?SizedBox(width: CustomSize.sizeWidth(context) / 45,):Container(),
-                    //     (srchAddress != true)?GestureDetector(
-                    //       onTap: () async{
-                    //         var result = await Navigator.push(
-                    //             context,
-                    //             PageTransition(
-                    //                 type: PageTransitionType.rightToLeft,
-                    //                 child: SearchAddressMaps(latitude!,longitude!)));
-                    //         if(result != ""){
-                    //           SharedPreferences pref = await SharedPreferences.getInstance();
-                    //           _srchAddress = TextEditingController(text: pref.getString('address'));
-                    //           int _ongkir = int.parse(ongkir!.toString());
-                    //           String dist = NumberFormat.currency(locale: 'id', symbol: '', decimalDigits: 0).format(double.parse(pref.getString('distan')));
-                    //           int _distan = int.parse(dist.split('.')[0]);
-                    //           if (_distan != 0) {
-                    //             int _totalOngkir = _ongkir * _distan;
-                    //             totalOngkir = _totalOngkir.toString();
-                    //             int _totalHarga = harga + _totalOngkir;
-                    //             totalHarga = _totalHarga.toString();
-                    //             setState(() {});
-                    //           } else {
-                    //             totalOngkir = ongkir!;
-                    //             int _totalHarga = harga + int.parse(totalOngkir);
-                    //             totalHarga = _totalHarga.toString();
-                    //             setState(() {});
-                    //           }
-                    //           setState(() {});
-                    //         }
-                    //       },
-                    //       child: Container(
-                    //         width: CustomSize.sizeWidth(context) / 3,
-                    //         height: CustomSize.sizeHeight(context) / 22,
-                    //         decoration: BoxDecoration(
-                    //             borderRadius: BorderRadius.circular(20),
-                    //             border: Border.all(color: Colors.black, width: 0.5)
-                    //         ),
-                    //         child: Center(
-                    //           child: Row(
-                    //             mainAxisAlignment: MainAxisAlignment.center,
-                    //             crossAxisAlignment: CrossAxisAlignment.center,
-                    //             children: [
-                    //               (srchAddress2 != true)?Icon(FontAwesome.map_marker, size: 14,):Container(),
-                    //               (srchAddress2 != true)?SizedBox(width: CustomSize.sizeWidth(context) / 86,):Container(),
-                    //               (srchAddress2 != true)?CustomText.bodyMedium12(text: "Buka maps"):CustomText.bodyMedium12(text: "Simpan")
-                    //             ],
-                    //           ),
-                    //         ),
-                    //       ),
-                    //     ):Container(),
-                    //   ],
-                    // ),
-                  ],
-                ):SizedBox():SizedBox(),
-                // (_transCode == 1 || _transCode == 2)?SizedBox(height: CustomSize.sizeHeight(context) / 48,):SizedBox(),
-                // SizedBox(height: CustomSize.sizeHeight(context) / 48,),
-                // (_transCode != 3)?Divider(thickness: 6, color: CustomColor.secondary,):SizedBox(),
-                // (_transCode != 3)?SizedBox(height: CustomSize.sizeHeight(context) / 48,):SizedBox(),
-
-                // SizedBox(height: CustomSize.sizeHeight(context) / 88,),
-                // (noted2.toString() != '[]')?SizedBox(height: CustomSize.sizeHeight(context) / 48,):Container(),
-                // Padding(
-                //   padding: EdgeInsets.symmetric(
-                //       horizontal: CustomSize.sizeWidth(context) / 32,
-                //       vertical: CustomSize.sizeHeight(context) / 86
-                //   ),
-                //   child: Row(
-                //     mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                //     crossAxisAlignment: CrossAxisAlignment.center,
-                //     children: [
-                //       Container(
-                //         width: CustomSize.sizeWidth(context) / 1.6,
-                //         child: Column(
-                //           crossAxisAlignment: CrossAxisAlignment.start,
-                //           children: [
-                //             CustomText.textHeading4(text: "Ada lagi pesanannya ?"),
-                //             CustomText.bodyRegular16(text: "Masih bisa tambah lagi loo")
-                //           ],
-                //         ),
-                //       ),
-                //       Padding(
-                //         padding: EdgeInsets.symmetric(horizontal: CustomSize.sizeWidth(context) / 86),
-                //         child: GestureDetector(
-                //           onTap: ()async{
-                //             Navigator.push(
-                //                 context,
-                //                 PageTransition(
-                //                     type: PageTransitionType.rightToLeft,
-                //                     child: new DetailResto(checkId)));
-                //           },
-                //           child: Container(
-                //             height: CustomSize.sizeHeight(context) / 24,
-                //             decoration: BoxDecoration(
-                //                 borderRadius: BorderRadius.circular(20),
-                //                 border: Border.all(color: Colors.grey)
-                //             ),
-                //             child: Padding(
-                //               padding: EdgeInsets.symmetric(horizontal: CustomSize.sizeWidth(context) / 32),
-                //               child: Center(
-                //                 child: CustomText.textTitle8(
-                //                     text: "Tambah",
-                //                     color: Colors.grey
-                //                 ),
-                //               ),
-                //             ),
-                //           ),
-                //         ),
-                //       )
-                //     ],
-                //   ),
-                // ),
-                SizedBox(height: CustomSize.sizeHeight(context) * 0.0075),
-                Divider(thickness: 6, color: CustomColor.secondary,),
-                Padding(
-                  padding: EdgeInsets.symmetric(
-                      horizontal: CustomSize.sizeWidth(context) / 32,
-                      // vertical: CustomSize.sizeHeight(context) / 55
-                  ),
-                  child: Container(
-                    width: CustomSize.sizeWidth(context),
-                    decoration: BoxDecoration(
-                        color: Colors.white
-                    ),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        MediaQuery(
-                            child: CustomText.textHeading4(text: "Data Usaha", sizeNew: double.parse(((MediaQuery.of(context).size.width*0.045).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.045)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.045)).toString())),
-                            data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0)
-                        ),
-                        SizedBox(height: CustomSize.sizeHeight(context) * 0.01,),
-                        Container(
-                          padding: EdgeInsets.only(
-                            left: CustomSize.sizeWidth(context) / 18,
-                            right: CustomSize.sizeWidth(context) / 18,
-                          ),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              (nameRestoTrans != '' && nameRestoTrans != 'null')?
-                              MediaQuery(
-                                  child: CustomText.bodyRegular17(text: "Nama Usaha: "+nameRestoTrans, maxLines: 4, sizeNew: double.parse(((MediaQuery.of(context).size.width*0.038).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.038).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.038).toString())),
-                                  data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0)
-                              ):
-                              Row(
-                                children: [
-                                  MediaQuery(
-                                      child: CustomText.bodyRegular17(text: "Nama Usaha: ", maxLines: 2, sizeNew: double.parse(((MediaQuery.of(context).size.width*0.038).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.038).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.038).toString())),
-                                      data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0)
-                                      ),
-                                  MediaQuery(
-                                      child: CustomText.bodyRegular17(text: "kosong", maxLines: 2, color: CustomColor.redBtn, sizeNew: double.parse(((MediaQuery.of(context).size.width*0.038).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.038).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.038).toString())),
-                                      data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0)
-                                  ),
-                                ],
-                              ),
-                              SizedBox(height: CustomSize.sizeHeight(context) * 0.005,),
-
-                              (restoAddress != '' && restoAddress != 'null')?
-                              Row(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  MediaQuery(
-                                      child: CustomText.bodyRegular17(text: "Alamat Usaha: ", maxLines: 4, sizeNew: double.parse(((MediaQuery.of(context).size.width*0.038).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.038).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.038).toString())),
-                                      data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0)
-                                  ),
-                                  GestureDetector(
-                                      onTap: (){
-                                        _launchURL();
-                                      },
-                                      child: Container(
-                                          width: CustomSize.sizeWidth(context) / 2.1,
-                                          child: MediaQuery(
-                                              child: CustomText.bodyRegular17(text: restoAddress, maxLines: 14, sizeNew: double.parse(((MediaQuery.of(context).size.width*0.038).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.038).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.038).toString())),
-                                              data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0)
-                                          )
-                                      )
-                                  ),
-                                ],
-                              ):
-                              Row(
-                                children: [
-                                  MediaQuery(
-                                      child: CustomText.bodyRegular17(text: "Alamat Usaha: ", maxLines: 2, sizeNew: double.parse(((MediaQuery.of(context).size.width*0.038).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.038).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.038).toString())),
-                                      data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0)
-                                  ),
-                                  MediaQuery(
-                                      child: CustomText.bodyRegular17(text: "kosong", maxLines: 2, color: CustomColor.redBtn, sizeNew: double.parse(((MediaQuery.of(context).size.width*0.038).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.038).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.038).toString())),
-                                      data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0)
-                                  ),
-                                ],
-                              ),
-                              SizedBox(height: CustomSize.sizeHeight(context) * 0.005,),
-
-                              (emailTokoTrans != '' && emailTokoTrans != 'null')?
-                              Row(
-                                children: [
-                                  MediaQuery(
-                                      child: CustomText.bodyRegular17(text: "Email Usaha: ", maxLines: 2, sizeNew: double.parse(((MediaQuery.of(context).size.width*0.038).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.038).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.038).toString())),
-                                      data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0)
-                                  ),
-                                  GestureDetector(
-                                      onTap: (){
-                                        launch('mailto:$emailTokoTrans');
-                                      },
-                                      child: MediaQuery(
-                                          child: CustomText.bodyRegular17(text: emailTokoTrans, maxLines: 2, sizeNew: double.parse(((MediaQuery.of(context).size.width*0.038).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.038).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.038).toString())),
-                                          data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0)
-                                      )
-                                  ),
-                                ],
-                              ):
-                              Row(
-                                children: [
-                                  MediaQuery(
-                                      child: CustomText.bodyRegular17(text: "Email Usaha: ", maxLines: 2, sizeNew: double.parse(((MediaQuery.of(context).size.width*0.038).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.038).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.038).toString())),
-                                      data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0)
-                                  ),
-                                  MediaQuery(
-                                      child: CustomText.bodyRegular17(text: "kosong", maxLines: 2, color: CustomColor.redBtn, sizeNew: double.parse(((MediaQuery.of(context).size.width*0.038).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.038).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.038).toString())),
-                                      data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0)
-                                  ),
-                                ],
-                              ),
-                              SizedBox(height: CustomSize.sizeHeight(context) * 0.005,),
-
-                              (phoneRestoTrans != '' && phoneRestoTrans != 'null')?
-                              Row(
-                                children: [
-                                  MediaQuery(
-                                      child: CustomText.bodyRegular17(text: "Telepon Usaha: ", maxLines: 2, sizeNew: double.parse(((MediaQuery.of(context).size.width*0.038).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.038).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.038).toString())),
-                                      data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0)
-                                  ),
-                                  GestureDetector(
-                                      onTap: (){
-                                        launch('tel:$phoneRestoTrans');
-                                      },
-                                      child: MediaQuery(
-                                          child: CustomText.bodyRegular17(text: phoneRestoTrans, maxLines: 2, sizeNew: double.parse(((MediaQuery.of(context).size.width*0.038).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.038).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.038).toString())),
-                                          data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0)
-                                      )
-                                  ),
-                                ],
-                              ):
-                              Row(
-                                children: [
-                                  MediaQuery(
-                                      child: CustomText.bodyRegular17(text: "Telepon Usaha: ", maxLines: 2, sizeNew: double.parse(((MediaQuery.of(context).size.width*0.038).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.038).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.038).toString())),
-                                      data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0)
-                                  ),
-                                  MediaQuery(
-                                      child: CustomText.bodyRegular17(text: "kosong", maxLines: 2, color: CustomColor.redBtn, sizeNew: double.parse(((MediaQuery.of(context).size.width*0.038).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.038).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.038).toString())),
-                                      data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0)
-                                  ),
-                                ],
-                              ),
-                              SizedBox(height: CustomSize.sizeHeight(context) * 0.005,),
-
-                              (ownerTokoTrans != '' && ownerTokoTrans != 'null')?
-                              MediaQuery(
-                                  child: CustomText.bodyRegular17(text: "Nama Pemilik: "+ownerTokoTrans, maxLines: 2, sizeNew: double.parse(((MediaQuery.of(context).size.width*0.038).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.038).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.038).toString())),
-                                  data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0)
-                              ):
-                              Row(
-                                children: [
-                                  MediaQuery(
-                                      child: CustomText.bodyRegular17(text: "Nama Pemilik: ", maxLines: 2, sizeNew: double.parse(((MediaQuery.of(context).size.width*0.038).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.038).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.038).toString())),
-                                      data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0)
-),
-                                  MediaQuery(
-                                      child: CustomText.bodyRegular17(text: "kosong", maxLines: 2, color: CustomColor.redBtn, sizeNew: double.parse(((MediaQuery.of(context).size.width*0.038).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.038).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.038).toString())),
-                                      data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0)
-                                  ),
-                                ],
-                              ),
-                              SizedBox(height: CustomSize.sizeHeight(context) * 0.005,),
-
-                              (pjTokoTrans != '' && pjTokoTrans != 'null')?
-                              MediaQuery(
-                                  child: CustomText.bodyRegular17(text: "Nama Penanggung Jawab: "+pjTokoTrans, maxLines: 2, sizeNew: double.parse(((MediaQuery.of(context).size.width*0.038).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.038).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.038).toString())),
-                                  data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0)
-                              ):
-                              Row(
-                                children: [
-                                  MediaQuery(
-                                      child: CustomText.bodyRegular17(text: "Nama Penanggung Jawab: ", maxLines: 2, sizeNew: double.parse(((MediaQuery.of(context).size.width*0.038).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.038).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.038).toString())),
-                                      data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0)
-                                  ),
-                                  MediaQuery(
-                                      child: CustomText.bodyRegular17(text: "kosong", maxLines: 2, color: CustomColor.redBtn, sizeNew: double.parse(((MediaQuery.of(context).size.width*0.038).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.038).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.038).toString())),
-                                      data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0)
-                                  ),
-                                ],
-                              ),
-                              SizedBox(height: CustomSize.sizeHeight(context) * 0.005,),
-
-                              (nameRekening != '' && nameRekening != 'null')?
-                              MediaQuery(
-                                  child: CustomText.bodyRegular17(text: "Nomor Rekening atas Nama: "+nameRekening, maxLines: 2, sizeNew: double.parse(((MediaQuery.of(context).size.width*0.038).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.038).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.038).toString())),
-                                  data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0)
-                              ):
-                              Row(
-                                children: [
-                                  MediaQuery(
-                                      child: CustomText.bodyRegular17(text: "Nomor Rekening atas Nama: ", maxLines: 2, sizeNew: double.parse(((MediaQuery.of(context).size.width*0.038).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.038).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.038).toString())),
-                                      data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0)
-                                  ),
-                                  MediaQuery(
-                                      child: CustomText.bodyRegular17(text: "kosong", maxLines: 2, color: CustomColor.redBtn, sizeNew: double.parse(((MediaQuery.of(context).size.width*0.038).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.038).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.038).toString())),
-                                      data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0)
-                                  ),
-                                ],
-                              ),
-                              SizedBox(height: CustomSize.sizeHeight(context) * 0.005,),
-
-                              (nameBank != '' && nameBank != 'null')?
-                              MediaQuery(
-                                  child: CustomText.bodyRegular17(text: "Rekening Bank: "+nameBank, maxLines: 2, sizeNew: double.parse(((MediaQuery.of(context).size.width*0.038).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.038).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.038).toString())),
-                                  data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0)
-                              ):
-                              Row(
-                                children: [
-                                  MediaQuery(
-                                      child: CustomText.bodyRegular17(text: "Rekening Bank: ", maxLines: 2, sizeNew: double.parse(((MediaQuery.of(context).size.width*0.038).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.038).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.038).toString())),
-                                      data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0)
-                                  ),
-                                  MediaQuery(
-                                      child: CustomText.bodyRegular17(text: "kosong", maxLines: 2, color: CustomColor.redBtn, sizeNew: double.parse(((MediaQuery.of(context).size.width*0.038).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.038).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.038).toString())),
-                                      data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0)
-                                  ),
-                                ],
-                              ),
-                              SizedBox(height: CustomSize.sizeHeight(context) * 0.005,),
-
-                              (norekTokoTrans != '' && norekTokoTrans != 'null')?
-                              MediaQuery(
-                                  child: CustomText.bodyRegular17(text: "Nomor Rekening: "+norekTokoTrans, maxLines: 2, sizeNew: double.parse(((MediaQuery.of(context).size.width*0.038).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.038).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.038).toString())),
-                                  data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0)
-                              ):
-                              Row(
-                                children: [
-                                  MediaQuery(
-                                      child: CustomText.bodyRegular17(text: "Nomor Rekening: ", maxLines: 2, sizeNew: double.parse(((MediaQuery.of(context).size.width*0.038).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.038).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.038).toString())),
-                                      data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0)
-                                  ),
-                                  MediaQuery(
-                                      child: CustomText.bodyRegular17(text: "kosong", maxLines: 2, color: CustomColor.redBtn, sizeNew: double.parse(((MediaQuery.of(context).size.width*0.038).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.038).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.038).toString())),
-                                      data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0)
-                                  ),
-                                ],
-                              ),
-                            ],
-                          ),
-                        ),
+                        // Padding(
+                        //   padding: EdgeInsets.symmetric(horizontal: CustomSize.sizeWidth(context) / 86),
+                        //   child: GestureDetector(
+                        //     onTap: (){
+                        //       showModalBottomSheet(
+                        //           isScrollControlled: true,
+                        //           shape: RoundedRectangleBorder(
+                        //               borderRadius: BorderRadius.only(topLeft: Radius.circular(20), topRight: Radius.circular(20))
+                        //           ),
+                        //           context: context,
+                        //           builder: (_){
+                        //             return Padding(
+                        //               padding: EdgeInsets.symmetric(horizontal: CustomSize.sizeWidth(context) / 32),
+                        //               child: Column(
+                        //                 crossAxisAlignment: CrossAxisAlignment.start,
+                        //                 mainAxisSize: MainAxisSize.min,
+                        //                 children: [
+                        //                   SizedBox(height: CustomSize.sizeHeight(context) / 86,),
+                        //                   Padding(
+                        //                     padding: EdgeInsets.symmetric(horizontal: CustomSize.sizeWidth(context) / 2.4),
+                        //                     child: Divider(thickness: 4,),
+                        //                   ),
+                        //                   SizedBox(height: CustomSize.sizeHeight(context) / 52,),
+                        //                   GestureDetector(
+                        //                     onTap: ()async{
+                        //                       SharedPreferences pref = await SharedPreferences.getInstance();
+                        //                       setState(() {
+                        //                         if (can_delivery == 'true') {
+                        //                           _transCode = 1;
+                        //                           pref.setString("metodeBeli", '1');
+                        //                           // Navigator.pop(context);
+                        //                           Navigator.pushReplacement(context, PageTransition(
+                        //                               type: PageTransitionType.fade,
+                        //                               child: FinalTrans()));
+                        //                         } else {
+                        //                           Fluttertoast.showToast(msg: "Pesan antar tidak tersedia.");
+                        //                         }
+                        //                       });
+                        //                     },
+                        //                     child: Row(
+                        //                       children: [
+                        //                         Container(
+                        //                           width: CustomSize.sizeWidth(context) / 8,
+                        //                           height: CustomSize.sizeWidth(context) / 8,
+                        //                           decoration: BoxDecoration(
+                        //                               color: CustomColor.primaryLight,
+                        //                               shape: BoxShape.circle
+                        //                           ),
+                        //                           child: Center(
+                        //                             child: Icon(FontAwesome.motorcycle, color: Colors.white, size: 20,),
+                        //                           ),
+                        //                         ),
+                        //                         SizedBox(width: CustomSize.sizeWidth(context) / 32,),
+                        //                         CustomText.textHeading6(text: "Pesan Antar",),
+                        //                       ],
+                        //                     ),
+                        //                   ),
+                        //                   SizedBox(height: CustomSize.sizeHeight(context) / 86,),
+                        //                   GestureDetector(
+                        //                     onTap: ()async{
+                        //                       SharedPreferences pref = await SharedPreferences.getInstance();
+                        //                       setState(() {
+                        //                         if (can_takeaway == 'true') {
+                        //                           _transCode = 2;
+                        //                           pref.setString("metodeBeli", '2');
+                        //                           // Navigator.pop(context);
+                        //                           Navigator.pushReplacement(context, PageTransition(
+                        //                               type: PageTransitionType.fade,
+                        //                               child: FinalTrans()));
+                        //                         } else {
+                        //                           Fluttertoast.showToast(msg: "Ambil langsung tidak tersedia.");
+                        //                         }
+                        //                       });
+                        //                     },
+                        //                     child: Row(
+                        //                       children: [
+                        //                         Container(
+                        //                           width: CustomSize.sizeWidth(context) / 8,
+                        //                           height: CustomSize.sizeWidth(context) / 8,
+                        //                           decoration: BoxDecoration(
+                        //                               color: CustomColor.primaryLight,
+                        //                               shape: BoxShape.circle
+                        //                           ),
+                        //                           child: Center(
+                        //                             child: Icon(MaterialCommunityIcons.shopping, color: Colors.white, size: 20,),
+                        //                           ),
+                        //                         ),
+                        //                         SizedBox(width: CustomSize.sizeWidth(context) / 32,),
+                        //                         CustomText.textHeading6(text: "Ambil Langsung",),
+                        //                       ],
+                        //                     ),
+                        //                   ),
+                        //                   SizedBox(height: CustomSize.sizeHeight(context) / 86,),
+                        //                   GestureDetector(
+                        //                     onTap: ()async{
+                        //                       SharedPreferences pref = await SharedPreferences.getInstance();
+                        //                       setState(() {
+                        //                         _transCode = 3;
+                        //                         pref.setString("metodeBeli", '3');
+                        //                         // Navigator.pop(context);
+                        //                         Navigator.pushReplacement(context, PageTransition(
+                        //                             type: PageTransitionType.fade,
+                        //                             child: FinalTrans()));
+                        //                       });
+                        //                     },
+                        //                     child: Row(
+                        //                       children: [
+                        //                         Container(
+                        //                           width: CustomSize.sizeWidth(context) / 8,
+                        //                           height: CustomSize.sizeWidth(context) / 8,
+                        //                           decoration: BoxDecoration(
+                        //                               color: CustomColor.primaryLight,
+                        //                               shape: BoxShape.circle
+                        //                           ),
+                        //                           child: Center(
+                        //                             child: Icon(Icons.restaurant, color: Colors.white, size: 20,),
+                        //                           ),
+                        //                         ),
+                        //                         SizedBox(width: CustomSize.sizeWidth(context) / 32,),
+                        //                         CustomText.textHeading6(text: "Makan Ditempat",),
+                        //                       ],
+                        //                     ),
+                        //                   ),
+                        //                   SizedBox(height: CustomSize.sizeHeight(context) / 86,),
+                        //                 ],
+                        //               ),
+                        //             );
+                        //           }
+                        //       );
+                        //     },
+                        //   ),
+                        // )
                       ],
                     ),
                   ),
-                ),
-                SizedBox(height: CustomSize.sizeHeight(context) * 0.0075),
-                Divider(thickness: 6, color: CustomColor.secondary,),
-                Padding(
-                  padding: EdgeInsets.only(
-                    left: CustomSize.sizeWidth(context) / 32,
-                    right: CustomSize.sizeWidth(context) / 32,
-                  ),
-                  child: MediaQuery(
-                      child: CustomText.textHeading4(text: "Rincian Pembayaran", sizeNew: double.parse(((MediaQuery.of(context).size.width*0.045).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.045)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.045)).toString())),
-                      data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0)
-                  ),
-                ),
-                SizedBox(height: CustomSize.sizeHeight(context) * 0.0048,),
-                Column(
-                  children: [
-                    Padding(
-                      padding: EdgeInsets.only(
-                        left: CustomSize.sizeWidth(context) / 18,
-                        right: CustomSize.sizeWidth(context) / 18,
-                      ),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          MediaQuery(
-                              child: CustomText.bodyLight16(text: (jmlhMeja.toString() == '')?"Harga":'Harga per meja', sizeNew: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.04).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.04).toString())),
-                              data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0)
-                          ),
-                          MediaQuery(
-                              child: CustomText.bodyLight16(text: NumberFormat.currency(locale: 'id', symbol: '', decimalDigits: 0).format((jmlhMeja.toString() == '')?int.parse(harga2):int.parse(hargaReser)), sizeNew: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.04).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.04).toString())),
-                              data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0)
-                          ),
-                        ],
-                      ),
+                  SizedBox(height: CustomSize.sizeHeight(context) / 88,),
+                  (_transCode == 1 || _transCode == 2 || _transCode == 3)?Divider(thickness: 6, color: CustomColor.secondary,):SizedBox(),
+                  // SizedBox(height: CustomSize.sizeHeight(context) / 88,),
+                  Padding(
+                    padding: EdgeInsets.only(
+                      left: CustomSize.sizeWidth(context) / 32,
+                      right: CustomSize.sizeWidth(context) / 32,
                     ),
-                    (jmlhMeja.toString() == '')?(_transCode == 1)?SizedBox(height: CustomSize.sizeHeight(context) / 100,):SizedBox():SizedBox(),
-                    (jmlhMeja.toString() == '')?(_transCode == 1)?Padding(
-                      padding: EdgeInsets.only(
-                        left: CustomSize.sizeWidth(context) / 18,
-                        right: CustomSize.sizeWidth(context) / 18,
-                      ),
-                      child: Row(mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          MediaQuery(
-                              child: CustomText.bodyLight16(text: "Ongkir", sizeNew: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.04).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.04).toString())),
-                              data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0)
-                          ),
-                          MediaQuery(
-                              child: CustomText.bodyLight16(text: NumberFormat.currency(locale: 'id', symbol: '', decimalDigits: 0).format(int.parse(delivTotalOngkir)), sizeNew: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.04).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.04).toString())),
-                              data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0)
-                          ),
-                        ],
-                      ),
-                    ):SizedBox():SizedBox(),
-                    // SizedBox(height: CustomSize.sizeHeight(context) / 64,),
-                    Padding(
-                      padding: EdgeInsets.only(
-                        left: CustomSize.sizeWidth(context) / 18,
-                        right: CustomSize.sizeWidth(context) / 18,
-                      ),
-                      child: Divider(thickness: 1,),
-                    ),
-                    // SizedBox(height: CustomSize.sizeHeight(context) / 120,),
-                    Padding(
-                      padding: EdgeInsets.only(
-                        left: CustomSize.sizeWidth(context) / 18,
-                        right: CustomSize.sizeWidth(context) / 18,
-                      ),
-                      child: Row(mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          MediaQuery(
-                              child: CustomText.textTitle3(text: "Total Pembayaran", sizeNew: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.04).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.04).toString())),
-                              data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0)
-                          ),
-                          MediaQuery(
-                              child: CustomText.textTitle3(text: NumberFormat.currency(locale: 'id', symbol: '', decimalDigits: 0).format(int.parse((jmlhMeja.toString() == '')?totalHargaTrans:totalReser)), sizeNew: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.04).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.04).toString())),
-                              data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0)
-                          ),
-                        ],
-                      ),
-                    ),
-                  ],
-                ),
-                SizedBox(height: CustomSize.sizeHeight(context) * 0.0075),
-                Divider(thickness: 6, color: CustomColor.secondary,),
-                Padding(
-                  padding: EdgeInsets.only(
-                    left: CustomSize.sizeWidth(context) / 32,
-                    right: CustomSize.sizeWidth(context) / 32,
+                    child: CustomText.bodyRegular18(text: "*Semua proses pembayaran dan transaksi di luar tanggung jawab IRG!", color: CustomColor.redBtn, minSize: double.parse(((MediaQuery.of(context).size.width*0.037).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.037)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.037)).toString()), maxLines: 3),
                   ),
-                  child: MediaQuery(
-                      child: CustomText.bodyRegular18(text: "*Terimakasih telah melakukan pembelian menggunakan aplikasi kami!", color: CustomColor.accent, sizeNew: double.parse(((MediaQuery.of(context).size.width*0.038).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.038).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.038).toString()), maxLines: 3),
-                      data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0)
+                  (_transCode == 1 || _transCode == 2 || _transCode == 3)?Divider(thickness: 6, color: Colors.transparent):SizedBox(),
+                  Padding(
+                    padding: EdgeInsets.only(
+                      left: CustomSize.sizeWidth(context) / 32,
+                      right: CustomSize.sizeWidth(context) / 32,
+                    ),
+                    child: CustomText.textHeading4(text: "Daftar Pembelian", minSize: double.parse(((MediaQuery.of(context).size.width*0.045).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.045)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.045)).toString())),
                   ),
-                ),
-                Divider(thickness: 6, color: CustomColor.secondary,),
-
-                SizedBox(height: CustomSize.sizeHeight(context) / 64,),
-                GestureDetector(
-                  onTap: ()async{
-                    // _getData();
-                    setState((){});
-                    SharedPreferences preferences = await SharedPreferences.getInstance();
-                    await preferences.remove('jmlhMeja');
-                    await preferences.remove('tglReser');
-                    await preferences.remove('jamReser');
-                    await preferences.remove('hargaReser');
-                    await preferences.remove('totalReser');
-                    // Navigator.push(context, PageTransition(
-                    //     type: PageTransitionType.fade,
-                    //     child: FinalTrans()));
-
-
-                    // String qrcode = '';
-                    // if(_transCode == 3){
-                    //   try {
-                    //     qrcode = await BarcodeScanner.scan();
-                    //     setState(() {});
-                    //     makeTransaction(qrcode);
-                    //     // makeTransaction(qrcode);
-                    //     Navigator.pushReplacement(
-                    //         context,
-                    //         PageTransition(
-                    //             type: PageTransitionType.leftToRight,
-                    //             child: HomeActivity()));
-                    //   } on PlatformException catch (error) {
-                    //     if (error.code == BarcodeScanner.CameraAccessDenied) {
-                    //       print('Izin kamera tidak diizinkan oleh si pengguna');
-                    //     } else {
-                    //       print('Error: $error');
-                    //     }
-                    //   }
-                    // }else{
-                    //   if(_transCode == 1){
-                    //     if(_srchAddress.text != ''){
-                    //       makeTransaction(qrcode);
-                    //       // makeTransaction(qrcode);
-                    //       Navigator.pushReplacement(
-                    //           context,
-                    //           PageTransition(
-                    //               type: PageTransitionType.leftToRight,
-                    //               child: HomeActivity()));
-                    //     }else{
-                    //       Fluttertoast.showToast(
-                    //         msg: "Alamat tujuan Anda dimana?",);
-                    //     }
-                    //   }else{
-                    //     makeTransaction(qrcode);
-                    //     // makeTransaction(qrcode);
-                    //     Navigator.pushReplacement(
-                    //         context,
-                    //         PageTransition(
-                    //             type: PageTransitionType.leftToRight,
-                    //             child: HomeActivity()));
-                    //   }
-                    // }
-
-
-                    Navigator.pushReplacement(
-                        context,
-                        PageTransition(
-                            type: PageTransitionType.fade,
-                            child: HomeActivity()));
-                  },
-                  child: Center(
-                    child: Container(
-                      width: CustomSize.sizeWidth(context) / 1.1,
-                      height: CustomSize.sizeHeight(context) / 14,
-                      decoration: BoxDecoration(
-                          color: (menuReady.contains(false))?CustomColor.textBody:CustomColor.primaryLight,
-                          borderRadius: BorderRadius.circular(50)
-                      ),
-                      child: Center(
-                        child: Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 20.0),
+                  SizedBox(height: CustomSize.sizeHeight(context) * 0.0048,),
+                  ListView.builder(
+                      shrinkWrap: true,
+                      physics: NeverScrollableScrollPhysics(),
+                      controller: _scrollController,
+                      itemCount: menuJson.length,
+                      padding: EdgeInsets.zero,
+                      itemBuilder: (_, index){
+                        return Padding(
+                          padding: EdgeInsets.only(
+                            top: CustomSize.sizeWidth(context) / 68,
+                            left: CustomSize.sizeWidth(context) / 18,
+                            right: CustomSize.sizeWidth(context) / 18,
+                          ),
                           child: Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
-                              MediaQuery(
-                                  child: CustomText.textTitle3(text: "Selesai", color: Colors.white, sizeNew: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.04).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.04).toString())),
-                                  data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0)
+                              Container(
+                                width: CustomSize.sizeWidth(context) / 1.65,
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  // mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    CustomText.textHeading7(
+                                        text: menuJson[index].name,
+                                        minSize: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.04)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.04)).toString()),
+                                        maxLines: 1
+                                    ),
+                                    CustomText.bodyRegular14(
+                                        text: menuJson[index].desc,
+                                        maxLines: 2,
+                                        minSize: double.parse(((MediaQuery.of(context).size.width*0.035).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.035)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.035)).toString())
+                                    ),
+                                    // CustomText.bodyRegular16(text: (noted[index].split(': ')[1] != 'kam5ia_null}')?noted[index].split('{')[1].split('}')[0]:''),
+                                    // SizedBox(height: CustomSize.sizeHeight(context) / 88,),
+                                    (menuJson[index].discount == null || menuJson[index].discount == 'null' || menuJson[index].discount == '')?CustomText.bodyMedium14(
+                                        text: NumberFormat.currency(locale: 'id', symbol: '', decimalDigits: 0).format(int.parse(menuJson[index].price)),
+                                        maxLines: 1,
+                                        minSize: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.04)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.04)).toString())
+                                    )
+                                        :Row(
+                                      children: [
+                                        CustomText.bodyMedium14(
+                                            text: NumberFormat.currency(locale: 'id', symbol: '', decimalDigits: 0).format(int.parse(menuJson[index].price)),
+                                            maxLines: 1,
+                                            minSize: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.04)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.04)).toString()),
+                                            decoration: TextDecoration.lineThrough
+                                        ),
+                                        SizedBox(width: CustomSize.sizeWidth(context) / 48,),
+                                        CustomText.bodyMedium14(
+                                            text: NumberFormat.currency(locale: 'id', symbol: '', decimalDigits: 0).format(int.parse(menuJson[index].discount!)),
+                                            maxLines: 1,
+                                            minSize: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.04)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.04)).toString())
+                                        ),
+                                      ],
+                                    ),
+                                    // (menuReady[index])?Container():CustomText.bodyMedium14(
+                                    //     text: "Menu tidak tersedia.",
+                                    //     maxLines: 1,
+                                    //     color: Colors.red
+                                    // ),
+                                  ],
+                                ),
                               ),
-                              // CustomText.textTitle3(text: NumberFormat.currency(locale: 'id', symbol: '', decimalDigits: 0).format(int.parse(totalHarga)), color: Colors.white),
+                              Column(
+                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                crossAxisAlignment: CrossAxisAlignment.end,
+                                children: [
+                                  Row(
+                                    children: [
+                                      CustomText.bodyRegular16(text: qty[index], minSize: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.04)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.04)).toString())),
+                                      CustomText.bodyRegular16(text: ' Item', minSize: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.04)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.04)).toString())),
+                                    ],
+                                  )
+                                ],
+                              ),
                             ],
+                          ),
+                        );
+                      }
+                  ),
+
+                  // (noted2.toString() != '[]')?SizedBox(height: CustomSize.sizeHeight(context) / 48,):SizedBox(),
+                  (noted2.toString() != '[]')?Divider(thickness: 6, color: CustomColor.secondary,):SizedBox(),
+                  // (noted2.toString() != '[]')?SizedBox(height: CustomSize.sizeHeight(context) / 48,):SizedBox(),
+                  (noted2.toString() != '[]')?Padding(
+                    padding: EdgeInsets.only(
+                      left: CustomSize.sizeWidth(context) / 32,
+                      right: CustomSize.sizeWidth(context) / 32,
+                    ),
+                    child: CustomText.textHeading4(text: "Catatan Pesananmu", minSize: double.parse(((MediaQuery.of(context).size.width*0.045).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.045)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.045)).toString())),
+                  ):Container(),
+                  (noted2.toString() != '[]')?SizedBox(height: CustomSize.sizeHeight(context) * 0.0048,):Container(),
+                  (noted2.toString() != '[]')?ListView.builder(
+                      shrinkWrap: true,
+                      physics: NeverScrollableScrollPhysics(),
+                      controller: _scrollController,
+                      itemCount: noted2.length,
+                      itemBuilder: (_, index){
+                        return Padding(
+                          padding: EdgeInsets.only(
+                            left: CustomSize.sizeWidth(context) / 18,
+                            right: CustomSize.sizeWidth(context) / 18,
+                            bottom: CustomSize.sizeHeight(context) * 0.0075,
+                          ),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              // CustomText.textHeading7(text: (noted2[index].split(': ')[1] != 'kam5ia_null}')?noted2[index].split('{')[1].split('}')[0].split(':')[0]+': ':'',  maxLines: 4),
+                              Container(
+                                  width: CustomSize.sizeWidth(context) / 1.4,
+                                  child: CustomText.textTitle3(text: (noted2[index].split(': ')[1] != 'kam5ia_null}')?noted2[index].split('{')[1].split('}')[0]:'',  maxLines: 10, minSize: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.04)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.04)).toString()))
+                              ),
+                              // (noted2[index].split(': ')[1] == 'kam5ia_null}' || noted2[index].split(': ')[1] == '}')?Container():GestureDetector(
+                              //   onTap: (){
+                              //     if (noted2[index].contains(noted2[index]) == true) {
+                              //       // noteProduct = noted[restoId.indexOf(promo[index].menu!.id.toString())].toString();
+                              //       noteProduct = noted2[index].toString();
+                              //       getNote();
+                              //       setState(() {});
+                              //     } else {
+                              //       noteProduct = '';
+                              //       getNote2();
+                              //       setState(() {});
+                              //     }
+                              //     showDialog(
+                              //         context: context,
+                              //         builder: (context) {
+                              //           return AlertDialog(
+                              //             shape: RoundedRectangleBorder(
+                              //                 borderRadius: BorderRadius.all(Radius.circular(10))
+                              //             ),
+                              //             title: Text('Catatan'),
+                              //             content: TextField(
+                              //               autofocus: true,
+                              //               keyboardType: TextInputType.text,
+                              //               controller: note,
+                              //               decoration: InputDecoration(
+                              //                 hintText: "Untuk pesananmu",
+                              //                 border: OutlineInputBorder(
+                              //                   borderRadius: BorderRadius.circular(10.0),
+                              //                 ),
+                              //                 enabledBorder: OutlineInputBorder(
+                              //                   borderSide: const BorderSide(color: Colors.grey, width: 1.0),
+                              //                 ),
+                              //                 focusedBorder: OutlineInputBorder(
+                              //                   borderSide: const BorderSide(color: Colors.grey, width: 2.0),
+                              //                 ),
+                              //               ),
+                              //             ),
+                              //             actions: <Widget>[
+                              //               Center(
+                              //                 child: Row(
+                              //                   mainAxisAlignment: MainAxisAlignment.spaceAround,
+                              //                   children: [
+                              //                     FlatButton(
+                              //                       // minWidth: CustomSize.sizeWidth(context),
+                              //                       color: CustomColor.redBtn,
+                              //                       textColor: Colors.white,
+                              //                       shape: RoundedRectangleBorder(
+                              //                           borderRadius: BorderRadius.all(Radius.circular(10))
+                              //                       ),
+                              //                       child: Text('Hapus'),
+                              //                       onPressed: () async{
+                              //                         String s = noted[noted.indexOf(noted2[index].toString())];
+                              //                         String i = s.replaceAll(noted[noted.indexOf(noted2[index].toString())].split(': ')[1], 'kam5ia_null'+'}') ;
+                              //                         print(i);
+                              //                         noted[noted.indexOf(noted2[index].toString())] = i.toString();
+                              //                         // int i = int.parse(s) + 1;
+                              //                         // print(i);
+                              //                         // noted.add(note.text);
+                              //                         SharedPreferences pref = await SharedPreferences.getInstance();
+                              //                         pref.setStringList("note", noted);
+                              //                         noteProduct = '';
+                              //                         // _getData();
+                              //                         getNote();
+                              //                         setState(() {
+                              //                           // codeDialog = valueText;
+                              //                           Navigator.pop(context);
+                              //                           Navigator.push(context, PageTransition(
+                              //                               type: PageTransitionType.fade,
+                              //                               child: FinalTrans()));
+                              //                         });
+                              //                       },
+                              //                     ),
+                              //                     FlatButton(
+                              //                       // minWidth: CustomSize.sizeWidth(context),
+                              //                       color: CustomColor.primaryLight,
+                              //                       textColor: Colors.white,
+                              //                       shape: RoundedRectangleBorder(
+                              //                           borderRadius: BorderRadius.all(Radius.circular(10))
+                              //                       ),
+                              //                       child: Text('Simpan'),
+                              //                       onPressed: () async{
+                              //                         String s = noted[noted.indexOf(noted2[index].toString())];
+                              //                         String i = s.replaceAll(noted[noted.indexOf(noted2[index].toString())].split(': ')[1], (note.text != '')?note.text+'}':'kam5ia_null'+'}') ;
+                              //                         print(i);
+                              //                         noted[noted.indexOf(noted2[index].toString())] = i.toString();
+                              //                         // int i = int.parse(s) + 1;
+                              //                         // print(i);
+                              //                         // noted.add(note.text);
+                              //                         SharedPreferences pref = await SharedPreferences.getInstance();
+                              //                         pref.setStringList("note", noted);
+                              //                         noteProduct = '';
+                              //                         // _getData();
+                              //                         getNote();
+                              //                         setState(() {
+                              //                           // codeDialog = valueText;
+                              //                           Navigator.pop(context);
+                              //                           Navigator.push(context, PageTransition(
+                              //                               type: PageTransitionType.fade,
+                              //                               child: FinalTrans()));
+                              //                         });
+                              //                       },
+                              //                     ),
+                              //                   ],
+                              //                 ),
+                              //               ),
+                              //
+                              //             ],
+                              //           );
+                              //         });
+                              //   },
+                              //   child: Container(
+                              //     // height: CustomSize.sizeHeight(context) / 28,
+                              //     // width: CustomSize.sizeWidth(context) / 3,
+                              //     // decoration: BoxDecoration(
+                              //     //     borderRadius: BorderRadius.circular(20),
+                              //     //     border: Border.all(color: Colors.grey)
+                              //     // ),
+                              //     child: Icon(Icons.edit),
+                              //   ),
+                              // ),
+                            ],
+                          ),
+                        );
+                      }
+                  ):Container(),
+
+                  Divider(thickness: 6, color: CustomColor.secondary,),
+                  Padding(
+                    padding: EdgeInsets.only(
+                      left: CustomSize.sizeWidth(context) / 32,
+                      right: CustomSize.sizeWidth(context) / 32,
+                    ),
+                    child: CustomText.textHeading4(text: "Tipe Pembelian", minSize: double.parse(((MediaQuery.of(context).size.width*0.045).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.045)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.045)).toString())),
+                  ),
+                  SizedBox(height: CustomSize.sizeHeight(context) * 0.0048,),
+                  Padding(
+                    padding: EdgeInsets.only(
+                      left: CustomSize.sizeWidth(context) / 18,
+                      right: CustomSize.sizeWidth(context) / 18,
+                    ),
+                    child: CustomText.textHeading6(text: (_transCode == 1)?"Pesan Antar":(_transCode == 2)?"Ambil Langsung":"Makan Ditempat", minSize: double.parse(((MediaQuery.of(context).size.width*0.035).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.035)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.035)).toString())),
+                  ),
+                  SizedBox(height: CustomSize.sizeHeight(context) * 0.0075),
+                  (_transCode != 3)?Divider(thickness: 6, color: CustomColor.secondary,):SizedBox(),
+                  (_transCode == 2)?Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      // SizedBox(height: CustomSize.sizeHeight(context) / 32,),
+                      Padding(
+                        padding: EdgeInsets.only(
+                          left: CustomSize.sizeWidth(context) / 32,
+                          right: CustomSize.sizeWidth(context) / 32,
+                        ),
+                        child: CustomText.textHeading4(text: "Alamat Toko", minSize: double.parse(((MediaQuery.of(context).size.width*0.045).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.045)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.045)).toString())),
+                      ),
+                      SizedBox(height: CustomSize.sizeHeight(context) * 0.0048,),
+                      Padding(
+                        padding: EdgeInsets.only(
+                          left: CustomSize.sizeWidth(context) / 18,
+                          right: CustomSize.sizeWidth(context) / 18,
+                        ),
+                        child: CustomText.textHeading6(
+                            text: restoAddress,
+                            minSize: double.parse(((MediaQuery.of(context).size.width*0.035).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.035)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.035)).toString()),
+                            maxLines: 10
+                        ),
+                      ),
+                    ],
+                  ):SizedBox(),
+                  (_transCode == 1)?Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      // SizedBox(height: CustomSize.sizeHeight(context) / 32,),
+                      Padding(
+                        padding: EdgeInsets.only(
+                          left: CustomSize.sizeWidth(context) / 32,
+                          right: CustomSize.sizeWidth(context) / 32,
+                        ),
+                        child: CustomText.textHeading4(text: "Alamat Pengiriman", minSize: double.parse(((MediaQuery.of(context).size.width*0.045).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.045)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.045)).toString())),
+                      ),
+                      SizedBox(height: CustomSize.sizeHeight(context) * 0.0048,),
+                      Padding(
+                        padding: EdgeInsets.only(
+                          left: CustomSize.sizeWidth(context) / 18,
+                          right: CustomSize.sizeWidth(context) / 18,
+                        ),
+                        child: CustomText.textHeading6(
+                            text: delivAddress.toString(),
+                            minSize: double.parse(((MediaQuery.of(context).size.width*0.035).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.035)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.035)).toString()),
+                            maxLines: 10
+                        ),
+                      )
+                      // SizedBox(height: CustomSize.sizeHeight(context) * 0.008,),
+                      // Row(
+                      //   children: [
+                      //     // (_srchAddress.text != '')?GestureDetector(
+                      //     //   onTap: () async{
+                      //     //     SharedPreferences pref2 = await SharedPreferences.getInstance();
+                      //     //     if (srchAddress == false) {
+                      //     //       srchAddress = true;
+                      //     //     } else {
+                      //     //       srchAddress = false;
+                      //     //       List<Placemark> placemark = await Geolocator().placemarkFromAddress(_srchAddress.text);
+                      //     //       double distan = await Geolocator().distanceBetween( double.parse(pref2.getString('latResto')), double.parse(pref2.getString('longResto')), placemark[0].position.latitude, placemark[0].position.longitude);
+                      //     //       int _ongkir = int.parse(ongkir!);
+                      //     //       String dist = NumberFormat.currency(locale: 'id', symbol: '', decimalDigits: 0).format(int.parse(distan.toString().split('.')[0]));
+                      //     //       int _distan = int.parse(dist.split('.')[0]);
+                      //     //       if (_distan != 0) {
+                      //     //         int _totalOngkir = _ongkir * _distan;
+                      //     //         totalOngkir = _totalOngkir.toString();
+                      //     //         int _totalHarga = harga + _totalOngkir;
+                      //     //         totalHarga = _totalHarga.toString();
+                      //     //       } else {
+                      //     //         totalOngkir = ongkir!;
+                      //     //         int _totalHarga = harga + int.parse(totalOngkir);
+                      //     //         totalHarga = _totalHarga.toString();
+                      //     //       }
+                      //     //     }
+                      //     //     setState(() {});
+                      //     //   },
+                      //     //   child: Container(
+                      //     //     width: CustomSize.sizeWidth(context) / 3,
+                      //     //     height: CustomSize.sizeHeight(context) / 22,
+                      //     //     decoration: BoxDecoration(
+                      //     //         borderRadius: BorderRadius.circular(20),
+                      //     //         border: Border.all(color: Colors.black, width: 0.5)
+                      //     //     ),
+                      //     //     child: Center(
+                      //     //       child: Row(
+                      //     //         mainAxisAlignment: MainAxisAlignment.center,
+                      //     //         crossAxisAlignment: CrossAxisAlignment.center,
+                      //     //         children: [
+                      //     //           (srchAddress != true)?Icon(Octicons.pencil, size: 14,):Container(),
+                      //     //           (srchAddress != true)?SizedBox(width: CustomSize.sizeWidth(context) / 86,):Container(),
+                      //     //           (srchAddress != true)?CustomText.bodyMedium12(text: "Ganti Alamat"):CustomText.bodyMedium12(text: "Simpan")
+                      //     //         ],
+                      //     //       ),
+                      //     //     ),
+                      //     //   ),
+                      //     // ):Container(),
+                      //     // (_srchAddress.text != '')?SizedBox(width: CustomSize.sizeWidth(context) / 45,):Container(),
+                      //     (srchAddress != true)?GestureDetector(
+                      //       onTap: () async{
+                      //         var result = await Navigator.push(
+                      //             context,
+                      //             PageTransition(
+                      //                 type: PageTransitionType.rightToLeft,
+                      //                 child: SearchAddressMaps(latitude!,longitude!)));
+                      //         if(result != ""){
+                      //           SharedPreferences pref = await SharedPreferences.getInstance();
+                      //           _srchAddress = TextEditingController(text: pref.getString('address'));
+                      //           int _ongkir = int.parse(ongkir!.toString());
+                      //           String dist = NumberFormat.currency(locale: 'id', symbol: '', decimalDigits: 0).format(double.parse(pref.getString('distan')));
+                      //           int _distan = int.parse(dist.split('.')[0]);
+                      //           if (_distan != 0) {
+                      //             int _totalOngkir = _ongkir * _distan;
+                      //             totalOngkir = _totalOngkir.toString();
+                      //             int _totalHarga = harga + _totalOngkir;
+                      //             totalHarga = _totalHarga.toString();
+                      //             setState(() {});
+                      //           } else {
+                      //             totalOngkir = ongkir!;
+                      //             int _totalHarga = harga + int.parse(totalOngkir);
+                      //             totalHarga = _totalHarga.toString();
+                      //             setState(() {});
+                      //           }
+                      //           setState(() {});
+                      //         }
+                      //       },
+                      //       child: Container(
+                      //         width: CustomSize.sizeWidth(context) / 3,
+                      //         height: CustomSize.sizeHeight(context) / 22,
+                      //         decoration: BoxDecoration(
+                      //             borderRadius: BorderRadius.circular(20),
+                      //             border: Border.all(color: Colors.black, width: 0.5)
+                      //         ),
+                      //         child: Center(
+                      //           child: Row(
+                      //             mainAxisAlignment: MainAxisAlignment.center,
+                      //             crossAxisAlignment: CrossAxisAlignment.center,
+                      //             children: [
+                      //               (srchAddress2 != true)?Icon(FontAwesome.map_marker, size: 14,):Container(),
+                      //               (srchAddress2 != true)?SizedBox(width: CustomSize.sizeWidth(context) / 86,):Container(),
+                      //               (srchAddress2 != true)?CustomText.bodyMedium12(text: "Buka maps"):CustomText.bodyMedium12(text: "Simpan")
+                      //             ],
+                      //           ),
+                      //         ),
+                      //       ),
+                      //     ):Container(),
+                      //   ],
+                      // ),
+                    ],
+                  ):SizedBox(),
+                  // (_transCode == 1 || _transCode == 2)?SizedBox(height: CustomSize.sizeHeight(context) / 48,):SizedBox(),
+                  // SizedBox(height: CustomSize.sizeHeight(context) / 48,),
+                  // (_transCode != 3)?Divider(thickness: 6, color: CustomColor.secondary,):SizedBox(),
+                  // (_transCode != 3)?SizedBox(height: CustomSize.sizeHeight(context) / 48,):SizedBox(),
+
+                  // SizedBox(height: CustomSize.sizeHeight(context) / 88,),
+                  // (noted2.toString() != '[]')?SizedBox(height: CustomSize.sizeHeight(context) / 48,):Container(),
+                  // Padding(
+                  //   padding: EdgeInsets.symmetric(
+                  //       horizontal: CustomSize.sizeWidth(context) / 32,
+                  //       vertical: CustomSize.sizeHeight(context) / 86
+                  //   ),
+                  //   child: Row(
+                  //     mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  //     crossAxisAlignment: CrossAxisAlignment.center,
+                  //     children: [
+                  //       Container(
+                  //         width: CustomSize.sizeWidth(context) / 1.6,
+                  //         child: Column(
+                  //           crossAxisAlignment: CrossAxisAlignment.start,
+                  //           children: [
+                  //             CustomText.textHeading4(text: "Ada lagi pesanannya ?"),
+                  //             CustomText.bodyRegular16(text: "Masih bisa tambah lagi loo")
+                  //           ],
+                  //         ),
+                  //       ),
+                  //       Padding(
+                  //         padding: EdgeInsets.symmetric(horizontal: CustomSize.sizeWidth(context) / 86),
+                  //         child: GestureDetector(
+                  //           onTap: ()async{
+                  //             Navigator.push(
+                  //                 context,
+                  //                 PageTransition(
+                  //                     type: PageTransitionType.rightToLeft,
+                  //                     child: new DetailResto(checkId)));
+                  //           },
+                  //           child: Container(
+                  //             height: CustomSize.sizeHeight(context) / 24,
+                  //             decoration: BoxDecoration(
+                  //                 borderRadius: BorderRadius.circular(20),
+                  //                 border: Border.all(color: Colors.grey)
+                  //             ),
+                  //             child: Padding(
+                  //               padding: EdgeInsets.symmetric(horizontal: CustomSize.sizeWidth(context) / 32),
+                  //               child: Center(
+                  //                 child: CustomText.textTitle8(
+                  //                     text: "Tambah",
+                  //                     color: Colors.grey
+                  //                 ),
+                  //               ),
+                  //             ),
+                  //           ),
+                  //         ),
+                  //       )
+                  //     ],
+                  //   ),
+                  // ),
+                  SizedBox(height: CustomSize.sizeHeight(context) * 0.0075),
+                  Divider(thickness: 6, color: CustomColor.secondary,),
+                  Padding(
+                    padding: EdgeInsets.symmetric(
+                      horizontal: CustomSize.sizeWidth(context) / 32,
+                      // vertical: CustomSize.sizeHeight(context) / 55
+                    ),
+                    child: Container(
+                      width: CustomSize.sizeWidth(context),
+                      decoration: BoxDecoration(
+                          color: Colors.white
+                      ),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          CustomText.textHeading4(text: "Data Usaha", minSize: double.parse(((MediaQuery.of(context).size.width*0.045).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.045)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.045)).toString())),
+                          SizedBox(height: CustomSize.sizeHeight(context) * 0.01,),
+                          Container(
+                            padding: EdgeInsets.only(
+                              left: CustomSize.sizeWidth(context) / 18,
+                              right: CustomSize.sizeWidth(context) / 18,
+                            ),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                (nameRestoTrans != '' && nameRestoTrans != 'null')?
+                                CustomText.bodyRegular17(text: "Nama Usaha: "+nameRestoTrans, maxLines: 4, minSize: double.parse(((MediaQuery.of(context).size.width*0.037).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.037)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.037)).toString())):
+                                Row(
+                                  children: [
+                                    CustomText.bodyRegular17(text: "Nama Usaha: ", maxLines: 2, minSize: double.parse(((MediaQuery.of(context).size.width*0.037).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.037)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.037)).toString())),
+                                    CustomText.bodyRegular17(text: "kosong", maxLines: 2, color: CustomColor.redBtn, minSize: double.parse(((MediaQuery.of(context).size.width*0.037).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.037)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.037)).toString())),
+                                  ],
+                                ),
+                                SizedBox(height: CustomSize.sizeHeight(context) * 0.005,),
+
+                                (restoAddress != '' && restoAddress != 'null')?
+                                Row(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    CustomText.bodyRegular17(text: "Alamat Usaha: ", maxLines: 4, minSize: double.parse(((MediaQuery.of(context).size.width*0.037).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.037)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.037)).toString())),
+                                    GestureDetector(
+                                        onTap: (){
+                                          _launchURL();
+                                        },
+                                        child: Container(
+                                            width: CustomSize.sizeWidth(context) / 2.1,
+                                            child: CustomText.bodyRegular17(text: restoAddress, maxLines: 14, minSize: double.parse(((MediaQuery.of(context).size.width*0.037).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.037)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.037)).toString()))
+                                        )
+                                    ),
+                                  ],
+                                ):
+                                Row(
+                                  children: [
+                                    CustomText.bodyRegular17(text: "Alamat Usaha: ", maxLines: 2, minSize: double.parse(((MediaQuery.of(context).size.width*0.037).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.037)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.037)).toString())),
+                                    CustomText.bodyRegular17(text: "kosong", maxLines: 2, color: CustomColor.redBtn, minSize: double.parse(((MediaQuery.of(context).size.width*0.037).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.037)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.037)).toString())),
+                                  ],
+                                ),
+                                SizedBox(height: CustomSize.sizeHeight(context) * 0.005,),
+
+                                (emailTokoTrans != '' && emailTokoTrans != 'null')?
+                                Row(
+                                  children: [
+                                    CustomText.bodyRegular17(text: "Email Usaha: ", maxLines: 2, minSize: double.parse(((MediaQuery.of(context).size.width*0.037).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.037)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.037)).toString())),
+                                    GestureDetector(
+                                        onTap: (){
+                                          launch('mailto:$emailTokoTrans');
+                                        },
+                                        child: CustomText.bodyRegular17(text: emailTokoTrans, maxLines: 2, minSize: double.parse(((MediaQuery.of(context).size.width*0.037).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.037)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.037)).toString()))
+                                    ),
+                                  ],
+                                ):
+                                Row(
+                                  children: [
+                                    CustomText.bodyRegular17(text: "Email Usaha: ", maxLines: 2, minSize: double.parse(((MediaQuery.of(context).size.width*0.037).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.037)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.037)).toString())),
+                                    CustomText.bodyRegular17(text: "kosong", maxLines: 2, color: CustomColor.redBtn, minSize: double.parse(((MediaQuery.of(context).size.width*0.037).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.037)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.037)).toString())),
+                                  ],
+                                ),
+                                SizedBox(height: CustomSize.sizeHeight(context) * 0.005,),
+
+                                (phoneRestoTrans != '' && phoneRestoTrans != 'null')?
+                                Row(
+                                  children: [
+                                    CustomText.bodyRegular17(text: "Telepon Usaha: ", maxLines: 2, minSize: double.parse(((MediaQuery.of(context).size.width*0.037).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.037)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.037)).toString())),
+                                    GestureDetector(
+                                        onTap: (){
+                                          launch('tel:$phoneRestoTrans');
+                                        },
+                                        child: CustomText.bodyRegular17(text: phoneRestoTrans, maxLines: 2, minSize: double.parse(((MediaQuery.of(context).size.width*0.037).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.037)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.037)).toString()))
+                                    ),
+                                  ],
+                                ):
+                                Row(
+                                  children: [
+                                    CustomText.bodyRegular17(text: "Telepon Usaha: ", maxLines: 2, minSize: double.parse(((MediaQuery.of(context).size.width*0.037).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.037)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.037)).toString())),
+                                    CustomText.bodyRegular17(text: "kosong", maxLines: 2, color: CustomColor.redBtn, minSize: double.parse(((MediaQuery.of(context).size.width*0.037).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.037)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.037)).toString())),
+                                  ],
+                                ),
+                                SizedBox(height: CustomSize.sizeHeight(context) * 0.005,),
+
+                                (ownerTokoTrans != '' && ownerTokoTrans != 'null')?
+                                CustomText.bodyRegular17(text: "Nama Pemilik: "+ownerTokoTrans, maxLines: 2, minSize: double.parse(((MediaQuery.of(context).size.width*0.037).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.037)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.037)).toString())):
+                                Row(
+                                  children: [
+                                    CustomText.bodyRegular17(text: "Nama Pemilik: ", maxLines: 2, minSize: double.parse(((MediaQuery.of(context).size.width*0.037).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.037)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.037)).toString())),
+                                    CustomText.bodyRegular17(text: "kosong", maxLines: 2, color: CustomColor.redBtn, minSize: double.parse(((MediaQuery.of(context).size.width*0.037).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.037)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.037)).toString())),
+                                  ],
+                                ),
+                                SizedBox(height: CustomSize.sizeHeight(context) * 0.005,),
+
+                                (pjTokoTrans != '' && pjTokoTrans != 'null')?
+                                CustomText.bodyRegular17(text: "Nama Penanggung Jawab: "+pjTokoTrans, maxLines: 2, minSize: double.parse(((MediaQuery.of(context).size.width*0.037).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.037)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.037)).toString())):
+                                Row(
+                                  children: [
+                                    CustomText.bodyRegular17(text: "Nama Penanggung Jawab: ", maxLines: 2, minSize: double.parse(((MediaQuery.of(context).size.width*0.037).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.037)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.037)).toString())),
+                                    CustomText.bodyRegular17(text: "kosong", maxLines: 2, color: CustomColor.redBtn, minSize: double.parse(((MediaQuery.of(context).size.width*0.037).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.037)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.037)).toString())),
+                                  ],
+                                ),
+                                SizedBox(height: CustomSize.sizeHeight(context) * 0.005,),
+
+                                (nameRekening != '' && nameRekening != 'null')?
+                                CustomText.bodyRegular17(text: "Nomor Rekening atas Nama: "+nameRekening, maxLines: 2, minSize: double.parse(((MediaQuery.of(context).size.width*0.037).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.037)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.037)).toString())):
+                                Row(
+                                  children: [
+                                    CustomText.bodyRegular17(text: "Nomor Rekening atas Nama: ", maxLines: 2, minSize: double.parse(((MediaQuery.of(context).size.width*0.037).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.037)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.037)).toString())),
+                                    CustomText.bodyRegular17(text: "kosong", maxLines: 2, color: CustomColor.redBtn, minSize: double.parse(((MediaQuery.of(context).size.width*0.037).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.037)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.037)).toString())),
+                                  ],
+                                ),
+                                SizedBox(height: CustomSize.sizeHeight(context) * 0.005,),
+
+                                (nameBank != '' && nameBank != 'null')?
+                                CustomText.bodyRegular17(text: "Rekening Bank: "+nameBank, maxLines: 2, minSize: double.parse(((MediaQuery.of(context).size.width*0.037).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.037)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.037)).toString())):
+                                Row(
+                                  children: [
+                                    CustomText.bodyRegular17(text: "Rekening Bank: ", maxLines: 2, minSize: double.parse(((MediaQuery.of(context).size.width*0.037).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.037)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.037)).toString())),
+                                    CustomText.bodyRegular17(text: "kosong", maxLines: 2, color: CustomColor.redBtn, minSize: double.parse(((MediaQuery.of(context).size.width*0.037).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.037)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.037)).toString())),
+                                  ],
+                                ),
+                                SizedBox(height: CustomSize.sizeHeight(context) * 0.005,),
+
+                                (norekTokoTrans != '' && norekTokoTrans != 'null')?
+                                CustomText.bodyRegular17(text: "Nomor Rekening: "+norekTokoTrans, maxLines: 2, minSize: double.parse(((MediaQuery.of(context).size.width*0.037).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.037)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.037)).toString())):
+                                Row(
+                                  children: [
+                                    CustomText.bodyRegular17(text: "Nomor Rekening: ", maxLines: 2, minSize: double.parse(((MediaQuery.of(context).size.width*0.037).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.037)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.037)).toString())),
+                                    CustomText.bodyRegular17(text: "kosong", maxLines: 2, color: CustomColor.redBtn, minSize: double.parse(((MediaQuery.of(context).size.width*0.037).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.037)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.037)).toString())),
+                                  ],
+                                ),
+                              ],
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                  SizedBox(height: CustomSize.sizeHeight(context) * 0.0075),
+                  Divider(thickness: 6, color: CustomColor.secondary,),
+                  Padding(
+                    padding: EdgeInsets.only(
+                      left: CustomSize.sizeWidth(context) / 32,
+                      right: CustomSize.sizeWidth(context) / 32,
+                    ),
+                    child: CustomText.textHeading4(text: "Rincian Pembayaran", minSize: double.parse(((MediaQuery.of(context).size.width*0.045).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.045)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.045)).toString())),
+                  ),
+                  SizedBox(height: CustomSize.sizeHeight(context) * 0.0048,),
+                  Column(
+                    children: [
+                      Padding(
+                        padding: EdgeInsets.only(
+                          left: CustomSize.sizeWidth(context) / 18,
+                          right: CustomSize.sizeWidth(context) / 18,
+                        ),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            CustomText.bodyLight16(text: "Harga", minSize: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.04)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.04)).toString())),
+                            CustomText.bodyLight16(text: NumberFormat.currency(locale: 'id', symbol: '', decimalDigits: 0).format(int.parse(harga2)), minSize: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.04)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.04)).toString())),
+                          ],
+                        ),
+                      ),
+                      (_transCode == 1)?SizedBox(height: CustomSize.sizeHeight(context) / 100,):SizedBox(),
+                      (_transCode == 1)?Padding(
+                        padding: EdgeInsets.only(
+                          left: CustomSize.sizeWidth(context) / 18,
+                          right: CustomSize.sizeWidth(context) / 18,
+                        ),
+                        child: Row(mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            CustomText.bodyLight16(text: "Ongkir", minSize: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.04)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.04)).toString())),
+                            CustomText.bodyLight16(text: NumberFormat.currency(locale: 'id', symbol: '', decimalDigits: 0).format(int.parse(delivTotalOngkir)), minSize: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.04)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.04)).toString())),
+                          ],
+                        ),
+                      ):SizedBox(),
+                      SizedBox(height: CustomSize.sizeHeight(context) / 100,),
+                      Padding(
+                        padding: EdgeInsets.only(
+                          left: CustomSize.sizeWidth(context) / 18,
+                          right: CustomSize.sizeWidth(context) / 18,
+                        ),
+                        child: Row(mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            CustomText.bodyLight16(text: "Platform Fee", minSize: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.04)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.04)).toString())),
+                            CustomText.bodyLight16(text: NumberFormat.currency(locale: 'id', symbol: '', decimalDigits: 0).format(1000), minSize: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.04)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.04)).toString())),
+                          ],
+                        ),
+                      ),
+                      // SizedBox(height: CustomSize.sizeHeight(context) / 64,),
+                      Padding(
+                        padding: EdgeInsets.only(
+                          left: CustomSize.sizeWidth(context) / 18,
+                          right: CustomSize.sizeWidth(context) / 18,
+                        ),
+                        child: Divider(thickness: 1,),
+                      ),
+                      // SizedBox(height: CustomSize.sizeHeight(context) / 120,),
+                      Padding(
+                        padding: EdgeInsets.only(
+                          left: CustomSize.sizeWidth(context) / 18,
+                          right: CustomSize.sizeWidth(context) / 18,
+                        ),
+                        child: Row(mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            CustomText.textTitle3(text: "Total Pembayaran", minSize: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.04)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.04)).toString())),
+                            CustomText.textTitle3(text: NumberFormat.currency(locale: 'id', symbol: '', decimalDigits: 0).format(int.parse(totalHargaTrans)), minSize: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.04)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.04)).toString())),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                  SizedBox(height: CustomSize.sizeHeight(context) * 0.0075),
+                  Divider(thickness: 6, color: CustomColor.secondary,),
+                  Padding(
+                    padding: EdgeInsets.only(
+                      left: CustomSize.sizeWidth(context) / 32,
+                      right: CustomSize.sizeWidth(context) / 32,
+                    ),
+                    child: CustomText.bodyRegular18(text: "*Terimakasih telah melakukan pembelian menggunakan aplikasi kami, terimakasih!", color: CustomColor.accent, minSize: double.parse(((MediaQuery.of(context).size.width*0.037).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.037)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.037)).toString()), maxLines: 3),
+                  ),
+                  Divider(thickness: 6, color: CustomColor.secondary,),
+
+                  SizedBox(height: CustomSize.sizeHeight(context) / 64,),
+                  GestureDetector(
+                    onTap: ()async{
+                      // _getData();
+                      setState((){});
+                      // Navigator.push(context, PageTransition(
+                      //     type: PageTransitionType.fade,
+                      //     child: FinalTrans()));
+
+
+                      // String qrcode = '';
+                      // if(_transCode == 3){
+                      //   try {
+                      //     qrcode = await BarcodeScanner.scan();
+                      //     setState(() {});
+                      //     makeTransaction(qrcode);
+                      //     // makeTransaction(qrcode);
+                      //     Navigator.pushReplacement(
+                      //         context,
+                      //         PageTransition(
+                      //             type: PageTransitionType.leftToRight,
+                      //             child: HomeActivity()));
+                      //   } on PlatformException catch (error) {
+                      //     if (error.code == BarcodeScanner.CameraAccessDenied) {
+                      //       print('Izin kamera tidak diizinkan oleh si pengguna');
+                      //     } else {
+                      //       print('Error: $error');
+                      //     }
+                      //   }
+                      // }else{
+                      //   if(_transCode == 1){
+                      //     if(_srchAddress.text != ''){
+                      //       makeTransaction(qrcode);
+                      //       // makeTransaction(qrcode);
+                      //       Navigator.pushReplacement(
+                      //           context,
+                      //           PageTransition(
+                      //               type: PageTransitionType.leftToRight,
+                      //               child: HomeActivity()));
+                      //     }else{
+                      //       Fluttertoast.showToast(
+                      //         msg: "Alamat tujuan Anda dimana?",);
+                      //     }
+                      //   }else{
+                      //     makeTransaction(qrcode);
+                      //     // makeTransaction(qrcode);
+                      //     Navigator.pushReplacement(
+                      //         context,
+                      //         PageTransition(
+                      //             type: PageTransitionType.leftToRight,
+                      //             child: HomeActivity()));
+                      //   }
+                      // }
+
+
+                      Navigator.pushReplacement(
+                          context,
+                          PageTransition(
+                              type: PageTransitionType.fade,
+                              child: HomeActivity()));
+                    },
+                    child: Center(
+                      child: Container(
+                        width: CustomSize.sizeWidth(context) / 1.1,
+                        height: CustomSize.sizeHeight(context) / 14,
+                        decoration: BoxDecoration(
+                            color: (menuReady.contains(false))?CustomColor.textBody:CustomColor.primaryLight,
+                            borderRadius: BorderRadius.circular(50)
+                        ),
+                        child: Center(
+                          child: Padding(
+                            padding: const EdgeInsets.symmetric(horizontal: 20.0),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                CustomText.textTitle3(text: "Selesai", color: Colors.white, minSize: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.04)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.04)).toString())),
+                                // CustomText.textTitle3(text: NumberFormat.currency(locale: 'id', symbol: '', decimalDigits: 0).format(int.parse(totalHarga)), color: Colors.white),
+                              ],
+                            ),
                           ),
                         ),
                       ),
                     ),
                   ),
-                ),
-                SizedBox(height: CustomSize.sizeHeight(context) / 54,),
+                  SizedBox(height: CustomSize.sizeHeight(context) / 54,),
 
-                // Container(
-                //   width: CustomSize.sizeWidth(context),
-                //   decoration: BoxDecoration(
-                //       color: CustomColor.secondary
-                //   ),
-                //   child: Column(
-                //     children: [
-                //       SizedBox(height: CustomSize.sizeHeight(context) / 48,),
-                //       Padding(
-                //         padding: EdgeInsets.symmetric(horizontal: CustomSize.sizeWidth(context) / 22),
-                //         child: Container(
-                //           width: CustomSize.sizeWidth(context),
-                //           height: CustomSize.sizeHeight(context) / 3.8,
-                //           decoration: BoxDecoration(
-                //             color: Colors.white,
-                //             borderRadius: BorderRadius.circular(20),
-                //           ),
-                //           child: Padding(
-                //             padding: const EdgeInsets.symmetric(horizontal: 20.0),
-                //             child: Column(
-                //               crossAxisAlignment: CrossAxisAlignment.start,
-                //               children: [
-                //                 SizedBox(height: CustomSize.sizeHeight(context) / 36,),
-                //                 CustomText.textTitle3(text: "Rincian Pembayaran"),
-                //                 SizedBox(height: CustomSize.sizeHeight(context) / 50,),
-                //                 Row(
-                //                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                //                   children: [
-                //                     CustomText.bodyLight16(text: "Harga"),
-                //                     CustomText.bodyLight16(text: NumberFormat.currency(locale: 'id', symbol: '', decimalDigits: 0).format(harga)),
-                //                   ],
-                //                 ),
-                //                 (_transCode == 1)?SizedBox(height: CustomSize.sizeHeight(context) / 100,):SizedBox(),
-                //                 (_transCode == 1)?Row(mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                //                   children: [
-                //                     CustomText.bodyLight16(text: "Ongkir"),
-                //                     CustomText.bodyLight16(text: NumberFormat.currency(locale: 'id', symbol: '', decimalDigits: 0).format(int.parse(totalOngkir))),
-                //                   ],
-                //                 ):SizedBox(),
-                //                 SizedBox(height: CustomSize.sizeHeight(context) / 64,),
-                //                 Divider(thickness: 1,),
-                //                 SizedBox(height: CustomSize.sizeHeight(context) / 120,),
-                //                 Row(mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                //                   children: [
-                //                     CustomText.textTitle3(text: "Total Pembayaran"),
-                //                     CustomText.textTitle3(text: NumberFormat.currency(locale: 'id', symbol: '', decimalDigits: 0).format(int.parse(totalHarga))),
-                //                   ],
-                //                 ),
-                //               ],
-                //             ),
-                //           ),
-                //         ),
-                //       ),
-                //       SizedBox(height: CustomSize.sizeHeight(context) / 40,),
-                //       GestureDetector(
-                //         onTap: ()async{
-                //           // _getData();
-                //           setState((){});
-                //           // Navigator.push(context, PageTransition(
-                //           //     type: PageTransitionType.fade,
-                //           //     child: FinalTrans()));
-                //
-                //
-                //           // String qrcode = '';
-                //           // if(_transCode == 3){
-                //           //   try {
-                //           //     qrcode = await BarcodeScanner.scan();
-                //           //     setState(() {});
-                //           //     makeTransaction(qrcode);
-                //           //     // makeTransaction(qrcode);
-                //           //     Navigator.pushReplacement(
-                //           //         context,
-                //           //         PageTransition(
-                //           //             type: PageTransitionType.leftToRight,
-                //           //             child: HomeActivity()));
-                //           //   } on PlatformException catch (error) {
-                //           //     if (error.code == BarcodeScanner.CameraAccessDenied) {
-                //           //       print('Izin kamera tidak diizinkan oleh si pengguna');
-                //           //     } else {
-                //           //       print('Error: $error');
-                //           //     }
-                //           //   }
-                //           // }else{
-                //           //   if(_transCode == 1){
-                //           //     if(_srchAddress.text != ''){
-                //           //       makeTransaction(qrcode);
-                //           //       // makeTransaction(qrcode);
-                //           //       Navigator.pushReplacement(
-                //           //           context,
-                //           //           PageTransition(
-                //           //               type: PageTransitionType.leftToRight,
-                //           //               child: HomeActivity()));
-                //           //     }else{
-                //           //       Fluttertoast.showToast(
-                //           //         msg: "Alamat tujuan Anda dimana?",);
-                //           //     }
-                //           //   }else{
-                //           //     makeTransaction(qrcode);
-                //           //     // makeTransaction(qrcode);
-                //           //     Navigator.pushReplacement(
-                //           //         context,
-                //           //         PageTransition(
-                //           //             type: PageTransitionType.leftToRight,
-                //           //             child: HomeActivity()));
-                //           //   }
-                //           // }
-                //
-                //
-                //               Navigator.pushReplacement(
-                //                   context,
-                //                   PageTransition(
-                //                       type: PageTransitionType.fade,
-                //                       child: HomeActivity()));
-                //         },
-                //         child: Center(
-                //           child: Container(
-                //             width: CustomSize.sizeWidth(context) / 1.1,
-                //             height: CustomSize.sizeHeight(context) / 14,
-                //             decoration: BoxDecoration(
-                //                 color: (menuReady.contains(false))?CustomColor.textBody:CustomColor.primaryLight,
-                //                 borderRadius: BorderRadius.circular(50)
-                //             ),
-                //             child: Center(
-                //               child: Padding(
-                //                 padding: const EdgeInsets.symmetric(horizontal: 20.0),
-                //                 child: Row(
-                //                   mainAxisAlignment: MainAxisAlignment.center,
-                //                   children: [
-                //                     CustomText.textTitle3(text: "Selesai", color: Colors.white),
-                //                     // CustomText.textTitle3(text: NumberFormat.currency(locale: 'id', symbol: '', decimalDigits: 0).format(int.parse(totalHarga)), color: Colors.white),
-                //                   ],
-                //                 ),
-                //               ),
-                //             ),
-                //           ),
-                //         ),
-                //       ),
-                //       SizedBox(height: CustomSize.sizeHeight(context) / 54,),
-                //     ],
-                //   ),
-                // ),
-              ],
+                  // Container(
+                  //   width: CustomSize.sizeWidth(context),
+                  //   decoration: BoxDecoration(
+                  //       color: CustomColor.secondary
+                  //   ),
+                  //   child: Column(
+                  //     children: [
+                  //       SizedBox(height: CustomSize.sizeHeight(context) / 48,),
+                  //       Padding(
+                  //         padding: EdgeInsets.symmetric(horizontal: CustomSize.sizeWidth(context) / 22),
+                  //         child: Container(
+                  //           width: CustomSize.sizeWidth(context),
+                  //           height: CustomSize.sizeHeight(context) / 3.8,
+                  //           decoration: BoxDecoration(
+                  //             color: Colors.white,
+                  //             borderRadius: BorderRadius.circular(20),
+                  //           ),
+                  //           child: Padding(
+                  //             padding: const EdgeInsets.symmetric(horizontal: 20.0),
+                  //             child: Column(
+                  //               crossAxisAlignment: CrossAxisAlignment.start,
+                  //               children: [
+                  //                 SizedBox(height: CustomSize.sizeHeight(context) / 36,),
+                  //                 CustomText.textTitle3(text: "Rincian Pembayaran"),
+                  //                 SizedBox(height: CustomSize.sizeHeight(context) / 50,),
+                  //                 Row(
+                  //                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  //                   children: [
+                  //                     CustomText.bodyLight16(text: "Harga"),
+                  //                     CustomText.bodyLight16(text: NumberFormat.currency(locale: 'id', symbol: '', decimalDigits: 0).format(harga)),
+                  //                   ],
+                  //                 ),
+                  //                 (_transCode == 1)?SizedBox(height: CustomSize.sizeHeight(context) / 100,):SizedBox(),
+                  //                 (_transCode == 1)?Row(mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  //                   children: [
+                  //                     CustomText.bodyLight16(text: "Ongkir"),
+                  //                     CustomText.bodyLight16(text: NumberFormat.currency(locale: 'id', symbol: '', decimalDigits: 0).format(int.parse(totalOngkir))),
+                  //                   ],
+                  //                 ):SizedBox(),
+                  //                 SizedBox(height: CustomSize.sizeHeight(context) / 64,),
+                  //                 Divider(thickness: 1,),
+                  //                 SizedBox(height: CustomSize.sizeHeight(context) / 120,),
+                  //                 Row(mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  //                   children: [
+                  //                     CustomText.textTitle3(text: "Total Pembayaran"),
+                  //                     CustomText.textTitle3(text: NumberFormat.currency(locale: 'id', symbol: '', decimalDigits: 0).format(int.parse(totalHarga))),
+                  //                   ],
+                  //                 ),
+                  //               ],
+                  //             ),
+                  //           ),
+                  //         ),
+                  //       ),
+                  //       SizedBox(height: CustomSize.sizeHeight(context) / 40,),
+                  //       GestureDetector(
+                  //         onTap: ()async{
+                  //           // _getData();
+                  //           setState((){});
+                  //           // Navigator.push(context, PageTransition(
+                  //           //     type: PageTransitionType.fade,
+                  //           //     child: FinalTrans()));
+                  //
+                  //
+                  //           // String qrcode = '';
+                  //           // if(_transCode == 3){
+                  //           //   try {
+                  //           //     qrcode = await BarcodeScanner.scan();
+                  //           //     setState(() {});
+                  //           //     makeTransaction(qrcode);
+                  //           //     // makeTransaction(qrcode);
+                  //           //     Navigator.pushReplacement(
+                  //           //         context,
+                  //           //         PageTransition(
+                  //           //             type: PageTransitionType.leftToRight,
+                  //           //             child: HomeActivity()));
+                  //           //   } on PlatformException catch (error) {
+                  //           //     if (error.code == BarcodeScanner.CameraAccessDenied) {
+                  //           //       print('Izin kamera tidak diizinkan oleh si pengguna');
+                  //           //     } else {
+                  //           //       print('Error: $error');
+                  //           //     }
+                  //           //   }
+                  //           // }else{
+                  //           //   if(_transCode == 1){
+                  //           //     if(_srchAddress.text != ''){
+                  //           //       makeTransaction(qrcode);
+                  //           //       // makeTransaction(qrcode);
+                  //           //       Navigator.pushReplacement(
+                  //           //           context,
+                  //           //           PageTransition(
+                  //           //               type: PageTransitionType.leftToRight,
+                  //           //               child: HomeActivity()));
+                  //           //     }else{
+                  //           //       Fluttertoast.showToast(
+                  //           //         msg: "Alamat tujuan Anda dimana?",);
+                  //           //     }
+                  //           //   }else{
+                  //           //     makeTransaction(qrcode);
+                  //           //     // makeTransaction(qrcode);
+                  //           //     Navigator.pushReplacement(
+                  //           //         context,
+                  //           //         PageTransition(
+                  //           //             type: PageTransitionType.leftToRight,
+                  //           //             child: HomeActivity()));
+                  //           //   }
+                  //           // }
+                  //
+                  //
+                  //               Navigator.pushReplacement(
+                  //                   context,
+                  //                   PageTransition(
+                  //                       type: PageTransitionType.fade,
+                  //                       child: HomeActivity()));
+                  //         },
+                  //         child: Center(
+                  //           child: Container(
+                  //             width: CustomSize.sizeWidth(context) / 1.1,
+                  //             height: CustomSize.sizeHeight(context) / 14,
+                  //             decoration: BoxDecoration(
+                  //                 color: (menuReady.contains(false))?CustomColor.textBody:CustomColor.primaryLight,
+                  //                 borderRadius: BorderRadius.circular(50)
+                  //             ),
+                  //             child: Center(
+                  //               child: Padding(
+                  //                 padding: const EdgeInsets.symmetric(horizontal: 20.0),
+                  //                 child: Row(
+                  //                   mainAxisAlignment: MainAxisAlignment.center,
+                  //                   children: [
+                  //                     CustomText.textTitle3(text: "Selesai", color: Colors.white),
+                  //                     // CustomText.textTitle3(text: NumberFormat.currency(locale: 'id', symbol: '', decimalDigits: 0).format(int.parse(totalHarga)), color: Colors.white),
+                  //                   ],
+                  //                 ),
+                  //               ),
+                  //             ),
+                  //           ),
+                  //         ),
+                  //       ),
+                  //       SizedBox(height: CustomSize.sizeHeight(context) / 54,),
+                  //     ],
+                  //   ),
+                  // ),
+                ],
+              ),
             ),
           ),
         ),
+        data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0),
       ),
     );
   }

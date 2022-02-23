@@ -14,9 +14,10 @@ class Menu{
   String urlImg = '';
   String type = '';
   String is_recommended = '';
+  String is_available = '';
   double? distance;
 
-  Menu({required this.id, required this.restoId, required this.name, required this.restoName, required this.desc, required this.qty, required this.price, required this.delivery_price, required this.urlImg, required this.type, required this.is_recommended, required this.distance});
+  Menu({required this.id, required this.restoId, required this.name, required this.restoName, required this.desc, required this.qty, required this.price, required this.delivery_price, required this.urlImg, required this.type, required this.is_recommended, required this.is_available, required this.distance});
   Menu.qty(this.qty);
 }
 
@@ -36,10 +37,11 @@ class Menu2{
   String urlImg;
   String type;
   String is_recommended;
+  String is_available;
   double? distance;
   Resto usaha;
 
-  Menu2({required this.id, required this.restoId, required this.name, required this.restoName, required this.desc, required this.qty, required this.price, required this.delivery_price, required this.urlImg, required this.type, required this.is_recommended, required this.distance, required this.usaha});
+  Menu2({required this.id, required this.restoId, required this.name, required this.restoName, required this.desc, required this.qty, required this.price, required this.delivery_price, required this.urlImg, required this.type, required this.is_recommended, required this.is_available, required this.distance, required this.usaha});
 }
 
 class Menu3{
@@ -55,7 +57,8 @@ class Menu3{
   String type = '';
   String ex_date = '';
   String is_recommended = '';
+  String is_available = '';
   double? distance;
 
-  Menu3({required this.id, required this.restoId, required this.name, required this.restoName, required this.desc, required this.qty, required this.price, required this.delivery_price, required this.urlImg, required this.type, required this.is_recommended, required this.distance, required this.ex_date});
+  Menu3({required this.id, required this.restoId, required this.name, required this.restoName, required this.desc, required this.qty, required this.price, required this.delivery_price, required this.urlImg, required this.type, required this.is_recommended, required this.is_available, required this.distance, required this.ex_date});
 }

@@ -288,6 +288,7 @@ class _PesananmuActivityState extends State<PesananmuActivity> {
           restoName: v['resto_name'],
           desc: v['desc']??'',
           urlImg: v['img'],
+          is_available: '',
           price: Price.discounted(int.parse(v['price'].toString()), int.parse(v['discounted_price'].toString())),
           distance: double.parse(v['resto_distance'].toString()), delivery_price: null, type: '', is_recommended: '', qty: ''
       );
@@ -334,6 +335,7 @@ class _PesananmuActivityState extends State<PesananmuActivity> {
             desc: v['desc'],
             distance: double.parse(v['distance'].toString()),
             urlImg: v['img'],
+            is_available: '',
             price: Price.discounted(int.parse(v['price']), v['discounted_price']), type: '', delivery_price: null, restoId: '', restoName: '', is_recommended: '', qty: ''
         ), word: '', discountedPrice: null, id: null,
       );
@@ -376,6 +378,7 @@ class _PesananmuActivityState extends State<PesananmuActivity> {
             name: a['menus']['name'],
             desc: a['menus']['desc'],
             urlImg: a['menus']['img'],
+            is_available: '',
             price: Price.promo(
                 a['menus']['price'].toString(), a['menus']['delivery_price'].toString()),
             restoName: '', type: '', restoId: '', delivery_price: null, distance: null, qty: '', is_recommended: ''

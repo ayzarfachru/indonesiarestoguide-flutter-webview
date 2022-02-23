@@ -183,6 +183,8 @@ class _AddMenuState extends State<AddMenu> {
   }
 
 
+  String is_available = '1';
+
   List<Menu> menu = [];
   Future<void> AddMenu()async{
     List<Menu> _menu = [];
@@ -198,6 +200,7 @@ class _AddMenuState extends State<AddMenu> {
           'desc': deskMenu.text,
           'price': hargaMenu.text,
           'delivery_price': '0',
+          'is_available': is_available,
           'is_recommended': (favorite == true)?'true':'false',
           'type': tipeMenu.text,
           'img': 'data:image/$extension;base64,'+base64Encode(image!.readAsBytesSync()).toString(),
@@ -220,6 +223,7 @@ class _AddMenuState extends State<AddMenu> {
         // 'type': tipeMenu.text,
         // 'img': (image != null)?'data:image/$extension;base64,'+base64Encode(image!.readAsBytesSync()).toString():'',
       }));
+      Navigator.pop(context);
       Navigator.pop(context);
       Navigator.pushReplacement(context, PageTransition(type: PageTransitionType.fade, child: MenuActivity()));
     } else {
@@ -261,6 +265,61 @@ class _AddMenuState extends State<AddMenu> {
       typeList.add(v['name']);
     }
     setState(() {});
+    showDialog(
+        context: context,
+        builder: (context) {
+          return AlertDialog(
+            contentPadding: EdgeInsets.only(left: 25, right: 25, top: 15, bottom: 5),
+            shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.all(Radius.circular(10))
+            ),
+            title: Center(child: Text('Peringatan!', style: TextStyle(color: CustomColor.redBtn))),
+            content: Text('Masukkan harga menu yang sudah dihitung beserta biaya PPN dan biaya Service Charge sesuai resto anda.', style: TextStyle(fontSize: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.04)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.04)).toString()), fontWeight: FontWeight.w500), textAlign: TextAlign.center),
+            actions: <Widget>[
+              Center(
+                child: Padding(
+                  padding: EdgeInsets.only(left: 25, right: 25),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.end,
+                    children: [
+                      // OutlineButton(
+                      //   // minWidth: CustomSize.sizeWidth(context),
+                      //   shape: StadiumBorder(),
+                      //   highlightedBorderColor: CustomColor.secondary,
+                      //   borderSide: BorderSide(
+                      //       width: 2,
+                      //       color: CustomColor.redBtn
+                      //   ),
+                      //   child: Text('Batal'),
+                      //   onPressed: () async{
+                      //     setState(() {
+                      //       // codeDialog = valueText;
+                      //       Navigator.pop(context);
+                      //     });
+                      //   },
+                      // ),
+                      OutlineButton(
+                        // minWidth: CustomSize.sizeWidth(context),
+                        shape: StadiumBorder(),
+                        highlightedBorderColor: CustomColor.secondary,
+                        borderSide: BorderSide(
+                            width: 2,
+                            color: CustomColor.accent
+                        ),
+                        child: Text('Oke'),
+                        onPressed: () async{
+                          Navigator.pop(context);
+                          // String qrcode = '';
+                        },
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+
+            ],
+          );
+        });
   }
 
   int load = 0;
@@ -609,9 +668,6 @@ class _AddMenuState extends State<AddMenu> {
         floatingActionButton:
         GestureDetector(
           onTap: () async{
-            setState(() {
-              isLoading = false;
-            });
             // Navigator.pushReplacement(context, PageTransition(type: PageTransitionType.fade, child: new HomeActivityResto()));
             // SharedPreferences pref = await SharedPreferences.getInstance();
             // pref.setString("name", namaMenu.text.toString());
@@ -627,12 +683,71 @@ class _AddMenuState extends State<AddMenu> {
             // print(deskMenu);
             // print(base64Encode(image.readAsBytesSync()).toString());
             // print(favorite);
-            if (namaMenu.text != '' && hargaMenu.text != '' && tipeMenu.text != '' && deskMenu.text != '' && image.toString() != 'null') {
-              AddMenu();
-              animateButton();
-            } else {
-              Fluttertoast.showToast(msg: 'Lengkapi data menu terlebih dahulu!');
-            }
+            showDialog(
+                context: context,
+                builder: (context) {
+                  return AlertDialog(
+                    contentPadding: EdgeInsets.only(left: 25, right: 25, top: 15, bottom: 5),
+                    shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.all(Radius.circular(10))
+                    ),
+                    title: Center(child: Text('Perhatian!', style: TextStyle(color: CustomColor.redBtn))),
+                    content: Text('Apakah menu ini sekarang tersedia?', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500), textAlign: TextAlign.center),
+                    actions: <Widget>[
+                      Center(
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceAround,
+                          children: [
+                            FlatButton(
+                              // minWidth: CustomSize.sizeWidth(context),
+                              color: CustomColor.redBtn,
+                              textColor: Colors.white,
+                              shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.all(Radius.circular(10))
+                              ),
+                              child: Text('Tidak'),
+                              onPressed: () async{
+                                setState(() {
+                                  // codeDialog = valueText;
+                                  // Navigator.pop(context);
+                                  is_available = '0';
+                                  if (namaMenu.text != '' && hargaMenu.text != '' && tipeMenu.text != '' && deskMenu.text != '' && image.toString() != 'null') {
+                                    setState(() {
+                                      isLoading = false;
+                                    });
+                                    AddMenu();
+                                  } else {
+                                    Fluttertoast.showToast(msg: 'Lengkapi data menu terlebih dahulu!');
+                                  }
+                                });
+                              },
+                            ),
+                            FlatButton(
+                              color: CustomColor.primaryLight,
+                              textColor: Colors.white,
+                              shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.all(Radius.circular(10))
+                              ),
+                              child: Text('Iya'),
+                              onPressed: () async{
+                                is_available = '1';
+                                if (namaMenu.text != '' && hargaMenu.text != '' && tipeMenu.text != '' && deskMenu.text != '' && image.toString() != 'null') {
+                                  setState(() {
+                                    isLoading = false;
+                                  });
+                                  AddMenu();
+                                } else {
+                                  Fluttertoast.showToast(msg: 'Lengkapi data menu terlebih dahulu!');
+                                }
+                              },
+                            ),
+                          ],
+                        ),
+                      ),
+
+                    ],
+                  );
+                });
           },
           child: Container(
             width: CustomSize.sizeWidth(context) / 1.1,

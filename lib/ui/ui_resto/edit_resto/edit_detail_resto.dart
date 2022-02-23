@@ -631,8 +631,8 @@ class _EditDetailRestoState extends State<EditDetailResto> {
           'longitude': longitude,
           'address': address,
           'phone': phone,
-          'ongkir': (_Ongkir.text.toString() != null)?_Ongkir.text.toString():'',
-          're_price': (_HargaPerMeja.text.toString() != '')?_HargaPerMeja.text.toString():'',
+          'ongkir': (_Ongkir.text.toString() != null)?_Ongkir.text.toString():'0',
+          're_price': (reservation != false)?(_HargaPerMeja.text.toString() != '')?_HargaPerMeja.text.toString():'':'0',
           'takeaway': (takeaway == true)?'1':'',
           'img': img,
           'type': _Tipe.text.toString(),
@@ -665,6 +665,7 @@ class _EditDetailRestoState extends State<EditDetailResto> {
 
     if(data['status_code'] == 200){
       print("success");
+      print(_HargaPerMeja.text.toString());
       print('inii '+latitude);
       print('inii '+longitude);
       print(json.encode({
@@ -742,7 +743,7 @@ class _EditDetailRestoState extends State<EditDetailResto> {
           'longitude': longitude,
           'address': address,
           'phone': phone,
-          're_price': (_HargaPerMeja.text.toString() != '')?_HargaPerMeja.text.toString():'',
+          're_price': (reservation != false)?(_HargaPerMeja.text.toString() != '')?_HargaPerMeja.text.toString():'':'0',
           'takeaway': (takeaway == true)?'1':'',
           'img': img,
           'type': _Tipe.text.toString(),
@@ -1070,26 +1071,26 @@ class _EditDetailRestoState extends State<EditDetailResto> {
                         ],
                       ),
                       //------------------------------------- biaya kirim ----------------------------------------
-                      (delivery)?CustomText.bodyLight12(text: "Ongkir per 1 km", sizeNew: double.parse(((MediaQuery.of(context).size.width*0.03).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.03).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.03).toString())):Container(),
-                      (delivery)?TextField(
-                        controller: _Ongkir,
-                        keyboardType: TextInputType.number,
-                        cursorColor: Colors.black,
-                        style: GoogleFonts.poppins(
-                            textStyle:
-                            TextStyle(fontSize: 18, color: Colors.black, fontWeight: FontWeight.w600)),
-                        decoration: InputDecoration(
-                          isDense: true,
-                          contentPadding: EdgeInsets.only(bottom: CustomSize.sizeHeight(context) / 86),
-                          hintStyle: GoogleFonts.poppins(
-                              textStyle:
-                              TextStyle(fontSize: 14, color: Colors.grey)),
-                          helperStyle: GoogleFonts.poppins(
-                              textStyle: TextStyle(fontSize: 14)),
-                          enabledBorder: UnderlineInputBorder(),
-                          focusedBorder: UnderlineInputBorder(),
-                        ),
-                      ):Container(),
+                      // (delivery)?CustomText.bodyLight12(text: "Ongkir per 1 km", sizeNew: double.parse(((MediaQuery.of(context).size.width*0.03).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.03).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.03).toString())):Container(),
+                      // (delivery)?TextField(
+                      //   controller: _Ongkir,
+                      //   keyboardType: TextInputType.number,
+                      //   cursorColor: Colors.black,
+                      //   style: GoogleFonts.poppins(
+                      //       textStyle:
+                      //       TextStyle(fontSize: 18, color: Colors.black, fontWeight: FontWeight.w600)),
+                      //   decoration: InputDecoration(
+                      //     isDense: true,
+                      //     contentPadding: EdgeInsets.only(bottom: CustomSize.sizeHeight(context) / 86),
+                      //     hintStyle: GoogleFonts.poppins(
+                      //         textStyle:
+                      //         TextStyle(fontSize: 14, color: Colors.grey)),
+                      //     helperStyle: GoogleFonts.poppins(
+                      //         textStyle: TextStyle(fontSize: 14)),
+                      //     enabledBorder: UnderlineInputBorder(),
+                      //     focusedBorder: UnderlineInputBorder(),
+                      //   ),
+                      // ):Container(),
                       //------------------------------------ checkbox reservation -------------------------------------
                       Row(
                         mainAxisSize: MainAxisSize.max,

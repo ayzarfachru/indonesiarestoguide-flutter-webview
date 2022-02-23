@@ -112,6 +112,7 @@ class _EditMenuState extends State<EditMenu> {
   bool favorite = false;
   bool reservation = false;
   bool delivery = false;
+  String is_available = '';
 
   List<String> menuList = [];
 
@@ -230,6 +231,61 @@ class _EditMenuState extends State<EditMenu> {
       typeList.add(v['name']);
     }
     setState(() {});
+    showDialog(
+        context: context,
+        builder: (context) {
+          return AlertDialog(
+            contentPadding: EdgeInsets.only(left: 25, right: 25, top: 15, bottom: 5),
+            shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.all(Radius.circular(10))
+            ),
+            title: Center(child: Text('Peringatan!', style: TextStyle(color: CustomColor.redBtn))),
+            content: Text('Masukkan harga menu yang sudah dihitung beserta biaya PPN dan biaya Service Charge sesuai resto anda.', style: TextStyle(fontSize: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.04)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.04)).toString()), fontWeight: FontWeight.w500), textAlign: TextAlign.center),
+            actions: <Widget>[
+              Center(
+                child: Padding(
+                  padding: EdgeInsets.only(left: 25, right: 25),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.end,
+                    children: [
+                      // OutlineButton(
+                      //   // minWidth: CustomSize.sizeWidth(context),
+                      //   shape: StadiumBorder(),
+                      //   highlightedBorderColor: CustomColor.secondary,
+                      //   borderSide: BorderSide(
+                      //       width: 2,
+                      //       color: CustomColor.redBtn
+                      //   ),
+                      //   child: Text('Batal'),
+                      //   onPressed: () async{
+                      //     setState(() {
+                      //       // codeDialog = valueText;
+                      //       Navigator.pop(context);
+                      //     });
+                      //   },
+                      // ),
+                      OutlineButton(
+                        // minWidth: CustomSize.sizeWidth(context),
+                        shape: StadiumBorder(),
+                        highlightedBorderColor: CustomColor.secondary,
+                        borderSide: BorderSide(
+                            width: 2,
+                            color: CustomColor.accent
+                        ),
+                        child: Text('Oke'),
+                        onPressed: () async{
+                          Navigator.pop(context);
+                          // String qrcode = '';
+                        },
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+
+            ],
+          );
+        });
   }
 
 
@@ -249,6 +305,7 @@ class _EditMenuState extends State<EditMenu> {
           'desc': deskMenu.text,
           'price': hargaMenu.text,
           'is_recommended': (favorite == true)?'true':'false',
+          'is_available': is_available,
           'type': tipeMenu.text,
           'img': (image != null)?'data:image/$extension;base64,'+base64Encode(image!.readAsBytesSync()).toString():'',
         },
@@ -268,6 +325,7 @@ class _EditMenuState extends State<EditMenu> {
         'desc': deskMenu.text,
         'price': hargaMenu.text,
         'is_recommended': (favorite == true)?'true':'false',
+        'is_available': is_available,
         'type': tipeMenu.text,
         'img': (image != null)?'data:image/$extension;base64,'+base64Encode(image!.readAsBytesSync()).toString():'',
       }));
@@ -302,6 +360,7 @@ class _EditMenuState extends State<EditMenu> {
     getFavMenu();
     setState(() {
       id = detailMenu.id.toString();
+      is_available = detailMenu.is_available.toString();
     });
     // Future.delayed(Duration.zero, () async {
     //
@@ -624,44 +683,81 @@ class _EditMenuState extends State<EditMenu> {
           ),
         ),
         floatingActionButton:
-        (isLoading != true)?GestureDetector(
-          onTap: () async{
-            setState(() {
-              isLoading = false;
-            });
-            _editMenu();
-            // Navigator.pushReplacement(context, PageTransition(type: PageTransitionType.fade, child: new HomeActivityResto()));
-            // SharedPreferences pref = await SharedPreferences.getInstance();
-            // pref.setString("name", namaMenu.text.toString());
-            // pref.setString("email", hargaDeliv.text.toString());
-            // pref.setString("img", (image == null)?img:base64Encode(image.readAsBytesSync()).toString());
-            // pref.setString("gender", gender);
-            // pref.setString("tgl", tgl);
-            // pref.setString("notelp", hargaMenu.text.toString());
-            print(favorite);
-          },
-          child: Container(
-            width: CustomSize.sizeWidth(context) / 1.1,
-            height: CustomSize.sizeHeight(context) / 14,
-            decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(30),
-                color: CustomColor.accent
-            ),
-            child: Center(child: CustomText.bodyRegular16(text: "Simpan", color: Colors.white, sizeNew: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.04)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.04)).toString()))),
-          ),
-        ):Container(
-          width: CustomSize.sizeWidth(context) / 1.1,
-          height: CustomSize.sizeHeight(context) / 14,
-          decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(30),
-              color: CustomColor.accent
-          ),
-          child: Center(
-            child: CircularProgressIndicator(
-              valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
-            ),
-          ),
-        ),
+        Column(
+            mainAxisAlignment: MainAxisAlignment.end,
+            children: [
+              GestureDetector(
+                onTap: () async{
+                  if (is_available == '1') {
+                    is_available = '0';
+                    Fluttertoast.showToast(msg: 'Sekarang menu tidak tersedia.');
+                  } else if (is_available == '0'){
+                    is_available = '1';
+                    Fluttertoast.showToast(msg: 'Sekarang menu tersedia.');
+                  }
+                  setState(() {});
+                  // _editMenu();
+                  // Navigator.pushReplacement(context, PageTransition(type: PageTransitionType.fade, child: new HomeActivityResto()));
+                  // SharedPreferences pref = await SharedPreferences.getInstance();
+                  // pref.setString("name", namaMenu.text.toString());
+                  // pref.setString("email", hargaDeliv.text.toString());
+                  // pref.setString("img", (image == null)?img:base64Encode(image.readAsBytesSync()).toString());
+                  // pref.setString("gender", gender);
+                  // pref.setString("tgl", tgl);
+                  // pref.setString("notelp", hargaMenu.text.toString());
+                  print(favorite);
+                },
+                child: Container(
+                  width: CustomSize.sizeWidth(context) / 1.1,
+                  height: CustomSize.sizeHeight(context) / 14,
+                  decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(30),
+                      color: (is_available != '1')?Colors.blue:CustomColor.redBtn
+                  ),
+                  child: Center(child: CustomText.bodyRegular16(text: (is_available != '1')?"Menu tersedia.":'Menu tidak tersedia.', color: Colors.white, minSize: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.04)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.04)).toString()))),
+                ),
+              ),
+              SizedBox(height: CustomSize.sizeHeight(context) * 0.0025,),
+              (isLoading != true)?GestureDetector(
+                onTap: () async{
+                  setState(() {
+                    isLoading = false;
+                  });
+                  _editMenu();
+                  // Navigator.pushReplacement(context, PageTransition(type: PageTransitionType.fade, child: new HomeActivityResto()));
+                  // SharedPreferences pref = await SharedPreferences.getInstance();
+                  // pref.setString("name", namaMenu.text.toString());
+                  // pref.setString("email", hargaDeliv.text.toString());
+                  // pref.setString("img", (image == null)?img:base64Encode(image.readAsBytesSync()).toString());
+                  // pref.setString("gender", gender);
+                  // pref.setString("tgl", tgl);
+                  // pref.setString("notelp", hargaMenu.text.toString());
+                  print(favorite);
+                },
+                child: Container(
+                  width: CustomSize.sizeWidth(context) / 1.1,
+                  height: CustomSize.sizeHeight(context) / 14,
+                  decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(30),
+                      color: CustomColor.accent
+                  ),
+                  child: Center(child: CustomText.bodyRegular16(text: "Simpan", color: Colors.white, sizeNew: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.04)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.04)).toString()))),
+                ),
+              ):Container(
+                width: CustomSize.sizeWidth(context) / 1.1,
+                height: CustomSize.sizeHeight(context) / 14,
+                decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(30),
+                    color: CustomColor.accent
+                ),
+                child: Center(
+                  child: CircularProgressIndicator(
+                    valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                  ),
+                ),
+              ),
+          ]
+        )
       ),
       data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0),
     );

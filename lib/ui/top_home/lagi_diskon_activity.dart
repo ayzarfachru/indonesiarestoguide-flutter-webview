@@ -138,6 +138,8 @@ class _LagiDiskonActivityState extends State<LagiDiskonActivity> {
           restoName: v['resto_name'],
           desc: v['desc']??'',
           urlImg: v['img'],
+          is_available: v['is_available'],
+          // is_available: '0',
           price: Price.discounted(int.parse(v['price'].toString()), int.parse(v['discounted_price'].toString())),
           distance: double.parse(v['resto_distance'].toString()), is_recommended: '', qty: '', type: '', delivery_price: null
       );
@@ -181,6 +183,8 @@ class _LagiDiskonActivityState extends State<LagiDiskonActivity> {
             name: a['menus']['name']??null,
             desc: a['menus']['desc']??null,
             urlImg: a['menus']['img'],
+            is_available: a['menus']['is_available'],
+            // is_available: '0',
             price: Price.promo(
                 a['menus']['price'].toString(), a['menus']['delivery_price'].toString()), type: '', distance: null, delivery_price: null, restoId: '', restoName: '', is_recommended: '', qty: ''
         ),
@@ -450,21 +454,41 @@ class _LagiDiskonActivityState extends State<LagiDiskonActivity> {
                                       Container(
                                         width: CustomSize.sizeWidth(context) / 2.6,
                                         height: CustomSize.sizeWidth(context) / 2.6,
-                                        decoration: (homepg == "1")?(promoResto[index].menu != null)?BoxDecoration(
+                                        decoration: (homepg == "1")?(promoResto[index].menu != null)?(promoResto[index].menu!.is_available != '0')?BoxDecoration(
                                           image: DecorationImage(
                                               image: NetworkImage(Links.subUrl + promoResto[index].menu!.urlImg),
                                               fit: BoxFit.cover
                                           ),
                                           borderRadius: BorderRadius.circular(20),
                                         ):BoxDecoration(
+                                            image: DecorationImage(
+                                                colorFilter: ColorFilter.mode(
+                                                  Colors.grey,
+                                                  BlendMode.saturation,
+                                                ),
+                                                image: NetworkImage(Links.subUrl + promoResto[index].menu!.urlImg),
+                                                fit: BoxFit.fitWidth
+                                            ),
+                                            borderRadius: BorderRadius.circular(20)
+                                        ):BoxDecoration(
                                           color: CustomColor.primaryLight,
                                           borderRadius: BorderRadius.circular(20),
-                                        ):BoxDecoration(
+                                        ):(promo[index].is_available != '0')?BoxDecoration(
                                           image: DecorationImage(
                                               image: NetworkImage(Links.subUrl + promo[index].urlImg),
                                               fit: BoxFit.cover
                                           ),
                                           borderRadius: BorderRadius.circular(20),
+                                        ):BoxDecoration(
+                                            image: DecorationImage(
+                                                colorFilter: ColorFilter.mode(
+                                                  Colors.grey,
+                                                  BlendMode.saturation,
+                                                ),
+                                                image: NetworkImage(Links.subUrl + promo[index].urlImg),
+                                                fit: BoxFit.fitWidth
+                                            ),
+                                            borderRadius: BorderRadius.circular(20)
                                         ),
                                       ),
                                       SizedBox(

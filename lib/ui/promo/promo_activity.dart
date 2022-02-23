@@ -139,6 +139,8 @@ class _PromoActivityState extends State<PromoActivity> {
           restoName: v['resto_name'],
           desc: v['desc']??'',
           urlImg: v['img'],
+          is_available: v['is_available'],
+          // is_available: '0',
           price: Price.discounted(int.parse(v['price'].toString()), int.parse(v['discounted_price'].toString())),
           distance: double.parse(v['resto_distance'].toString()), is_recommended: '', qty: '', type: '', delivery_price: null
       );
@@ -182,6 +184,8 @@ class _PromoActivityState extends State<PromoActivity> {
               name: a['menus']['name']??null,
               desc: a['menus']['desc']??null,
               urlImg: a['menus']['img'],
+              is_available: a['menus']['is_available'],
+              // is_available: '0',
               price: Price.promo(
                   a['menus']['price'].toString(), a['menus']['delivery_price'].toString()), type: '', distance: null, delivery_price: null, restoId: '', restoName: '', is_recommended: '', qty: ''
           ),
@@ -438,13 +442,45 @@ class _PromoActivityState extends State<PromoActivity> {
                                       child: Container(
                                         width: CustomSize.sizeWidth(context) / 2.6,
                                         height: CustomSize.sizeWidth(context) / 2.6,
-                                        child: (homepg == "1")?(promoResto[index].menu != null)?ClipRRect(
+                                        child: (homepg == "1")?(promoResto[index].menu != null)?(promoResto[index].menu!.is_available != '0')?ClipRRect(
                                           borderRadius: BorderRadius.circular(20),
                                           child: Image.network(Links.subUrl + promoResto[index].menu!.urlImg, fit: BoxFit.fitWidth),
+                                        ):FullScreenWidget(
+                                          child: Container(
+                                            width: CustomSize.sizeWidth(context) / 2.6,
+                                            height: CustomSize.sizeWidth(context) / 2.6,
+                                            decoration: BoxDecoration(
+                                                image: DecorationImage(
+                                                    colorFilter: ColorFilter.mode(
+                                                      Colors.grey,
+                                                      BlendMode.saturation,
+                                                    ),
+                                                    image: NetworkImage(Links.subUrl + promoResto[index].menu!.urlImg),
+                                                    fit: BoxFit.fitWidth
+                                                ),
+                                                borderRadius: BorderRadius.circular(20)
+                                            ),
+                                          ),
                                         ):Container(decoration: BoxDecoration(color: CustomColor.primaryLight, borderRadius: BorderRadius.circular(20),)
-                                        ):ClipRRect(
+                                        ):(promo[index].is_available != '0')?ClipRRect(
                                           borderRadius: BorderRadius.circular(20),
                                           child: Image.network(Links.subUrl + promo[index].urlImg, fit: BoxFit.fitWidth),
+                                        ):FullScreenWidget(
+                                          child: Container(
+                                            width: CustomSize.sizeWidth(context) / 2.6,
+                                            height: CustomSize.sizeWidth(context) / 2.6,
+                                            decoration: BoxDecoration(
+                                                image: DecorationImage(
+                                                    colorFilter: ColorFilter.mode(
+                                                      Colors.grey,
+                                                      BlendMode.saturation,
+                                                    ),
+                                                    image: NetworkImage(Links.subUrl + promo[index].urlImg),
+                                                    fit: BoxFit.fitWidth
+                                                ),
+                                                borderRadius: BorderRadius.circular(20)
+                                            ),
+                                          ),
                                         ),
                                       ),
                                     ),

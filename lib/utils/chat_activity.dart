@@ -72,7 +72,7 @@ class _ChatActivityState extends State<ChatActivity> {
             .collection('messages').add({
           'type': "1",
           'text': "",
-          'from': userName,
+          'from': email,
           'img': imageUrl,
           'date': DateTime.now().toIso8601String().toString(),
         });
@@ -409,6 +409,7 @@ class _ChatActivityState extends State<ChatActivity> {
   }
 
   String homepg = "";
+  String email = "";
   String rev = "";
   String idnyatrans = "";
   getHomePg() async {
@@ -417,6 +418,7 @@ class _ChatActivityState extends State<ChatActivity> {
       pref.setString("timeLog", DateTime.now().toString().toString().split('-')[2].replaceAll('.', '').replaceAll(':', '').replaceAll('T', '')).toString();
       timeNow = (pref.getString('timeLog'));
       homepg = (pref.getString('homepg'));
+      email = (pref.getString('email'));
       print('homepg '+homepg);
       rev = (pref.getString('rev'));
       idnyatrans = (pref.getString('idnyatrans'));
@@ -500,7 +502,7 @@ class _ChatActivityState extends State<ChatActivity> {
           'type': "0",
           'text': txt,
           'img': "",
-          'from': userName,
+          'from': email,
           'date': DateTime.now().toIso8601String().toString(),
         });
         scrollController.animateTo(

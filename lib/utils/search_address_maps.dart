@@ -242,31 +242,37 @@ class _SearchAddressMapsState extends State<SearchAddressMaps> {
                           duration: Duration.zero,
                           child: InkWell(
                             onTap: () async{
-                              SharedPreferences pref = await SharedPreferences.getInstance();
-                              latitude = lat1;
-                              longitude = long1;
-                              distan = await Geolocator.distanceBetween( latitude, longitude, _lat, _long,);
-                              print(distan.toString());
-                              print(distan.toString().length);
-                              pref.setString("addressDelivTrans", address);
-                              pref.setString("lat", latitude.toString());
-                              pref.setString("long", longitude.toString());
-                              // pref.setString("distan", distan.toString());
-                              // if (distan.toString().split('.')[0].length == 3) {
-                              //   pref.setString("distan", distan.toString().split('.')[0].split('')[0]);
-                              // } else {
-                              //   pref.setString("distan", '1');
-                              // }
-                              // polylineCoordinates.add(LatLng(latitude, longitude));
-                              // polylineCoordinates.add(LatLng(_lat, _long));
-                              data = [{'lat':latitude,'long':longitude},{'lat':_lat,'long':_long}];
-                              _calculateDistance(latitude,longitude,_lat,_long);
-                              print(address);
-                              print(latitude.toString() +" "+ longitude.toString() +" "+ _lat.toString() +" "+ _long.toString() );
-                              Navigator.pop(context, "v");
-                              // Navigator.pushReplacement(context, PageTransition(type: PageTransitionType.fade,
-                              //     child:new CartActivity(token, inCart, order, address,
-                              //         (distan.toInt() < 1000)?"1000":distan.toInt().toString(),ongkir)));
+                              if (address == 'Loading') {
+
+                              } else {
+                                SharedPreferences pref = await SharedPreferences.getInstance();
+                                latitude = lat1;
+                                longitude = long1;
+                                distan = await Geolocator.distanceBetween( latitude, longitude, _lat, _long,);
+                                print(distan.toString());
+                                print(distan.toString().length);
+                                pref.setString("addressDelivTrans", address);
+                                pref.setString("lat", latitude.toString());
+                                pref.setString("long", longitude.toString());
+                                pref.setString("latUser", _lat.toString());
+                                pref.setString("longUser", _long.toString());
+                                // pref.setString("distan", distan.toString());
+                                // if (distan.toString().split('.')[0].length == 3) {
+                                //   pref.setString("distan", distan.toString().split('.')[0].split('')[0]);
+                                // } else {
+                                //   pref.setString("distan", '1');
+                                // }
+                                // polylineCoordinates.add(LatLng(latitude, longitude));
+                                // polylineCoordinates.add(LatLng(_lat, _long));
+                                data = [{'lat':latitude,'long':longitude},{'lat':_lat,'long':_long}];
+                                _calculateDistance(latitude,longitude,_lat,_long);
+                                print(address);
+                                print(latitude.toString() +" "+ longitude.toString() +" "+ _lat.toString() +" "+ _long.toString() );
+                                Navigator.pop(context, "v");
+                                // Navigator.pushReplacement(context, PageTransition(type: PageTransitionType.fade,
+                                //     child:new CartActivity(token, inCart, order, address,
+                                //         (distan.toInt() < 1000)?"1000":distan.toInt().toString(),ongkir)));
+                              }
                             },
                             splashColor: Colors.white,
                             borderRadius: BorderRadius.circular(6.0),

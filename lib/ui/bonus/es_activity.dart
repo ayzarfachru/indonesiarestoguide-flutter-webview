@@ -139,6 +139,7 @@ class EsActivityState extends State<EsActivity> {
             desc: v['desc'],
             distance: double.parse(v['distance'].toString()),
             urlImg: v['img'],
+            is_available: '',
             price: Price.discounted(int.parse(v['price']), v['discounted_price']), delivery_price: null, restoId: '', type: '', restoName: '', is_recommended: '', qty: ''
         ), discountedPrice: null, id: null, word: '',
       );
@@ -181,6 +182,7 @@ class EsActivityState extends State<EsActivity> {
             name: a['menus']['name'],
             desc: a['menus']['desc'],
             urlImg: a['menus']['img'],
+            is_available: '',
             price: Price.promo(
                 a['menus']['price'].toString(), a['menus']['delivery_price'].toString()), qty: '', is_recommended: '', restoName: '', type: '', distance: null, restoId: '', delivery_price: null
         ),
@@ -325,6 +327,7 @@ class EsActivityState extends State<EsActivity> {
         restoId: x['resto_id'].toString(),
         restoName: x['resto_name'],
         urlImg: x['img'],
+        is_available: '',
         price: Price.discounted(x['price'], x['discounted_price']),
         distance: double.parse(x['resto_distance'].toString()), type: '', is_recommended: '', qty: '', delivery_price: null, desc: '',
       );

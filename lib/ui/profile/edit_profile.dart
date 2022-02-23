@@ -656,101 +656,101 @@ class _EditProfileState extends State<EditProfile> {
                         color: Colors.black,
                         thickness: 1,
                       ),
-                      // // SizedBox(height: CustomSize.sizeHeight(context) / 48,),
-                      // //------------------------------------ checkbox pass -------------------------------------
-                      // Row(
-                      //   mainAxisSize: MainAxisSize.max,
-                      //   mainAxisAlignment: MainAxisAlignment.start,
-                      //   children: [
-                      //     Checkbox(
-                      //       value: Pass,
-                      //       onChanged: (bool? value) {
-                      //         setState(() {
-                      //           print(value);
-                      //           Pass = value!;
-                      //         });
-                      //       },
-                      //     ),
-                      //     // Text('Apakah Restomu melayani reservasi ?', style: TextStyle(fontWeight: FontWeight.bold))
-                      //     Text('Apakah anda ingin mengganti password ?', style: GoogleFonts.poppins(
-                      //         textStyle: TextStyle(
-                      //             fontWeight: FontWeight.bold, fontSize: 12)),),
-                      //   ],
-                      // ),
-                      // //------------------------------------- new pass ----------------------------------------
-                      // (Pass)?CustomText.bodyLight12(text: "Masukkan password baru"):Container(),
-                      // (Pass)?TextField(
-                      //   maxLines: 1,
-                      //   controller: newPass,
-                      //   obscureText: _obscureText,
-                      //   keyboardType: TextInputType.text,
-                      //   cursorColor: Colors.black,
-                      //   style: GoogleFonts.poppins(
-                      //       textStyle:
-                      //       TextStyle(fontSize: 18, color: Colors.black, fontWeight: FontWeight.w600)),
-                      //   decoration: InputDecoration(
-                      //     suffixIcon: IconButton(
-                      //       highlightColor: Colors.transparent,
-                      //       onPressed: _toggle,
-                      //       icon: Icon(
-                      //           _obscureText
-                      //               ? MaterialCommunityIcons.eye
-                      //               : MaterialCommunityIcons.eye_off,
-                      //           color: Colors.black),
-                      //     ),
-                      //     isDense: true,
-                      //     contentPadding: EdgeInsets.symmetric(vertical: 10.0),
-                      //     hintStyle: GoogleFonts.poppins(
-                      //         textStyle:
-                      //         TextStyle(fontSize: 14, color: Colors.grey)),
-                      //     helperStyle: GoogleFonts.poppins(
-                      //         textStyle: TextStyle(fontSize: 14)),
-                      //     enabledBorder: UnderlineInputBorder(),
-                      //     focusedBorder: UnderlineInputBorder(),
-                      //   ),
-                      // ):Container(),
-                      // (Pass)?SizedBox(height: CustomSize.sizeHeight(context) / 48,):Container(),
-                      // //------------------------------------- confirm pass ----------------------------------------
-                      // (Pass)?CustomText.bodyLight12(text: "Konfirmasi password baru"):Container(),
-                      // (Pass)?TextField(
-                      //   maxLines: 1,
-                      //   controller: _newPass,
-                      //   obscureText: _obscureText2,
-                      //   keyboardType: TextInputType.text,
-                      //   cursorColor: Colors.black,
-                      //   style: GoogleFonts.poppins(
-                      //       textStyle:
-                      //       TextStyle(fontSize: 18, color: Colors.black, fontWeight: FontWeight.w600)),
-                      //   decoration: InputDecoration(
-                      //     suffixIcon: IconButton(
-                      //       highlightColor: Colors.transparent,
-                      //       onPressed: _toggle2,
-                      //       icon: Icon(
-                      //           _obscureText2
-                      //               ? MaterialCommunityIcons.eye
-                      //               : MaterialCommunityIcons.eye_off,
-                      //           color: Colors.black),
-                      //     ),
-                      //     isDense: true,
-                      //     contentPadding: EdgeInsets.symmetric(vertical: 10.0),
-                      //     hintStyle: GoogleFonts.poppins(
-                      //         textStyle:
-                      //         TextStyle(fontSize: 14, color: Colors.grey)),
-                      //     helperStyle: GoogleFonts.poppins(
-                      //         textStyle: TextStyle(fontSize: 14)),
-                      //     enabledBorder: UnderlineInputBorder(),
-                      //     focusedBorder: UnderlineInputBorder(),
-                      //   ),
-                      // ):Container(),
-                      // (Pass)?SizedBox(height: CustomSize.sizeHeight(context) / 68,):Container(),
-                      // SizedBox(height: CustomSize.sizeHeight(context) / 88,),
-                      // Padding(
-                      //   padding: EdgeInsets.only(
-                      //     left: CustomSize.sizeWidth(context) / 32,
-                      //     right: CustomSize.sizeWidth(context) / 32,
-                      //   ),
-                      //   child: CustomText.bodyRegular18(text: "*Jika ingin menggunakan login tanpa google tolong ganti password dan isi semua data anda terlebih dahulu!", color: CustomColor.redBtn, minSize: 15, maxLines: 3),
-                      // ),
+                      // SizedBox(height: CustomSize.sizeHeight(context) / 48,),
+                      //------------------------------------ checkbox pass -------------------------------------
+                      Row(
+                        mainAxisSize: MainAxisSize.max,
+                        mainAxisAlignment: MainAxisAlignment.start,
+                        children: [
+                          Checkbox(
+                            value: Pass,
+                            onChanged: (bool? value) {
+                              setState(() {
+                                print(value);
+                                Pass = value!;
+                              });
+                            },
+                          ),
+                          // Text('Apakah Restomu melayani reservasi ?', style: TextStyle(fontWeight: FontWeight.bold))
+                          Text('Apakah anda ingin mengganti password ?', style: GoogleFonts.poppins(
+                              textStyle: TextStyle(
+                                  fontWeight: FontWeight.bold, fontSize: double.parse(((MediaQuery.of(context).size.width*0.03).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.03).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.03).toString()))),),
+                        ],
+                      ),
+                      //------------------------------------- new pass ----------------------------------------
+                      (Pass)?CustomText.bodyLight12(text: "Masukkan password baru", minSize: double.parse(((MediaQuery.of(context).size.width*0.03).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.03).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.03).toString())):Container(),
+                      (Pass)?TextField(
+                        maxLines: 1,
+                        controller: newPass,
+                        obscureText: _obscureText,
+                        keyboardType: TextInputType.text,
+                        cursorColor: Colors.black,
+                        style: GoogleFonts.poppins(
+                            textStyle:
+                            TextStyle(fontSize: 18, color: Colors.black, fontWeight: FontWeight.w600)),
+                        decoration: InputDecoration(
+                          suffixIcon: IconButton(
+                            highlightColor: Colors.transparent,
+                            onPressed: _toggle,
+                            icon: Icon(
+                                _obscureText
+                                    ? MaterialCommunityIcons.eye
+                                    : MaterialCommunityIcons.eye_off,
+                                color: Colors.black),
+                          ),
+                          isDense: true,
+                          contentPadding: EdgeInsets.symmetric(vertical: 10.0),
+                          hintStyle: GoogleFonts.poppins(
+                              textStyle:
+                              TextStyle(fontSize: 14, color: Colors.grey)),
+                          helperStyle: GoogleFonts.poppins(
+                              textStyle: TextStyle(fontSize: 14)),
+                          enabledBorder: UnderlineInputBorder(),
+                          focusedBorder: UnderlineInputBorder(),
+                        ),
+                      ):Container(),
+                      (Pass)?SizedBox(height: CustomSize.sizeHeight(context) / 48,):Container(),
+                      //------------------------------------- confirm pass ----------------------------------------
+                      (Pass)?CustomText.bodyLight12(text: "Konfirmasi password baru", minSize: double.parse(((MediaQuery.of(context).size.width*0.03).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.03).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.03).toString())):Container(),
+                      (Pass)?TextField(
+                        maxLines: 1,
+                        controller: _newPass,
+                        obscureText: _obscureText2,
+                        keyboardType: TextInputType.text,
+                        cursorColor: Colors.black,
+                        style: GoogleFonts.poppins(
+                            textStyle:
+                            TextStyle(fontSize: 18, color: Colors.black, fontWeight: FontWeight.w600)),
+                        decoration: InputDecoration(
+                          suffixIcon: IconButton(
+                            highlightColor: Colors.transparent,
+                            onPressed: _toggle2,
+                            icon: Icon(
+                                _obscureText2
+                                    ? MaterialCommunityIcons.eye
+                                    : MaterialCommunityIcons.eye_off,
+                                color: Colors.black),
+                          ),
+                          isDense: true,
+                          contentPadding: EdgeInsets.symmetric(vertical: 10.0),
+                          hintStyle: GoogleFonts.poppins(
+                              textStyle:
+                              TextStyle(fontSize: 14, color: Colors.grey)),
+                          helperStyle: GoogleFonts.poppins(
+                              textStyle: TextStyle(fontSize: 14)),
+                          enabledBorder: UnderlineInputBorder(),
+                          focusedBorder: UnderlineInputBorder(),
+                        ),
+                      ):Container(),
+                      (Pass)?SizedBox(height: CustomSize.sizeHeight(context) / 68,):Container(),
+                      SizedBox(height: CustomSize.sizeHeight(context) / 88,),
+                      Padding(
+                        padding: EdgeInsets.only(
+                          left: CustomSize.sizeWidth(context) / 32,
+                          right: CustomSize.sizeWidth(context) / 32,
+                        ),
+                        child: CustomText.bodyRegular18(text: "*Jika ingin menggunakan login tanpa google mohon ganti password dan isi semua data anda terlebih dahulu!", color: CustomColor.redBtn, minSize: 15, maxLines: 3),
+                      ),
                       SizedBox(height: CustomSize.sizeHeight(context) / 48,),
                       (isLoading != true)?GestureDetector(
                         onTap: () async{
@@ -760,7 +760,7 @@ class _EditProfileState extends State<EditProfile> {
 
                           SharedPreferences pref = await SharedPreferences.getInstance();
                           pref.setString('name',_loginTextName.text.toString());
-                          print(image.toString() + 'Ini Image');
+                          print(newPass.text.toString().length.toString() + 'Ini Image');
                           if (_loginEmailName.text == '') {
                             Fluttertoast.showToast(msg: 'Email wajib diisi!');
                           } else {
@@ -770,15 +770,27 @@ class _EditProfileState extends State<EditProfile> {
                               } else if (image == null) {
                                 editProfile2(_loginTextName.text.toString(), _loginEmailName.text.toString(), tgl.toString(), gender.toString(), _loginNotelpName.text.toString());
                               }
-                            } else if (Pass == true) {
+                            } else if (Pass == true && newPass.text.toString().length >= 8) {
                               if (newPass.text.toString() == _newPass.text.toString()) {
                                 if (image != null) {
                                   editProfile(_loginTextName.text.toString(), _loginEmailName.text.toString(), tgl.toString(), gender.toString(), _loginNotelpName.text.toString(), image!, img.toString()).whenComplete(() {
-                                    _editPass();
+                                    // _editPass();
+                                    if (newPass.text.toString() == _newPass.text.toString()) {
+                                      print(newPass.text.toString() == _newPass.text.toString());
+                                      _editPass();
+                                    } else if (newPass.text.toString() != _newPass.text.toString()){
+                                      Fluttertoast.showToast(msg: 'Konfirmasi password gagal!');
+                                    }
                                   });
                                 } else if (image == null) {
                                   editProfile2(_loginTextName.text.toString(), _loginEmailName.text.toString(), tgl.toString(), gender.toString(), _loginNotelpName.text.toString()).whenComplete(() {
-                                    _editPass();
+                                    // _editPass();
+                                      if (newPass.text.toString() == _newPass.text.toString()) {
+                                        print(newPass.text.toString() == _newPass.text.toString());
+                                        _editPass();
+                                      } else if (newPass.text.toString() != _newPass.text.toString()){
+                                        Fluttertoast.showToast(msg: 'Konfirmasi password gagal!');
+                                      }
                                   });
                                 }
                               } else {
@@ -789,6 +801,8 @@ class _EditProfileState extends State<EditProfile> {
                                   // });
                                 });
                               }
+                            } else {
+                              Fluttertoast.showToast(msg: 'Password minimal 8 karakter!');
                             }
                           }
 

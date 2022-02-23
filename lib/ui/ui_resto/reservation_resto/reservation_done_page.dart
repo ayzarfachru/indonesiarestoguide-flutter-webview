@@ -76,6 +76,7 @@ class _ReservationDoneState extends State<ReservationDone> {
 
   // List<Menu> menu = [];
   List<Transaction> detTransaction = [];
+  bool waiting = false;
   Future _getDetailTrans(String Id)async{
     List<Transaction> _detTransaction = [];
     // List<Menu> _menu = [];
@@ -181,12 +182,22 @@ class _ReservationDoneState extends State<ReservationDone> {
                                     ),
                                   ],
                                 ),
+                                SizedBox(height: CustomSize.sizeHeight(context) / 100,),
+                                Row(mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    CustomText.bodyLight16(text: "Platform fee", sizeNew: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.04).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.04).toString())),
+                                    CustomText.bodyLight16(text: '1000',
+                                        sizeNew: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.04).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.04).toString())
+                                      // totalOngkir
+                                    ),
+                                  ],
+                                ),
                                 Divider(thickness: 1,),
                                 SizedBox(height: CustomSize.sizeHeight(context) / 120,),
                                 Row(mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                   children: [
                                     CustomText.textTitle3(text: "Total Pembayaran", sizeNew: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.04).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.04).toString())),
-                                    CustomText.textTitle3(text: NumberFormat.currency(locale: 'id', symbol: '', decimalDigits: 0).format(int.parse(total)),
+                                    CustomText.textTitle3(text: NumberFormat.currency(locale: 'id', symbol: '', decimalDigits: 0).format(int.parse(total)+1000),
                                         sizeNew: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.04).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.04).toString())
                                       // NumberFormat.currency(locale: 'id', symbol: '', decimalDigits: 0).format(int.parse(totalHarga))
                                     ),
@@ -359,6 +370,7 @@ class _ReservationDoneState extends State<ReservationDone> {
     }
 
     setState(() {
+      waiting = false;
       chatroom = data['trx']['chatroom']['id'].toString();
       id = data['trx']['id'].toString();
       status = data['trx']['status'];
@@ -477,9 +489,12 @@ class _ReservationDoneState extends State<ReservationDone> {
                         return GestureDetector(
                           onTap: ()async{
                             Fluttertoast.showToast(msg: "Tunggu sebentar");
-                            _getDetailTrans(transaction[index].id.toString()).whenComplete(() {
-                              _getTrans();
-                            });
+                            if (waiting == false) {
+                              waiting = true;
+                              _getDetailTrans(transaction[index].id.toString()).whenComplete(() {
+                                _getTrans();
+                              });
+                            }
                             id = transaction[index].id.toString();
                             _open('', id!);
                             SharedPreferences pref = await SharedPreferences.getInstance();
@@ -561,7 +576,7 @@ class _ReservationDoneState extends State<ReservationDone> {
                                             SizedBox(height: CustomSize.sizeHeight(context) * 0.00468,),
                                             CustomText.bodyMedium12(
                                               // text: transaction[index].type.toString(),
-                                                text: transaction[index].total.toString(),
+                                                text: (transaction[index].total! + 1000).toString(),
                                                 maxLines: 1,
                                                 sizeNew: double.parse(((MediaQuery.of(context).size.width*0.033).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.033).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.033).toString())
                                             ),

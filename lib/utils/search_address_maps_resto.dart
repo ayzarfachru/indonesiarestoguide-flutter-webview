@@ -134,22 +134,26 @@ class _SearchAddressMapsRestoState extends State<SearchAddressMapsResto> {
                           duration: Duration.zero,
                           child: InkWell(
                             onTap: () async{
-                              SharedPreferences pref = await SharedPreferences.getInstance();
-                              // latitude = double.parse(pref.getString('latResto'));
-                              // longitude = double.parse(pref.getString('longResto'));
-                              double distan = await Geolocator.distanceBetween( latitude, longitude, -7.3382452, 112.7271302);
-                              print(distan.toInt().toString());
-                              pref.setString("address", address);
-                              pref.setString("latitudeResto", _lat.toString());
-                              pref.setString("longitudeResto", _long.toString());
-                              pref.setString("distan", distan.toInt().toString());
-                              print(_lat);
-                              print(_long);
-                              print(latitude.toString() +" "+ longitude.toString() +" "+ _lat.toString() +" "+ _long.toString() );
-                              Navigator.pop(context, "v");
-                              // Navigator.pushReplacement(context, PageTransition(type: PageTransitionType.fade,
-                              //     child:new CartActivity(token, inCart, order, address,
-                              //         (distan.toInt() < 1000)?"1000":distan.toInt().toString(),ongkir)));
+                              if (address == "Loading") {
+
+                              } else {
+                                SharedPreferences pref = await SharedPreferences.getInstance();
+                                // latitude = double.parse(pref.getString('latResto'));
+                                // longitude = double.parse(pref.getString('longResto'));
+                                double distan = await Geolocator.distanceBetween( latitude, longitude, -7.3382452, 112.7271302);
+                                print(distan.toInt().toString());
+                                pref.setString("address", address);
+                                pref.setString("latitudeResto", _lat.toString());
+                                pref.setString("longitudeResto", _long.toString());
+                                pref.setString("distan", distan.toInt().toString());
+                                print(_lat);
+                                print(_long);
+                                print(latitude.toString() +" "+ longitude.toString() +" "+ _lat.toString() +" "+ _long.toString() );
+                                Navigator.pop(context, "v");
+                                // Navigator.pushReplacement(context, PageTransition(type: PageTransitionType.fade,
+                                //     child:new CartActivity(token, inCart, order, address,
+                                //         (distan.toInt() < 1000)?"1000":distan.toInt().toString(),ongkir)));
+                              }
                             },
                             splashColor: Colors.white,
                             borderRadius: BorderRadius.circular(6.0),

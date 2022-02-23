@@ -13,6 +13,9 @@ class Links{
   static String mainUrl = "http://irg.devus-sby.com/api/v2";
   static String subUrl = "http://irg.devus-sby.com";
 
+  // static String mainUrl = "http://irg.devastic.com/api/v2";
+  // static String subUrl = "http://irg.devastic.com";
+
   // static String mainUrl = "https://kamsia.devus-sby.com/api";
   // static String subUrl = "https://kamsia.devus-sby.com";
 }
@@ -44,10 +47,10 @@ class CustomText{
       style: GoogleFonts.poppins(
           textStyle: TextStyle(
               // fontSize: 32,
-              fontSize: sizeNew,
+              fontSize: minSize,
               fontWeight:
               FontWeight.w700, color: color??=Colors.black)),
-      minFontSize: minSize??0,
+      minFontSize: (minSize == 0)?0:0,
       maxLines: maxLines??1,
     );
   }
@@ -59,7 +62,7 @@ class CustomText{
       style: GoogleFonts.poppins(
           textStyle: TextStyle(
               // fontSize: 32,
-              fontSize: 32,
+              fontSize: minSize,
               fontWeight:
               FontWeight.w600, color: color??=Colors.black)),
       minFontSize: minSize??0,
@@ -209,7 +212,7 @@ class CustomText{
       text,
       style: GoogleFonts.poppins(
           textStyle: TextStyle(
-              fontSize: 16,
+              fontSize: minSize,
               fontWeight:
               FontWeight.w400, color: color??=Colors.black)),
       minFontSize: minSize??0,
@@ -268,7 +271,7 @@ class CustomText{
       text,
       style: GoogleFonts.poppins(
           textStyle: TextStyle(
-              fontSize: 16,
+              fontSize: minSize,
               fontWeight:
               FontWeight.w300, color: color??=Colors.black)),
       minFontSize: minSize??0,
@@ -296,7 +299,7 @@ class CustomText{
       text,
       style: GoogleFonts.poppins(
           textStyle: TextStyle(
-              fontSize: 13,
+              fontSize: minSize,
               fontWeight:
               FontWeight.w300, color: color??=Colors.black)),
       minFontSize: minSize??0,

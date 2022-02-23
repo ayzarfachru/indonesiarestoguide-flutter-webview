@@ -176,6 +176,7 @@ class _AddPromoState extends State<AddPromo> {
       initial = (pref.getString('name').substring(0, 1).toUpperCase());
       nameRes = (pref.getString('resProm'));
       print(initial);
+      print('Name Rest '+nameRes.toString());
     });
   }
 

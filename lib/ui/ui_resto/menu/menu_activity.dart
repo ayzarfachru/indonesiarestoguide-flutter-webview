@@ -67,6 +67,8 @@ class _MenuActivityState extends State<MenuActivity> {
               id: a['id'],
               name: a['name'],
               desc: a['desc'],
+              is_available: a['is_available'],
+              // is_available: '0',
               price: Price.delivery(a['price'], a['delivery_price']),
               urlImg: a['img'], restoId: '', delivery_price: null, distance: null, type: '', qty: '', is_recommended: '', restoName: ''
           );
@@ -107,6 +109,8 @@ class _MenuActivityState extends State<MenuActivity> {
             urlImg: v['img'],
             type: v['type'],
             is_recommended: v['is_recommended'],
+            is_available: v['is_available'],
+            // is_available: '0',
             price: Price(original: int.parse(v['price'].toString()), discounted: null, delivery: null),
             delivery_price: Price(original: int.parse(v['price']), delivery: null, discounted: null), restoId: '', restoName: '', distance: null, qty: ''
         );
@@ -257,13 +261,29 @@ class _MenuActivityState extends State<MenuActivity> {
                             ),
                             child: Row(
                               children: [
-                                FullScreenWidget(
+                                (menu[index].is_available != '0')?FullScreenWidget(
                                   child: Container(
                                     width: CustomSize.sizeWidth(context) / 2.6,
                                     height: CustomSize.sizeWidth(context) / 2.6,
                                     child: ClipRRect(
                                       borderRadius: BorderRadius.circular(20),
                                       child: Image.network(Links.subUrl + menu[index].urlImg, fit: BoxFit.fitWidth),
+                                    ),
+                                  ),
+                                ):FullScreenWidget(
+                                  child: Container(
+                                    width: CustomSize.sizeWidth(context) / 2.6,
+                                    height: CustomSize.sizeWidth(context) / 2.6,
+                                    decoration: BoxDecoration(
+                                        image: DecorationImage(
+                                            colorFilter: ColorFilter.mode(
+                                              Colors.grey,
+                                              BlendMode.saturation,
+                                            ),
+                                            image: NetworkImage(Links.subUrl + menu[index].urlImg),
+                                            fit: BoxFit.fitWidth
+                                        ),
+                                        borderRadius: BorderRadius.circular(20)
                                     ),
                                   ),
                                 ),

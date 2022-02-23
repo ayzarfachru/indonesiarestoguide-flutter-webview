@@ -926,6 +926,7 @@ class _AddDetailRestoState extends State<AddDetailResto> {
                                       // Optional onChange to receive value as DateTime
                                       onChangeDateTime: (DateTime dateTime) {
                                         print(jamBuka.hour.toString() + '.' + jamBuka.minute.toString());
+                                        buka = jamBuka.hour.toString() + ':' + jamBuka.minute.toString();
                                         getBuka();
                                       },
                                     ));
@@ -984,7 +985,7 @@ class _AddDetailRestoState extends State<AddDetailResto> {
                           suffixIcon: GestureDetector(
                             onTap: () {
                               setState(() {
-                                buka = jamBuka.hour.toString() + ':' + jamBuka.minute.toString();
+                                // buka = jamBuka.hour.toString() + ':' + jamBuka.minute.toString();
                                 jamTutup = TimeOfDay.now().replacing(minute: 30);
                                 print(_JamOperasionalTutup.toString() + 'ini');
                                 // print(cuisine.split(",")[0]);
@@ -1067,26 +1068,26 @@ class _AddDetailRestoState extends State<AddDetailResto> {
                         ],
                       ),
                       //------------------------------------- biaya kirim ----------------------------------------
-                      (delivery)?CustomText.bodyLight12(text: "Ongkir per 1 km", sizeNew: double.parse(((MediaQuery.of(context).size.width*0.03).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.03).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.03).toString())):Container(),
-                      (delivery)?TextField(
-                        controller: _Ongkir,
-                        keyboardType: TextInputType.number,
-                        cursorColor: Colors.black,
-                        style: GoogleFonts.poppins(
-                            textStyle:
-                            TextStyle(fontSize: 18, color: Colors.black, fontWeight: FontWeight.w600)),
-                        decoration: InputDecoration(
-                          isDense: true,
-                          contentPadding: EdgeInsets.only(bottom: CustomSize.sizeHeight(context) / 86),
-                          hintStyle: GoogleFonts.poppins(
-                              textStyle:
-                              TextStyle(fontSize: 14, color: Colors.grey)),
-                          helperStyle: GoogleFonts.poppins(
-                              textStyle: TextStyle(fontSize: 14)),
-                          enabledBorder: UnderlineInputBorder(),
-                          focusedBorder: UnderlineInputBorder(),
-                        ),
-                      ):Container(),
+                      // (delivery)?CustomText.bodyLight12(text: "Ongkir per 1 km", sizeNew: double.parse(((MediaQuery.of(context).size.width*0.03).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.03).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.03).toString())):Container(),
+                      // (delivery)?TextField(
+                      //   controller: _Ongkir,
+                      //   keyboardType: TextInputType.number,
+                      //   cursorColor: Colors.black,
+                      //   style: GoogleFonts.poppins(
+                      //       textStyle:
+                      //       TextStyle(fontSize: 18, color: Colors.black, fontWeight: FontWeight.w600)),
+                      //   decoration: InputDecoration(
+                      //     isDense: true,
+                      //     contentPadding: EdgeInsets.only(bottom: CustomSize.sizeHeight(context) / 86),
+                      //     hintStyle: GoogleFonts.poppins(
+                      //         textStyle:
+                      //         TextStyle(fontSize: 14, color: Colors.grey)),
+                      //     helperStyle: GoogleFonts.poppins(
+                      //         textStyle: TextStyle(fontSize: 14)),
+                      //     enabledBorder: UnderlineInputBorder(),
+                      //     focusedBorder: UnderlineInputBorder(),
+                      //   ),
+                      // ):Container(),
                       //------------------------------------ checkbox reservation -------------------------------------
                       Row(
                         mainAxisSize: MainAxisSize.max,

@@ -49,6 +49,7 @@ class _OrderProcessState extends State<OrderProcess> {
   String note = '';
   String chatRestoCount = '';
   // String s = 'null';
+  bool waiting = false;
   Future _getDetailTrans(String Id, String name, String status)async{
     List<Transaction> _detTransaction = [];
     List<Menu> _menu = [];
@@ -92,6 +93,7 @@ class _OrderProcessState extends State<OrderProcess> {
         qty: v['qty'].toString(),
         urlImg: v['img'],
         type: v['type'],
+        is_available: '',
         is_recommended: v['is_recommended'],
         price: Price(original: int.parse(v['price'].toString()),discounted: int.parse(v['discounted_price'].toString()), delivery: null), restoName: '', distance: null, delivery_price: null, restoId: '',
       );
@@ -288,10 +290,10 @@ class _OrderProcessState extends State<OrderProcess> {
                                         ),
                                       ),
                                     ):Container(),
-                                    SizedBox(height: CustomSize.sizeHeight(context) / 48,),
+                                    SizedBox(height: CustomSize.sizeHeight(context) / 56,),
                                     Container(
                                       width: CustomSize.sizeWidth(context),
-                                      height: CustomSize.sizeHeight(context) / 3.8,
+                                      // height: (Meja != 'null')?CustomSize.sizeHeight(context) / 3.2:CustomSize.sizeHeight(context) / 3.3,
                                       decoration: BoxDecoration(
                                         color: Colors.white,
                                         borderRadius: BorderRadius.circular(20),
@@ -311,16 +313,11 @@ class _OrderProcessState extends State<OrderProcess> {
                                           children: [
                                             SizedBox(height: CustomSize.sizeHeight(context) / 36,),
                                             CustomText.textTitle3(text: "Rincian Pembayaran", sizeNew: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.04)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.04)).toString())),
-                                            SizedBox(height: CustomSize.sizeHeight(context) / 50,),
-                                            Row(mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                              children: [
-                                                CustomText.bodyLight16(text: "Harga", sizeNew: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.04)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.04)).toString())),
-                                                CustomText.bodyLight16(text: NumberFormat.currency(locale: 'id', symbol: '', decimalDigits: 0).format(total), sizeNew: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.04)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.04)).toString())
-                                                  // NumberFormat.currency(locale: 'id', symbol: '', decimalDigits: 0).format(harga)
-                                                ),
-                                              ],
-                                            ),
-                                            (Meja != 'null')?SizedBox(height: CustomSize.sizeHeight(context) / 100,):SizedBox(),
+                                            // CustomText.bodyLight12(
+                                            //     text: date_trans.toString().split('T')[1].split(':')[0]+':'+date_trans.toString().split('T')[1].split(':')[1]+', '+DateFormat('dd-MM-y').format(DateTime.parse(date_trans)).toString(),
+                                            //     maxLines: 1,
+                                            //     minSize: 10
+                                            // ),
                                             (Meja != 'null')?ListView.builder(
                                                 shrinkWrap: true,
                                                 controller: _scrollController,
@@ -329,32 +326,64 @@ class _OrderProcessState extends State<OrderProcess> {
                                                 itemBuilder: (_, index){
                                                   return Row(mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                                     children: [
-                                                      CustomText.bodyLight16(text: "Meja", sizeNew: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.04)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.04)).toString())),
-                                                      CustomText.bodyLight16(text: (meja[index].id.toString().startsWith(Meja))?meja[index].name.toString():'', sizeNew: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.04)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.04)).toString()))
+                                                      CustomText.textTitle3(text: "Meja Nomor :", sizeNew: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.04)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.04)).toString())),
+                                                      // CustomText.textTitle3(text: (meja[index].id.toString().startsWith(Meja))?meja[index].name.toString():'1', color: CustomColor.primary, sizeNew: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.04)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.04)).toString()))
+                                                      CustomText.textTitle3(text: (meja.firstWhere((t) => t.id.toString() == Meja, orElse: (){ return Meja2(id: 0, name: "", url: "", qr: ""); })).name, color: CustomColor.primary, sizeNew: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.04)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.04)).toString()))
                                                     ],
                                                   );
                                                 }
                                             ):SizedBox(),
-                                            (Meja == 'null')?SizedBox(height: CustomSize.sizeHeight(context) / 100,):Container(),
-                                            (Meja == 'null')?Row(mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                            SizedBox(height: CustomSize.sizeHeight(context) / 50,),
+                                            // (Meja != 'null')?SizedBox(height: CustomSize.sizeHeight(context) / 100,):SizedBox(),
+                                            // (Meja != 'null')?Divider(thickness: 1,):SizedBox(),
+                                            Row(mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                              children: [
+                                                CustomText.bodyLight16(text: "Harga", sizeNew: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.04)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.04)).toString())),
+                                                CustomText.bodyLight16(text: NumberFormat.currency(locale: 'id', symbol: '', decimalDigits: 0).format(total), sizeNew: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.04)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.04)).toString())
+                                                  // NumberFormat.currency(locale: 'id', symbol: '', decimalDigits: 0).format(harga)
+                                                ),
+                                              ],
+                                            ),
+                                            (Meja == 'null')?(type == 'delivery')?SizedBox(height: CustomSize.sizeHeight(context) / 100,):Container():Container(),
+                                            (Meja == 'null')?(type == 'delivery')?Row(mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                               children: [
                                                 CustomText.bodyLight16(text: "Ongkir", sizeNew: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.04)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.04)).toString())),
                                                 CustomText.bodyLight16(text: NumberFormat.currency(locale: 'id', symbol: '', decimalDigits: 0).format(ongkir), sizeNew: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.04)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.04)).toString())
                                                   // totalOngkir
                                                 ),
                                               ],
-                                            ):Container(),
+                                            ):Container():Container(),
+                                            SizedBox(height: CustomSize.sizeHeight(context) / 100,),
+                                            Row(mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                              children: [
+                                                CustomText.bodyLight16(text: "Platform Fee", minSize: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.04)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.04)).toString())),
+                                                CustomText.bodyLight16(text: NumberFormat.currency(locale: 'id', symbol: '', decimalDigits: 0).format(1000), minSize: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.04)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.04)).toString())),
+                                              ],
+                                            ),
                                             SizedBox(height: CustomSize.sizeHeight(context) / 64,),
                                             Divider(thickness: 1,),
                                             SizedBox(height: CustomSize.sizeHeight(context) / 120,),
-                                            Row(mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                            Column(
+                                              crossAxisAlignment: CrossAxisAlignment.end,
                                               children: [
-                                                CustomText.textTitle3(text: "Total Pembayaran", sizeNew: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.04)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.04)).toString())),
-                                                CustomText.textTitle3(text: NumberFormat.currency(locale: 'id', symbol: '', decimalDigits: 0).format(all), sizeNew: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.04)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.04)).toString())
-                                                  // NumberFormat.currency(locale: 'id', symbol: '', decimalDigits: 0).format(int.parse(totalHarga))
+                                                Row(mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                                  children: [
+                                                    CustomText.textTitle3(text: "Total Pembayaran", sizeNew: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.04)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.04)).toString())),
+                                                    CustomText.textTitle3(text: NumberFormat.currency(locale: 'id', symbol: '', decimalDigits: 0).format((all+1000)), sizeNew: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.04)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.04)).toString())
+                                                      // NumberFormat.currency(locale: 'id', symbol: '', decimalDigits: 0).format(int.parse(totalHarga))
+                                                    ),
+                                                  ],
                                                 ),
+                                                // SizedBox(height: CustomSize.sizeHeight(context) * 0.0075,),
+                                                // GestureDetector(
+                                                //   onTap: (){
+                                                //
+                                                //   },
+                                                //     child: CustomText.bodyRegular14(text: "lihat detail")
+                                                // ),
                                               ],
                                             ),
+                                            SizedBox(height: CustomSize.sizeHeight(context) / 36,),
                                           ],
                                         ),
                                       ),
@@ -362,7 +391,7 @@ class _OrderProcessState extends State<OrderProcess> {
                                     SizedBox(height: CustomSize.sizeHeight(context) / 56,),
                                     Container(
                                       width: CustomSize.sizeWidth(context),
-                                      height: CustomSize.sizeHeight(context) / 7.2,
+                                      height: (type != "delivery")?CustomSize.sizeHeight(context) / 7.2:CustomSize.sizeHeight(context) / 4.8,
                                       decoration: BoxDecoration(
                                         color: Colors.white,
                                         borderRadius: BorderRadius.circular(20),
@@ -404,32 +433,36 @@ class _OrderProcessState extends State<OrderProcess> {
                                                     (type == "delivery")?CustomText.textHeading7(text:
                                                     // (_transCode == 1)?
                                                     "Pesan antar",
-                                                      sizeNew: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.04)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.04)).toString())
+                                                      minSize: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.04)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.04)).toString())
                                                       // :(_transCode == 2)?"Ambil Langsung":"Makan Ditempat"
                                                       ,):(type == "takeaway")?CustomText.textHeading7(text:
                                                     // (_transCode == 1)?
                                                     "Ambil ditempat",
-                                                      sizeNew: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.04)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.04)).toString())
+                                                      minSize: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.04)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.04)).toString())
                                                       // :(_transCode == 2)?"Ambil Langsung":"Makan Ditempat"
                                                       ,):CustomText.textHeading7(text:
                                                     // (_transCode == 1)?
                                                     "Makan ditempat",
-                                                      sizeNew: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.04)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.04)).toString())
+                                                      minSize: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.04)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.04)).toString())
                                                       // :(_transCode == 2)?"Ambil Langsung":"Makan Ditempat"
                                                       ,),
-                                                    (type == "delivery")?SizedBox(height: CustomSize.sizeHeight(context) / 138,):Container(),
+                                                    (type == "delivery")?SizedBox(height: CustomSize.sizeHeight(context) * 0.003,):Container(),
                                                     (type == "delivery")?CustomText.bodyRegular15(text:
                                                     // (_transCode == 1)?
                                                     "Alamat Pengiriman",
-                                                      sizeNew: double.parse(((MediaQuery.of(context).size.width*0.038).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.038)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.038)).toString())
+                                                      sizeNew: double.parse(((MediaQuery.of(context).size.width*0.035).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.035)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.035)).toString())
                                                       // :(_transCode == 2)?"Ambil Langsung":"Makan Ditempat"
                                                       ,):Container(),
-                                                    (type == "delivery")?CustomText.textHeading7(text:
-                                                    // (_transCode == 1)?
-                                                    "Jl Jemur Gayungan 1 no 86",
-                                                      sizeNew: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.04)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.04)).toString())
-                                                      // :(_transCode == 2)?"Ambil Langsung":"Makan Ditempat"
-                                                      ,):Container(),
+                                                    // (type == "delivery")?SizedBox(height: CustomSize.sizeHeight(context) * 0.005,):Container(),
+                                                    (type == "delivery")?Container(
+                                                      width: CustomSize.sizeWidth(context) / 1.6,
+                                                      child: CustomText.textHeading7(text: address,
+                                                        // (_transCode == 1)?
+                                                        maxLines: 3,
+                                                        sizeNew: double.parse(((MediaQuery.of(context).size.width*0.033).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.033)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.033)).toString())
+                                                        // :(_transCode == 2)?"Ambil Langsung":"Makan Ditempat"
+                                                        ,),
+                                                    ):Container(),
                                                   ],
                                                 ),
                                               ],
@@ -438,6 +471,174 @@ class _OrderProcessState extends State<OrderProcess> {
                                         ),
                                       ),
                                     ),
+                                    (type == 'delivery')?SizedBox(height: CustomSize.sizeHeight(context) / 56,):Container(),
+                                    (type == 'delivery')?Container(
+                                      width: CustomSize.sizeWidth(context),
+                                      height: CustomSize.sizeHeight(context) / 7.2,
+                                      decoration: BoxDecoration(
+                                        color: Colors.white,
+                                        borderRadius: BorderRadius.circular(20),
+                                        boxShadow: [
+                                          BoxShadow(
+                                            color: Colors.grey.withOpacity(0.5),
+                                            spreadRadius: 0,
+                                            blurRadius: 4,
+                                            offset: Offset(0, 3), // changes position of shadow
+                                          ),
+                                        ],
+                                      ),
+                                      child: Padding(
+                                        padding: EdgeInsets.symmetric(horizontal: CustomSize.sizeWidth(context) / 24),
+                                        child: Row(
+                                          children: [
+                                            (StatusDriver != 'pending' && StatusDriver != 'Tidak Ditemukan')?Container(
+                                              padding: EdgeInsets.all(5),
+                                              child: Container(
+                                                width: CustomSize.sizeWidth(context) / 7.2,
+                                                height: CustomSize.sizeWidth(context) / 7.2,
+                                                child: ClipRRect(
+                                                  borderRadius: BorderRadius.circular(50.0),
+                                                  child: FullScreenWidget(
+                                                    child: Image.network(
+                                                      PhotoDriver,
+                                                      errorBuilder: (BuildContext context, Object exception, StackTrace? stackTrace) {
+                                                        // Appropriate logging or analytics, e.g.
+                                                        // myAnalytics.recordError(
+                                                        //   'An error occurred loading "https://example.does.not.exist/image.jpg"',
+                                                        //   exception,
+                                                        //   stackTrace,
+                                                        // );
+                                                        return Image.network(
+                                                          PhotoDriver,
+                                                          errorBuilder: (BuildContext context, Object exception, StackTrace? stackTrace) {
+                                                            // Appropriate logging or analytics, e.g.
+                                                            // myAnalytics.recordError(
+                                                            //   'An error occurred loading "https://example.does.not.exist/image.jpg"',
+                                                            //   exception,
+                                                            //   stackTrace,
+                                                            // );
+                                                            return Image.network(
+                                                              PhotoDriver,
+                                                              errorBuilder: (BuildContext context, Object exception, StackTrace? stackTrace) {
+                                                                // Appropriate logging or analytics, e.g.
+                                                                // myAnalytics.recordError(
+                                                                //   'An error occurred loading "https://example.does.not.exist/image.jpg"',
+                                                                //   exception,
+                                                                //   stackTrace,
+                                                                // );
+                                                                return Image.asset('assets/default.png');
+                                                              },
+                                                              loadingBuilder: (BuildContext context, Widget child,
+                                                                  ImageChunkEvent? loadingProgress) {
+                                                                if (loadingProgress == null) return child;
+                                                                return Center(
+                                                                  child: CircularProgressIndicator(
+                                                                    color: CustomColor.primary,
+                                                                    value: loadingProgress.expectedTotalBytes != null
+                                                                        ? loadingProgress.cumulativeBytesLoaded /
+                                                                        loadingProgress.expectedTotalBytes!
+                                                                        : null,
+                                                                  ),
+                                                                );
+                                                              },
+                                                              fit: BoxFit.cover,
+                                                              width: CustomSize.sizeWidth(context) / 7.2,
+                                                              height: CustomSize.sizeWidth(context) / 7.2,
+                                                            );
+                                                          },
+                                                          fit: BoxFit.cover,
+                                                          width: CustomSize.sizeWidth(context) / 7.2,
+                                                          height: CustomSize.sizeWidth(context) / 7.2,
+                                                        );
+                                                      },
+                                                      fit: BoxFit.cover,
+                                                      width: CustomSize.sizeWidth(context) / 7.2,
+                                                      height: CustomSize.sizeWidth(context) / 7.2,
+                                                    ),
+                                                    backgroundColor: Colors.white,
+                                                  ),
+                                                ),
+                                              ),
+                                            ):Container(
+                                              padding: EdgeInsets.all(5),
+                                              child: Container(
+                                                width: CustomSize.sizeWidth(context) / 7.2,
+                                                height: CustomSize.sizeWidth(context) / 7.2,
+                                                child: Image.asset('assets/default.png'),
+                                              ),
+                                            ),
+                                            SizedBox(width: CustomSize.sizeWidth(context) / 32,),
+                                            Column(
+                                              crossAxisAlignment: CrossAxisAlignment.start,
+                                              mainAxisAlignment: MainAxisAlignment.center,
+                                              children: [
+                                                GestureDetector(
+                                                  onTap: (){
+                                                    if (PhoneDriver == '0') {
+
+                                                    } else {
+                                                      launch("tel:$PhoneDriver");
+                                                    }
+                                                  },
+                                                  child: Container(
+                                                    width: CustomSize.sizeWidth(context) / 1.6,
+                                                    child: CustomText.textHeading7(
+                                                        text: (StatusDriver != 'pending')?NameDriver:'Mencari . . .',
+                                                        maxLines: 2,
+                                                        minSize: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.04)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.04)).toString())
+                                                    ),
+                                                  ),
+                                                ),
+                                                // SizedBox(height: CustomSize.sizeHeight(context) / 138,),
+                                                // CustomText.bodyRegular15(
+                                                //     text: (StatusDriver != 'pending')?NameDriver:'Mencari . . .',
+                                                //     maxLines: 1,
+                                                //     minSize: double.parse(((MediaQuery.of(context).size.width*0.037).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.037)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.037)).toString())
+                                                // ),
+                                                GestureDetector(
+                                                  onTap: (){
+                                                    if (PhoneDriver == '0') {
+
+                                                    } else {
+                                                      launch("tel:$PhoneDriver");
+                                                    }
+                                                  },
+                                                  child: Row(
+                                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                                    children: [
+                                                      Container(
+                                                        width: CustomSize.sizeWidth(context) / 1.8,
+                                                        child: CustomText.bodyRegular15(
+                                                            text: (StatusDriver != 'pending')?(StatusDriver != 'Tidak Ditemukan')?(StatusDriver != 'active')?'Status: $StatusDriver':'Status: Sedang perjalanan':'Status: Transaksi tidak ditemukan':'Status: Sedang mencari driver',
+                                                            maxLines: 1,
+                                                            minSize: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.04)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.04)).toString())
+                                                        ),
+                                                      ),
+                                                    ],
+                                                  ),
+                                                ),
+                                                GestureDetector(
+                                                  onTap: (){
+                                                    if (PhoneDriver == '0') {
+
+                                                    } else {
+                                                      launch("tel:$PhoneDriver");
+                                                    }
+                                                  },
+                                                  child: CustomText.bodyRegular15(
+                                                      text: (StatusDriver != 'pending')?(PhoneDriver != '0')?PhoneDriver:'Tunggu':'Mencari . . .',
+                                                      maxLines: 1,
+                                                      minSize: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.04)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.04)).toString())
+                                                  ),
+                                                ),
+                                                // CustomText.bodyLight16(text: 'Status', maxLines: 1, minSize: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.04)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.04)).toString())),
+                                                // (user[index].notelp != null)?CustomText.bodyLight16(text: user[index].notelp, maxLines: 1, minSize: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.04)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.04)).toString())):CustomText.bodyLight16(text: 'Belum diisi.', maxLines: 1, minSize: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.04)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.04)).toString()), color: CustomColor.redBtn),
+                                              ],
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                    ):Container(),
                                     SizedBox(height: CustomSize.sizeHeight(context) / 56,),
                                   ],
                                 ),
@@ -645,6 +846,7 @@ class _OrderProcessState extends State<OrderProcess> {
     }
 
     setState(() {
+      waiting = false;
       chatroom = (data['trx']['chatroom'] != null)?(data['trx']['chatroom']['id']??'null').toString():'null';
       Meja = (data['trx']['restaurant_tables_id'] != null)?(data['trx']['restaurant_tables_id']??'null').toString():'null';
       ongkir = int.parse(data['trx']['ongkir']);
@@ -695,7 +897,7 @@ class _OrderProcessState extends State<OrderProcess> {
             chatroom: '',
             type: v['type'],
             img: v['user_image'],
-            chat_user: v['trans']['chat_user']??'0'
+            chat_user: v['chat_user']??'0'
         );
         _transaction.add(r);
       }
@@ -706,6 +908,77 @@ class _OrderProcessState extends State<OrderProcess> {
     setState(() {
       transaction = _transaction;
     });
+  }
+
+  String NameDriver = 'Tunggu';
+  String PhoneDriver = '0';
+  String PhotoDriver = '';
+  String StatusDriver = 'Tunggu sebentar';
+  Future<void> _getDriver()async{
+    // List<Menu> _menu = [];
+
+    setState(() {
+      // isLoading = true;
+    });
+    SharedPreferences pref = await SharedPreferences.getInstance();
+    String token = pref.getString("token") ?? "";
+    var apiResult = await http.get('https://qurir.devastic.com/api/borzo?transaction_id=IRG-$id', headers: {
+      "Accept": "Application/json",
+      "Authorization": "Bearer $token"
+    });
+    var data = json.decode(apiResult.body);
+    print(data);
+
+    print('driver '+apiResult.body.toString());
+    // print('driver '+idResto.toString());
+    if (apiResult.body.toString() != 'not found') {
+      if (data['courier'].toString().contains('name') == false) {
+        StatusDriver = (apiResult.body.toString() != '"not found"')?data['status'].toString():'Tidak Ditemukan';
+        PhoneDriver = 'Tunggu';
+      } else {
+        NameDriver = (apiResult.body.toString() != 'not found')?data['courier']['name'].toString():'Tidak Ditemukan';
+        PhoneDriver = (apiResult.body.toString() != 'not found')?data['courier']['phone'].toString():'0';
+        PhotoDriver = (apiResult.body.toString() != 'not found')?data['courier']['photo'].toString():'';
+        StatusDriver = (apiResult.body.toString() != 'not found')?(data['status'].toString() != 'active')?'Sudah sampai':data['status'].toString():'Tidak Ditemukan';
+      }
+    } else {
+      NameDriver = 'Tidak Ditemukan';
+      PhoneDriver = 'Tidak Ditemukan';
+      PhotoDriver = '';
+      StatusDriver = 'Tidak Ditemukan';
+    }
+    // for(var v in data['menu']){
+    //   Menu p = Menu(
+    //       id: v['id'],
+    //       name: v['name'],
+    //       desc: v['desc'],
+    //       urlImg: v['img'],
+    //       type: v['type'],
+    //       is_recommended: v['is_recommended'],
+    //       price: Price(original: int.parse(v['price'].toString()), discounted: null, delivery: null),
+    //       delivery_price: Price(original: int.parse(v['price']), delivery: null, discounted: null), restoId: '', restoName: '', distance: null, qty: ''
+    //   );
+    //   _menu.add(p);
+    // }
+    setState(() {
+      // emailTokoTrans = data['email'].toString();
+      // ownerTokoTrans = data['name_owner'].toString();
+      // pjTokoTrans = data['name_pj'].toString();
+      // // bankTokoTrans = data['bank'].toString();
+      // // nameNorekTokoTrans = data['namaNorek'].toString();
+      // nameRekening = data['nama_norek'].toString();
+      // nameBank = data['bank_norek'].toString();
+      // norekTokoTrans = data['norek'].toString();
+      // phone = data['resto']['phone_number'].toString();
+      // addressRes = data['resto']['address'].toString();
+      // nameRestoTrans = data['resto']['name'];
+      // restoAddress = data['resto']['address'];
+      // isLoading = false;
+    });
+
+    // if (apiResult.statusCode == 200 && menu.toString() == '[]') {
+    //   kosong = true;
+    // }
   }
 
   String operation ='';
@@ -806,7 +1079,13 @@ class _OrderProcessState extends State<OrderProcess> {
                         itemBuilder: (_, index){
                           return GestureDetector(
                             onTap: ()async{
-                              _getDetailTrans(transaction[index].id.toString(), userName, transaction[index].status!);
+                              Fluttertoast.showToast(msg: "Tunggu sebentar");
+                              if (waiting == false) {
+                                waiting = true;
+                                _getDriver().whenComplete((){
+                                  _getDetailTrans(transaction[index].id.toString(), userName, transaction[index].status!);
+                                });
+                              }
                               id = transaction[index].id.toString();
                               SharedPreferences pref = await SharedPreferences.getInstance();
                               pref.setString('idnyatrans', transaction[index].id.toString());

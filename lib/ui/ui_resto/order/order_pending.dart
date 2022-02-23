@@ -4,6 +4,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_icons/flutter_icons.dart';
 import 'package:full_screen_image/full_screen_image.dart';
+import 'package:geocoder/geocoder.dart';
 import 'package:kam5ia/model/Meja.dart';
 import 'package:kam5ia/model/Transaction.dart';
 import 'package:kam5ia/model/User.dart';
@@ -40,6 +41,7 @@ class _OrderPendingState extends State<OrderPending> {
     List<Transaction> _transaction = [];
 
     SharedPreferences pref = await SharedPreferences.getInstance();
+    checkId = pref.getString('idHomeResto');
     String token = pref.getString("token") ?? "";
     var apiResult = await http.get(Links.mainUrl + '/resto/trans', headers: {
       "Accept": "Application/json",
@@ -47,6 +49,8 @@ class _OrderPendingState extends State<OrderPending> {
     });
     // print(apiResult.body);
     var data = json.decode(apiResult.body);
+    // print('kuntul');
+    print('data oi');
     print(data);
 
     if (data['trx'].toString().contains('pending')) {
@@ -57,9 +61,9 @@ class _OrderPendingState extends State<OrderPending> {
             username: v['username'].toString(),
             total: (v['total'] != null)?int.parse(v['total'].toString()):0,
             type: v['type'].toString(),
-            img: v['user_image'].toString(), chatroom: '', chat_user: v['trans']['chat_user']??'0',
+            img: v['user_image'].toString(), chatroom: '', chat_user: v['chat_user']??'0',
             is_opened: v['is_opened']??'1',
-            date_trans: v['chatroom']['created_at']??''
+            date_trans: ''
         );
         _transaction.add(r);
       }
@@ -136,10 +140,25 @@ class _OrderPendingState extends State<OrderPending> {
   String Meja = 'null';
   String note = '';
   String chatRestoCount = '';
+  bool waiting = false;
   List<Transaction> detTransaction = [];
   Future _getDetailTrans(String Id, String name, String status)async{
+    // waiting = true;
+    idTrans = Id;
     List<Transaction> _detTransaction = [];
     List<Menu> _menu = [];
+
+    print('IRG-$idTrans');
+    print(restoAddress);
+    print(pjTokoTrans);
+    print(phoneRestoTrans);
+    print(latRes);
+    print(longRes);
+    print(delivAddress);
+    print(userNamePembeli);
+    print(notelp);
+    print(latUser);
+    print(longUser);
 
     SharedPreferences pref = await SharedPreferences.getInstance();
     String token = pref.getString("token") ?? "";
@@ -172,6 +191,7 @@ class _OrderPendingState extends State<OrderPending> {
             qty: v['qty'].toString(),
             urlImg: v['img'],
             type: v['type'],
+            is_available: '',
             is_recommended: v['is_recommended'],
             price: Price(original: int.parse(v['price'].toString()),discounted: int.parse(v['discounted_price'].toString()), delivery: null), restoName: '', distance: null, delivery_price: null, restoId: '',
         );
@@ -191,6 +211,18 @@ class _OrderPendingState extends State<OrderPending> {
     //   );
     //   _menu.add(p);
     // }
+
+    if (data['trx']['type'].toString() == 'Pesan antar') {
+      var addresses = await Geocoder.local.findAddressesFromQuery(data['trx']['address'].toString());
+      var first = addresses.first;
+      setState(() {
+        latUser = first.coordinates.latitude.toString();
+        longUser = first.coordinates.longitude.toString();
+        print('latt');
+        print(latUser);
+        print(longUser);
+      });
+    }
 
     if (data['status_code'].toString() == "200") {
       showModalBottomSheet(
@@ -390,7 +422,7 @@ class _OrderPendingState extends State<OrderPending> {
                                     SizedBox(height: CustomSize.sizeHeight(context) / 56,),
                                     Container(
                                       width: CustomSize.sizeWidth(context),
-                                      height: CustomSize.sizeHeight(context) / 3.8,
+                                      // height: (Meja != 'null')?CustomSize.sizeHeight(context) / 3.2:CustomSize.sizeHeight(context) / 3.3,
                                       decoration: BoxDecoration(
                                         color: Colors.white,
                                         borderRadius: BorderRadius.circular(20),
@@ -415,16 +447,6 @@ class _OrderPendingState extends State<OrderPending> {
                                             //     maxLines: 1,
                                             //     minSize: 10
                                             // ),
-                                            SizedBox(height: CustomSize.sizeHeight(context) / 50,),
-                                            Row(mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                              children: [
-                                                CustomText.bodyLight16(text: "Harga", sizeNew: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.04)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.04)).toString())),
-                                                CustomText.bodyLight16(text: NumberFormat.currency(locale: 'id', symbol: '', decimalDigits: 0).format(total), sizeNew: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.04)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.04)).toString())
-                                                  // NumberFormat.currency(locale: 'id', symbol: '', decimalDigits: 0).format(harga)
-                                                ),
-                                              ],
-                                            ),
-                                            (Meja != 'null')?SizedBox(height: CustomSize.sizeHeight(context) / 100,):SizedBox(),
                                             (Meja != 'null')?ListView.builder(
                                                 shrinkWrap: true,
                                                 controller: _scrollController,
@@ -433,21 +455,39 @@ class _OrderPendingState extends State<OrderPending> {
                                                 itemBuilder: (_, index){
                                                   return Row(mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                                     children: [
-                                                      CustomText.bodyLight16(text: "Meja", sizeNew: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.04)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.04)).toString())),
-                                                      CustomText.bodyLight16(text: (meja[index].id.toString().startsWith(Meja))?meja[index].name.toString():'', sizeNew: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.04)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.04)).toString()))
+                                                      CustomText.textTitle3(text: "Meja Nomor :", sizeNew: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.04)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.04)).toString())),
+                                                      CustomText.textTitle3(text: (meja.firstWhere((t) => t.id.toString() == Meja, orElse: (){ return Meja2(id: 0, name: "", url: "", qr: ""); })).name, color: CustomColor.primary, sizeNew: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.04)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.04)).toString()))
                                                     ],
                                                   );
                                                 }
                                             ):SizedBox(),
-                                            (Meja == 'null')?SizedBox(height: CustomSize.sizeHeight(context) / 100,):Container(),
-                                            (Meja == 'null')?Row(mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                            SizedBox(height: CustomSize.sizeHeight(context) / 50,),
+                                            // (Meja != 'null')?SizedBox(height: CustomSize.sizeHeight(context) / 100,):SizedBox(),
+                                            // (Meja != 'null')?Divider(thickness: 1,):SizedBox(),
+                                            Row(mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                              children: [
+                                                CustomText.bodyLight16(text: "Harga", sizeNew: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.04)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.04)).toString())),
+                                                CustomText.bodyLight16(text: NumberFormat.currency(locale: 'id', symbol: '', decimalDigits: 0).format(total), sizeNew: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.04)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.04)).toString())
+                                                  // NumberFormat.currency(locale: 'id', symbol: '', decimalDigits: 0).format(harga)
+                                                ),
+                                              ],
+                                            ),
+                                            (Meja == 'null')?(type == 'delivery')?SizedBox(height: CustomSize.sizeHeight(context) / 100,):Container():Container(),
+                                            (Meja == 'null')?(type == 'delivery')?Row(mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                               children: [
                                                 CustomText.bodyLight16(text: "Ongkir", sizeNew: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.04)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.04)).toString())),
                                                 CustomText.bodyLight16(text: NumberFormat.currency(locale: 'id', symbol: '', decimalDigits: 0).format(ongkir), sizeNew: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.04)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.04)).toString())
                                                   // totalOngkir
                                                 ),
                                               ],
-                                            ):Container(),
+                                            ):Container():Container(),
+                                            SizedBox(height: CustomSize.sizeHeight(context) / 100,),
+                                            Row(mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                              children: [
+                                                CustomText.bodyLight16(text: "Platform Fee", minSize: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.04)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.04)).toString())),
+                                                CustomText.bodyLight16(text: NumberFormat.currency(locale: 'id', symbol: '', decimalDigits: 0).format(1000), minSize: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.04)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.04)).toString())),
+                                              ],
+                                            ),
                                             SizedBox(height: CustomSize.sizeHeight(context) / 64,),
                                             Divider(thickness: 1,),
                                             SizedBox(height: CustomSize.sizeHeight(context) / 120,),
@@ -457,7 +497,7 @@ class _OrderPendingState extends State<OrderPending> {
                                                 Row(mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                                   children: [
                                                     CustomText.textTitle3(text: "Total Pembayaran", sizeNew: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.04)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.04)).toString())),
-                                                    CustomText.textTitle3(text: NumberFormat.currency(locale: 'id', symbol: '', decimalDigits: 0).format(all), sizeNew: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.04)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.04)).toString())
+                                                    CustomText.textTitle3(text: NumberFormat.currency(locale: 'id', symbol: '', decimalDigits: 0).format((all+1000)), sizeNew: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.04)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.04)).toString())
                                                       // NumberFormat.currency(locale: 'id', symbol: '', decimalDigits: 0).format(int.parse(totalHarga))
                                                     ),
                                                   ],
@@ -471,6 +511,7 @@ class _OrderPendingState extends State<OrderPending> {
                                                 // ),
                                               ],
                                             ),
+                                            SizedBox(height: CustomSize.sizeHeight(context) / 36,),
                                           ],
                                         ),
                                       ),
@@ -478,7 +519,7 @@ class _OrderPendingState extends State<OrderPending> {
                                     SizedBox(height: CustomSize.sizeHeight(context) / 56,),
                                     Container(
                                       width: CustomSize.sizeWidth(context),
-                                      height: CustomSize.sizeHeight(context) / 7.2,
+                                      height: (type != "delivery")?CustomSize.sizeHeight(context) / 7.2:CustomSize.sizeHeight(context) / 4.8,
                                       decoration: BoxDecoration(
                                         color: Colors.white,
                                         borderRadius: BorderRadius.circular(20),
@@ -520,37 +561,35 @@ class _OrderPendingState extends State<OrderPending> {
                                                     (type == "delivery")?CustomText.textHeading7(text:
                                                     // (_transCode == 1)?
                                                     "Pesan antar",
-                                                      sizeNew: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.04)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.04)).toString())
+                                                      minSize: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.04)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.04)).toString())
                                                       // :(_transCode == 2)?"Ambil Langsung":"Makan Ditempat"
                                                       ,):(type == "takeaway")?CustomText.textHeading7(text:
                                                     // (_transCode == 1)?
                                                     "Ambil ditempat",
-                                                      sizeNew: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.04)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.04)).toString())
+                                                      minSize: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.04)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.04)).toString())
                                                       // :(_transCode == 2)?"Ambil Langsung":"Makan Ditempat"
                                                       ,):CustomText.textHeading7(text:
                                                     // (_transCode == 1)?
                                                     "Makan ditempat",
-                                                      sizeNew: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.04)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.04)).toString())
+                                                      minSize: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.04)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.04)).toString())
                                                       // :(_transCode == 2)?"Ambil Langsung":"Makan Ditempat"
                                                       ,),
-                                                    (type == "delivery")?SizedBox(height: CustomSize.sizeHeight(context) / 138,):Container(),
+                                                    (type == "delivery")?SizedBox(height: CustomSize.sizeHeight(context) * 0.003,):Container(),
                                                     (type == "delivery")?CustomText.bodyRegular15(text:
                                                     // (_transCode == 1)?
                                                     "Alamat Pengiriman",
-                                                      sizeNew: double.parse(((MediaQuery.of(context).size.width*0.038).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.038)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.038)).toString())
+                                                      sizeNew: double.parse(((MediaQuery.of(context).size.width*0.035).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.035)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.035)).toString())
                                                       // :(_transCode == 2)?"Ambil Langsung":"Makan Ditempat"
                                                       ,):Container(),
+                                                    // (type == "delivery")?SizedBox(height: CustomSize.sizeHeight(context) * 0.005,):Container(),
                                                     (type == "delivery")?Container(
-                                                      width: CustomSize.sizeWidth(context) / 1.8,
-                                                      child: GestureDetector(
-                                                        onTap: _launchURL,
-                                                        child: CustomText.textHeading7(text:
+                                                      width: CustomSize.sizeWidth(context) / 1.6,
+                                                      child: CustomText.textHeading7(text: address,
                                                         // (_transCode == 1)?
-                                                        address,
-                                                            sizeNew: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.04)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.04)).toString()),
-                                                          maxLines: 2),
-                                                      ),
+                                                        maxLines: 3,
+                                                        sizeNew: double.parse(((MediaQuery.of(context).size.width*0.033).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.033)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.033)).toString())
                                                         // :(_transCode == 2)?"Ambil Langsung":"Makan Ditempat"
+                                                        ,),
                                                     ):Container(),
                                                   ],
                                                 ),
@@ -723,15 +762,29 @@ class _OrderPendingState extends State<OrderPending> {
                                   ),
                                   GestureDetector(
                                     onTap: (){
-                                      _getPending(operation = "process", id!);
+                                      if (type == 'delivery') {
+                                        cariKurir()!.whenComplete((){
+                                          _getPending(operation = "process", id!);
+                                          Future.delayed(Duration(seconds: 0)).then((_) {
+                                            Navigator.pushReplacement(
+                                                context,
+                                                PageTransition(
+                                                    type: PageTransitionType.fade,
+                                                    child: OrderActivity()));
+                                          });
+                                        });
+                                      } else {
+                                        _getPending(operation = "process", id!).whenComplete((){
+                                          Future.delayed(Duration(seconds: 0)).then((_) {
+                                            Navigator.pushReplacement(
+                                                context,
+                                                PageTransition(
+                                                    type: PageTransitionType.fade,
+                                                    child: OrderActivity()));
+                                          });
+                                        });
+                                      }
                                       setStateModal(() {});
-                                      Future.delayed(Duration(seconds: 0)).then((_) {
-                                        Navigator.pushReplacement(
-                                            context,
-                                            PageTransition(
-                                                type: PageTransitionType.fade,
-                                                child: OrderActivity()));
-                                      });
                                       setState(() { });
                                     },
                                     child: Center(
@@ -749,7 +802,7 @@ class _OrderPendingState extends State<OrderPending> {
                                               mainAxisAlignment: MainAxisAlignment.center,
                                               crossAxisAlignment: CrossAxisAlignment.center,
                                               children: [
-                                                CustomText.textHeading7(text: "Terima", color: Colors.white, sizeNew: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.04)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.04)).toString())),
+                                                CustomText.textHeading7(text: "Proses", color: Colors.white, sizeNew: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.04)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.04)).toString())),
                                                 CustomText.textHeading7(text: "Pesanan", color: Colors.white, sizeNew: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.04)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.04)).toString())),
                                               ],
                                             ),
@@ -778,14 +831,18 @@ class _OrderPendingState extends State<OrderPending> {
     }
 
     setState(() {
+      waiting = false;
+      notelp = data['trx']['user_phone'].toString();
       chatroom = (data['trx']['chatroom'] != null)?(data['trx']['chatroom']['id']??'null').toString():'null';
       print('chatt '+chatroom.toString());
       Meja = (data['trx']['restaurant_tables_id'] != null)?(data['trx']['restaurant_tables_id']??'null').toString():'null';
+      // Meja = '1';
       ongkir = int.parse(data['trx']['ongkir']);
       total = int.parse(data['trx']['total']);
       all = total+ongkir;
       type = data['trx']['type'].toString();
       address = data['trx']['address'].toString();
+      delivAddress = address.toString();
       phone = data['trx']['user_phone'].toString();
       date_trans = data['trx']['created_at'].toString();
       // print(price);
@@ -800,6 +857,96 @@ class _OrderPendingState extends State<OrderPending> {
       await launch(url);
     } else {
       throw 'Could not launch $url';
+    }
+  }
+
+  String idTrans = '';
+  String restoAddress = '';
+  String pjTokoTrans = '';
+  String phoneRestoTrans = "";
+  String latRes = "";
+  String longRes = "";
+  String delivAddress = "";
+  String userNamePembeli = "";
+  String notelp = "";
+  String latUser = "";
+  String longUser = "";
+  Future<String?>? cariKurir()async{
+    // print(qrscan);
+    SharedPreferences pref = await SharedPreferences.getInstance();
+    var token = pref.getString("token") ?? "";
+
+    var apiResult = await http.post('https://qurir.devastic.com/api/borzo/checkout',
+        body: {
+          'address_pick_up': restoAddress,
+          'name_pick_up': pjTokoTrans,
+          'phone_pick_up': phoneRestoTrans,
+          'latitude_pick_up': latRes,
+          'longitude_pick_up': longRes,
+          'address_sender': delivAddress,
+          'name_sender': userNamePembeli,
+          'phone_sender': notelp,
+          'latitude_sender': latUser,
+          'longitude_sender': longUser,
+          'transaction_id': 'IRG-$idTrans'
+        },
+        headers: {
+          "Accept": "Application/json",
+          "Authorization": "Bearer $token"
+        });
+    print('Cek Harga '+apiResult.body.toString());
+    var data = json.decode(apiResult.body);
+
+    // totalOngkirBorzo = data['price'];
+    setState((){});
+
+    // for(var v in data['device_id']){
+    //   // User p = User.resto(
+    //   //   name: v['device_id'],
+    //   // );
+    //   List<String> id = [];
+    //   id.add(v);
+    //   print('099');
+    //   print(id);
+    //   OneSignal.shared.postNotification(OSCreateNotification(
+    //     playerIds: id,
+    //     heading: "$nameUser telah memesan produk di toko Anda",
+    //     content: "Cek sekarang !",
+    //     androidChannelId: "2482eb14-bcdf-4045-b69e-422011d9e6ef",
+    //   ));
+    //   // await OneSignal.shared.postNotificationWithJson();
+    //   // user3.add(v['device_id']);
+    //   // _user.add(p);
+    // }
+
+    if(data['status_code'] == 200){
+      print('IRG-$idTrans');
+      print(restoAddress);
+      print(pjTokoTrans);
+      print(phoneRestoTrans);
+      print(latRes);
+      print(longRes);
+      print(delivAddress);
+      print(userNamePembeli);
+      print(notelp);
+      print(latUser);
+      print(longUser);
+      // totalOngkirBorzo = data['price'];
+      // SharedPreferences pref = await SharedPreferences.getInstance();
+      // pref.setString('totalOngkirBorzo', totalOngkirBorzo);
+      setState((){});
+      // SharedPreferences preferences = await SharedPreferences.getInstance();
+      // await preferences.remove('menuJson');
+      // await preferences.remove('restoId');
+      // await preferences.remove('qty');
+      // await preferences.remove('note');
+      // await preferences.remove('address');
+      // await preferences.remove('inCart');
+      // await pref.remove('restoIdUsr');
+      // pref.remove("addressDelivTrans");
+      // pref.remove("distan");
+      // notif(jsonEncode(data['device_id'].toString().split('[')[1].split(']')[0]));
+      // print('ini device nya '+json.encode(data['device_id'].toString().split('[')[1].split(']')[0]));
     }
   }
 
@@ -920,6 +1067,80 @@ class _OrderPendingState extends State<OrderPending> {
     super.dispose();
   }
 
+  Future<void> _getUserDataResto()async{
+    // List<Menu> _menu = [];
+
+    // setState(() {
+    //   isLoading = true;
+    // });
+    SharedPreferences pref = await SharedPreferences.getInstance();
+    String token = pref.getString("token") ?? "";
+    var apiResult = await http.get(Links.mainUrl + '/resto/userdata/'+checkId, headers: {
+      "Accept": "Application/json",
+      "Authorization": "Bearer $token"
+    });
+    print(Links.mainUrl + '/resto/userdata/'+checkId);
+    var data = json.decode(apiResult.body);
+
+    print('id e '+data.toString());
+    print('id e '+checkId.toString());
+    // for(var v in data['menu']){
+    //   Menu p = Menu(
+    //       id: v['id'],
+    //       name: v['name'],
+    //       desc: v['desc'],
+    //       urlImg: v['img'],
+    //       type: v['type'],
+    //       is_recommended: v['is_recommended'],
+    //       price: Price(original: int.parse(v['price'].toString()), discounted: null, delivery: null),
+    //       delivery_price: Price(original: int.parse(v['price']), delivery: null, discounted: null), restoId: '', restoName: '', distance: null, qty: ''
+    //   );
+    //   _menu.add(p);
+    // }
+    setState(() {
+      pjTokoTrans = data['name_pj'].toString();
+      // restoAddress = '';
+      // phoneRestoTrans = '';
+      // latRes = '';
+      // longRes = '';
+
+      // emailTokoTrans = data['email'].toString();
+      // ownerTokoTrans = data['name_owner'].toString();
+      // pjTokoTrans = data['name_pj'].toString();
+      // bankTokoTrans = data['bank'].toString();
+      // nameNorekTokoTrans = data['namaNorek'].toString();
+      // nameRekening = data['nama_norek'].toString();
+      // nameBank = data['bank_norek'].toString();
+      // norekTokoTrans = data['norek'].toString();
+      // isLoading = false;
+    });
+
+    // if (apiResult.statusCode == 200 && menu.toString() == '[]') {
+    //   kosong = true;
+    // }
+  }
+
+  String checkId = "";
+  Future _getDetail()async{
+    // waiting = true;
+    SharedPreferences pref = await SharedPreferences.getInstance();
+    String token = pref.getString("token") ?? "";
+    var apiResult = await http.get(Links.mainUrl + '/resto/detail/$checkId', headers: {
+      "Accept": "Application/json",
+      "Authorization": "Bearer $token"
+    });
+    var data = json.decode(apiResult.body);
+    print('resto data '+data.toString());
+
+    setState(() {
+      restoAddress = data['data']['address'];
+      phoneRestoTrans = data['data']['phone_number'].toString();
+      latRes = data['data']['lat'].toString();
+      longRes = data['data']['long'].toString();
+      // waiting = false;
+    });
+  }
+
   @override
   void initState() {
     _getQr();
@@ -952,9 +1173,17 @@ class _OrderPendingState extends State<OrderPending> {
                           return GestureDetector(
                             onTap: ()async{
                               Fluttertoast.showToast(msg: "Tunggu sebentar");
-                              _getDetailTrans(transaction[index].id.toString(), userName, transaction[index].status!).whenComplete((){
-                                _getTrans();
-                              });
+                              userNamePembeli = transaction[index].username.toString();
+                              if (waiting == false) {
+                                waiting = true;
+                                _getDetail().whenComplete((){
+                                  _getUserDataResto().whenComplete((){
+                                    _getDetailTrans(transaction[index].id.toString(), userName, transaction[index].status!).whenComplete((){
+                                      _getTrans();
+                                    });
+                                  });
+                                });
+                              }
                               id = transaction[index].id.toString();
                               _open('', id!);
                               SharedPreferences pref = await SharedPreferences.getInstance();

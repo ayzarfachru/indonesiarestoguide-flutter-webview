@@ -69,7 +69,7 @@ class _LoginActivityState extends State<LoginActivity> {
                 child: HomeActivity()));
       } else {
         Fluttertoast.showToast(
-          msg: data['message'],);
+          msg: 'Email atau password anda salah!',);
         setState(() {
           isLoading = false;
         });
@@ -249,173 +249,98 @@ class _LoginActivityState extends State<LoginActivity> {
                   SizedBox(
                     height: CustomSize.sizeHeight(context) / 44,
                   ),
-                  // CustomText.bodyMedium16(
-                  //     text: "   Email",
-                  //     maxLines: 1
-                  // ),
-                  // SizedBox(
-                  //   height: CustomSize.sizeHeight(context) * 0.005,
-                  // ),
-                  // Container(
-                  //   height: CustomSize.sizeHeight(context) / 14,
-                  //   decoration: BoxDecoration(
-                  //     color: Color(0xffF5F5F5),
-                  //     borderRadius: BorderRadius.circular(12),
-                  //   ),
-                  //   child: Padding(
-                  //     padding: EdgeInsets.symmetric(horizontal: CustomSize.sizeWidth(context) / 32),
-                  //     child: Center(
-                  //       child: TextField(
-                  //         controller: _loginTextEmail,
-                  //         keyboardType: TextInputType.emailAddress,
-                  //         cursorColor: Colors.black,
-                  //         style: GoogleFonts.sourceSansPro(
-                  //             textStyle:
-                  //             TextStyle(fontSize: 16, color: Colors.black)),
-                  //         decoration: InputDecoration(
-                  //           isDense: true,
-                  //           contentPadding: EdgeInsets.all(0),
-                  //           hintStyle: GoogleFonts.poppins(
-                  //               textStyle:
-                  //               TextStyle(fontSize: 14, color: Colors.grey)),
-                  //           helperStyle: GoogleFonts.poppins(
-                  //               textStyle: TextStyle(fontSize: 14)),
-                  //           enabledBorder: InputBorder.none,
-                  //           focusedBorder: InputBorder.none,
-                  //         ),
-                  //       ),
-                  //     ),
-                  //   ),
-                  // ),
-                  // SizedBox(height: CustomSize.sizeHeight(context) / 48,),
-                  // CustomText.bodyMedium16(
-                  //     text: "   Password",
-                  //     maxLines: 1
-                  // ),
-                  // SizedBox(
-                  //   height: CustomSize.sizeHeight(context) * 0.005,
-                  // ),
-                  // Container(
-                  //   height: CustomSize.sizeHeight(context) / 14,
-                  //   decoration: BoxDecoration(
-                  //     color: Color(0xffF5F5F5),
-                  //     borderRadius: BorderRadius.circular(12),
-                  //   ),
-                  //   child: Padding(
-                  //     padding: EdgeInsets.symmetric(horizontal: CustomSize.sizeWidth(context) / 32),
-                  //     child: Row(
-                  //       children: [
-                  //         Expanded(
-                  //           child: TextField(
-                  //             enableInteractiveSelection: false,
-                  //             autocorrect: false,
-                  //             focusNode: fPassword,
-                  //             obscureText: _obscureText,
-                  //             controller: _loginTextPassword,
-                  //             cursorColor: Colors.black,
-                  //             style: GoogleFonts.poppins(
-                  //                 textStyle:
-                  //                 TextStyle(fontSize: 14, color: Colors.black)),
-                  //             decoration: InputDecoration(
-                  //               isDense: true,
-                  //               contentPadding: EdgeInsets.all(0),
-                  //               hintStyle: GoogleFonts.poppins(
-                  //                   textStyle: TextStyle(
-                  //                       fontSize: 16, color: Colors.grey)),
-                  //               helperStyle: GoogleFonts.poppins(
-                  //                   textStyle: TextStyle(fontSize: 14)),
-                  //               enabledBorder: InputBorder.none,
-                  //               focusedBorder: InputBorder.none,
-                  //             ),
-                  //           ),
-                  //         ),
-                  //         GestureDetector(
-                  //           onTap: _toggle,
-                  //           child: Icon(
-                  //               _obscureText
-                  //                   ? MaterialCommunityIcons.eye
-                  //                   : MaterialCommunityIcons.eye_off,
-                  //               color: Colors.black),
-                  //         ),
-                  //       ],
-                  //     ),
-                  //   ),
-                  // ),
-                  //
-                  // // SizedBox(
-                  // //   height: CustomSize.sizeHeight(context) * 0.005,
-                  // // ),
-                  // // Align(
-                  // //   alignment: Alignment.bottomRight,
-                  // //   child: CustomText.bodyMedium16(
-                  // //       text: "Forgot Password",
-                  // //       color: CustomColor.primary,
-                  // //       maxLines: 1
-                  // //   ),
-                  // // ),
-                  // SizedBox(
-                  //   height: CustomSize.sizeHeight(context) / 18,
-                  // ),
-                  // (isLoading != true)?GestureDetector(
-                  //   onTap: (){
-                  //     _login(_loginTextEmail.text, _loginTextPassword.text);
-                  //   },
-                  //   child: Container(
-                  //     height: CustomSize.sizeHeight(context) / 12,
-                  //     width: CustomSize.sizeWidth(context) ,
-                  //     decoration: BoxDecoration(
-                  //         color: CustomColor.primary,
-                  //         borderRadius: BorderRadius.circular(20)
-                  //     ),
-                  //     child: Center(
-                  //       child: CustomText.bodyMedium16(
-                  //           text: "Sign in",
-                  //           color: Colors.white,
-                  //           maxLines: 1
-                  //       ),
-                  //     ),
-                  //   ),
-                  // ):Container(
-                  //   height: CustomSize.sizeHeight(context) / 12,
-                  //   width: CustomSize.sizeWidth(context) ,
-                  //   decoration: BoxDecoration(
-                  //       color: CustomColor.primary,
-                  //       borderRadius: BorderRadius.circular(20)
-                  //   ),
-                  //   child: Center(
-                  //     child: CircularProgressIndicator(
-                  //       backgroundColor: Colors.white,
-                  //       color: CustomColor.primaryLight,
-                  //     ),
-                  //   ),
-                  // ),
-
-                  Container(
-                    alignment: Alignment.center,
-                    child: Image.asset(
-                      "assets/irgLogo.png",
-                      width: CustomSize.sizeWidth(context) / 1.4,
-                      height: CustomSize.sizeWidth(context) / 1.4,
-                    ),
-                  ),
-                  SizedBox(
-                    height: CustomSize.sizeHeight(context) / 54,
-                  ),
-                  Center(
-                    child: Container(
-                      alignment: Alignment.topCenter,
-                      width: CustomSize.sizeWidth(context) / 1.1,
-                      child: MediaQuery(child: CustomText.textHeading8(text: "Indonesia Resto Guide", sizeNew: double.parse(((MediaQuery.of(context).size.width*0.07).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.07).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.07).toString())),
-                        data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0),),
-                    ),
+                  CustomText.bodyMedium16(
+                      text: "   Email",
+                      maxLines: 1
                   ),
                   SizedBox(
                     height: CustomSize.sizeHeight(context) * 0.005,
                   ),
-                  Divider(),
-                  // SizedBox(
-                  //   height: CustomSize.sizeHeight(context) * 0.005,
-                  // ),
+                  Container(
+                    height: CustomSize.sizeHeight(context) / 14,
+                    decoration: BoxDecoration(
+                      color: Color(0xffF5F5F5),
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: Padding(
+                      padding: EdgeInsets.symmetric(horizontal: CustomSize.sizeWidth(context) / 32),
+                      child: Center(
+                        child: TextField(
+                          controller: _loginTextEmail,
+                          keyboardType: TextInputType.emailAddress,
+                          cursorColor: Colors.black,
+                          style: GoogleFonts.sourceSansPro(
+                              textStyle:
+                              TextStyle(fontSize: 16, color: Colors.black)),
+                          decoration: InputDecoration(
+                            isDense: true,
+                            contentPadding: EdgeInsets.all(0),
+                            hintStyle: GoogleFonts.poppins(
+                                textStyle:
+                                TextStyle(fontSize: 14, color: Colors.grey)),
+                            helperStyle: GoogleFonts.poppins(
+                                textStyle: TextStyle(fontSize: 14)),
+                            enabledBorder: InputBorder.none,
+                            focusedBorder: InputBorder.none,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                  SizedBox(height: CustomSize.sizeHeight(context) / 48,),
+                  CustomText.bodyMedium16(
+                      text: "   Password",
+                      maxLines: 1
+                  ),
+                  SizedBox(
+                    height: CustomSize.sizeHeight(context) * 0.005,
+                  ),
+                  Container(
+                    height: CustomSize.sizeHeight(context) / 14,
+                    decoration: BoxDecoration(
+                      color: Color(0xffF5F5F5),
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: Padding(
+                      padding: EdgeInsets.symmetric(horizontal: CustomSize.sizeWidth(context) / 32),
+                      child: Row(
+                        children: [
+                          Expanded(
+                            child: TextField(
+                              enableInteractiveSelection: false,
+                              autocorrect: false,
+                              focusNode: fPassword,
+                              obscureText: _obscureText,
+                              controller: _loginTextPassword,
+                              cursorColor: Colors.black,
+                              style: GoogleFonts.poppins(
+                                  textStyle:
+                                  TextStyle(fontSize: 14, color: Colors.black)),
+                              decoration: InputDecoration(
+                                isDense: true,
+                                contentPadding: EdgeInsets.all(0),
+                                hintStyle: GoogleFonts.poppins(
+                                    textStyle: TextStyle(
+                                        fontSize: 16, color: Colors.grey)),
+                                helperStyle: GoogleFonts.poppins(
+                                    textStyle: TextStyle(fontSize: 14)),
+                                enabledBorder: InputBorder.none,
+                                focusedBorder: InputBorder.none,
+                              ),
+                            ),
+                          ),
+                          GestureDetector(
+                            onTap: _toggle,
+                            child: Icon(
+                                _obscureText
+                                    ? MaterialCommunityIcons.eye
+                                    : MaterialCommunityIcons.eye_off,
+                                color: Colors.black),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
                   Row(
                     mainAxisSize: MainAxisSize.max,
                     mainAxisAlignment: MainAxisAlignment.start,
@@ -522,6 +447,95 @@ class _LoginActivityState extends State<LoginActivity> {
                       ),
                     ],
                   ),
+
+                  // SizedBox(
+                  //   height: CustomSize.sizeHeight(context) * 0.005,
+                  // ),
+                  // Align(
+                  //   alignment: Alignment.bottomRight,
+                  //   child: CustomText.bodyMedium16(
+                  //       text: "Forgot Password",
+                  //       color: CustomColor.primary,
+                  //       maxLines: 1
+                  //   ),
+                  // ),
+                  SizedBox(
+                    height: CustomSize.sizeHeight(context) / 48,
+                  ),
+                  (isLoading != true)?GestureDetector(
+                    onTap: (){
+                      if (_loginTextEmail.text == '' || _loginTextPassword.text == '') {
+                        Fluttertoast.showToast(msg: "Isi email dan password terlebih dahulu.");
+                      } else {
+                        if (terms == false) {
+                          Fluttertoast.showToast(msg: "Baca lalu setujui Terms Conditions untuk melanjutkan.");
+                        } else {
+                          idPlayer().whenComplete(() {
+                            terms = true;
+                            setState(() {});
+                            _login(_loginTextEmail.text, _loginTextPassword.text);
+                          });
+                        }
+                      }
+                    },
+                    child: Container(
+                      height: CustomSize.sizeHeight(context) / 12,
+                      width: CustomSize.sizeWidth(context) ,
+                      decoration: BoxDecoration(
+                          color: CustomColor.primary,
+                          borderRadius: BorderRadius.circular(20)
+                      ),
+                      child: Center(
+                        child: CustomText.bodyMedium16(
+                            text: "Sign in",
+                            color: Colors.white,
+                            maxLines: 1,
+                            sizeNew: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.04).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.04).toString())
+                        ),
+                      ),
+                    ),
+                  ):Container(
+                    height: CustomSize.sizeHeight(context) / 12,
+                    width: CustomSize.sizeWidth(context) ,
+                    decoration: BoxDecoration(
+                        color: CustomColor.primary,
+                        borderRadius: BorderRadius.circular(20)
+                    ),
+                    child: Center(
+                      child: CircularProgressIndicator(
+                        backgroundColor: Colors.white,
+                        color: CustomColor.primaryLight,
+                      ),
+                    ),
+                  ),
+
+                  // Container(
+                  //   alignment: Alignment.center,
+                  //   child: Image.asset(
+                  //     "assets/irgLogo.png",
+                  //     width: CustomSize.sizeWidth(context) / 1.4,
+                  //     height: CustomSize.sizeWidth(context) / 1.4,
+                  //   ),
+                  // ),
+                  // SizedBox(
+                  //   height: CustomSize.sizeHeight(context) / 54,
+                  // ),
+                  // Center(
+                  //   child: Container(
+                  //     alignment: Alignment.topCenter,
+                  //     width: CustomSize.sizeWidth(context) / 1.1,
+                  //     child: MediaQuery(child: CustomText.textHeading8(text: "Indonesia Resto Guide", sizeNew: double.parse(((MediaQuery.of(context).size.width*0.07).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.07).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.07).toString())),
+                  //       data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0),),
+                  //   ),
+                  // ),
+                  
+                  SizedBox(
+                    height: CustomSize.sizeHeight(context) * 0.005,
+                  ),
+                  Divider(),
+                  // SizedBox(
+                  //   height: CustomSize.sizeHeight(context) * 0.005,
+                  // ),
                   GestureDetector(
                     onTap: (){
                       if (terms == false) {

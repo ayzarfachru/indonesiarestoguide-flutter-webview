@@ -325,8 +325,8 @@ class _HistoryActivityState extends State<HistoryActivity> {
                                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                             children: [
                                               CustomText.textHeading4(
-                                                  text: (homepg != "1")?NumberFormat.currency(locale: 'id', symbol: '', decimalDigits: 0).format(history[index].price):
-                                                  NumberFormat.currency(locale: 'id', symbol: '', decimalDigits: 0).format(user[index].price),
+                                                  text: (homepg != "1")?NumberFormat.currency(locale: 'id', symbol: '', decimalDigits: 0).format((history[index].price+1000)):
+                                                  NumberFormat.currency(locale: 'id', symbol: '', decimalDigits: 0).format((user[index].price+1000)),
                                                   sizeNew: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.04)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.04)).toString()),
                                                   maxLines: 1
                                               ),

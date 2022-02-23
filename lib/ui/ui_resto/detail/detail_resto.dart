@@ -156,7 +156,8 @@ class _DetailRestoAdminState extends State<DetailRestoAdmin> {
               id: a['id'],
               name: a['name'],
               desc: a['desc'],
-              price: Price.delivery(a['price'], a['delivery_price']),
+              is_available: '',
+              price: Price.delivery(a['price'], int.parse(a['delivery_price'])),
               urlImg: a['img'], distance: null, is_recommended: '', restoName: '', type: '', qty: '', restoId: '', delivery_price: null
           );
           _cateMenu.add(m);
@@ -204,6 +205,7 @@ class _DetailRestoAdminState extends State<DetailRestoAdmin> {
                 name: v['menu_name'],
                 desc: v['menu_desc'],
                 urlImg: v['menu_img'],
+                is_available: '',
                 price: Price.discounted(v['menu_price'], v['menu_discounted']), qty: '', restoId: '', delivery_price: null, is_recommended: '', restoName: '', distance: null, type: ''
             ), discountedPrice: null, id: null,
           );
@@ -230,7 +232,7 @@ class _DetailRestoAdminState extends State<DetailRestoAdmin> {
       openClose = data['data']['openclose'];
       reservationFee = data['data']['reservation_fee'].toString();
       can_delivery = data['data']['can_delivery'].toString();
-      print('deliv '+data['data']['can_delivery'].toString());
+      print('deliv '+data['data']['reservation_fee'].toString());
       can_takeaway = data['data']['can_take_away'].toString();
       lat = data['data']['lat'].toString();
       long = data['data']['long'].toString();
@@ -368,6 +370,7 @@ class _DetailRestoAdminState extends State<DetailRestoAdmin> {
     for(var p in data['img']){
       Menu v = Menu(
           id: p['id'],
+          is_available: '',
           urlImg: p['img'], delivery_price: null, restoId: '', qty: '', type: '', price: null, distance: null, name: '',
           restoName: '', is_recommended: '', desc: ''
       );

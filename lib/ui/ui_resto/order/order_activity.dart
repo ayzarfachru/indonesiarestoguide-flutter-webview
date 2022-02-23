@@ -67,7 +67,7 @@ class _OrderActivityState extends State<OrderActivity> {
                           children: [
                             GestureDetector(
                                 onTap: (){
-                                  Navigator.pop(context);
+                                  onWillPop();
                                 },
                                 child: Icon(Icons.chevron_left, size: double.parse(((MediaQuery.of(context).size.width*0.075).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.075)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.075)).toString()), color: Colors.black,)
                             ),
@@ -76,7 +76,7 @@ class _OrderActivityState extends State<OrderActivity> {
                             ),
                             GestureDetector(
                               onTap: (){
-                                Navigator.pop(context);
+                                Navigator.pushReplacement(context, PageTransition(type: PageTransitionType.fade, child: HomeActivityResto()));
                               },
                               child: CustomText.textHeading4(
                                   text: "Daftar Pesanan",

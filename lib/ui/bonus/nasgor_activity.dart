@@ -139,6 +139,7 @@ class _NasgorActivityState extends State<NasgorActivity> {
             desc: v['desc'],
             distance: double.parse(v['distance'].toString()),
             urlImg: v['img'],
+            is_available: '',
             price: Price.discounted(int.parse(v['price']), v['discounted_price']), type: '', restoId: '', delivery_price: null, qty: '', is_recommended: '', restoName: ''
         ), discountedPrice: null, id: null, word: '',
       );
@@ -181,6 +182,7 @@ class _NasgorActivityState extends State<NasgorActivity> {
             name: a['menus']['name'],
             desc: a['menus']['desc'],
             urlImg: a['menus']['img'],
+            is_available: '',
             price: Price.promo(
                 a['menus']['price'].toString(), a['menus']['delivery_price'].toString()), is_recommended: '', qty: '', restoName: '', type: '', delivery_price: null, restoId: '', distance: null
         ),
@@ -326,6 +328,7 @@ class _NasgorActivityState extends State<NasgorActivity> {
         restoId: x['resto_id'].toString(),
         restoName: x['resto_name'],
         urlImg: x['img'],
+        is_available: '',
         price: Price.discounted(x['price'], x['discounted_price']),
         distance: double.parse(x['resto_distance'].toString()), is_recommended: '', qty: '', delivery_price: null, desc: '', type: '',
       );

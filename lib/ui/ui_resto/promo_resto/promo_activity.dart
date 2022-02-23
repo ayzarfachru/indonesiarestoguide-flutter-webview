@@ -147,6 +147,7 @@ class _PromoActivityState extends State<PromoActivity> {
           restoName: v['resto_name'],
           desc: v['desc']??'',
           urlImg: v['img'],
+          is_available: '',
           price: Price.discounted(int.parse(v['price'].toString()), int.parse(v['discounted_price'].toString())),
           distance: double.parse(v['resto_distance'].toString()), type: '', is_recommended: '', delivery_price: null, qty: ''
       );
@@ -190,6 +191,7 @@ class _PromoActivityState extends State<PromoActivity> {
             name: a['menus']['name']??null,
             desc: a['menus']['desc']??null,
             urlImg: a['menus']['img'],
+            is_available: '',
             price: Price.promo(
                 a['menus']['price'].toString(), a['menus']['delivery_price'].toString()), qty: '', restoId: '', delivery_price: null,
             restoName: '', is_recommended: '', type: '', distance: null

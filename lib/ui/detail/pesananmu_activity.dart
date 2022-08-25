@@ -115,7 +115,7 @@ class _PesananmuActivityState extends State<PesananmuActivity> {
   getHomePg() async {
     SharedPreferences pref = await SharedPreferences.getInstance();
     setState(() {
-      homepg = (pref.getString('homepg'));
+      homepg = (pref.getString('homepg')??'');
       print(homepg);
     });
   }
@@ -158,7 +158,7 @@ class _PesananmuActivityState extends State<PesananmuActivity> {
     });
     SharedPreferences pref = await SharedPreferences.getInstance();
     String token = pref.getString("token") ?? "";
-    var apiResult = await http.get(Links.mainUrl + '/page/home?lat=$lat&long=$long&limit=0', headers: {
+    var apiResult = await http.get(Uri.parse(Links.mainUrl + '/page/home?lat=$lat&long=$long&limit=0'), headers: {
       "Accept": "Application/json",
       "Authorization": "Bearer $token"
     });
@@ -320,7 +320,7 @@ class _PesananmuActivityState extends State<PesananmuActivity> {
     });
     SharedPreferences pref = await SharedPreferences.getInstance();
     String token = pref.getString("token") ?? "";
-    var apiResult = await http.get(Links.mainUrl + '/page/promo?lat=$lat&long=$long', headers: {
+    var apiResult = await http.get(Uri.parse(Links.mainUrl + '/page/promo?lat=$lat&long=$long'), headers: {
       "Accept": "Application/json",
       "Authorization": "Bearer $token"
     });
@@ -356,7 +356,7 @@ class _PesananmuActivityState extends State<PesananmuActivity> {
     });
     SharedPreferences pref = await SharedPreferences.getInstance();
     String token = pref.getString("token") ?? "";
-    var apiResult = await http.get(Links.mainUrl + '/promo', headers: {
+    var apiResult = await http.get(Uri.parse(Links.mainUrl + '/promo'), headers: {
       "Accept": "Application/json",
       "Authorization": "Bearer $token"
     });
@@ -406,8 +406,8 @@ class _PesananmuActivityState extends State<PesananmuActivity> {
         Location.instance.getLocation().then((value) {
           _getData(value.latitude.toString(), value.longitude.toString());
           setState(() {
-            latitude = value.latitude;
-            longitude = value.longitude;
+            latitude = value.latitude!;
+            longitude = value.longitude!;
           });
           // _getPromo(value.latitude.toString(), value.longitude.toString());
         });
@@ -470,7 +470,7 @@ class _PesananmuActivityState extends State<PesananmuActivity> {
     });
     SharedPreferences pref = await SharedPreferences.getInstance();
     String token = pref.getString("token") ?? "";
-    var apiResult = await http.get(Links.mainUrl + '/promo/delete/$id', headers: {
+    var apiResult = await http.get(Uri.parse(Links.mainUrl + '/promo/delete/$id'), headers: {
       "Accept": "Application/json",
       "Authorization": "Bearer $token"
     });
@@ -510,8 +510,8 @@ class _PesananmuActivityState extends State<PesananmuActivity> {
         Location.instance.getLocation().then((value) {
           _getData(value.latitude.toString(), value.longitude.toString());
           setState(() {
-            latitude = value.latitude;
-            longitude = value.longitude;
+            latitude = value.latitude!;
+            longitude = value.longitude!;
           });
           // _getPromo(value.latitude.toString(), value.longitude.toString());
         });
@@ -697,8 +697,10 @@ class _PesananmuActivityState extends State<PesananmuActivity> {
                                   child: CustomText.bodyRegular14(text: again[index].distance.toString() + " Km", sizeNew: double.parse(((MediaQuery.of(context).size.width*0.035).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.035).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.035).toString())),
                                 ),
                                 Padding(
-                                  padding: EdgeInsets.only(left: CustomSize.sizeWidth(context) / 24),
-                                  child: CustomText.bodyMedium16(text: again[index].name, sizeNew: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.04).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.04).toString())),
+                                  padding: EdgeInsets.only(left: CustomSize.sizeWidth(context) / 24, right: CustomSize.sizeWidth(context) / 34),
+                                  child: Container(
+                                      height: CustomSize.sizeWidth(context) / 12,
+                                      child: CustomText.bodyMedium16(maxLines: 2, text: again[index].name, sizeNew: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.04).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.04).toString()))),
                                 ),
                               ],
                             ),

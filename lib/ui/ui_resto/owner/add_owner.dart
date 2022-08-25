@@ -47,7 +47,7 @@ class _AddOwnerActivityState extends State<AddOwnerActivity> {
   getName() async {
     SharedPreferences pref = await SharedPreferences.getInstance();
     setState(() {
-      name = (pref.getString('name'));
+      name = (pref.getString('name')??'');
       print(name);
     });
   }
@@ -61,7 +61,7 @@ class _AddOwnerActivityState extends State<AddOwnerActivity> {
   getEmail() async {
     SharedPreferences pref = await SharedPreferences.getInstance();
     setState(() {
-      email = (pref.getString('email'));
+      email = (pref.getString('email')??'');
       print(email);
     });
   }
@@ -69,7 +69,7 @@ class _AddOwnerActivityState extends State<AddOwnerActivity> {
   getImg() async {
     SharedPreferences pref = await SharedPreferences.getInstance();
     setState(() {
-      img = (pref.getString('img'));
+      img = (pref.getString('img')??'');
       print(img);
     });
   }
@@ -98,7 +98,7 @@ class _AddOwnerActivityState extends State<AddOwnerActivity> {
   getGender() async {
     SharedPreferences pref = await SharedPreferences.getInstance();
     setState(() {
-      gender = (pref.getString('gender'));
+      gender = (pref.getString('gender')??'');
       print(gender);
     });
   }
@@ -120,7 +120,7 @@ class _AddOwnerActivityState extends State<AddOwnerActivity> {
   getTgl() async {
     SharedPreferences pref = await SharedPreferences.getInstance();
     setState(() {
-      tgl = (pref.getString('tgl'));
+      tgl = (pref.getString('tgl')??'');
       print(tgl);
     });
   }
@@ -134,7 +134,7 @@ class _AddOwnerActivityState extends State<AddOwnerActivity> {
     final pickedFile = await picker.getImage(source: ImageSource.gallery);
 
     setState(() {
-      image = File(pickedFile.path);
+      image = File(pickedFile!.path);
       extension = pickedFile.path.split('.').last;
     });
   }
@@ -144,7 +144,7 @@ class _AddOwnerActivityState extends State<AddOwnerActivity> {
     var token = pref.getString("token") ?? "";
     // var id = pref.getInt("id") ?? "";
 
-    var apiResult = await http.post(Links.mainUrl + '/owner',
+    var apiResult = await http.post(Uri.parse(Links.mainUrl + '/owner'),
         body: {
           'resto_id': id,
           'email': _loginEmailName.text,
@@ -197,10 +197,23 @@ class _AddOwnerActivityState extends State<AddOwnerActivity> {
                 SizedBox(height: CustomSize.sizeHeight(context) / 38,),
                 Padding(
                   padding: EdgeInsets.symmetric(horizontal: CustomSize.sizeWidth(context) / 32),
-                  child: CustomText.textHeading4(
-                      text: "Tambah owner",
-                      minSize: double.parse(((MediaQuery.of(context).size.width*0.045).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.045)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.045)).toString()),
-                      maxLines: 1
+                  child: GestureDetector(
+                    onTap: (){
+                      Navigator.pop(context);
+                    },
+                    child: Row(
+                      children: [
+                        Icon(Icons.chevron_left, size: double.parse(((MediaQuery.of(context).size.width*0.075).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.075)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.075)).toString()),),
+                        SizedBox(
+                          width: CustomSize.sizeWidth(context) / 88,
+                        ),
+                        CustomText.textHeading4(
+                            text: "Tambah owner",
+                            minSize: double.parse(((MediaQuery.of(context).size.width*0.045).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.045)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.045)).toString()),
+                            maxLines: 1
+                        ),
+                      ],
+                    ),
                   ),
                 ),
                 SizedBox(height: CustomSize.sizeHeight(context) / 86,),
@@ -302,12 +315,13 @@ class _AddOwnerActivityState extends State<AddOwnerActivity> {
             // pref.setString("notelp", _loginNotelpName.text.toString());
 
             if (_loginEmailName.text != '') {
-              addEployees();
-              Navigator.pop(context);
-              Navigator.pushReplacement(context,
-                  PageTransition(
-                      type: PageTransitionType.fade,
-                      child: HomeActivityResto()));
+              addEployees()?.whenComplete((){
+                Navigator.pop(context);
+                Navigator.pushReplacement(context,
+                    PageTransition(
+                        type: PageTransitionType.fade,
+                        child: HomeActivityResto()));
+              });
             } else {
               Fluttertoast.showToast(msg: "Isi email terlebih dahulu!",);
             }

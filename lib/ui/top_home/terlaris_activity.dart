@@ -105,16 +105,17 @@ class _TerlarisActivityState extends State<TerlarisActivity> {
   }
   ScrollController _scrollController = ScrollController();
   String homepg = "";
-  bool isLoading = false;
+  bool isLoading = true;
 
   getHomePg() async {
     SharedPreferences pref = await SharedPreferences.getInstance();
     setState(() {
-      homepg = (pref.getString('homepg'));
+      homepg = (pref.getString('homepg')??'');
       print(homepg);
     });
   }
 
+  int allMenu = 0;
   List<Menu2> promo = [];
   Future<void> _getPromo(String lat, String long)async{
     List<Menu2> _promo = [];
@@ -124,12 +125,13 @@ class _TerlarisActivityState extends State<TerlarisActivity> {
     });
     SharedPreferences pref = await SharedPreferences.getInstance();
     String token = pref.getString("token") ?? "";
-    var apiResult = await http.get(Links.mainUrl + '/page/special/terlaris?lat=$lat&long=$long', headers: {
+    var apiResult = await http.get(Uri.parse(Links.mainUrl + '/page/special/terlaris?lat=$lat&long=$long'), headers: {
       "Accept": "Application/json",
       "Authorization": "Bearer $token"
     });
     var data = json.decode(apiResult.body);
-    print(data['menu']);
+    print(data);
+    // print(data['menu']);
     print(lat);
     print(long);
 
@@ -152,9 +154,13 @@ class _TerlarisActivityState extends State<TerlarisActivity> {
           distance: null, delivery_price: null, qty: '', is_recommended: '', type: ''
       );
       _promo.add(d);
+      allMenu = allMenu + 1;
+      if (allMenu == 15) break;
     }
+    print('length');
     setState(() {
       promo = _promo;
+      print(promo.length);
       isLoading = false;
     });
 
@@ -294,7 +300,7 @@ class _TerlarisActivityState extends State<TerlarisActivity> {
     });
     SharedPreferences pref = await SharedPreferences.getInstance();
     String token = pref.getString("token") ?? "";
-    var apiResult = await http.get(Links.mainUrl + '/promo/delete/$id', headers: {
+    var apiResult = await http.get(Uri.parse(Links.mainUrl + '/promo/delete/$id'), headers: {
       "Accept": "Application/json",
       "Authorization": "Bearer $token"
     });
@@ -494,11 +500,12 @@ class _TerlarisActivityState extends State<TerlarisActivity> {
                                       ),
                                       Container(
                                         width: CustomSize.sizeWidth(context) / 2.1,
+                                        height: CustomSize.sizeWidth(context) / 2.85,
                                         child: Column(
-                                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                           children: [
                                             Column(
-                                              mainAxisAlignment: MainAxisAlignment.center,
+                                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                               crossAxisAlignment: CrossAxisAlignment.start,
                                               children: [
                                                 Row(
@@ -547,7 +554,7 @@ class _TerlarisActivityState extends State<TerlarisActivity> {
                                                 (homepg != "1")?CustomText.textHeading4(
                                                     text: promo[index].name,
                                                     sizeNew: double.parse(((MediaQuery.of(context).size.width*0.045).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.045).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.045).toString()),
-                                                    maxLines: 1
+                                                    maxLines: 2
                                                 ):(promoResto[index].menu != null)?CustomText.textHeading4(
                                                     text: promoResto[index].menu!.name,
                                                     sizeNew: double.parse(((MediaQuery.of(context).size.width*0.045).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.045).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.045).toString()),
@@ -560,20 +567,24 @@ class _TerlarisActivityState extends State<TerlarisActivity> {
                                                 (homepg != "1")?CustomText.bodyMedium12(
                                                     text: promo[index].usaha.name,
                                                     sizeNew: double.parse(((MediaQuery.of(context).size.width*0.03).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.03).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.03).toString()),
-                                                    maxLines: 1
+                                                    maxLines: 2,
+                                                    color: CustomColor.primary
                                                 ):Container(),
                                                 // CustomText.bodyMedium12(text: promo[index].restoName, minSize: 12),
-                                                SizedBox(height: CustomSize.sizeHeight(context) * 0.01326,),
-                                                (homepg != "1")?CustomText.bodyMedium12(
-                                                    text: promo[index].desc,
-                                                    maxLines: 1,
-                                                    sizeNew: double.parse(((MediaQuery.of(context).size.width*0.03).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.03).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.03).toString())
+                                                SizedBox(height: CustomSize.sizeHeight(context) * 0.005,),
+                                                (homepg != "1")?Container(
+                                                  height: CustomSize.sizeHeight(context) / 34,
+                                                  child: CustomText.bodyMedium12(
+                                                      text: promo[index].desc,
+                                                      maxLines: 4,
+                                                      sizeNew: double.parse(((MediaQuery.of(context).size.width*0.03).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.03).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.03).toString())
+                                                  ),
                                                 ):CustomText.bodyMedium12(
                                                     text: promoResto[index].word,
                                                     maxLines: 1,
                                                     sizeNew: double.parse(((MediaQuery.of(context).size.width*0.03).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.03).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.03).toString())
                                                 ),
-                                                (homepg != "1")?SizedBox(height: CustomSize.sizeHeight(context) / 38,):SizedBox(height: CustomSize.sizeHeight(context) / 56,),
+                                                // (homepg != "1")?SizedBox(height: CustomSize.sizeHeight(context) / 38,):SizedBox(height: CustomSize.sizeHeight(context) / 56,),
                                               ],
                                             ),
                                             Row(

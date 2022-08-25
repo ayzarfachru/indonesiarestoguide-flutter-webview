@@ -140,7 +140,7 @@ class _EditMenuState extends State<EditMenu> {
                 child: Text("Simpan", style: TextStyle(color: CustomColor.accent),),
                 onPressed: () async{
                   SharedPreferences pref = await SharedPreferences.getInstance();
-                  pref.setString("tipeMenu", tipe);
+                  pref.setString("tipeMenu", tipe.toString());
                   setState(() {
                     print(tipe);
                     getNewTipeMenu();
@@ -184,7 +184,7 @@ class _EditMenuState extends State<EditMenu> {
   getInitial() async {
     SharedPreferences pref = await SharedPreferences.getInstance();
     setState(() {
-      initial = (pref.getString('name').substring(0, 1).toUpperCase());
+      initial = (pref.getString('name')!.substring(0, 1).toUpperCase());
       print(initial);
     });
   }
@@ -199,7 +199,7 @@ class _EditMenuState extends State<EditMenu> {
     final pickedFile = await picker.getImage(source: ImageSource.gallery);
 
     setState(() {
-      image = File(pickedFile.path);
+      image = File(pickedFile!.path);
       extension = pickedFile.path.split('.').last;
     });
   }
@@ -218,7 +218,7 @@ class _EditMenuState extends State<EditMenu> {
   Future<void> getType() async {
     SharedPreferences pref = await SharedPreferences.getInstance();
     var token = pref.getString("token") ?? "";
-    var data = await http.get(Links.mainUrl +'/util/data?q=menutype',
+    var data = await http.get(Uri.parse(Links.mainUrl +'/util/data?q=menutype'),
         headers: {
           "Accept": "application/json",
           "Authorization": "Bearer $token"
@@ -231,61 +231,59 @@ class _EditMenuState extends State<EditMenu> {
       typeList.add(v['name']);
     }
     setState(() {});
-    showDialog(
-        context: context,
-        builder: (context) {
-          return AlertDialog(
-            contentPadding: EdgeInsets.only(left: 25, right: 25, top: 15, bottom: 5),
-            shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.all(Radius.circular(10))
-            ),
-            title: Center(child: Text('Peringatan!', style: TextStyle(color: CustomColor.redBtn))),
-            content: Text('Masukkan harga menu yang sudah dihitung beserta biaya PPN dan biaya Service Charge sesuai resto anda.', style: TextStyle(fontSize: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.04)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.04)).toString()), fontWeight: FontWeight.w500), textAlign: TextAlign.center),
-            actions: <Widget>[
-              Center(
-                child: Padding(
-                  padding: EdgeInsets.only(left: 25, right: 25),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.end,
-                    children: [
-                      // OutlineButton(
-                      //   // minWidth: CustomSize.sizeWidth(context),
-                      //   shape: StadiumBorder(),
-                      //   highlightedBorderColor: CustomColor.secondary,
-                      //   borderSide: BorderSide(
-                      //       width: 2,
-                      //       color: CustomColor.redBtn
-                      //   ),
-                      //   child: Text('Batal'),
-                      //   onPressed: () async{
-                      //     setState(() {
-                      //       // codeDialog = valueText;
-                      //       Navigator.pop(context);
-                      //     });
-                      //   },
-                      // ),
-                      OutlineButton(
-                        // minWidth: CustomSize.sizeWidth(context),
-                        shape: StadiumBorder(),
-                        highlightedBorderColor: CustomColor.secondary,
-                        borderSide: BorderSide(
-                            width: 2,
-                            color: CustomColor.accent
-                        ),
-                        child: Text('Oke'),
-                        onPressed: () async{
-                          Navigator.pop(context);
-                          // String qrcode = '';
-                        },
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-
-            ],
-          );
-        });
+    // showDialog(
+    //     context: context,
+    //     builder: (context) {
+    //       return AlertDialog(
+    //         contentPadding: EdgeInsets.only(left: 25, right: 25, top: 15, bottom: 5),
+    //         shape: RoundedRectangleBorder(
+    //             borderRadius: BorderRadius.all(Radius.circular(10))
+    //         ),
+    //         title: Center(child: Text('Peringatan!', style: TextStyle(color: CustomColor.redBtn))),
+    //         content: Text('Masukkan harga menu yang sudah dihitung beserta biaya PPN dan biaya Service Charge sesuai resto anda.', style: TextStyle(fontSize: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.04)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.04)).toString()), fontWeight: FontWeight.w500), textAlign: TextAlign.center),
+    //         actions: <Widget>[
+    //           Center(
+    //             child: Padding(
+    //               padding: EdgeInsets.only(left: 25, right: 25),
+    //               child: Row(
+    //                 mainAxisAlignment: MainAxisAlignment.end,
+    //                 children: [
+    //                   // OutlineButton(
+    //                   //   // minWidth: CustomSize.sizeWidth(context),
+    //                   //   shape: StadiumBorder(),
+    //                   //   highlightedBorderColor: CustomColor.secondary,
+    //                   //   borderSide: BorderSide(
+    //                   //       width: 2,
+    //                   //       color: CustomColor.redBtn
+    //                   //   ),
+    //                   //   child: Text('Batal'),
+    //                   //   onPressed: () async{
+    //                   //     setState(() {
+    //                   //       // codeDialog = valueText;
+    //                   //       Navigator.pop(context);
+    //                   //     });
+    //                   //   },
+    //                   // ),
+    //                   FlatButton(
+    //                     color: CustomColor.accent,
+    //                     textColor: Colors.white,
+    //                     shape: RoundedRectangleBorder(
+    //                         borderRadius: BorderRadius.all(Radius.circular(10))
+    //                     ),
+    //                     child: Text('Oke'),
+    //                     onPressed: () async{
+    //                       Navigator.pop(context);
+    //                       // String qrcode = '';
+    //                     },
+    //                   ),
+    //                 ],
+    //               ),
+    //             ),
+    //           ),
+    //
+    //         ],
+    //       );
+    //     });
   }
 
 
@@ -299,7 +297,7 @@ class _EditMenuState extends State<EditMenu> {
     });
     SharedPreferences pref = await SharedPreferences.getInstance();
     String token = pref.getString("token") ?? "";
-    var apiResult = await http.post(Links.mainUrl + '/resto/menu/$id',
+    var apiResult = await http.post(Uri.parse(Links.mainUrl + '/resto/menu/$id'),
         body: {
           'name': namaMenu.text,
           'desc': deskMenu.text,
@@ -442,6 +440,65 @@ class _EditMenuState extends State<EditMenu> {
                         height: CustomSize.sizeHeight(context) * 0.005,
                       ),
                       TextField(
+                        // readOnly: true,
+                        // onTap: (){
+                        //   showDialog(
+                        //       context: context,
+                        //       builder: (context) {
+                        //         return AlertDialog(
+                        //           contentPadding: EdgeInsets.only(left: 25, right: 25, top: 15, bottom: 5),
+                        //           shape: RoundedRectangleBorder(
+                        //               borderRadius: BorderRadius.all(Radius.circular(10))
+                        //           ),
+                        //           title: Center(child: Text('Peringatan!', style: TextStyle(color: CustomColor.redBtn))),
+                        //           content: Text('Harga menu anda tidak dapat di ubah. \n\n Jika anda ingin mengganti harga menu kirim foto, harga terbaru dan nama menu yang anda gunakan saat ini ke info@irg.com', style: TextStyle(fontSize: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.04)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.04)).toString()), fontWeight: FontWeight.w500), textAlign: TextAlign.center),
+                        //           actions: <Widget>[
+                        //             Center(
+                        //               child: Padding(
+                        //                 padding: EdgeInsets.only(left: 25, right: 25),
+                        //                 child: Row(
+                        //                   mainAxisAlignment: MainAxisAlignment.center,
+                        //                   children: [
+                        //                     // OutlineButton(
+                        //                     //   // minWidth: CustomSize.sizeWidth(context),
+                        //                     //   shape: StadiumBorder(),
+                        //                     //   highlightedBorderColor: CustomColor.secondary,
+                        //                     //   borderSide: BorderSide(
+                        //                     //       width: 2,
+                        //                     //       color: CustomColor.redBtn
+                        //                     //   ),
+                        //                     //   child: Text('Batal'),
+                        //                     //   onPressed: () async{
+                        //                     //     setState(() {
+                        //                     //       // codeDialog = valueText;
+                        //                     //       Navigator.pop(context);
+                        //                     //     });
+                        //                     //   },
+                        //                     // ),
+                        //                     OutlinedButton(
+                        //                       // minWidth: CustomSize.sizeWidth(context),
+                        //                       // shape: StadiumBorder(),
+                        //                       // highlightedBorderColor: CustomColor.secondary,
+                        //                       // borderSide: BorderSide(
+                        //                       //     width: 2,
+                        //                       //     color: CustomColor.accent
+                        //                       // ),
+                        //                       style: OutlinedButton.styleFrom(shape: StadiumBorder()),
+                        //                       child: Text('Oke'),
+                        //                       onPressed: () async{
+                        //                         Navigator.pop(context);
+                        //                         // String qrcode = '';
+                        //                       },
+                        //                     ),
+                        //                   ],
+                        //                 ),
+                        //               ),
+                        //             ),
+                        //
+                        //           ],
+                        //         );
+                        //       });
+                        // },
                         inputFormatters: [FilteringTextInputFormatter.digitsOnly],
                         controller: hargaMenu,
                         keyboardType: TextInputType.number,

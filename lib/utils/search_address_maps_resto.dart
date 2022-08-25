@@ -2,11 +2,12 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
-import 'package:geocoder/geocoder.dart';
+// import 'package:geocoder/geocoder.dart';
 import 'package:geolocator/geolocator.dart';
+import 'package:geocoding/geocoding.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
-import 'package:kam5ia/ui/cart/cart_activity.dart';
+import 'package:kam5ia/ui/cart/cart_activity.dart' as cart;
 import 'package:kam5ia/utils/utils.dart';
 import 'package:page_transition/page_transition.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -74,11 +75,33 @@ class _SearchAddressMapsRestoState extends State<SearchAddressMapsResto> {
                   myLocationButtonEnabled: true,
                   mapToolbarEnabled: true,
                   onCameraIdle: () async{
-                    var addresses = await Geocoder.local.findAddressesFromCoordinates(new Coordinates(_lat, _long));
-                    var first = addresses.first;
+                    var addresses = await
+                    placemarkFromCoordinates(double.parse(_lat.toString()), double.parse(_long.toString()),
+                        localeIdentifier: 'id_ID').then((placemarks) async {
+                      setState(() {
+                        // latitude = widget.lat!;
+                        // longitude = widget.long!;
+                        address = placemarks[0].street! +
+                            ', ' +
+                            placemarks[0].subLocality! +
+                            ', ' +
+                            placemarks[0].locality! +
+                            ', ' +
+                            placemarks[0].subAdministrativeArea! +
+                            ', ' +
+                            placemarks[0].administrativeArea! +
+                            ' ' +
+                            placemarks[0].postalCode! +
+                            ', ' +
+                            placemarks[0].country!;
+                      });
+                    });
+                    // geoCode.reverseGeocoding(latitude: double.parse(_lat.toString()), longitude: double.parse(_long.toString()));
+                    // Geocoder2.getDataFromCoordinates(latitude: double.parse(_lat.toString()), longitude: double.parse(_long.toString()), googleMapApiKey: 'AIzaSyB6JZGEaiyrHrG0PvrvHTFr72RMCU9Wn7c');
+                    // var first = addresses.first;
                     setState(() {
                       isMove = false;
-                      address = first.addressLine ;
+                      // address = addresses.streetAddress.toString();
                     });
                   },
                   onCameraMoveStarted: (){
@@ -195,14 +218,14 @@ class _SearchAddressMapsRestoState extends State<SearchAddressMapsResto> {
                         cursorColor: Colors.black,
                         textInputAction: TextInputAction.search,
                         onSubmitted: (v)async{
-                          var addresses = await Geocoder.local.findAddressesFromQuery(v);
+                          List<Location> addresses = await locationFromAddress(v);
 
                           CameraPosition cPosition = CameraPosition(
                             zoom: 18,
                             // tilt: 80,
                             // bearing: 30,
-                            target: LatLng(addresses[0].coordinates.latitude,
-                                addresses[0].coordinates.longitude),
+                            target: LatLng(addresses[0].latitude,
+                                addresses[0].longitude),
                           );
 
                           final GoogleMapController controller = await _controller.future;

@@ -11,6 +11,8 @@ import 'package:kam5ia/model/Menu.dart';
 import 'package:kam5ia/model/Price.dart';
 import 'package:kam5ia/model/Resto.dart';
 import 'package:kam5ia/ui/detail/detail_resto.dart';
+import 'package:kam5ia/ui/search/more_menu_activity.dart';
+import 'package:kam5ia/ui/search/more_resto_activity.dart';
 import 'package:kam5ia/utils/utils.dart';
 import 'package:intl/intl.dart';
 import 'package:page_transition/page_transition.dart';
@@ -63,13 +65,16 @@ class _SearchActivityState extends State<SearchActivity> {
       q = '';
     }
     print("q = $q ");
-    var apiResult = await http.get(Links.mainUrl + '/page/search?q=$q&type=$tipe&lat=$lat&long=$long&limit=0&city=$kota2&facility=$facilityList2',
+    var apiResult = await http.get(Uri.parse(Links.mainUrl + '/page/search?q=$q&type=$tipe&lat=$lat&long=$long&limit=0&city=$kota2&facility=$facilityList2'),
         headers: {
           "Accept": "Application/json",
           "Authorization": "Bearer $token"
         });
     print(apiResult.body);
     var data = json.decode(apiResult.body);
+    print('ini loh sob rese '+data.toString());
+    print('LOHH '+data['data']['resto'].toString());
+    print('ini loh sob rese '+data['data']['resto'].toString());
 
     if (data['menu'] != null) {
       for(var v in data['menu']){
@@ -112,7 +117,7 @@ class _SearchActivityState extends State<SearchActivity> {
     SharedPreferences pref = await SharedPreferences.getInstance();
     var token = pref.getString("token") ?? "";
 
-    var apiResult = await http.get(Links.mainUrl + '/util/data',
+    var apiResult = await http.get(Uri.parse(Links.mainUrl + '/util/data'),
         headers: {
           "Accept": "Application/json",
           "Authorization": "Bearer $token"
@@ -152,7 +157,7 @@ class _SearchActivityState extends State<SearchActivity> {
     SharedPreferences pref = await SharedPreferences.getInstance();
     var token = pref.getString("token") ?? "";
 
-    var apiResult = await http.get('http://irg.devus-sby.com/api/v2/util/province',
+    var apiResult = await http.get(Uri.parse('http://irg.devus-sby.com/api/v2/util/province'),
         headers: {
           "Accept": "Application/json",
           "Authorization": "Bearer $token"
@@ -189,7 +194,7 @@ class _SearchActivityState extends State<SearchActivity> {
     SharedPreferences pref = await SharedPreferences.getInstance();
     var token = pref.getString("token") ?? "";
 
-    var apiResult = await http.get('http://irg.devus-sby.com/api/v2/util/province',
+    var apiResult = await http.get(Uri.parse('http://irg.devus-sby.com/api/v2/util/province'),
         headers: {
           "Accept": "Application/json",
           "Authorization": "Bearer $token"
@@ -228,7 +233,7 @@ class _SearchActivityState extends State<SearchActivity> {
     SharedPreferences pref = await SharedPreferences.getInstance();
     var token = pref.getString("token") ?? "";
 
-    var apiResult = await http.get('http://irg.devus-sby.com/api/v2/util/city/$provId2',
+    var apiResult = await http.get(Uri.parse('http://irg.devus-sby.com/api/v2/util/city/$provId2'),
         headers: {
           "Accept": "Application/json",
           "Authorization": "Bearer $token"
@@ -312,7 +317,14 @@ class _SearchActivityState extends State<SearchActivity> {
                       },
                       // dropdownSearchDecoration: InputDecoration(counterText: ''),
                       items: prov,
-                      label: "Pilih Provinsi",
+                      // label: "Pilih Provinsi",
+                      dropdownSearchDecoration: InputDecoration(
+                          labelText: "Pilih Provinsi",
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(10.0),
+                          )
+                        // hintText: "fasilitas",
+                      ),
                       onChanged: (data) {
                         print(data);
                         kota = [];
@@ -367,7 +379,14 @@ class _SearchActivityState extends State<SearchActivity> {
                       },
                       // dropdownSearchDecoration: InputDecoration(counterText: ''),
                       items: kota,
-                      label: "Pilih Kota",
+                      // label: "Pilih Kota",
+                      dropdownSearchDecoration: InputDecoration(
+                          labelText: "Pilih Kota",
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(10.0),
+                          )
+                        // hintText: "fasilitas",
+                      ),
                       onChanged: (data) {
                         print(data);
                         // idProv = data!;
@@ -420,7 +439,14 @@ class _SearchActivityState extends State<SearchActivity> {
                         return MyListTileBuilderImplementation(); //This is where the ListTile will go.
                       },
                       items: cuisineList,
-                      label: "Pilih Cuisine",
+                      // label: "Pilih Cuisine",
+                      dropdownSearchDecoration: InputDecoration(
+                          labelText: "Pilih Cuisine",
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(10.0),
+                          )
+                        // hintText: "fasilitas",
+                      ),
                       // emptyBuilder: (child) => Badge(child: child!),
                       onChanged: (data) {
                         print(data);
@@ -491,13 +517,39 @@ class _SearchActivityState extends State<SearchActivity> {
                         return MyListTileBuilderImplementation(); //This is where the ListTile will go.
                       },
                       items: facilityList,
-                      label: "Pilih Fasilitas",
+                      // label: "Pilih Fasilitas",
                       onChanged: (data) {
-                        idFasilitas = data!;
-                        fasilitas = data;
-                        getFacilityid();
-                        setState(() {});
-                        setStateModal(() {});
+                        if (facilityNew.contains(data.toString())) {
+                          print('pler3');
+                          // print(fasilitas);
+                          Fluttertoast.showToast(
+                            msg: "Sebelumnya sudah anda pilih!",);
+                          facilityList2 = '';
+                          fasilitas = '';
+                          facilityNew = [];
+                          setState(() {});
+                          setStateModal(() {});
+                        } else {
+                          if (fasilitas == '') {
+                            idFasilitas = data!;
+                            fasilitas = data;
+                            facilityNew.add(data.toString());
+                            print('pler1');
+                            print(facilityNew);
+                            getFacilityid();
+                            setState(() {});
+                            setStateModal(() {});
+                          } else {
+                            print('pler2');
+                            // print(facilityList1.contains((element) => element.name.toLowerCase() == data!.toLowerCase()));
+                            idFasilitas = data!;
+                            fasilitas = fasilitas + ', ' + data;
+                            facilityNew.add(idFasilitas);
+                            getFacilityid();
+                            setState(() {});
+                            setStateModal(() {});
+                          }
+                        }
                         // print(fasilitas);
                         // fasilitas = data!;
                         // fasilitas = data!.splitMapJoin(',');
@@ -522,6 +574,13 @@ class _SearchActivityState extends State<SearchActivity> {
                       selectedItem: (fasilitas == '')?null:fasilitas,
                       // selectedItem: "Brazil",
                       showSearchBox: true,
+                      dropdownSearchDecoration: InputDecoration(
+                        labelText: "Pilih Fasilitas",
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(10.0),
+                        )
+                        // hintText: "fasilitas",
+                      ),
                       searchFieldProps: TextFieldProps(
                         decoration: InputDecoration(
                           border: OutlineInputBorder(),
@@ -543,6 +602,7 @@ class _SearchActivityState extends State<SearchActivity> {
                           onTap: (){
                             fasilitas = '';
                             facilityList2 = '';
+                            facilityNew = [];
                             setState(() {});
                             setStateModal(() {});
                           },
@@ -574,7 +634,7 @@ class _SearchActivityState extends State<SearchActivity> {
   Future<void> getFacility() async {
     SharedPreferences pref = await SharedPreferences.getInstance();
     var token = pref.getString("token") ?? "";
-    var data = await http.get(Links.mainUrl +'/util/data?q=facility',
+    var data = await http.get(Uri.parse(Links.mainUrl +'/util/data?q=facility'),
         headers: {
           "Accept": "application/json",
           "Authorization": "Bearer $token"
@@ -590,20 +650,22 @@ class _SearchActivityState extends State<SearchActivity> {
   }
 
   List<Cuisine> facilityList1 = [];
+  List<Cuisine> facility = [];
   String facilityList2 = '';
-  Future<void> getFacilityid() async {
+  Future<void> _getFacilityid() async {
     List<Cuisine> _fasilitas = [];
 
     SharedPreferences pref = await SharedPreferences.getInstance();
     var token = pref.getString("token") ?? "";
-    var data = await http.get(Links.mainUrl +'/util/data?q=facility',
+    var data = await http.get(Uri.parse(Links.mainUrl +'/util/data?q=facility'),
         headers: {
           "Accept": "application/json",
           "Authorization": "Bearer $token"
         }
     );
     var jsonData = jsonDecode(data.body);
-    // print(jsonData);
+    print('BUH');
+    print(jsonData);
 
     // facilityList1.add(jsonData['data'].toString().split('[')[1].split(']')[0]);
     // print('serius id'+facilityList1.toString());
@@ -616,9 +678,63 @@ class _SearchActivityState extends State<SearchActivity> {
     }
 
     setState(() {
-      facilityList1 = _fasilitas.where((element) => element.name.toLowerCase().contains(idFasilitas.toLowerCase())).toList();
-      facilityList2 = facilityList1.single.id.toString();
-      print('${facilityList2}'.toString());
+      facility = _fasilitas;
+      // facilityList1 = _fasilitas.where((element) => element.name.toLowerCase().contains(idFasilitas.toLowerCase())).toList();
+      // if (facilityList2 == '') {
+      //   facilityList2 = facilityList1.single.id.toString();
+      //   print('${facilityList2}'.toString());
+      //   print('iki');
+      // } else {
+      //   facilityList2 = facilityList2+ ', '+facilityList1.single.id.toString();
+      //   print('${facilityList2}'.toString());
+      // }
+      // for(var b in facilityList1){
+      //   facilityList1.add(b['id']);
+      // }
+    });
+  }
+
+  List<String> facilityNew = [];
+
+  Future<void> getFacilityid() async {
+    // List<Cuisine> _fasilitas = [];
+
+    // SharedPreferences pref = await SharedPreferences.getInstance();
+    // var token = pref.getString("token") ?? "";
+    // var data = await http.get(Uri.parse(Links.mainUrl +'/util/data?q=facility'),
+    //     headers: {
+    //       "Accept": "application/json",
+    //       "Authorization": "Bearer $token"
+    //     }
+    // );
+    // var jsonData = jsonDecode(data.body);
+    // // print(jsonData);
+    //
+    // // facilityList1.add(jsonData['data'].toString().split('[')[1].split(']')[0]);
+    // // print('serius id'+facilityList1.toString());
+    // for(var v in jsonData['data']){
+    //   Cuisine h = Cuisine(
+    //     id: v['id'],
+    //     name: v['name'],
+    //   );
+    //   _fasilitas.add(h);
+    // }
+
+    setState(() {
+      print(facility.where((element) => element.name.toLowerCase() == idFasilitas.toLowerCase()).toList());
+      facilityList1 = facility.where((element) => element.name.toLowerCase() == idFasilitas.toLowerCase()).toList();
+      if (facilityList2 == '') {
+        facilityList2 = facilityList1.single.id.toString();
+        print('${facilityList2}'.toString());
+        print('iki');
+        print(facilityList1.single.name);
+        setState(() {});
+      } else if (facilityList2 != '') {
+        facilityList2 = facilityList2+ ','+facilityList1.single.id.toString();
+        print('search cok');
+        print('${facilityList2}'.toString());
+        setState(() {});
+      }
       // for(var b in facilityList1){
       //   facilityList1.add(b['id']);
       // }
@@ -629,7 +745,7 @@ class _SearchActivityState extends State<SearchActivity> {
   Future<void> getCuisine() async {
     SharedPreferences pref = await SharedPreferences.getInstance();
     var token = pref.getString("token") ?? "";
-    var data = await http.get(Links.mainUrl +'/util/data?q=cuisine',
+    var data = await http.get(Uri.parse(Links.mainUrl +'/util/data?q=cuisine'),
         headers: {
           "Accept": "application/json",
           "Authorization": "Bearer $token"
@@ -657,6 +773,7 @@ class _SearchActivityState extends State<SearchActivity> {
     if(cui != ''){
       searchHome();
     }
+    _getFacilityid();
     getFacility();
     getCuisine();
     facilityList2 = '';
@@ -1035,28 +1152,42 @@ class _SearchActivityState extends State<SearchActivity> {
                                     ),
                                     Container(
                                       width: CustomSize.sizeWidth(context) / 2.1,
+                                      height: CustomSize.sizeWidth(context) / 2.85,
                                       child: Column(
-                                        mainAxisAlignment: MainAxisAlignment.center,
+                                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                         crossAxisAlignment: CrossAxisAlignment.start,
                                         children: [
-                                          CustomText.bodyLight12(
-                                              text: promo[index].distance.toString() + " km",
-                                              maxLines: 1,
-                                              sizeNew: double.parse(((MediaQuery.of(context).size.width*0.03).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.03)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.03)).toString())
+                                          Column(
+                                            mainAxisAlignment: MainAxisAlignment.start,
+                                            crossAxisAlignment: CrossAxisAlignment.start,
+                                            children: [
+                                              CustomText.bodyLight12(
+                                                  text: promo[index].distance.toString() + " km",
+                                                  maxLines: 1,
+                                                  minSize: double.parse(((MediaQuery.of(context).size.width*0.033).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.033)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.033)).toString())
+                                              ),
+                                              SizedBox(height: CustomSize.sizeHeight(context) * 0.00426,),
+                                              CustomText.textHeading4(
+                                                  text: promo[index].name,
+                                                  sizeNew: double.parse(((MediaQuery.of(context).size.width*0.045).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.045)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.045)).toString()),
+                                                  maxLines: 2,
+                                                  // color: CustomColor.primary
+                                              ),
+                                              CustomText.textHeading2(
+                                                  text: promo[index].restoName,
+                                                  minSize: double.parse(((MediaQuery.of(context).size.width*0.03).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.03)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.03)).toString()),
+                                                  maxLines: 2,
+                                                  color: CustomColor.primary
+                                              ),
+                                              // SizedBox(height: CustomSize.sizeHeight(context) / 86,),
+                                              // CustomText.bodyMedium12(
+                                              //     text: promo[index].restoName,
+                                              //     maxLines: 1,
+                                              //     sizeNew: double.parse(((MediaQuery.of(context).size.width*0.03).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.03).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.03).toString())
+                                              // ),
+                                              // SizedBox(height: CustomSize.sizeHeight(context) / 48,),
+                                            ],
                                           ),
-                                          SizedBox(height: CustomSize.sizeHeight(context) / 86,),
-                                          CustomText.textHeading4(
-                                              text: promo[index].name,
-                                              sizeNew: double.parse(((MediaQuery.of(context).size.width*0.045).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.045)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.045)).toString()),
-                                              maxLines: 1
-                                          ),
-                                          SizedBox(height: CustomSize.sizeHeight(context) / 86,),
-                                          CustomText.bodyMedium12(
-                                              text: promo[index].restoName,
-                                              maxLines: 1,
-                                              sizeNew: double.parse(((MediaQuery.of(context).size.width*0.03).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.03).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.03).toString())
-                                          ),
-                                          SizedBox(height: CustomSize.sizeHeight(context) / 48,),
                                           Row(
                                             children: [
                                               CustomText.bodyRegular12(text: NumberFormat.currency(locale: 'id', symbol: '', decimalDigits: 0).format(promo[index].price!.original), sizeNew: double.parse(((MediaQuery.of(context).size.width*0.03).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.03).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.03).toString()),
@@ -1103,10 +1234,35 @@ class _SearchActivityState extends State<SearchActivity> {
                       (menu.isNotEmpty)?SizedBox(height: CustomSize.sizeHeight(context) / 48,):SizedBox(),
                       (menu.isNotEmpty)?Padding(
                         padding: EdgeInsets.symmetric(horizontal: CustomSize.sizeWidth(context) / 24),
-                        child: CustomText.textTitle2(
-                            text: "Menu",
-                            maxLines: 1,
-                            sizeNew: double.parse(((MediaQuery.of(context).size.width*0.045).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.045)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.045)).toString())
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            CustomText.textTitle2(
+                                text: "Menu",
+                                maxLines: 1,
+                                sizeNew: double.parse(((MediaQuery.of(context).size.width*0.045).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.045)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.045)).toString())
+                            ),
+                            GestureDetector(
+                              onTap: ()async{
+                                // SharedPreferences pref = await SharedPreferences.getInstance();
+                                // pref.setString('statusPesanan', );
+                                var i = await Navigator.push(
+                                    context,
+                                    PageTransition(
+                                        type: PageTransitionType.rightToLeft,
+                                        child: new MoreMenuActivity(_loginTextName.text.toString(), tipe.toString(), lat.toString(), long.toString(), kota2 = kota1.contains(" ") ? kota1.split(' ')[1] : "", facilityList2.toString())));
+                              },
+                              child: MediaQuery(
+                                child: CustomText.bodyMedium12(
+                                  text: "Lebih banyak",
+                                  color: CustomColor.primary,
+                                  maxLines: 1,
+                                  sizeNew: double.parse(((MediaQuery.of(context).size.width*0.03).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.03)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.03)).toString()),
+                                ),
+                                data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0),
+                              ),
+                            ),
+                          ],
                         ),
                       ):SizedBox(),
                       (menu.isNotEmpty)?Container(
@@ -1114,7 +1270,7 @@ class _SearchActivityState extends State<SearchActivity> {
                         height: CustomSize.sizeHeight(context) / 5,
                         child: ListView.builder(
                             scrollDirection: Axis.horizontal,
-                            itemCount: menu.length,
+                            itemCount: (menu.length > 15)?15:menu.length,
                             itemBuilder: (_, index){
                               return Padding(
                                 padding: EdgeInsets.only(left: CustomSize.sizeWidth(context) / 20,
@@ -1184,7 +1340,8 @@ class _SearchActivityState extends State<SearchActivity> {
                                                   children: [
                                                     // CustomText.bodyRegular12(text: menu[index].distance.toString() + " Km", minSize: 12),
                                                     CustomText.textTitle6(text: menu[index].name, sizeNew: double.parse(((MediaQuery.of(context).size.width*0.035).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.035)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.035)).toString()), maxLines: 2),
-                                                    CustomText.bodyMedium12(text: menu[index].restoName, sizeNew: double.parse(((MediaQuery.of(context).size.width*0.03).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.03).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.03).toString())),
+                                                    CustomText.bodyMedium12(text: menu[index].restoName, sizeNew: double.parse(((MediaQuery.of(context).size.width*0.03).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.03).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.03).toString()),
+                                                        color: CustomColor.primary),
                                                   ],
                                                 ),
                                                 Row(
@@ -1212,10 +1369,35 @@ class _SearchActivityState extends State<SearchActivity> {
                       (resto.isNotEmpty)?SizedBox(height: CustomSize.sizeHeight(context) / 48,):SizedBox(),
                       (resto.isNotEmpty)?Padding(
                         padding: EdgeInsets.symmetric(horizontal: CustomSize.sizeWidth(context) / 24),
-                        child: CustomText.textTitle2(
-                            text: "Resto",
-                            maxLines: 1,
-                            sizeNew: double.parse(((MediaQuery.of(context).size.width*0.045).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.045)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.045)).toString())
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            CustomText.textTitle2(
+                                text: "Resto",
+                                maxLines: 1,
+                                sizeNew: double.parse(((MediaQuery.of(context).size.width*0.045).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.045)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.045)).toString())
+                            ),
+                            GestureDetector(
+                              onTap: ()async{
+                                // SharedPreferences pref = await SharedPreferences.getInstance();
+                                // pref.setString('statusPesanan', );
+                                var i = await Navigator.push(
+                                    context,
+                                    PageTransition(
+                                        type: PageTransitionType.rightToLeft,
+                                        child: new MoreRestoActivity(_loginTextName.text.toString(), tipe.toString(), lat.toString(), long.toString(), kota2 = kota1.contains(" ") ? kota1.split(' ')[1] : "", facilityList2.toString())));
+                              },
+                              child: MediaQuery(
+                                child: CustomText.bodyMedium12(
+                                  text: "Lebih banyak",
+                                  color: CustomColor.primary,
+                                  maxLines: 1,
+                                  sizeNew: double.parse(((MediaQuery.of(context).size.width*0.03).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.03)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.03)).toString()),
+                                ),
+                                data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0),
+                              ),
+                            ),
+                          ],
                         ),
                       ):SizedBox(),
                       (resto.isNotEmpty)?Container(
@@ -1254,7 +1436,7 @@ class _SearchActivityState extends State<SearchActivity> {
                                     child: Column(
                                       crossAxisAlignment: CrossAxisAlignment.start,
                                       children: [
-                                        (resto[index].status.toString() == 'active')?(resto[index].isOpen.toString() == 'true')?Container(
+                                        Container(
                                           width: CustomSize.sizeWidth(context) / 2.3,
                                           height: CustomSize.sizeHeight(context) / 5.8,
                                           decoration: BoxDecoration(
@@ -1264,57 +1446,72 @@ class _SearchActivityState extends State<SearchActivity> {
                                             ),
                                             borderRadius: BorderRadius.circular(20),
                                           ),
-                                        ):Container(
-                                          width: CustomSize.sizeWidth(context) / 2.3,
-                                          height: CustomSize.sizeHeight(context) / 5.8,
-                                          child: ClipRRect(
-                                            borderRadius: BorderRadius.circular(20),
-                                            child: ColorFiltered(
-                                              colorFilter: ColorFilter.mode(
-                                                Colors.grey,
-                                                BlendMode.saturation,
-                                              ),
-                                              child: Container(
-                                                decoration: BoxDecoration(
-                                                  image: DecorationImage(
-                                                      image: NetworkImage(Links.subUrl + resto[index].img!),
-                                                      fit: BoxFit.cover
-                                                  ),
-                                                  borderRadius: BorderRadius.circular(20),
-                                                ),
-                                              ),
-                                            ),
-                                          ),
-                                        ):Container(
-                                          width: CustomSize.sizeWidth(context) / 2.3,
-                                          height: CustomSize.sizeHeight(context) / 5.8,
-                                          child: ClipRRect(
-                                            borderRadius: BorderRadius.circular(20),
-                                            child: ColorFiltered(
-                                              colorFilter: ColorFilter.mode(
-                                                Colors.grey,
-                                                BlendMode.saturation,
-                                              ),
-                                              child: Container(
-                                                decoration: BoxDecoration(
-                                                  image: DecorationImage(
-                                                      image: NetworkImage(Links.subUrl + resto[index].img!),
-                                                      fit: BoxFit.cover
-                                                  ),
-                                                  borderRadius: BorderRadius.circular(20),
-                                                ),
-                                              ),
-                                            ),
-                                          ),
                                         ),
+                                        // (resto[index].status.toString() == 'active')?(resto[index].isOpen.toString() == 'true')?Container(
+                                        //   width: CustomSize.sizeWidth(context) / 2.3,
+                                        //   height: CustomSize.sizeHeight(context) / 5.8,
+                                        //   decoration: BoxDecoration(
+                                        //     image: DecorationImage(
+                                        //         image: NetworkImage(Links.subUrl + resto[index].img!),
+                                        //         fit: BoxFit.cover
+                                        //     ),
+                                        //     borderRadius: BorderRadius.circular(20),
+                                        //   ),
+                                        // ):Container(
+                                        //   width: CustomSize.sizeWidth(context) / 2.3,
+                                        //   height: CustomSize.sizeHeight(context) / 5.8,
+                                        //   child: ClipRRect(
+                                        //     borderRadius: BorderRadius.circular(20),
+                                        //     child: ColorFiltered(
+                                        //       colorFilter: ColorFilter.mode(
+                                        //         Colors.grey,
+                                        //         BlendMode.saturation,
+                                        //       ),
+                                        //       child: Container(
+                                        //         decoration: BoxDecoration(
+                                        //           image: DecorationImage(
+                                        //               image: NetworkImage(Links.subUrl + resto[index].img!),
+                                        //               fit: BoxFit.cover
+                                        //           ),
+                                        //           borderRadius: BorderRadius.circular(20),
+                                        //         ),
+                                        //       ),
+                                        //     ),
+                                        //   ),
+                                        // ):Container(
+                                        //   width: CustomSize.sizeWidth(context) / 2.3,
+                                        //   height: CustomSize.sizeHeight(context) / 5.8,
+                                        //   child: ClipRRect(
+                                        //     borderRadius: BorderRadius.circular(20),
+                                        //     child: ColorFiltered(
+                                        //       colorFilter: ColorFilter.mode(
+                                        //         Colors.grey,
+                                        //         BlendMode.saturation,
+                                        //       ),
+                                        //       child: Container(
+                                        //         decoration: BoxDecoration(
+                                        //           image: DecorationImage(
+                                        //               image: NetworkImage(Links.subUrl + resto[index].img!),
+                                        //               fit: BoxFit.cover
+                                        //           ),
+                                        //           borderRadius: BorderRadius.circular(20),
+                                        //         ),
+                                        //       ),
+                                        //     ),
+                                        //   ),
+                                        // ),
                                         SizedBox(height: CustomSize.sizeHeight(context) / 86,),
                                         Padding(
                                           padding: EdgeInsets.only(left: CustomSize.sizeWidth(context) / 24),
                                           child: CustomText.bodyRegular14(text: resto[index].distance.toString() + " km", sizeNew: double.parse(((MediaQuery.of(context).size.width*0.035).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.035)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.035)).toString())),
                                         ),
                                         Padding(
-                                          padding: EdgeInsets.only(left: CustomSize.sizeWidth(context) / 24),
-                                          child: CustomText.bodyMedium16(text: resto[index].name, sizeNew: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.04)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.04)).toString())),
+                                          padding: EdgeInsets.only(left: CustomSize.sizeWidth(context) / 24, right: CustomSize.sizeWidth(context) / 34),
+                                          child: Container(
+                                            height: CustomSize.sizeWidth(context) / 12,
+                                            child: CustomText.bodyMedium16(text: resto[index].name, sizeNew: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.04)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.04)).toString()),
+                                                maxLines: 2),
+                                          ),
                                         ),
                                       ],
                                     ),

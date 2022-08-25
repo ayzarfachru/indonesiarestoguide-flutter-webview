@@ -2,7 +2,8 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_icons/flutter_icons.dart';
-import 'package:full_screen_image/full_screen_image.dart';
+import 'package:full_screen_image_null_safe/full_screen_image_null_safe.dart';
+// import 'package:full_screen_image/full_screen_image.dart';
 import 'package:kam5ia/ui/detail/detail_resto.dart';
 import 'package:kam5ia/ui/promo/add_promo.dart';
 import 'package:kam5ia/ui/promo/edit_promo.dart';
@@ -110,7 +111,7 @@ class _PromoActivityState extends State<PromoActivity> {
   getHomePg() async {
     SharedPreferences pref = await SharedPreferences.getInstance();
     setState(() {
-      homepg = (pref.getString('homepg'));
+      homepg = (pref.getString('homepg')??'');
       print(homepg);
     });
   }
@@ -124,7 +125,7 @@ class _PromoActivityState extends State<PromoActivity> {
     });
     SharedPreferences pref = await SharedPreferences.getInstance();
     String token = pref.getString("token") ?? "";
-    var apiResult = await http.get(Links.mainUrl + '/page/home?lat=$lat&long=$long&limit=0', headers: {
+    var apiResult = await http.get(Uri.parse(Links.mainUrl + '/page/home?lat=$lat&long=$long&limit=0'), headers: {
       "Accept": "Application/json",
       "Authorization": "Bearer $token"
     });
@@ -162,7 +163,7 @@ class _PromoActivityState extends State<PromoActivity> {
     });
     SharedPreferences pref = await SharedPreferences.getInstance();
     String token = pref.getString("token") ?? "";
-    var apiResult = await http.get(Links.mainUrl + '/promo', headers: {
+    var apiResult = await http.get(Uri.parse(Links.mainUrl + '/promo'), headers: {
       "Accept": "Application/json",
       "Authorization": "Bearer $token"
     });
@@ -277,14 +278,14 @@ class _PromoActivityState extends State<PromoActivity> {
     });
     SharedPreferences pref = await SharedPreferences.getInstance();
     String token = pref.getString("token") ?? "";
-    var apiResult = await http.get(Links.mainUrl + '/promo/delete/$id', headers: {
+    var apiResult = await http.get(Uri.parse(Links.mainUrl + '/promo/delete/$id'), headers: {
       "Accept": "Application/json",
       "Authorization": "Bearer $token"
     });
     print(apiResult.body);
     var data = json.decode(apiResult.body);
 
-    if (data['msg'].toString() == 'success') {
+    if (apiResult.statusCode == 200) {
       Navigator.pop(context);
       Navigator.pushReplacement(context,
           PageTransition(

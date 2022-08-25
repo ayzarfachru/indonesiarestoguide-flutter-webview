@@ -5,6 +5,8 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_icons/flutter_icons.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:intl/intl.dart';
+import 'package:kam5ia/model/Category.dart';
 import 'package:kam5ia/model/Transaction.dart';
 import 'package:kam5ia/ui/auth/login_activity.dart';
 import 'package:kam5ia/ui/detail/detail_resto.dart';
@@ -21,6 +23,7 @@ import 'package:kam5ia/ui/ui_resto/menu/menu_activity.dart';
 import 'package:kam5ia/ui/ui_resto/order/order_activity.dart';
 import 'package:kam5ia/ui/ui_resto/owner/add_owner.dart';
 import 'package:kam5ia/ui/ui_resto/reservation_resto/reservation_activity.dart';
+import 'package:kam5ia/ui/ui_resto/deposit/deposit_activity.dart';
 import 'package:kam5ia/ui/ui_resto/reservation_resto/reservation_pending_page.dart';
 import 'package:kam5ia/model/Meja.dart';
 import 'package:pull_to_refresh/pull_to_refresh.dart';
@@ -50,9 +53,9 @@ class _HomeActivityRestoState extends State<HomeActivityResto> with WidgetsBindi
   getOwner() async {
     SharedPreferences pref = await SharedPreferences.getInstance();
     setState(() {
-      owner = (pref.getString('owner'));
-      nameOwner = (pref.getString('nameOwner'));
-      emailOwner = (pref.getString('emailOwner'));
+      owner = (pref.getString('owner')??'');
+      nameOwner = (pref.getString('nameOwner')??'');
+      emailOwner = (pref.getString('emailOwner')??'');
       print(owner);
       print('POOO');
     });
@@ -63,7 +66,7 @@ class _HomeActivityRestoState extends State<HomeActivityResto> with WidgetsBindi
       _getUserResto();
       SharedPreferences pref = await SharedPreferences.getInstance();
       print('PUKIII 1');
-      id = pref.getInt("ownerId");
+      id = pref.getInt("ownerId")??0;
     }
   }
 
@@ -76,7 +79,7 @@ class _HomeActivityRestoState extends State<HomeActivityResto> with WidgetsBindi
     SharedPreferences pref = await SharedPreferences.getInstance();
     String token = pref.getString("token") ?? "";
     int idRes = pref.getInt("ownerId") ?? 0;
-    var apiResult = await http.get(Links.mainUrl + '/owner/deactivate', headers: {
+    var apiResult = await http.get(Uri.parse(Links.mainUrl + '/owner/deactivate'), headers: {
       "Accept": "Application/json",
       "Authorization": "Bearer $token"
     });
@@ -136,7 +139,7 @@ class _HomeActivityRestoState extends State<HomeActivityResto> with WidgetsBindi
   getImg() async {
     SharedPreferences pref = await SharedPreferences.getInstance();
     setState(() {
-      img = (pref.getString('img'));
+      img = (pref.getString('img')??'');
       print(img);
     });
   }
@@ -145,7 +148,7 @@ class _HomeActivityRestoState extends State<HomeActivityResto> with WidgetsBindi
   getHomePg() async {
     SharedPreferences pref = await SharedPreferences.getInstance();
     setState(() {
-      homepg = (pref.getString('homepg'));
+      homepg = (pref.getString('homepg')??'');
       print(homepg);
     });
   }
@@ -162,7 +165,7 @@ class _HomeActivityRestoState extends State<HomeActivityResto> with WidgetsBindi
     });
     SharedPreferences pref = await SharedPreferences.getInstance();
     String token = pref.getString("token") ?? "";
-    var apiResult = await http.get(Links.mainUrl + '/resto/qrcode', headers: {
+    var apiResult = await http.get(Uri.parse(Links.mainUrl + '/resto/qrcode'), headers: {
       "Accept": "Application/json",
       "Authorization": "Bearer $token"
     });
@@ -186,8 +189,8 @@ class _HomeActivityRestoState extends State<HomeActivityResto> with WidgetsBindi
   }
 
   _launchURL() async {
-    if (await canLaunch(url)) {
-      await launch(url);
+    if (await canLaunch(url!)) {
+      await launch(url!);
     } else {
       throw 'Error';
     }
@@ -212,7 +215,7 @@ class _HomeActivityRestoState extends State<HomeActivityResto> with WidgetsBindi
     SharedPreferences pref = await SharedPreferences.getInstance();
     String token = pref.getString("token") ?? "";
     idUser = pref.getInt("id") ?? 0;
-    var apiResult = await http.get(Links.mainUrl + '/resto', headers: {
+    var apiResult = await http.get(Uri.parse(Links.mainUrl + '/resto'), headers: {
       "Accept": "Application/json",
       "Authorization": "Bearer $token"
     });
@@ -232,9 +235,9 @@ class _HomeActivityRestoState extends State<HomeActivityResto> with WidgetsBindi
     //   _history.add(h);
     // }
 
-    if (apiResult.statusCode == 200) {
-      _getDetail();
-    }
+    // if (apiResult.statusCode == 200) {
+    //   _getDetail();
+    // }
     setState(() {
       restoName = data['resto']['name'];
       id = data['resto']['id'];
@@ -272,16 +275,25 @@ class _HomeActivityRestoState extends State<HomeActivityResto> with WidgetsBindi
   String phone = '';
   String address = '';
   bool reservation = false;
+  String deposit = '';
   Future _getDetail()async{
     List<String> _facility = [];
     SharedPreferences pref = await SharedPreferences.getInstance();
     String token = pref.getString("token") ?? "";
-    var apiResult = await http.get(Links.mainUrl + '/resto/detail/$id', headers: {
+    var apiResult = await http.get(Uri.parse(Links.mainUrl + '/resto/detail/$id'), headers: {
       "Accept": "Application/json",
       "Authorization": "Bearer $token"
     });
     var data = json.decode(apiResult.body);
-    print('Open '+data.toString());
+    print('Open '+data['data']['is_deposit'].toString());
+
+    // String id = pref.getString("idHomeResto") ?? "";
+    var apiResult2 = await http
+        .get(Uri.parse(Links.mainUrl + "/deposit/$id"), headers: {
+      "Accept": "Application/json",
+      "Authorization": "Bearer $token"
+    });
+    var data2 = json.decode(apiResult2.body);
 
     for(var v in data['data']['fasilitas']){
       _facility.add(v['name']);
@@ -289,6 +301,10 @@ class _HomeActivityRestoState extends State<HomeActivityResto> with WidgetsBindi
 
     setState(() {
       reservation = (data['data']['reservation_fee'].toString() == '0')?false:true;
+      // reservation = true;
+      deposit = data2['balance'].toString();
+      // is_deposit = (int.parse(deposit) >= 1000)?data['data']['is_deposit']:false;
+      // is_deposit = true;
       if (data['data']['status'].toString() == 'active') {
         isOpen = data['data']['isOpen'].toString();
       } else {
@@ -309,6 +325,7 @@ class _HomeActivityRestoState extends State<HomeActivityResto> with WidgetsBindi
       }else if(isOpen == 'false'){
         SharedPreferences pref = await SharedPreferences.getInstance();
         pref.setString("isOpen", '0');
+        pref.setString("resProm", data['data']['name'].toString());
       }
         pref.setString("jUsaha", _facility.toString().split('[')[1].split(']')[0].replaceAll(new RegExp(r",\s+"), ","));
       Future.delayed(Duration(seconds: 1), () async{
@@ -322,18 +339,19 @@ class _HomeActivityRestoState extends State<HomeActivityResto> with WidgetsBindi
   getInitial() async {
     SharedPreferences pref = await SharedPreferences.getInstance();
     setState(() {
-      initial = (pref.getString('name').substring(0, 1).toUpperCase());
+      initial = (pref.getString('name')!.substring(0, 1).toUpperCase());
       print(initial);
     });
   }
 
   String status = 'ongoing';
+  bool is_deposit = true;
   Future checkTest() async{
     SharedPreferences pref = await SharedPreferences.getInstance();
     String token = pref.getString("token") ?? "";
 
     var apiResult = await http
-        .post(Links.mainUrl + '/payment/inquiry', headers: {
+        .post(Uri.parse(Links.mainUrl + '/payment/inquiry'), headers: {
       "Accept": "Application/json",
       "Authorization": "Bearer $token"
     });
@@ -354,6 +372,7 @@ class _HomeActivityRestoState extends State<HomeActivityResto> with WidgetsBindi
     // }
 
     status = data['status'];
+    // status = 'ongoing';
     setState(() {});
     if (apiResult.statusCode == 200) {
       if (status == 'ongoing') {
@@ -376,7 +395,7 @@ class _HomeActivityRestoState extends State<HomeActivityResto> with WidgetsBindi
 
     SharedPreferences pref = await SharedPreferences.getInstance();
     String token = pref.getString("token") ?? "";
-    var apiResult = await http.get(Links.mainUrl + '/resto/trans', headers: {
+    var apiResult = await http.get(Uri.parse(Links.mainUrl + '/resto/trans'), headers: {
       "Accept": "Application/json",
       "Authorization": "Bearer $token"
     });
@@ -453,7 +472,7 @@ class _HomeActivityRestoState extends State<HomeActivityResto> with WidgetsBindi
 
     SharedPreferences pref = await SharedPreferences.getInstance();
     String token = pref.getString("token") ?? "";
-    var apiResult = await http.get(Links.mainUrl + '/resto/reservation', headers: {
+    var apiResult = await http.get(Uri.parse(Links.mainUrl + '/resto/reservation'), headers: {
       "Accept": "Application/json",
       "Authorization": "Bearer $token"
     });
@@ -586,15 +605,12 @@ class _HomeActivityRestoState extends State<HomeActivityResto> with WidgetsBindi
     if (data != null){
       return getRoute(data.link);
     }
-    FirebaseDynamicLinks.instance.onLink(
-        onSuccess: (PendingDynamicLinkData dynamicLink) async {
-          print('pppp');
-          print(dynamicLink.link);
-          return getRoute(dynamicLink.link);
-        }, onError: (OnLinkErrorException e) async {
-      print('onLinkError');
-      return e.message;
-    });
+    FirebaseDynamicLinks.instance.onLink.listen((PendingDynamicLinkData dynamicLink) async {
+      print('pppp');
+      print(dynamicLink.link);
+      getRoute(dynamicLink.link);
+    }
+    );
     return HomeActivity();
   }
 
@@ -625,6 +641,102 @@ class _HomeActivityRestoState extends State<HomeActivityResto> with WidgetsBindi
             child: DetailResto(id)));
   }
 
+  int balance = 0;
+  List<Category> history2 = [];
+  Future getDepo() async {
+    // initializeDateFormatting();
+    SharedPreferences pref = await SharedPreferences.getInstance();
+    String token = pref.getString("token") ?? "";
+
+    history2 = [];
+    var apiResult = await http
+        .get(Uri.parse(Links.mainUrl + "/page/deposit"), headers: {
+      "Accept": "Application/json",
+      "Authorization": "Bearer $token"
+    });
+    print('oi');
+    print(apiResult.body);
+    var data = json.decode(apiResult.body);
+
+    var apiResult1 = await http.post(Uri.parse(Links.mainUrl + '/payment/inquiry-deposit'),
+        headers: {
+          "Accept": "Application/json",
+          "Authorization": "Bearer $token"
+        });
+    print('inquiry: '+apiResult1.body.toString());
+
+    if (data.toString().contains('history') == true ) {
+      for(var h in data['history']){
+        Category c = Category(
+            id: int.parse(h['amount']),
+            nama: h['trans_code']??"topup",
+            created: h['created_at'], img: ''
+        );
+        history2.add(c);
+      }
+    }
+
+    setState(() {
+      // balance = 0;
+      balance = int.parse(data['balance'].toString());
+      if (balance < 10000 && balance != 0) {
+        showDialog(
+            context: context,
+            builder: (context) {
+              return AlertDialog(
+                contentPadding: EdgeInsets.only(left: 25, right: 25, top: 15, bottom: 5),
+                shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.all(Radius.circular(10))
+                ),
+                title: Center(child: Text('Peringatan!', style: TextStyle(color: CustomColor.redBtn))),
+                content: Text('Saldo deposit anda tinggal '+ NumberFormat.currency(locale: 'id', symbol: '', decimalDigits: 0).format(balance)+','+'\n segera isi sekarang juga!', style: TextStyle(fontSize: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.04)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.04)).toString()), fontWeight: FontWeight.w500), textAlign: TextAlign.center),
+                actions: <Widget>[
+                  Center(
+                    child: Padding(
+                      padding: EdgeInsets.only(left: 25, right: 25),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          // OutlineButton(
+                          //   // minWidth: CustomSize.sizeWidth(context),
+                          //   shape: StadiumBorder(),
+                          //   highlightedBorderColor: CustomColor.secondary,
+                          //   borderSide: BorderSide(
+                          //       width: 2,
+                          //       color: CustomColor.redBtn
+                          //   ),
+                          //   child: Text('Batal'),
+                          //   onPressed: () async{
+                          //     setState(() {
+                          //       // codeDialog = valueText;
+                          //       Navigator.pop(context);
+                          //     });
+                          //   },
+                          // ),
+                          FlatButton(
+                            color: CustomColor.accent,
+                            textColor: Colors.white,
+                            shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.all(Radius.circular(10))
+                            ),
+                            child: Text('Oke'),
+                            onPressed: () async{
+                              Navigator.pop(context);
+                              // String qrcode = '';
+                            },
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+
+                ],
+              );
+            });
+      }
+    });
+  }
+
   @override
   void initState() {
     WidgetsBinding.instance!.addObserver(this);
@@ -640,6 +752,7 @@ class _HomeActivityRestoState extends State<HomeActivityResto> with WidgetsBindi
     // idResto();
     getInitial();
     checkTest();
+    // getDepo();
     // _getQr();
   }
 
@@ -672,7 +785,7 @@ class _HomeActivityRestoState extends State<HomeActivityResto> with WidgetsBindi
     SharedPreferences pref = await SharedPreferences.getInstance();
     String token = pref.getString("token") ?? "";
     int idRes = pref.getInt("ownerId") ?? 0;
-    var apiResult = await http.get(Links.mainUrl + '/owner/deactivate', headers: {
+    var apiResult = await http.get(Uri.parse(Links.mainUrl + '/owner/deactivate'), headers: {
       "Accept": "Application/json",
       "Authorization": "Bearer $token"
     });
@@ -813,7 +926,7 @@ class _HomeActivityRestoState extends State<HomeActivityResto> with WidgetsBindi
                       Container(
                         padding: EdgeInsets.symmetric(horizontal: CustomSize.sizeWidth(context) / 10),
                         child: CustomText.textHeading5(
-                          text: "Selamat Datang,",
+                          text: (wait == true)?"Selamat Datang,":"Selamat Datang",
                           color: Colors.white,
                             sizeNew: double.parse(((MediaQuery.of(context).size.width*0.06).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.06)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.06)).toString()),
                           maxLines: 1
@@ -823,7 +936,7 @@ class _HomeActivityRestoState extends State<HomeActivityResto> with WidgetsBindi
                       Container(
                         padding: EdgeInsets.symmetric(horizontal: CustomSize.sizeWidth(context) / 10),
                         child: CustomText.textHeading5(
-                          text: "di "+restoName,
+                          text: (wait == true)?"di "+restoName:"",
                           color: Colors.white,
                             sizeNew: double.parse(((MediaQuery.of(context).size.width*0.06).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.06)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.06)).toString()),
                             maxLines: 1
@@ -835,7 +948,119 @@ class _HomeActivityRestoState extends State<HomeActivityResto> with WidgetsBindi
                           onTap: (){
                             // print(id.toString());
                             setState(() {
-                              Navigator.push(context, PageTransition(type: PageTransitionType.fade, child: new DetailRestoAdmin(id.toString())));
+                              if (is_deposit == true) {
+                                Navigator.push(context, PageTransition(type: PageTransitionType.fade, child: new DetailRestoAdmin(id.toString())));
+                              } else {
+                                if ((transaction.where((element) => element.is_opened.contains('0')).length) != 0) {
+                                  showDialog(
+                                      context: context,
+                                      builder: (context) {
+                                        return AlertDialog(
+                                          contentPadding: EdgeInsets.only(left: 25, right: 25, top: 15, bottom: 5),
+                                          shape: RoundedRectangleBorder(
+                                              borderRadius: BorderRadius.all(Radius.circular(10))
+                                          ),
+                                          title: Center(child: Text('Peringatan!', style: TextStyle(color: CustomColor.redBtn))),
+                                          content: Text('Segera isi deposit sekarang juga!\nAda '+(transaction.where((element) => element.is_opened.contains('0')).length).toString()+' pesanan sedang menunggu untuk diproses', style: TextStyle(fontSize: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.04)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.04)).toString()), fontWeight: FontWeight.w500), textAlign: TextAlign.center),
+                                          actions: <Widget>[
+                                            Center(
+                                              child: Padding(
+                                                padding: EdgeInsets.only(left: 25, right: 25),
+                                                child: Row(
+                                                  mainAxisAlignment: MainAxisAlignment.center,
+                                                  children: [
+                                                    // OutlineButton(
+                                                    //   // minWidth: CustomSize.sizeWidth(context),
+                                                    //   shape: StadiumBorder(),
+                                                    //   highlightedBorderColor: CustomColor.secondary,
+                                                    //   borderSide: BorderSide(
+                                                    //       width: 2,
+                                                    //       color: CustomColor.redBtn
+                                                    //   ),
+                                                    //   child: Text('Batal'),
+                                                    //   onPressed: () async{
+                                                    //     setState(() {
+                                                    //       // codeDialog = valueText;
+                                                    //       Navigator.pop(context);
+                                                    //     });
+                                                    //   },
+                                                    // ),
+                                                    FlatButton(
+                                                      color: CustomColor.accent,
+                                                      textColor: Colors.white,
+                                                      shape: RoundedRectangleBorder(
+                                                          borderRadius: BorderRadius.all(Radius.circular(10))
+                                                      ),
+                                                      child: Text('Oke'),
+                                                      onPressed: () async{
+                                                        Navigator.pop(context);
+                                                        // String qrcode = '';
+                                                      },
+                                                    ),
+                                                  ],
+                                                ),
+                                              ),
+                                            ),
+
+                                          ],
+                                        );
+                                      });
+                                } else {
+                                  showDialog(
+                                      context: context,
+                                      builder: (context) {
+                                        return AlertDialog(
+                                          contentPadding: EdgeInsets.only(left: 25, right: 25, top: 15, bottom: 5),
+                                          shape: RoundedRectangleBorder(
+                                              borderRadius: BorderRadius.all(Radius.circular(10))
+                                          ),
+                                          title: Center(child: Text('Peringatan!', style: TextStyle(color: CustomColor.redBtn))),
+                                          content: Text('Segera isi deposit sekarang juga!\nAgar restomu aktif dan dapat berjualan kembali', style: TextStyle(fontSize: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.04)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.04)).toString()), fontWeight: FontWeight.w500), textAlign: TextAlign.center),
+                                          actions: <Widget>[
+                                            Center(
+                                              child: Padding(
+                                                padding: EdgeInsets.only(left: 25, right: 25),
+                                                child: Row(
+                                                  mainAxisAlignment: MainAxisAlignment.center,
+                                                  children: [
+                                                    // OutlineButton(
+                                                    //   // minWidth: CustomSize.sizeWidth(context),
+                                                    //   shape: StadiumBorder(),
+                                                    //   highlightedBorderColor: CustomColor.secondary,
+                                                    //   borderSide: BorderSide(
+                                                    //       width: 2,
+                                                    //       color: CustomColor.redBtn
+                                                    //   ),
+                                                    //   child: Text('Batal'),
+                                                    //   onPressed: () async{
+                                                    //     setState(() {
+                                                    //       // codeDialog = valueText;
+                                                    //       Navigator.pop(context);
+                                                    //     });
+                                                    //   },
+                                                    // ),
+                                                    FlatButton(
+                                                      color: CustomColor.accent,
+                                                      textColor: Colors.white,
+                                                      shape: RoundedRectangleBorder(
+                                                          borderRadius: BorderRadius.all(Radius.circular(10))
+                                                      ),
+                                                      child: Text('Oke'),
+                                                      onPressed: () async{
+                                                        Navigator.pop(context);
+                                                        // String qrcode = '';
+                                                      },
+                                                    ),
+                                                  ],
+                                                ),
+                                              ),
+                                            ),
+
+                                          ],
+                                        );
+                                      });
+                                }
+                              }
                             });
                           },
                           child: Container(
@@ -853,10 +1078,10 @@ class _HomeActivityRestoState extends State<HomeActivityResto> with WidgetsBindi
                                 ),
                               ],
                             ),
-                            child: Padding(
+                            child: (wait == true)?Padding(
                               padding: EdgeInsets.symmetric(horizontal: CustomSize.sizeWidth(context) / 20),
                               child: Row(
-                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                mainAxisAlignment: (is_deposit == true)?MainAxisAlignment.spaceBetween:MainAxisAlignment.spaceBetween,
                                 crossAxisAlignment: CrossAxisAlignment.center,
                                 children: [
                                   Container(
@@ -879,11 +1104,11 @@ class _HomeActivityRestoState extends State<HomeActivityResto> with WidgetsBindi
                                           crossAxisAlignment: CrossAxisAlignment.start,
                                           children: [
                                             CustomText.bodyRegular14(
-                                              text: "Info yang ditampilin tentang",
+                                              text: (is_deposit == true)?"Info yang ditampilkan tentang":"Isi deposit terlebih dahulu untuk",
                                                 sizeNew: double.parse(((MediaQuery.of(context).size.width*0.035).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.035)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.035)).toString())
                                             ),
                                             CustomText.bodyRegular14(
-                                                text: "restomu",
+                                                text: (is_deposit == true)?"restomu":"mengaktifkan restomu",
                                                 maxLines: 2,
                                                 sizeNew: double.parse(((MediaQuery.of(context).size.width*0.035).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.035)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.035)).toString())
                                             ),
@@ -892,10 +1117,25 @@ class _HomeActivityRestoState extends State<HomeActivityResto> with WidgetsBindi
                                       ],
                                     ),
                                   ),
-                                  Icon(MaterialCommunityIcons.home_account, color: CustomColor.primaryLight, size: 49,)
-                                ],
+                                  (is_deposit == true)?Icon(MaterialCommunityIcons.home_account, color: CustomColor.primaryLight, size: 49,):Stack(
+                                    alignment: Alignment.topRight,
+                                    children: [
+                                      Icon(FontAwesome.warning, color: CustomColor.primaryLight, size: 39,),
+                                      Positioned(
+                                        right: -2,
+                                        child: (transaction.where((element) => element.is_opened.contains('0')).length != 0)?Stack(
+                                          alignment: Alignment.center,
+                                          children: [
+                                            Icon(Icons.circle, color: CustomColor.redBtn, size: 22,),
+                                            CustomText.bodyMedium14(text: (transaction.where((element) => element.is_opened.contains('0')).length).toString(), color: Colors.white, sizeNew: double.parse(((MediaQuery.of(context).size.width*0.035).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.035)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.035)).toString()))
+                                          ],
+                                        ):Container(),
+                                      ),
+                                    ],
+                                  ),
+                               ], 
                               ),
-                            ),
+                            ):Container(),
                           ),
                         ),
                       ),
@@ -913,7 +1153,7 @@ class _HomeActivityRestoState extends State<HomeActivityResto> with WidgetsBindi
                           onRefresh: _onRefresh,
                           onLoading: _onLoading,
                           child: SingleChildScrollView(
-                            child: (wait == true)?Column(
+                            child: (wait == true)?(is_deposit == true)?Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 SizedBox(height: CustomSize.sizeHeight(context) / 90,),
@@ -926,7 +1166,7 @@ class _HomeActivityRestoState extends State<HomeActivityResto> with WidgetsBindi
                             Row(
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
-                                GestureDetector(
+                                (idUserRest == idUser)?GestureDetector(
                                   onTap: (){
                                     setState(() {
                                       Navigator.push(context, PageTransition(type: PageTransitionType.fade, child: new MenuActivity()));
@@ -960,47 +1200,7 @@ class _HomeActivityRestoState extends State<HomeActivityResto> with WidgetsBindi
                                       ],
                                     ),
                                   ),
-                                ),
-                                GestureDetector(
-                                  onTap: (){
-                                    setState(() {
-                                      print(homepg + "oi");
-                                      // Navigator.push(context, PageTransition(type: PageTransitionType.fade, child: new PromoActivity(id.toString())));
-                                      Navigator.push(context, PageTransition(type: PageTransitionType.fade, child: new PromoActivity()));
-                                    });
-                                  },
-                                  child: Container(
-                                    width: CustomSize.sizeWidth(context) / 3.8,
-                                    height: CustomSize.sizeWidth(context) / 3.8,
-                                    decoration: BoxDecoration(
-                                      color: Colors.white,
-                                      borderRadius: BorderRadius.circular(20),
-                                      boxShadow: [
-                                        BoxShadow(
-                                          color: Colors.grey.withOpacity(0.5),
-                                          spreadRadius: 0,
-                                          blurRadius: 7,
-                                          offset: Offset(0, 7), // changes position of shadow
-                                        ),
-                                      ],
-                                    ),
-                                    child: Column(
-                                      mainAxisAlignment: MainAxisAlignment.center,
-                                      crossAxisAlignment: CrossAxisAlignment.center,
-                                      children: [
-                                        Icon(FontAwesome.tags, color: CustomColor.primaryLight, size: 32,),
-                                        CustomText.bodyMedium14(
-                                            text: "Promo",
-                                            sizeNew: double.parse(((MediaQuery.of(context).size.width*0.035).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.035)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.035)).toString()),
-                                            maxLines: 1
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                ),
-
-
-                                GestureDetector(
+                                ):GestureDetector(
                                   onTap: (){
                                     setState(() async{
                                       SharedPreferences pref = await SharedPreferences.getInstance();
@@ -1055,6 +1255,183 @@ class _HomeActivityRestoState extends State<HomeActivityResto> with WidgetsBindi
                                         ):Container(),
                                       ),
                                     ],
+                                  ),
+                                ),
+                                (idUserRest == idUser)?GestureDetector(
+                                  onTap: (){
+                                    setState(() {
+                                      print(homepg + "oi");
+                                      // Navigator.push(context, PageTransition(type: PageTransitionType.fade, child: new PromoActivity(id.toString())));
+                                      Navigator.push(context, PageTransition(type: PageTransitionType.fade, child: new PromoActivity()));
+                                    });
+                                  },
+                                  child: Container(
+                                    width: CustomSize.sizeWidth(context) / 3.8,
+                                    height: CustomSize.sizeWidth(context) / 3.8,
+                                    decoration: BoxDecoration(
+                                      color: Colors.white,
+                                      borderRadius: BorderRadius.circular(20),
+                                      boxShadow: [
+                                        BoxShadow(
+                                          color: Colors.grey.withOpacity(0.5),
+                                          spreadRadius: 0,
+                                          blurRadius: 7,
+                                          offset: Offset(0, 7), // changes position of shadow
+                                        ),
+                                      ],
+                                    ),
+                                    child: Column(
+                                      mainAxisAlignment: MainAxisAlignment.center,
+                                      crossAxisAlignment: CrossAxisAlignment.center,
+                                      children: [
+                                        Icon(FontAwesome.tags, color: CustomColor.primaryLight, size: 32,),
+                                        CustomText.bodyMedium14(
+                                            text: "Promo",
+                                            sizeNew: double.parse(((MediaQuery.of(context).size.width*0.035).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.035)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.035)).toString()),
+                                            maxLines: 1
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                ):GestureDetector(
+                                  onTap: (){
+                                    setState(() {
+                                      Navigator.push(context, PageTransition(type: PageTransitionType.fade, child: new FollowersActivity()));
+                                    });
+                                  },
+                                  child: Container(
+                                    width: CustomSize.sizeWidth(context) / 3.8,
+                                    height: CustomSize.sizeWidth(context) / 3.8,
+                                    decoration: BoxDecoration(
+                                      color: Colors.white,
+                                      borderRadius: BorderRadius.circular(20),
+                                      boxShadow: [
+                                        BoxShadow(
+                                          color: Colors.grey.withOpacity(0.5),
+                                          spreadRadius: 0,
+                                          blurRadius: 7,
+                                          offset: Offset(0, 7), // changes position of shadow
+                                        ),
+                                      ],
+                                    ),
+                                    child: Column(
+                                      mainAxisAlignment: MainAxisAlignment.center,
+                                      crossAxisAlignment: CrossAxisAlignment.center,
+                                      children: [
+                                        Icon(FontAwesome.group, color: CustomColor.primaryLight, size: 32,),
+                                        CustomText.bodyMedium14(
+                                            text: "Followers",
+                                            sizeNew: double.parse(((MediaQuery.of(context).size.width*0.035).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.035)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.035)).toString()),
+                                            maxLines: 1
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                ),
+
+
+                                (idUserRest == idUser)?GestureDetector(
+                                  onTap: (){
+                                    setState(() async{
+                                      SharedPreferences pref = await SharedPreferences.getInstance();
+                                      pref.setString('rev', '0');
+                                      Navigator.push(
+                                          context,
+                                          PageTransition(
+                                              type: PageTransitionType.rightToLeft,
+                                              child: OrderActivity()));
+                                    });
+                                  },
+                                  child: Stack(
+                                    alignment: Alignment.topRight,
+                                    children: [
+                                      Container(
+                                        width: CustomSize.sizeWidth(context) / 3.8,
+                                        height: CustomSize.sizeWidth(context) / 3.8,
+                                        decoration: BoxDecoration(
+                                          color: Colors.white,
+                                          borderRadius: BorderRadius.circular(20),
+                                          boxShadow: [
+                                            BoxShadow(
+                                              color: Colors.grey.withOpacity(0.5),
+                                              spreadRadius: 0,
+                                              blurRadius: 7,
+                                              offset: Offset(0, 7), // changes position of shadow
+                                            ),
+                                          ],
+                                        ),
+                                        child: Column(
+                                          mainAxisAlignment: MainAxisAlignment.center,
+                                          crossAxisAlignment: CrossAxisAlignment.center,
+                                          children: [
+                                            Icon(CupertinoIcons.cart_fill, color: CustomColor.primaryLight, size: 32,),
+                                            CustomText.bodyMedium14(
+                                                text: "Transaksi",
+                                                sizeNew: double.parse(((MediaQuery.of(context).size.width*0.035).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.035)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.035)).toString()),
+                                                maxLines: 1
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                      Container(
+                                        padding: EdgeInsets.only(right: 5, top: 5),
+                                        child: (transaction.where((element) => element.is_opened.contains('0')).length != 0 || (transactionC1.length + transaction2.length + transaction3.length) != 0)?
+                                        Stack(
+                                          alignment: Alignment.center,
+                                          children: [
+                                            Icon(Icons.circle, color: CustomColor.redBtn, size: 22,),
+                                            CustomText.bodyMedium14(text: (transaction.where((element) => element.is_opened.contains('0')).length + transactionC1.length + transaction2.length + transaction3.length).toString(), color: Colors.white, sizeNew: double.parse(((MediaQuery.of(context).size.width*0.035).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.035)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.035)).toString()))
+                                          ],
+                                        ):Container(),
+                                      ),
+                                    ],
+                                  ),
+                                ):GestureDetector(
+                                  onTap: (){
+                                    setState(() {
+                                      // _launchURL();
+                                      Navigator.push(context, PageTransition(type: PageTransitionType.fade, child: new MejaActivity()));
+                                    });
+                                  },
+                                  child: Container(
+                                    width: CustomSize.sizeWidth(context) / 3.8,
+                                    height: CustomSize.sizeWidth(context) / 3.8,
+                                    decoration: BoxDecoration(
+                                      color: Colors.white,
+                                      borderRadius: BorderRadius.circular(20),
+                                      boxShadow: [
+                                        BoxShadow(
+                                          color: Colors.grey.withOpacity(0.5),
+                                          spreadRadius: 0,
+                                          blurRadius: 7,
+                                          offset: Offset(0, 7), // changes position of shadow
+                                        ),
+                                      ],
+                                    ),
+                                    child: Column(
+                                      mainAxisAlignment: MainAxisAlignment.center,
+                                      crossAxisAlignment: CrossAxisAlignment.center,
+                                      children: [
+                                        Icon(FontAwesome.th, color: CustomColor.primaryLight, size: 32,),
+                                        CustomText.bodyMedium14(
+                                            text: "Meja",
+                                            sizeNew: double.parse(((MediaQuery.of(context).size.width*0.035).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.035)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.035)).toString()),
+                                            maxLines: 1
+                                        ),
+                                      ],
+                                    ),
+                                    // child: Column(
+                                    //   mainAxisAlignment: MainAxisAlignment.center,
+                                    //   crossAxisAlignment: CrossAxisAlignment.center,
+                                    //   children: [
+                                    //     Icon(FontAwesome.qrcode, color: CustomColor.primaryLight, size: 32,),
+                                    //     CustomText.bodyMedium14(
+                                    //         text: "Qr Code",
+                                    //         minSize: 14,
+                                    //         maxLines: 1
+                                    //     ),
+                                    //   ],
+                                    // ),
                                   ),
                                 ),
 
@@ -1115,7 +1492,7 @@ class _HomeActivityRestoState extends State<HomeActivityResto> with WidgetsBindi
                             Row(
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
-                                GestureDetector(
+                                (idUserRest == idUser)?GestureDetector(
                                   onTap: (){
                                     setState(() {
                                       Navigator.push(context, PageTransition(type: PageTransitionType.fade, child: new FollowersActivity()));
@@ -1149,58 +1526,7 @@ class _HomeActivityRestoState extends State<HomeActivityResto> with WidgetsBindi
                                       ],
                                     ),
                                   ),
-                                ),
-
-                                GestureDetector(
-                                  onTap: (){
-                                    setState(() {
-                                      // _launchURL();
-                                      Navigator.push(context, PageTransition(type: PageTransitionType.fade, child: new MejaActivity()));
-                                    });
-                                  },
-                                  child: Container(
-                                    width: CustomSize.sizeWidth(context) / 3.8,
-                                    height: CustomSize.sizeWidth(context) / 3.8,
-                                    decoration: BoxDecoration(
-                                      color: Colors.white,
-                                      borderRadius: BorderRadius.circular(20),
-                                      boxShadow: [
-                                        BoxShadow(
-                                          color: Colors.grey.withOpacity(0.5),
-                                          spreadRadius: 0,
-                                          blurRadius: 7,
-                                          offset: Offset(0, 7), // changes position of shadow
-                                        ),
-                                      ],
-                                    ),
-                                    child: Column(
-                                      mainAxisAlignment: MainAxisAlignment.center,
-                                      crossAxisAlignment: CrossAxisAlignment.center,
-                                      children: [
-                                        Icon(FontAwesome.th, color: CustomColor.primaryLight, size: 32,),
-                                        CustomText.bodyMedium14(
-                                            text: "Meja",
-                                            sizeNew: double.parse(((MediaQuery.of(context).size.width*0.035).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.035)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.035)).toString()),
-                                            maxLines: 1
-                                        ),
-                                      ],
-                                    ),
-                                    // child: Column(
-                                    //   mainAxisAlignment: MainAxisAlignment.center,
-                                    //   crossAxisAlignment: CrossAxisAlignment.center,
-                                    //   children: [
-                                    //     Icon(FontAwesome.qrcode, color: CustomColor.primaryLight, size: 32,),
-                                    //     CustomText.bodyMedium14(
-                                    //         text: "Qr Code",
-                                    //         minSize: 14,
-                                    //         maxLines: 1
-                                    //     ),
-                                    //   ],
-                                    // ),
-                                  ),
-                                ),
-
-                                (reservation == true)?GestureDetector(
+                                ):(reservation == true)?GestureDetector(
                                   onTap: (){
                                     setState(() async{
                                       SharedPreferences pref = await SharedPreferences.getInstance();
@@ -1295,88 +1621,95 @@ class _HomeActivityRestoState extends State<HomeActivityResto> with WidgetsBindi
                                       ],
                                     ),
                                   ),
-                                ):Container(
-                                  width: CustomSize.sizeWidth(context) / 3.8,
-                                  height: CustomSize.sizeWidth(context) / 3.8,),
-
-
-                                // Container(
-                                //   width: CustomSize.sizeWidth(context) / 3.8,
-                                //   height: CustomSize.sizeWidth(context) / 3.8,
-                                //   decoration: BoxDecoration(
-                                //     color: Colors.transparent,
-                                //   ),
-                                //   // child: Column(
-                                //   //   mainAxisAlignment: MainAxisAlignment.center,
-                                //   //   crossAxisAlignment: CrossAxisAlignment.center,
-                                //   //   children: [
-                                //   //     Icon(FontAwesome.qrcode, color: CustomColor.primaryLight, size: 32,),
-                                //   //     CustomText.bodyMedium14(
-                                //   //         text: "Qr Code",
-                                //   //         minSize: 14,
-                                //   //         maxLines: 1
-                                //   //     ),
-                                //   //   ],
-                                //   // ),
-                                // ),
-
-                                // GestureDetector(
-                                //   onTap: (){
-                                //     setState(() {
-                                //       // _launchURL();
-                                //       Navigator.push(context, PageTransition(type: PageTransitionType.fade, child: new MejaActivity()));
-                                //     });
-                                //   },
-                                //   child: Container(
-                                //     width: CustomSize.sizeWidth(context) / 3.8,
-                                //     height: CustomSize.sizeWidth(context) / 3.8,
-                                //     decoration: BoxDecoration(
-                                //       color: Colors.white,
-                                //       borderRadius: BorderRadius.circular(20),
-                                //       boxShadow: [
-                                //         BoxShadow(
-                                //           color: Colors.grey.withOpacity(0.5),
-                                //           spreadRadius: 0,
-                                //           blurRadius: 7,
-                                //           offset: Offset(0, 7), // changes position of shadow
-                                //         ),
-                                //       ],
-                                //     ),
-                                //     child: Column(
-                                //       mainAxisAlignment: MainAxisAlignment.center,
-                                //       crossAxisAlignment: CrossAxisAlignment.center,
-                                //       children: [
-                                //         Icon(FontAwesome.th, color: CustomColor.primaryLight, size: 32,),
-                                //         CustomText.bodyMedium14(
-                                //             text: "Meja",
-                                //             minSize: 14,
-                                //             maxLines: 1
-                                //         ),
-                                //       ],
-                                //     ),
-                                //     // child: Column(
-                                //     //   mainAxisAlignment: MainAxisAlignment.center,
-                                //     //   crossAxisAlignment: CrossAxisAlignment.center,
-                                //     //   children: [
-                                //     //     Icon(FontAwesome.qrcode, color: CustomColor.primaryLight, size: 32,),
-                                //     //     CustomText.bodyMedium14(
-                                //     //         text: "Qr Code",
-                                //     //         minSize: 14,
-                                //     //         maxLines: 1
-                                //     //     ),
-                                //     //   ],
-                                //     // ),
-                                //   ),
-                                // ),
-
-
-                              ],
-                            ),
-                                (reservation == true)?(status != 'done')?SizedBox(height: CustomSize.sizeHeight(context) / 48,):Container():Container(),
-                                (reservation == true)?(status != 'done')?Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                GestureDetector(
+                                ):GestureDetector(
+                                  onTap: (){
+                                    setState(() {
+                                      Navigator.push(context, PageTransition(type: PageTransitionType.fade, child: new DepositActivity()));
+                                      // if (tunggu == 'false') {
+                                      //   Navigator.push(context, PageTransition(type: PageTransitionType.fade, child: new PaymentResto(restoName, phone, address)));
+                                      // } else if (tunggu == 'true'){
+                                      //   Fluttertoast.showToast(msg: "Tunggu sebentar",);
+                                      // }
+                                      // Navigator.push(context, PageTransition(type: PageTransitionType.fade, child: new FollowersActivity()));
+                                    });
+                                  },
+                                  child: Container(
+                                    width: CustomSize.sizeWidth(context) / 3.8,
+                                    height: CustomSize.sizeWidth(context) / 3.8,
+                                    decoration: BoxDecoration(
+                                      color: Colors.white,
+                                      borderRadius: BorderRadius.circular(20),
+                                      boxShadow: [
+                                        BoxShadow(
+                                          color: Colors.grey.withOpacity(0.5),
+                                          spreadRadius: 0,
+                                          blurRadius: 7,
+                                          offset: Offset(0, 7), // changes position of shadow
+                                        ),
+                                      ],
+                                    ),
+                                    child: Column(
+                                      mainAxisAlignment: MainAxisAlignment.center,
+                                      crossAxisAlignment: CrossAxisAlignment.center,
+                                      children: [
+                                        Icon(MaterialCommunityIcons.wallet, color: CustomColor.primaryLight, size: 32,),
+                                        CustomText.bodyMedium14(
+                                            text: "Pendapatan",
+                                            sizeNew: double.parse(((MediaQuery.of(context).size.width*0.035).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.035)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.035)).toString()),
+                                            maxLines: 1
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                ),
+                                (idUserRest == idUser)?GestureDetector(
+                                  onTap: (){
+                                    setState(() {
+                                      // _launchURL();
+                                      Navigator.push(context, PageTransition(type: PageTransitionType.fade, child: new MejaActivity()));
+                                    });
+                                  },
+                                  child: Container(
+                                    width: CustomSize.sizeWidth(context) / 3.8,
+                                    height: CustomSize.sizeWidth(context) / 3.8,
+                                    decoration: BoxDecoration(
+                                      color: Colors.white,
+                                      borderRadius: BorderRadius.circular(20),
+                                      boxShadow: [
+                                        BoxShadow(
+                                          color: Colors.grey.withOpacity(0.5),
+                                          spreadRadius: 0,
+                                          blurRadius: 7,
+                                          offset: Offset(0, 7), // changes position of shadow
+                                        ),
+                                      ],
+                                    ),
+                                    child: Column(
+                                      mainAxisAlignment: MainAxisAlignment.center,
+                                      crossAxisAlignment: CrossAxisAlignment.center,
+                                      children: [
+                                        Icon(FontAwesome.th, color: CustomColor.primaryLight, size: 32,),
+                                        CustomText.bodyMedium14(
+                                            text: "Meja",
+                                            sizeNew: double.parse(((MediaQuery.of(context).size.width*0.035).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.035)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.035)).toString()),
+                                            maxLines: 1
+                                        ),
+                                      ],
+                                    ),
+                                    // child: Column(
+                                    //   mainAxisAlignment: MainAxisAlignment.center,
+                                    //   crossAxisAlignment: CrossAxisAlignment.center,
+                                    //   children: [
+                                    //     Icon(FontAwesome.qrcode, color: CustomColor.primaryLight, size: 32,),
+                                    //     CustomText.bodyMedium14(
+                                    //         text: "Qr Code",
+                                    //         minSize: 14,
+                                    //         maxLines: 1
+                                    //     ),
+                                    //   ],
+                                    // ),
+                                  ),
+                                ):(status != 'done' && reservation == true)?GestureDetector(
                                   onTap: (){
                                     setState(() {
                                       if (tunggu == 'false') {
@@ -1415,16 +1748,229 @@ class _HomeActivityRestoState extends State<HomeActivityResto> with WidgetsBindi
                                       ],
                                     ),
                                   ),
+                                ):GestureDetector(
+                                  onTap: (){
+                                    setState(() {
+                                      Navigator.push(context, PageTransition(type: PageTransitionType.fade, child: new DepositActivity()));
+                                      // if (tunggu == 'false') {
+                                      //   Navigator.push(context, PageTransition(type: PageTransitionType.fade, child: new PaymentResto(restoName, phone, address)));
+                                      // } else if (tunggu == 'true'){
+                                      //   Fluttertoast.showToast(msg: "Tunggu sebentar",);
+                                      // }
+                                      // Navigator.push(context, PageTransition(type: PageTransitionType.fade, child: new FollowersActivity()));
+                                    });
+                                  },
+                                  child: Container(
+                                    width: CustomSize.sizeWidth(context) / 3.8,
+                                    height: CustomSize.sizeWidth(context) / 3.8,
+                                    decoration: BoxDecoration(
+                                      color: Colors.white,
+                                      borderRadius: BorderRadius.circular(20),
+                                      boxShadow: [
+                                        BoxShadow(
+                                          color: Colors.grey.withOpacity(0.5),
+                                          spreadRadius: 0,
+                                          blurRadius: 7,
+                                          offset: Offset(0, 7), // changes position of shadow
+                                        ),
+                                      ],
+                                    ),
+                                    child: Column(
+                                      mainAxisAlignment: MainAxisAlignment.center,
+                                      crossAxisAlignment: CrossAxisAlignment.center,
+                                      children: [
+                                        Icon(MaterialCommunityIcons.wallet, color: CustomColor.primaryLight, size: 32,),
+                                        CustomText.bodyMedium14(
+                                            text: "Pendapatan",
+                                            sizeNew: double.parse(((MediaQuery.of(context).size.width*0.035).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.035)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.035)).toString()),
+                                            maxLines: 1
+                                        ),
+                                      ],
+                                    ),
+                                  ),
                                 ),
-                                Container(
+                                (idUserRest == idUser)?(reservation == true)?GestureDetector(
+                                  onTap: (){
+                                    setState(() async{
+                                      SharedPreferences pref = await SharedPreferences.getInstance();
+                                      pref.setString('rev', '1');
+                                      Navigator.push(
+                                          context,
+                                          PageTransition(
+                                              type: PageTransitionType.rightToLeft,
+                                              child: ReservationRestoActivity()));
+                                    });
+                                  },
+                                  child: Stack(
+                                    alignment: Alignment.topRight,
+                                    children: [
+                                      Container(
+                                        width: CustomSize.sizeWidth(context) / 3.8,
+                                        height: CustomSize.sizeWidth(context) / 3.8,
+                                        decoration: BoxDecoration(
+                                          color: Colors.white,
+                                          borderRadius: BorderRadius.circular(20),
+                                          boxShadow: [
+                                            BoxShadow(
+                                              color: Colors.grey.withOpacity(0.5),
+                                              spreadRadius: 0,
+                                              blurRadius: 7,
+                                              offset: Offset(0, 7), // changes position of shadow
+                                            ),
+                                          ],
+                                        ),
+                                        child: Column(
+                                          mainAxisAlignment: MainAxisAlignment.center,
+                                          crossAxisAlignment: CrossAxisAlignment.center,
+                                          children: [
+                                            Icon(FontAwesome5.clipboard, color: CustomColor.primaryLight, size: 32,),
+                                            CustomText.bodyMedium14(
+                                                text: "Reservasi",
+                                                sizeNew: double.parse(((MediaQuery.of(context).size.width*0.035).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.035)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.035)).toString()),
+                                                maxLines: 1
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                      Container(
+                                        padding: EdgeInsets.only(right: 5, top: 5),
+                                        child: (transactionR.where((element) => element.is_opened.contains('0')).length != 0 || (transactionC1R.length + transaction2R.length + transaction3R.length) != 0)?
+                                        Stack(
+                                          alignment: Alignment.center,
+                                          children: [
+                                            Icon(Icons.circle, color: CustomColor.redBtn, size: 22,),
+                                            CustomText.bodyMedium14(text: (transactionR.where((element) => element.is_opened.contains('0')).length + transactionC1R.length + transaction2R.length + transaction3R.length).toString(), color: Colors.white, sizeNew: double.parse(((MediaQuery.of(context).size.width*0.035).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.035)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.035)).toString()))
+                                          ],
+                                        ):Container(),
+                                      ),
+                                    ],
+                                  ),
+                                ):(status != 'done')?GestureDetector(
+                                  onTap: (){
+                                    setState(() {
+                                      if (tunggu == 'false') {
+                                        Navigator.push(context, PageTransition(type: PageTransitionType.fade, child: new PaymentResto(restoName, phone, address)));
+                                      } else if (tunggu == 'true'){
+                                        Fluttertoast.showToast(msg: "Tunggu sebentar",);
+                                      }
+                                      // Navigator.push(context, PageTransition(type: PageTransitionType.fade, child: new FollowersActivity()));
+                                    });
+                                  },
+                                  child: Container(
+                                    width: CustomSize.sizeWidth(context) / 3.8,
+                                    height: CustomSize.sizeWidth(context) / 3.8,
+                                    decoration: BoxDecoration(
+                                      color: Colors.white,
+                                      borderRadius: BorderRadius.circular(20),
+                                      boxShadow: [
+                                        BoxShadow(
+                                          color: Colors.grey.withOpacity(0.5),
+                                          spreadRadius: 0,
+                                          blurRadius: 7,
+                                          offset: Offset(0, 7), // changes position of shadow
+                                        ),
+                                      ],
+                                    ),
+                                    child: Column(
+                                      mainAxisAlignment: MainAxisAlignment.center,
+                                      crossAxisAlignment: CrossAxisAlignment.center,
+                                      children: [
+                                        Icon(FontAwesome.calendar_check_o, color: CustomColor.primaryLight, size: 32,),
+                                        CustomText.bodyMedium14(
+                                            text: "Langganan",
+                                            sizeNew: double.parse(((MediaQuery.of(context).size.width*0.035).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.035)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.035)).toString()),
+                                            maxLines: 1
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                ):GestureDetector(
+                                  onTap: (){
+                                    setState(() {
+                                      Navigator.push(context, PageTransition(type: PageTransitionType.fade, child: new DepositActivity()));
+                                      // if (tunggu == 'false') {
+                                      //   Navigator.push(context, PageTransition(type: PageTransitionType.fade, child: new PaymentResto(restoName, phone, address)));
+                                      // } else if (tunggu == 'true'){
+                                      //   Fluttertoast.showToast(msg: "Tunggu sebentar",);
+                                      // }
+                                      // Navigator.push(context, PageTransition(type: PageTransitionType.fade, child: new FollowersActivity()));
+                                    });
+                                  },
+                                  child: Container(
+                                    width: CustomSize.sizeWidth(context) / 3.8,
+                                    height: CustomSize.sizeWidth(context) / 3.8,
+                                    decoration: BoxDecoration(
+                                      color: Colors.white,
+                                      borderRadius: BorderRadius.circular(20),
+                                      boxShadow: [
+                                        BoxShadow(
+                                          color: Colors.grey.withOpacity(0.5),
+                                          spreadRadius: 0,
+                                          blurRadius: 7,
+                                          offset: Offset(0, 7), // changes position of shadow
+                                        ),
+                                      ],
+                                    ),
+                                    child: Column(
+                                      mainAxisAlignment: MainAxisAlignment.center,
+                                      crossAxisAlignment: CrossAxisAlignment.center,
+                                      children: [
+                                        Icon(MaterialCommunityIcons.wallet, color: CustomColor.primaryLight, size: 32,),
+                                        CustomText.bodyMedium14(
+                                            text: "Pendapatan",
+                                            sizeNew: double.parse(((MediaQuery.of(context).size.width*0.035).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.035)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.035)).toString()),
+                                            maxLines: 1
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                ):(status != 'done' && reservation == true)?GestureDetector(
+                                  onTap: (){
+                                    setState(() {
+                                      Navigator.push(context, PageTransition(type: PageTransitionType.fade, child: new DepositActivity()));
+                                      // if (tunggu == 'false') {
+                                      //   Navigator.push(context, PageTransition(type: PageTransitionType.fade, child: new PaymentResto(restoName, phone, address)));
+                                      // } else if (tunggu == 'true'){
+                                      //   Fluttertoast.showToast(msg: "Tunggu sebentar",);
+                                      // }
+                                      // Navigator.push(context, PageTransition(type: PageTransitionType.fade, child: new FollowersActivity()));
+                                    });
+                                  },
+                                  child: Container(
+                                    width: CustomSize.sizeWidth(context) / 3.8,
+                                    height: CustomSize.sizeWidth(context) / 3.8,
+                                    decoration: BoxDecoration(
+                                      color: Colors.white,
+                                      borderRadius: BorderRadius.circular(20),
+                                      boxShadow: [
+                                        BoxShadow(
+                                          color: Colors.grey.withOpacity(0.5),
+                                          spreadRadius: 0,
+                                          blurRadius: 7,
+                                          offset: Offset(0, 7), // changes position of shadow
+                                        ),
+                                      ],
+                                    ),
+                                    child: Column(
+                                      mainAxisAlignment: MainAxisAlignment.center,
+                                      crossAxisAlignment: CrossAxisAlignment.center,
+                                      children: [
+                                        Icon(MaterialCommunityIcons.wallet, color: CustomColor.primaryLight, size: 32,),
+                                        CustomText.bodyMedium14(
+                                            text: "Pendapatan",
+                                            sizeNew: double.parse(((MediaQuery.of(context).size.width*0.035).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.035)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.035)).toString()),
+                                            maxLines: 1
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                ):Container(
                                   width: CustomSize.sizeWidth(context) / 3.8,
                                   height: CustomSize.sizeWidth(context) / 3.8,
-                                ),
-
-                                Container(
-                                  width: CustomSize.sizeWidth(context) / 3.8,
-                                  height: CustomSize.sizeWidth(context) / 3.8,
-                                ),
+                                )
+                                  //   :Container(
+                                  // width: CustomSize.sizeWidth(context) / 3.8,
+                                  // height: CustomSize.sizeWidth(context) / 3.8,),
 
 
                                 // Container(
@@ -1495,8 +2041,210 @@ class _HomeActivityRestoState extends State<HomeActivityResto> with WidgetsBindi
                                 //     // ),
                                 //   ),
                                 // ),
+                              ],
+                            ),
+                                (idUserRest == idUser)?(reservation == true || status != 'done')?SizedBox(height: CustomSize.sizeHeight(context) / 48,):Container():Container(),
+                                (idUserRest == idUser)?(reservation == true || status != 'done')?Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                (status != 'done' && reservation == true)?GestureDetector(
+                                  onTap: (){
+                                    setState(() {
+                                      if (tunggu == 'false') {
+                                        Navigator.push(context, PageTransition(type: PageTransitionType.fade, child: new PaymentResto(restoName, phone, address)));
+                                      } else if (tunggu == 'true'){
+                                        Fluttertoast.showToast(msg: "Tunggu sebentar",);
+                                      }
+                                      // Navigator.push(context, PageTransition(type: PageTransitionType.fade, child: new FollowersActivity()));
+                                    });
+                                  },
+                                  child: Container(
+                                    width: CustomSize.sizeWidth(context) / 3.8,
+                                    height: CustomSize.sizeWidth(context) / 3.8,
+                                    decoration: BoxDecoration(
+                                      color: Colors.white,
+                                      borderRadius: BorderRadius.circular(20),
+                                      boxShadow: [
+                                        BoxShadow(
+                                          color: Colors.grey.withOpacity(0.5),
+                                          spreadRadius: 0,
+                                          blurRadius: 7,
+                                          offset: Offset(0, 7), // changes position of shadow
+                                        ),
+                                      ],
+                                    ),
+                                    child: Column(
+                                      mainAxisAlignment: MainAxisAlignment.center,
+                                      crossAxisAlignment: CrossAxisAlignment.center,
+                                      children: [
+                                        Icon(FontAwesome.calendar_check_o, color: CustomColor.primaryLight, size: 32,),
+                                        CustomText.bodyMedium14(
+                                            text: "Langganan",
+                                            sizeNew: double.parse(((MediaQuery.of(context).size.width*0.035).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.035)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.035)).toString()),
+                                            maxLines: 1
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                ):GestureDetector(
+                                  onTap: (){
+                                    setState(() {
+                                      Navigator.push(context, PageTransition(type: PageTransitionType.fade, child: new DepositActivity()));
+                                      // if (tunggu == 'false') {
+                                      //   Navigator.push(context, PageTransition(type: PageTransitionType.fade, child: new PaymentResto(restoName, phone, address)));
+                                      // } else if (tunggu == 'true'){
+                                      //   Fluttertoast.showToast(msg: "Tunggu sebentar",);
+                                      // }
+                                      // Navigator.push(context, PageTransition(type: PageTransitionType.fade, child: new FollowersActivity()));
+                                    });
+                                  },
+                                  child: Container(
+                                    width: CustomSize.sizeWidth(context) / 3.8,
+                                    height: CustomSize.sizeWidth(context) / 3.8,
+                                    decoration: BoxDecoration(
+                                      color: Colors.white,
+                                      borderRadius: BorderRadius.circular(20),
+                                      boxShadow: [
+                                        BoxShadow(
+                                          color: Colors.grey.withOpacity(0.5),
+                                          spreadRadius: 0,
+                                          blurRadius: 7,
+                                          offset: Offset(0, 7), // changes position of shadow
+                                        ),
+                                      ],
+                                    ),
+                                    child: Column(
+                                      mainAxisAlignment: MainAxisAlignment.center,
+                                      crossAxisAlignment: CrossAxisAlignment.center,
+                                      children: [
+                                        Icon(MaterialCommunityIcons.wallet, color: CustomColor.primaryLight, size: 32,),
+                                        CustomText.bodyMedium14(
+                                            text: "Pendapatan",
+                                            sizeNew: double.parse(((MediaQuery.of(context).size.width*0.035).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.035)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.035)).toString()),
+                                            maxLines: 1
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                ),
 
+                                (status != 'done' && reservation == true)?GestureDetector(
+                                  onTap: (){
+                                    setState(() {
+                                      Navigator.push(context, PageTransition(type: PageTransitionType.fade, child: new DepositActivity()));
+                                      // if (tunggu == 'false') {
+                                      //   Navigator.push(context, PageTransition(type: PageTransitionType.fade, child: new PaymentResto(restoName, phone, address)));
+                                      // } else if (tunggu == 'true'){
+                                      //   Fluttertoast.showToast(msg: "Tunggu sebentar",);
+                                      // }
+                                      // Navigator.push(context, PageTransition(type: PageTransitionType.fade, child: new FollowersActivity()));
+                                    });
+                                  },
+                                  child: Container(
+                                    width: CustomSize.sizeWidth(context) / 3.8,
+                                    height: CustomSize.sizeWidth(context) / 3.8,
+                                    decoration: BoxDecoration(
+                                      color: Colors.white,
+                                      borderRadius: BorderRadius.circular(20),
+                                      boxShadow: [
+                                        BoxShadow(
+                                          color: Colors.grey.withOpacity(0.5),
+                                          spreadRadius: 0,
+                                          blurRadius: 7,
+                                          offset: Offset(0, 7), // changes position of shadow
+                                        ),
+                                      ],
+                                    ),
+                                    child: Column(
+                                      mainAxisAlignment: MainAxisAlignment.center,
+                                      crossAxisAlignment: CrossAxisAlignment.center,
+                                      children: [
+                                        Icon(MaterialCommunityIcons.wallet, color: CustomColor.primaryLight, size: 32,),
+                                        CustomText.bodyMedium14(
+                                            text: "Pendapatan",
+                                            sizeNew: double.parse(((MediaQuery.of(context).size.width*0.035).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.035)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.035)).toString()),
+                                            maxLines: 1
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                ):Container(
+                                  width: CustomSize.sizeWidth(context) / 3.8,
+                                  height: CustomSize.sizeWidth(context) / 3.8,
+                                ),
 
+                                Container(
+                                  width: CustomSize.sizeWidth(context) / 3.8,
+                                  height: CustomSize.sizeWidth(context) / 3.8,
+                                ),
+                                // Container(
+                                //   width: CustomSize.sizeWidth(context) / 3.8,
+                                //   height: CustomSize.sizeWidth(context) / 3.8,
+                                //   decoration: BoxDecoration(
+                                //     color: Colors.transparent,
+                                //   ),
+                                //   // child: Column(
+                                //   //   mainAxisAlignment: MainAxisAlignment.center,
+                                //   //   crossAxisAlignment: CrossAxisAlignment.center,
+                                //   //   children: [
+                                //   //     Icon(FontAwesome.qrcode, color: CustomColor.primaryLight, size: 32,),
+                                //   //     CustomText.bodyMedium14(
+                                //   //         text: "Qr Code",
+                                //   //         minSize: 14,
+                                //   //         maxLines: 1
+                                //   //     ),
+                                //   //   ],
+                                //   // ),
+                                // ),
+
+                                // GestureDetector(
+                                //   onTap: (){
+                                //     setState(() {
+                                //       // _launchURL();
+                                //       Navigator.push(context, PageTransition(type: PageTransitionType.fade, child: new MejaActivity()));
+                                //     });
+                                //   },
+                                //   child: Container(
+                                //     width: CustomSize.sizeWidth(context) / 3.8,
+                                //     height: CustomSize.sizeWidth(context) / 3.8,
+                                //     decoration: BoxDecoration(
+                                //       color: Colors.white,
+                                //       borderRadius: BorderRadius.circular(20),
+                                //       boxShadow: [
+                                //         BoxShadow(
+                                //           color: Colors.grey.withOpacity(0.5),
+                                //           spreadRadius: 0,
+                                //           blurRadius: 7,
+                                //           offset: Offset(0, 7), // changes position of shadow
+                                //         ),
+                                //       ],
+                                //     ),
+                                //     child: Column(
+                                //       mainAxisAlignment: MainAxisAlignment.center,
+                                //       crossAxisAlignment: CrossAxisAlignment.center,
+                                //       children: [
+                                //         Icon(FontAwesome.th, color: CustomColor.primaryLight, size: 32,),
+                                //         CustomText.bodyMedium14(
+                                //             text: "Meja",
+                                //             minSize: 14,
+                                //             maxLines: 1
+                                //         ),
+                                //       ],
+                                //     ),
+                                //     // child: Column(
+                                //     //   mainAxisAlignment: MainAxisAlignment.center,
+                                //     //   crossAxisAlignment: CrossAxisAlignment.center,
+                                //     //   children: [
+                                //     //     Icon(FontAwesome.qrcode, color: CustomColor.primaryLight, size: 32,),
+                                //     //     CustomText.bodyMedium14(
+                                //     //         text: "Qr Code",
+                                //     //         minSize: 14,
+                                //     //         maxLines: 1
+                                //     //     ),
+                                //     //   ],
+                                //     // ),
+                                //   ),
+                                // ),
                               ],
                             ):Container():Container(),
                             // SizedBox(height: CustomSize.sizeHeight(context) / 58,),
@@ -1589,7 +2337,7 @@ class _HomeActivityRestoState extends State<HomeActivityResto> with WidgetsBindi
                                     ),
                                   ),
                                 ),
-                                GestureDetector(
+                                (idUserRest == idUser)?GestureDetector(
                                   onTap: (){
                                     setState(() {
                                       if (tunggu == 'false') {
@@ -1632,7 +2380,7 @@ class _HomeActivityRestoState extends State<HomeActivityResto> with WidgetsBindi
                                       ],
                                     ),
                                   ),
-                                ),
+                                ):Container(),
                                 (idUserRest == idUser)?GestureDetector(
                                   onTap: (){
                                     setState(() {
@@ -1795,6 +2543,205 @@ class _HomeActivityRestoState extends State<HomeActivityResto> with WidgetsBindi
                                   ],
                                 ):Container(),
                                 SizedBox(height: CustomSize.sizeHeight(context) / 59,),
+                              ],
+                            ):Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                SizedBox(height: CustomSize.sizeHeight(context) / 90,),
+                                CustomText.bodyMedium16(
+                                    text: "Kelola Restomu",
+                                    sizeNew: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.04)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.04)).toString()),
+                                    maxLines: 1
+                                ),
+                                SizedBox(height: CustomSize.sizeHeight(context) / 48,),
+                                Row(
+                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    GestureDetector(
+                                      onTap: (){
+                                        setState(() {
+                                          Navigator.push(context, PageTransition(type: PageTransitionType.fade, child: new DepositActivity()));
+                                          // if (tunggu == 'false') {
+                                          //   Navigator.push(context, PageTransition(type: PageTransitionType.fade, child: new PaymentResto(restoName, phone, address)));
+                                          // } else if (tunggu == 'true'){
+                                          //   Fluttertoast.showToast(msg: "Tunggu sebentar",);
+                                          // }
+                                          // Navigator.push(context, PageTransition(type: PageTransitionType.fade, child: new FollowersActivity()));
+                                        });
+                                      },
+                                      child: Container(
+                                        width: CustomSize.sizeWidth(context) / 3.8,
+                                        height: CustomSize.sizeWidth(context) / 3.8,
+                                        decoration: BoxDecoration(
+                                          color: Colors.white,
+                                          borderRadius: BorderRadius.circular(20),
+                                          boxShadow: [
+                                            BoxShadow(
+                                              color: Colors.grey.withOpacity(0.5),
+                                              spreadRadius: 0,
+                                              blurRadius: 7,
+                                              offset: Offset(0, 7), // changes position of shadow
+                                            ),
+                                          ],
+                                        ),
+                                        child: Column(
+                                          mainAxisAlignment: MainAxisAlignment.center,
+                                          crossAxisAlignment: CrossAxisAlignment.center,
+                                          children: [
+                                            Icon(MaterialCommunityIcons.wallet, color: CustomColor.primaryLight, size: 32,),
+                                            CustomText.bodyMedium14(
+                                                text: "Pendapatan",
+                                                sizeNew: double.parse(((MediaQuery.of(context).size.width*0.035).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.035)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.035)).toString()),
+                                                maxLines: 1
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                    ),
+                                    GestureDetector(
+                                      onTap: (){
+                                        // setState(() {
+                                        //   print(homepg + "oi");
+                                        //   // Navigator.push(context, PageTransition(type: PageTransitionType.fade, child: new PromoActivity(id.toString())));
+                                        //   Navigator.push(context, PageTransition(type: PageTransitionType.fade, child: new PromoActivity()));
+                                        // });
+                                      },
+                                      child: Container(
+                                        width: CustomSize.sizeWidth(context) / 3.8,
+                                        height: CustomSize.sizeWidth(context) / 3.8,
+                                        // decoration: BoxDecoration(
+                                        //   color: Colors.white,
+                                        //   borderRadius: BorderRadius.circular(20),
+                                        //   boxShadow: [
+                                        //     BoxShadow(
+                                        //       color: Colors.grey.withOpacity(0.5),
+                                        //       spreadRadius: 0,
+                                        //       blurRadius: 7,
+                                        //       offset: Offset(0, 7), // changes position of shadow
+                                        //     ),
+                                        //   ],
+                                        // ),
+                                        // child: Column(
+                                        //   mainAxisAlignment: MainAxisAlignment.center,
+                                        //   crossAxisAlignment: CrossAxisAlignment.center,
+                                        //   children: [
+                                        //     Icon(FontAwesome.tags, color: CustomColor.primaryLight, size: 32,),
+                                        //     CustomText.bodyMedium14(
+                                        //         text: "Promo",
+                                        //         sizeNew: double.parse(((MediaQuery.of(context).size.width*0.035).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.035)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.035)).toString()),
+                                        //         maxLines: 1
+                                        //     ),
+                                        //   ],
+                                        // ),
+                                      ),
+                                    ),
+                                    GestureDetector(
+                                      onTap: (){
+                                        // setState(() async{
+                                        //   SharedPreferences pref = await SharedPreferences.getInstance();
+                                        //   pref.setString('rev', '0');
+                                        //   Navigator.push(
+                                        //       context,
+                                        //       PageTransition(
+                                        //           type: PageTransitionType.rightToLeft,
+                                        //           child: OrderActivity()));
+                                        // });
+                                      },
+                                      child: Stack(
+                                        alignment: Alignment.topRight,
+                                        children: [
+                                          Container(
+                                            width: CustomSize.sizeWidth(context) / 3.8,
+                                            height: CustomSize.sizeWidth(context) / 3.8,
+                                            // decoration: BoxDecoration(
+                                            //   color: Colors.white,
+                                            //   borderRadius: BorderRadius.circular(20),
+                                            //   boxShadow: [
+                                            //     BoxShadow(
+                                            //       color: Colors.grey.withOpacity(0.5),
+                                            //       spreadRadius: 0,
+                                            //       blurRadius: 7,
+                                            //       offset: Offset(0, 7), // changes position of shadow
+                                            //     ),
+                                            //   ],
+                                            // ),
+                                            // child: Column(
+                                            //   mainAxisAlignment: MainAxisAlignment.center,
+                                            //   crossAxisAlignment: CrossAxisAlignment.center,
+                                            //   children: [
+                                            //     Icon(CupertinoIcons.cart_fill, color: CustomColor.primaryLight, size: 32,),
+                                            //     CustomText.bodyMedium14(
+                                            //         text: "Transaksi",
+                                            //         sizeNew: double.parse(((MediaQuery.of(context).size.width*0.035).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.035)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.035)).toString()),
+                                            //         maxLines: 1
+                                            //     ),
+                                            //   ],
+                                            // ),
+                                          ),
+                                          // Container(
+                                          //   padding: EdgeInsets.only(right: 5, top: 5),
+                                          //   child: (transaction.where((element) => element.is_opened.contains('0')).length != 0 || (transactionC1.length + transaction2.length + transaction3.length) != 0)?
+                                          //   Stack(
+                                          //     alignment: Alignment.center,
+                                          //     children: [
+                                          //       Icon(Icons.circle, color: CustomColor.redBtn, size: 22,),
+                                          //       CustomText.bodyMedium14(text: (transaction.where((element) => element.is_opened.contains('0')).length + transactionC1.length + transaction2.length + transaction3.length).toString(), color: Colors.white, sizeNew: double.parse(((MediaQuery.of(context).size.width*0.035).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.035)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.035)).toString()))
+                                          //     ],
+                                          //   ):Container(),
+                                          // ),
+                                        ],
+                                      ),
+                                    ),
+                                    // GestureDetector(
+                                    //   onTap: (){
+                                    //     setState(() {
+                                    //       // _launchURL();
+                                    //       Navigator.push(context, PageTransition(type: PageTransitionType.fade, child: new MejaActivity()));
+                                    //     });
+                                    //   },
+                                    //   child: Container(
+                                    //     width: CustomSize.sizeWidth(context) / 3.8,
+                                    //     height: CustomSize.sizeWidth(context) / 3.8,
+                                    //     decoration: BoxDecoration(
+                                    //       color: Colors.white,
+                                    //       borderRadius: BorderRadius.circular(20),
+                                    //       boxShadow: [
+                                    //         BoxShadow(
+                                    //           color: Colors.grey.withOpacity(0.5),
+                                    //           spreadRadius: 0,
+                                    //           blurRadius: 7,
+                                    //           offset: Offset(0, 7), // changes position of shadow
+                                    //         ),
+                                    //       ],
+                                    //     ),
+                                    //     child: Column(
+                                    //       mainAxisAlignment: MainAxisAlignment.center,
+                                    //       crossAxisAlignment: CrossAxisAlignment.center,
+                                    //       children: [
+                                    //         Icon(FontAwesome.th, color: CustomColor.primaryLight, size: 32,),
+                                    //         CustomText.bodyMedium14(
+                                    //             text: "Meja",
+                                    //             minSize: 14,
+                                    //             maxLines: 1
+                                    //         ),
+                                    //       ],
+                                    //     ),
+                                    //     // child: Column(
+                                    //     //   mainAxisAlignment: MainAxisAlignment.center,
+                                    //     //   crossAxisAlignment: CrossAxisAlignment.center,
+                                    //     //   children: [
+                                    //     //     Icon(FontAwesome.qrcode, color: CustomColor.primaryLight, size: 32,),
+                                    //     //     CustomText.bodyMedium14(
+                                    //     //         text: "Qr Code",
+                                    //     //         minSize: 14,
+                                    //     //         maxLines: 1
+                                    //     //     ),
+                                    //     //   ],
+                                    //     // ),
+                                    //   ),
+                                    // ),
+                                  ],
+                                ),
                               ],
                             ):Container(),
                           ),

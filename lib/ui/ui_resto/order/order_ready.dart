@@ -1,9 +1,11 @@
 import 'dart:convert';
 
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_icons/flutter_icons.dart';
-import 'package:full_screen_image/full_screen_image.dart';
+import 'package:full_screen_image_null_safe/full_screen_image_null_safe.dart';
+// import 'package:full_screen_image/full_screen_image.dart';
 import 'package:kam5ia/model/Meja.dart';
 import 'package:kam5ia/model/Meja.dart';
 import 'package:kam5ia/model/Meja.dart';
@@ -14,7 +16,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:kam5ia/model/Price.dart';
 import 'package:kam5ia/model/Menu.dart';
 import 'package:kam5ia/ui/ui_resto/order/order_activity.dart';
-import 'package:kam5ia/model/Transaction.dart';
+import 'package:kam5ia/model/Transaction.dart' as trans;
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:http/http.dart' as http;
 import 'package:intl/intl.dart';
@@ -37,7 +39,7 @@ class _OrderReadyState extends State<OrderReady> {
   Future getUser()async{
     SharedPreferences pref = await SharedPreferences.getInstance();
     setState(() {
-      userName = (pref.getString('name'));
+      userName = (pref.getString('name')??'');
     });
   }
 
@@ -65,7 +67,7 @@ class _OrderReadyState extends State<OrderReady> {
 
     SharedPreferences pref = await SharedPreferences.getInstance();
     String token = pref.getString("token") ?? "";
-    var apiResult = await http.get(Links.mainUrl + '/resto/trans/$Id', headers: {
+    var apiResult = await http.get(Uri.parse(Links.mainUrl + '/resto/trans/$Id'), headers: {
       "Accept": "Application/json",
       "Authorization": "Bearer $token"
     });
@@ -477,7 +479,7 @@ class _OrderReadyState extends State<OrderReady> {
                                                       child: CustomText.textHeading7(text: address,
                                                         // (_transCode == 1)?
                                                         maxLines: 3,
-                                                        sizeNew: double.parse(((MediaQuery.of(context).size.width*0.033).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.033)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.033)).toString())
+                                                        sizeNew: double.parse(((MediaQuery.of(context).size.width*0.03).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.03)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.03)).toString())
                                                         // :(_transCode == 2)?"Ambil Langsung":"Makan Ditempat"
                                                         ,),
                                                     ):Container(),
@@ -794,15 +796,55 @@ class _OrderReadyState extends State<OrderReady> {
                               SizedBox(height: CustomSize.sizeHeight(context) / 86,),
                               GestureDetector(
                                 onTap: (){
-                                  _getReady(operation = "done", id!);
-                                  setStateModal(() {});
-                                  Future.delayed(Duration(seconds: 0)).then((_) {
-                                    Navigator.pushReplacement(
-                                        context,
-                                        PageTransition(
-                                            type: PageTransitionType.fade,
-                                            child: OrderActivity()));
-                                  });
+                                  // _getReady(operation = "done", id!);
+                                  // setStateModal(() {});
+                                  // Future.delayed(Duration(seconds: 0)).then((_) {
+                                  //   Navigator.pushReplacement(
+                                  //       context,
+                                  //       PageTransition(
+                                  //           type: PageTransitionType.fade,
+                                  //           child: OrderActivity()));
+                                  // });
+                                  if (type != 'delivery') {
+                                    _getReady(operation = "done", id!);
+                                    setStateModal(() {});
+                                    Future.delayed(Duration(seconds: 0)).then((_) async{
+                                      // var collection = FirebaseFirestore.instance.collection('room');
+                                      // var snapshot = await collection.where(chatroom).get();
+                                      // for (var doc in snapshot.docs) {
+                                      //   await doc.reference.delete();
+                                      // }
+                                      // var collection = _firestore.collection('room');
+
+                                      //   _onDeleteItemPressed(index);
+                                      // await _firestore.collection("room").document(chatroom).delete().then((_) {
+                                      //   print("BERHASIL!");
+                                      // });
+
+                                      Navigator.pushReplacement(
+                                          context,
+                                          PageTransition(
+                                              type: PageTransitionType.fade,
+                                              child: OrderActivity()));
+                                    });
+                                  } else {
+                                    Fluttertoast.showToast(msg: 'Status hanya bisa di ubah oleh customer');
+                                  }
+
+                                  // if (int.parse(deposit) >= (1000)) {
+                                  //   _getReady(operation = "done", id!);
+                                  //   setStateModal(() {});
+                                  //   Future.delayed(Duration(seconds: 0)).then((_) {
+                                  //     Navigator.pushReplacement(
+                                  //         context,
+                                  //         PageTransition(
+                                  //             type: PageTransitionType.fade,
+                                  //             child: OrderActivity()));
+                                  //   });
+                                  // } else {
+                                  //   Fluttertoast.showToast(
+                                  //     msg: 'Saldo deposit anda tidak mencukupi untuk melanjutkan transaksi ini!',);
+                                  // }
                                   setState(() { });
                                 },
                                 child: Center(
@@ -810,7 +852,7 @@ class _OrderReadyState extends State<OrderReady> {
                                     width: CustomSize.sizeWidth(context) / 1,
                                     height: CustomSize.sizeHeight(context) / 14,
                                     decoration: BoxDecoration(
-                                        color: CustomColor.accent,
+                                        color: (type == 'delivery')?Colors.grey:CustomColor.accent,
                                         borderRadius: BorderRadius.circular(50)
                                     ),
                                     child: Center(
@@ -820,7 +862,7 @@ class _OrderReadyState extends State<OrderReady> {
                                           mainAxisAlignment: MainAxisAlignment.center,
                                           crossAxisAlignment: CrossAxisAlignment.center,
                                           children: [
-                                            CustomText.textHeading7(text: "Selesai", color: Colors.white, sizeNew: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.04)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.04)).toString())),
+                                            CustomText.textHeading7(text: (type == 'delivery')?"Belum diterima customer":"Selesai", color: Colors.white, sizeNew: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.04)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.04)).toString())),
                                           ],
                                         ),
                                       ),
@@ -874,7 +916,7 @@ class _OrderReadyState extends State<OrderReady> {
     });
     SharedPreferences pref = await SharedPreferences.getInstance();
     String token = pref.getString("token") ?? "";
-    var apiResult = await http.get('https://qurir.devastic.com/api/borzo?transaction_id=IRG-$id', headers: {
+    var apiResult = await http.get(Uri.parse('https://qurir.devastic.com/api/borzo?transaction_id=IRG-$id'), headers: {
       "Accept": "Application/json",
       "Authorization": "Bearer $token"
     });
@@ -883,15 +925,15 @@ class _OrderReadyState extends State<OrderReady> {
 
     print('driver '+apiResult.body.toString());
     // print('driver '+idResto.toString());
-    if (apiResult.body.toString() != 'not found') {
+    if (apiResult.body.toString() != '"not found"') {
       if (data['courier'].toString().contains('name') == false) {
         StatusDriver = (apiResult.body.toString() != '"not found"')?data['status'].toString():'Tidak Ditemukan';
         PhoneDriver = 'Tunggu';
       } else {
-        NameDriver = (apiResult.body.toString() != 'not found')?data['courier']['name'].toString():'Tidak Ditemukan';
-        PhoneDriver = (apiResult.body.toString() != 'not found')?data['courier']['phone'].toString():'0';
-        PhotoDriver = (apiResult.body.toString() != 'not found')?data['courier']['photo'].toString():'';
-        StatusDriver = (apiResult.body.toString() != 'not found')?(data['status'].toString() != 'active')?'Sudah sampai':data['status'].toString():'Tidak Ditemukan';
+        NameDriver = (apiResult.body.toString() != '"not found"')?data['courier']['name'].toString():'Tidak Ditemukan';
+        PhoneDriver = (apiResult.body.toString() != '"not found"')?data['courier']['phone'].toString():'0';
+        PhotoDriver = (apiResult.body.toString() != '"not found"')?data['courier']['photo'].toString():'';
+        StatusDriver = (apiResult.body.toString() != '"not found"')?(data['status'].toString() != 'active')?'Sudah sampai':data['status'].toString():'Tidak Ditemukan';
       }
     } else {
       NameDriver = 'Tidak Ditemukan';
@@ -935,13 +977,13 @@ class _OrderReadyState extends State<OrderReady> {
 
 
   bool ksg = false;
-  List<Transaction> transaction = [];
+  List<trans.Transaction> transaction = [];
   Future _getTrans()async{
-    List<Transaction> _transaction = [];
+    List<trans.Transaction> _transaction = [];
 
     SharedPreferences pref = await SharedPreferences.getInstance();
     String token = pref.getString("token") ?? "";
-    var apiResult = await http.get(Links.mainUrl + '/resto/trans', headers: {
+    var apiResult = await http.get(Uri.parse(Links.mainUrl + '/resto/trans'), headers: {
       "Accept": "Application/json",
       "Authorization": "Bearer $token"
     });
@@ -957,7 +999,7 @@ class _OrderReadyState extends State<OrderReady> {
 
     if (data['trx'].toString().contains('ready')) {
       for(var v in data['trx']['ready']){
-        Transaction r = Transaction.resto2(
+        trans.Transaction r = trans.Transaction.resto2(
             id: v['id'],
             status: v['status'],
             username: v['username'],
@@ -984,7 +1026,7 @@ class _OrderReadyState extends State<OrderReady> {
 
     SharedPreferences pref = await SharedPreferences.getInstance();
     String token = pref.getString("token") ?? "";
-    var apiResult = await http.get(Links.mainUrl + '/trans/op/$operation/$id', headers: {
+    var apiResult = await http.get(Uri.parse(Links.mainUrl + '/trans/op/$operation/$id'), headers: {
       "Accept": "Application/json",
       "Authorization": "Bearer $token"
     });
@@ -992,6 +1034,11 @@ class _OrderReadyState extends State<OrderReady> {
     var data = json.decode(apiResult.body);
     print(data);
 
+    FirebaseFirestore.instance.collection('room').doc(chatroom).collection('messages').get().then((snapshot) {
+      for (DocumentSnapshot ds in snapshot.docs){
+        ds.reference.delete();
+      }
+    });
     // for(var v in data['trx']['process']){
     //   Transaction r = Transaction.resto(
     //       id: v['id'],
@@ -1010,6 +1057,7 @@ class _OrderReadyState extends State<OrderReady> {
   }
 
   List<Meja2> meja = [];
+  String deposit = '';
   Future<void> _getQr()async{
     List<Meja2> _meja = [];
 
@@ -1018,7 +1066,7 @@ class _OrderReadyState extends State<OrderReady> {
     // });
     SharedPreferences pref = await SharedPreferences.getInstance();
     String token = pref.getString("token") ?? "";
-    var apiResult = await http.get(Links.mainUrl + '/resto/table', headers: {
+    var apiResult = await http.get(Uri.parse(Links.mainUrl + '/resto/table'), headers: {
       "Accept": "Application/json",
       "Authorization": "Bearer $token"
     });
@@ -1036,8 +1084,17 @@ class _OrderReadyState extends State<OrderReady> {
       _meja.add(p);
     }
 
+    String id = pref.getString("idHomeResto") ?? "";
+    var apiResult2 = await http
+        .get(Uri.parse(Links.mainUrl + "/deposit/$id"), headers: {
+      "Accept": "Application/json",
+      "Authorization": "Bearer $token"
+    });
+    var data2 = json.decode(apiResult2.body);
+
     setState(() {
       meja = _meja;
+      deposit = data2['balance'].toString();
       // isLoading = false;
     });
   }
@@ -1150,7 +1207,7 @@ class _OrderReadyState extends State<OrderReady> {
                                               SizedBox(height: CustomSize.sizeHeight(context) / 26,),
                                               Row(
                                                 children: [
-                                                  CustomText.bodyRegular12(text: transaction[index].total.toString(), sizeNew: double.parse(((MediaQuery.of(context).size.width*0.035).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.035)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.035)).toString())),
+                                                  CustomText.bodyRegular12(text: (transaction[index].total!+1000).toString(), sizeNew: double.parse(((MediaQuery.of(context).size.width*0.035).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.035)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.035)).toString())),
                                                 ],
                                               )
                                             ],

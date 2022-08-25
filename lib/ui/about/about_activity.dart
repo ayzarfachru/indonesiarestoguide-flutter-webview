@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:full_screen_image/full_screen_image.dart';
+import 'package:full_screen_image_null_safe/full_screen_image_null_safe.dart';
+// import 'package:full_screen_image/full_screen_image.dart';
 import 'package:kam5ia/utils/utils.dart';
 import 'package:page_transition/page_transition.dart';
 

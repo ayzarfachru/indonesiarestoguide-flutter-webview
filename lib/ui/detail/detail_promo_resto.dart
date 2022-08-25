@@ -3,7 +3,8 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter_icons/flutter_icons.dart';
 import 'package:fluttertoast/fluttertoast.dart';
-import 'package:full_screen_image/full_screen_image.dart';
+import 'package:full_screen_image_null_safe/full_screen_image_null_safe.dart';
+// import 'package:full_screen_image/full_screen_image.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:kam5ia/model/CategoryMenu.dart';
 import 'package:kam5ia/model/MenuJson.dart';
@@ -50,7 +51,7 @@ class _DetailPromoResto extends State<DetailPromoResto> {
   getHomePg() async {
     SharedPreferences pref = await SharedPreferences.getInstance();
     setState(() {
-      homepg = (pref.getString('homepg'));
+      homepg = (pref.getString('homepg')??'');
       print(homepg);
     });
   }
@@ -95,7 +96,7 @@ class _DetailPromoResto extends State<DetailPromoResto> {
 
     SharedPreferences pref = await SharedPreferences.getInstance();
     String token = pref.getString("token") ?? "";
-    var apiResult = await http.get(Links.mainUrl + '/resto/detail/$id', headers: {
+    var apiResult = await http.get(Uri.parse(Links.mainUrl + '/resto/detail/$id'), headers: {
       "Accept": "Application/json",
       "Authorization": "Bearer $token"
     });
@@ -232,7 +233,7 @@ class _DetailPromoResto extends State<DetailPromoResto> {
     });
     SharedPreferences pref = await SharedPreferences.getInstance();
     String token = pref.getString("token") ?? "";
-    var apiResult = await http.get(Links.mainUrl + '/promo', headers: {
+    var apiResult = await http.get(Uri.parse(Links.mainUrl + '/promo'), headers: {
       "Accept": "Application/json",
       "Authorization": "Bearer $token"
     });
@@ -335,7 +336,7 @@ class _DetailPromoResto extends State<DetailPromoResto> {
     });
     SharedPreferences pref = await SharedPreferences.getInstance();
     String token = pref.getString("token") ?? "";
-    var apiResult = await http.get(Links.mainUrl + '/promo/delete/$id', headers: {
+    var apiResult = await http.get(Uri.parse(Links.mainUrl + '/promo/delete/$id'), headers: {
       "Accept": "Application/json",
       "Authorization": "Bearer $token"
     });
@@ -423,9 +424,9 @@ class _DetailPromoResto extends State<DetailPromoResto> {
 
   Future _getData2()async{
     SharedPreferences pref = await SharedPreferences.getInstance();
-    cart = pref.getString('inCart');
+    cart = pref.getString('inCart')??'';
     checkId = pref.getString('restoIdUsr')??'';
-    json2 = pref.getString("menuJson");
+    json2 = pref.getString("menuJson")??'';
     setState(() {});
   }
 
@@ -656,8 +657,8 @@ class _DetailPromoResto extends State<DetailPromoResto> {
                                                         MediaQuery(
                                                             child: CustomText.textHeading5(
                                                                 text: promo[index].menu!.name,
-                                                                minSize: double.parse(((MediaQuery.of(context).size.width*0.06).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.06)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.06)).toString()),
-                                                                maxLines: 1
+                                                                sizeNew: double.parse(((MediaQuery.of(context).size.width*0.06).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.06)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.06)).toString()),
+                                                                maxLines: 2
                                                             ),
                                                             data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0)
                                                         ),
@@ -970,411 +971,37 @@ class _DetailPromoResto extends State<DetailPromoResto> {
                                                   ),
                                                   SizedBox(height: CustomSize.sizeHeight(context) / 32,),
                                                   (restoId.contains(promo[index].menu!.id.toString()) != true)?Center(
-                                                    child: Container(
-                                                        width: CustomSize.sizeWidth(context) / 1.1,
-                                                        height: CustomSize.sizeHeight(context) / 14,
-                                                        decoration: BoxDecoration(
-                                                            color: (promo[index].menu!.is_available.toString() == '1')?(isOpen != 'false')?CustomColor.primaryLight:Colors.grey:Colors.grey,
-                                                            borderRadius: BorderRadius.circular(20)
-                                                        ),
-                                                        child: (promo[index].menu!.is_available.toString() == '1')?(isOpen != 'false')?GestureDetector(
-                                                            onTap: ()async{
-                                                              if (checkId == '') {
-                                                                if (inCart == "") {
-                                                                  showModalBottomSheet(
-                                                                      isScrollControlled: true,
-                                                                      shape: RoundedRectangleBorder(
-                                                                          borderRadius: BorderRadius.only(topLeft: Radius.circular(20), topRight: Radius.circular(20))
-                                                                      ),
-                                                                      context: context,
-                                                                      builder: (_){
-                                                                        return Padding(
-                                                                          padding: EdgeInsets.symmetric(horizontal: CustomSize.sizeWidth(context) / 32),
-                                                                          child: Column(
-                                                                            crossAxisAlignment: CrossAxisAlignment.start,
-                                                                            mainAxisSize: MainAxisSize.min,
-                                                                            children: [
-                                                                              SizedBox(height: CustomSize.sizeHeight(context) / 86,),
-                                                                              Padding(
-                                                                                padding: EdgeInsets.symmetric(horizontal: CustomSize.sizeWidth(context) / 2.4),
-                                                                                child: Divider(thickness: 4,),
-                                                                              ),
-                                                                              SizedBox(height: CustomSize.sizeHeight(context) / 52,),
-                                                                              GestureDetector(
-                                                                                onTap: ()async{
-                                                                                  SharedPreferences pref = await SharedPreferences.getInstance();
-                                                                                  setState(() {
-                                                                                    if (can_delivery == 'true') {
-                                                                                      print('ini json '+json2.toString()+ cart.toString());
-                                                                                      if (cart.toString() == '1') {
-                                                                                        if (json2.toString() != '[]') {
-                                                                                          MenuJson m = MenuJson(
-                                                                                            id: promo[index].menu!.id,
-                                                                                            restoId: promo[index].menu!.restoId,
-                                                                                            name: promo[index].menu!.name,
-                                                                                            desc: promo[index].menu!.desc,
-                                                                                            price: promo[index].menu!.price!.original.toString(),
-                                                                                            discount: promo[index].menu!.price!.discounted.toString(),
-                                                                                            pricePlus: promo[index].menu!.price!.delivery.toString(),
-                                                                                            urlImg: promo[index].menu!.urlImg, distance: null, restoName: '',
-                                                                                          );
-                                                                                          menuJson.add(m);
-                                                                                          // List<String> _restoId = [];
-                                                                                          // List<String> _qty = [];
-                                                                                          restoId.add(promo[index].menu!.id.toString());
-                                                                                          qty.add("1");
-                                                                                          noted.add("{${promo[index].menu!.name}: kam5ia_null}");
-                                                                                          inCart = '1';
-
-                                                                                          pref.setString("menuJson", json2.toString().split(']')[0]+', '+jsonEncode(menuJson.map((m) => m.toJson()).toList()).split('[')[1].split(']')[0]+']');
-                                                                                          menuJson = [];
-                                                                                          print('kudune '+menuJson.toString());
-                                                                                          json2 = pref.getString("menuJson");
-                                                                                          pref.setString('inCart', '1');
-                                                                                          pref.setString("menuJson", json2);
-                                                                                          pref.setString("restoIdUsr", idnyaResto);
-                                                                                          pref.setStringList("restoId", restoId);
-                                                                                          pref.setStringList("qty", qty);
-                                                                                          pref.setStringList("note", noted);
-                                                                                          pref.setString("restoNameTrans", nameResto);
-                                                                                          pref.setString("restoPhoneTrans", phone);
-                                                                                          noteProduct = '';
-                                                                                          getNote();
-
-                                                                                          setStateModal(() {});
-                                                                                          setState(() {});
-                                                                                        } else {
-                                                                                          MenuJson m = MenuJson(
-                                                                                            id: promo[index].menu!.id,
-                                                                                            restoId: promo[index].menu!.restoId,
-                                                                                            name: promo[index].menu!.name,
-                                                                                            desc: promo[index].menu!.desc,
-                                                                                            price: promo[index].menu!.price!.original.toString(),
-                                                                                            discount: promo[index].menu!.price!.discounted.toString(),
-                                                                                            pricePlus: promo[index].menu!.price!.delivery.toString(),
-                                                                                            urlImg: promo[index].menu!.urlImg, distance: null, restoName: '',
-                                                                                          );
-                                                                                          menuJson.add(m);
-                                                                                          // List<String> _restoId = [];
-                                                                                          // List<String> _qty = [];
-                                                                                          restoId.add(promo[index].menu!.id.toString());
-                                                                                          qty.add("1");
-                                                                                          noted.add("{${promo[index].menu!.name}: kam5ia_null}");
-                                                                                          inCart = '1';
-
-                                                                                          pref.setString("menuJson", json2.toString().split(']')[0]+', '+jsonEncode(menuJson.map((m) => m.toJson()).toList()).split('[')[1].split(']')[0]+']');
-                                                                                          menuJson = [];
-                                                                                          print('kudune '+menuJson.toString());
-                                                                                          json2 = pref.getString("menuJson");
-                                                                                          pref.setString('inCart', '1');
-                                                                                          pref.setString("menuJson", json2);
-                                                                                          pref.setString("restoIdUsr", idnyaResto);
-                                                                                          pref.setStringList("restoId", restoId);
-                                                                                          pref.setStringList("qty", qty);
-                                                                                          pref.setStringList("note", noted);
-                                                                                          pref.setString("restoNameTrans", nameResto);
-                                                                                          pref.setString("restoPhoneTrans", phone);
-                                                                                          noteProduct = '';
-                                                                                          getNote();
-
-                                                                                          setStateModal(() {});
-                                                                                          setState(() {});
-                                                                                        }
-                                                                                      } else {
-                                                                                        MenuJson m = MenuJson(
-                                                                                          id: promo[index].menu!.id,
-                                                                                          restoId: promo[index].menu!.restoId,
-                                                                                          name: promo[index].menu!.name,
-                                                                                          desc: promo[index].menu!.desc,
-                                                                                          price: promo[index].menu!.price!.original.toString(),
-                                                                                          discount: promo[index].menu!.price!.discounted.toString(),
-                                                                                          pricePlus: promo[index].menu!.price!.delivery.toString(),
-                                                                                          urlImg: promo[index].menu!.urlImg, distance: null, restoName: '',
-                                                                                        );
-                                                                                        menuJson.add(m);
-                                                                                        // List<String> _restoId = [];
-                                                                                        // List<String> _qty = [];
-                                                                                        restoId.add(promo[index].menu!.id.toString());
-                                                                                        qty.add("1");
-                                                                                        noted.add("{${promo[index].menu!.name}: kam5ia_null}");
-                                                                                        inCart = '1';
-
-                                                                                        String json1 = jsonEncode(menuJson.map((m) => m.toJson()).toList());
-                                                                                        pref.setString('inCart', '1');
-                                                                                        pref.setString("menuJson", json1);
-                                                                                        pref.setString("restoIdUsr", idnyaResto);
-                                                                                        pref.setStringList("restoId", restoId);
-                                                                                        pref.setStringList("qty", qty);
-                                                                                        pref.setStringList("note", noted);
-                                                                                        pref.setString("restoNameTrans", nameResto);
-                                                                                        pref.setString("restoPhoneTrans", phone);
-                                                                                        menuJson = [];
-                                                                                        print('kudune '+menuJson.toString());
-                                                                                        json2 = pref.getString("menuJson");
-                                                                                        _getData2();
-                                                                                        noteProduct = '';
-                                                                                        getNote();
-
-                                                                                        setStateModal(() {});
-                                                                                        setState(() {});
-                                                                                      }
-
-                                                                                      pref.setString("metodeBeli", '1');
-                                                                                    } else {
-                                                                                      Fluttertoast.showToast(msg: "Pesan antar tidak tersedia.");
-                                                                                    }
-                                                                                  });
-                                                                                  Navigator.pop(context);
-                                                                                },
-                                                                                child: Row(
-                                                                                  children: [
-                                                                                    Container(
-                                                                                      width: CustomSize.sizeWidth(context) / 8,
-                                                                                      height: CustomSize.sizeWidth(context) / 8,
-                                                                                      decoration: BoxDecoration(
-                                                                                          color: CustomColor.primaryLight,
-                                                                                          shape: BoxShape.circle
-                                                                                      ),
-                                                                                      child: Center(
-                                                                                        child: Icon(FontAwesome.motorcycle, color: Colors.white, size: 20,),
-                                                                                      ),
-                                                                                    ),
-                                                                                    SizedBox(width: CustomSize.sizeWidth(context) / 32,),
-                                                                                    MediaQuery(
-                                                                                        child: CustomText.textHeading6(text: "Pesan Antar", minSize: double.parse(((MediaQuery.of(context).size.width*0.035).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.035).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.035).toString()),),
-                                                                                        data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0)
-                                                                                    ),
-                                                                                  ],
-                                                                                ),
-                                                                              ),
-                                                                              SizedBox(height: CustomSize.sizeHeight(context) / 86,),
-                                                                              GestureDetector(
-                                                                                onTap: ()async{
-                                                                                  SharedPreferences pref = await SharedPreferences.getInstance();
-                                                                                  setState(() {
-                                                                                    if (can_takeaway == 'true') {
-                                                                                      print('ini json '+json2.toString()+ cart.toString());
-                                                                                      if (cart.toString() == '1') {
-                                                                                        if (json2.toString() != '[]') {
-                                                                                          MenuJson m = MenuJson(
-                                                                                            id: promo[index].menu!.id,
-                                                                                            restoId: promo[index].menu!.restoId,
-                                                                                            name: promo[index].menu!.name,
-                                                                                            desc: promo[index].menu!.desc,
-                                                                                            price: promo[index].menu!.price!.original.toString(),
-                                                                                            discount: promo[index].menu!.price!.discounted.toString(),
-                                                                                            pricePlus: promo[index].menu!.price!.delivery.toString(),
-                                                                                            urlImg: promo[index].menu!.urlImg, distance: null, restoName: '',
-                                                                                          );
-                                                                                          menuJson.add(m);
-                                                                                          // List<String> _restoId = [];
-                                                                                          // List<String> _qty = [];
-                                                                                          restoId.add(promo[index].menu!.id.toString());
-                                                                                          qty.add("1");
-                                                                                          noted.add("{${promo[index].menu!.name}: kam5ia_null}");
-                                                                                          inCart = '1';
-
-                                                                                          pref.setString("menuJson", json2.toString().split(']')[0]+', '+jsonEncode(menuJson.map((m) => m.toJson()).toList()).split('[')[1].split(']')[0]+']');
-                                                                                          menuJson = [];
-                                                                                          print('kudune '+menuJson.toString());
-                                                                                          json2 = pref.getString("menuJson");
-                                                                                          pref.setString('inCart', '1');
-                                                                                          pref.setString("menuJson", json2);
-                                                                                          pref.setString("restoIdUsr", idnyaResto);
-                                                                                          pref.setStringList("restoId", restoId);
-                                                                                          pref.setStringList("qty", qty);
-                                                                                          pref.setStringList("note", noted);
-                                                                                          pref.setString("restoNameTrans", nameResto);
-                                                                                          pref.setString("restoPhoneTrans", phone);
-                                                                                          noteProduct = '';
-                                                                                          getNote();
-
-                                                                                          setStateModal(() {});
-                                                                                          setState(() {});
-                                                                                        } else {
-                                                                                          MenuJson m = MenuJson(
-                                                                                            id: promo[index].menu!.id,
-                                                                                            restoId: promo[index].menu!.restoId,
-                                                                                            name: promo[index].menu!.name,
-                                                                                            desc: promo[index].menu!.desc,
-                                                                                            price: promo[index].menu!.price!.original.toString(),
-                                                                                            discount: promo[index].menu!.price!.discounted.toString(),
-                                                                                            pricePlus: promo[index].menu!.price!.delivery.toString(),
-                                                                                            urlImg: promo[index].menu!.urlImg, distance: null, restoName: '',
-                                                                                          );
-                                                                                          menuJson.add(m);
-                                                                                          // List<String> _restoId = [];
-                                                                                          // List<String> _qty = [];
-                                                                                          restoId.add(promo[index].menu!.id.toString());
-                                                                                          qty.add("1");
-                                                                                          noted.add("{${promo[index].menu!.name}: kam5ia_null}");
-                                                                                          inCart = '1';
-
-                                                                                          pref.setString("menuJson", json2.toString().split(']')[0]+', '+jsonEncode(menuJson.map((m) => m.toJson()).toList()).split('[')[1].split(']')[0]+']');
-                                                                                          menuJson = [];
-                                                                                          print('kudune '+menuJson.toString());
-                                                                                          json2 = pref.getString("menuJson");
-                                                                                          pref.setString('inCart', '1');
-                                                                                          pref.setString("menuJson", json2);
-                                                                                          pref.setString("restoIdUsr", idnyaResto);
-                                                                                          pref.setStringList("restoId", restoId);
-                                                                                          pref.setStringList("qty", qty);
-                                                                                          pref.setStringList("note", noted);
-                                                                                          pref.setString("restoNameTrans", nameResto);
-                                                                                          pref.setString("restoPhoneTrans", phone);
-                                                                                          noteProduct = '';
-                                                                                          getNote();
-
-                                                                                          setStateModal(() {});
-                                                                                          setState(() {});
-                                                                                        }
-                                                                                      } else {
-                                                                                        MenuJson m = MenuJson(
-                                                                                          id: promo[index].menu!.id,
-                                                                                          restoId: promo[index].menu!.restoId,
-                                                                                          name: promo[index].menu!.name,
-                                                                                          desc: promo[index].menu!.desc,
-                                                                                          price: promo[index].menu!.price!.original.toString(),
-                                                                                          discount: promo[index].menu!.price!.discounted.toString(),
-                                                                                          pricePlus: promo[index].menu!.price!.delivery.toString(),
-                                                                                          urlImg: promo[index].menu!.urlImg, distance: null, restoName: '',
-                                                                                        );
-                                                                                        menuJson.add(m);
-                                                                                        // List<String> _restoId = [];
-                                                                                        // List<String> _qty = [];
-                                                                                        restoId.add(promo[index].menu!.id.toString());
-                                                                                        qty.add("1");
-                                                                                        noted.add("{${promo[index].menu!.name}: kam5ia_null}");
-                                                                                        inCart = '1';
-
-                                                                                        String json1 = jsonEncode(menuJson.map((m) => m.toJson()).toList());
-                                                                                        pref.setString('inCart', '1');
-                                                                                        pref.setString("menuJson", json1);
-                                                                                        pref.setString("restoIdUsr", idnyaResto);
-                                                                                        pref.setStringList("restoId", restoId);
-                                                                                        pref.setStringList("qty", qty);
-                                                                                        pref.setStringList("note", noted);
-                                                                                        pref.setString("restoNameTrans", nameResto);
-                                                                                        pref.setString("restoPhoneTrans", phone);
-                                                                                        menuJson = [];
-                                                                                        print('kudune '+menuJson.toString());
-                                                                                        json2 = pref.getString("menuJson");
-                                                                                        _getData2();
-                                                                                        noteProduct = '';
-                                                                                        getNote();
-
-                                                                                        setStateModal(() {});
-                                                                                        setState(() {});
-                                                                                      }
-
-                                                                                      pref.setString("metodeBeli", '2');
-                                                                                    } else {
-                                                                                      Fluttertoast.showToast(msg: "Ambil langsung tidak tersedia.");
-                                                                                    }
-                                                                                  });
-                                                                                  Navigator.pop(context);
-                                                                                },
-                                                                                child: Row(
-                                                                                  children: [
-                                                                                    Container(
-                                                                                      width: CustomSize.sizeWidth(context) / 8,
-                                                                                      height: CustomSize.sizeWidth(context) / 8,
-                                                                                      decoration: BoxDecoration(
-                                                                                          color: CustomColor.primaryLight,
-                                                                                          shape: BoxShape.circle
-                                                                                      ),
-                                                                                      child: Center(
-                                                                                        child: Icon(MaterialCommunityIcons.shopping, color: Colors.white, size: 20,),
-                                                                                      ),
-                                                                                    ),
-                                                                                    SizedBox(width: CustomSize.sizeWidth(context) / 32,),
-                                                                                    MediaQuery(
-                                                                                        child: CustomText.textHeading6(text: "Ambil Langsung", minSize: double.parse(((MediaQuery.of(context).size.width*0.035).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.035).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.035).toString()),),
-                                                                                        data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0)
-                                                                                    ),
-                                                                                  ],
-                                                                                ),
-                                                                              ),
-                                                                              SizedBox(height: CustomSize.sizeHeight(context) / 86,),
-                                                                              GestureDetector(
-                                                                                onTap: ()async{
-                                                                                  SharedPreferences pref = await SharedPreferences.getInstance();
-                                                                                  print('ini json '+json2.toString()+ cart.toString());
-                                                                                  if (cart.toString() == '1') {
-                                                                                    if (json2.toString() != '[]') {
-                                                                                      MenuJson m = MenuJson(
-                                                                                        id: promo[index].menu!.id,
-                                                                                        restoId: promo[index].menu!.restoId,
-                                                                                        name: promo[index].menu!.name,
-                                                                                        desc: promo[index].menu!.desc,
-                                                                                        price: promo[index].menu!.price!.original.toString(),
-                                                                                        discount: promo[index].menu!.price!.discounted.toString(),
-                                                                                        pricePlus: promo[index].menu!.price!.delivery.toString(),
-                                                                                        urlImg: promo[index].menu!.urlImg, distance: null, restoName: '',
-                                                                                      );
-                                                                                      menuJson.add(m);
-                                                                                      // List<String> _restoId = [];
-                                                                                      // List<String> _qty = [];
-                                                                                      restoId.add(promo[index].menu!.id.toString());
-                                                                                      qty.add("1");
-                                                                                      noted.add("{${promo[index].menu!.name}: kam5ia_null}");
-                                                                                      inCart = '1';
-
-                                                                                      pref.setString("menuJson", json2.toString().split(']')[0]+', '+jsonEncode(menuJson.map((m) => m.toJson()).toList()).split('[')[1].split(']')[0]+']');
-                                                                                      menuJson = [];
-                                                                                      print('kudune '+menuJson.toString());
-                                                                                      json2 = pref.getString("menuJson");
-                                                                                      pref.setString('inCart', '1');
-                                                                                      pref.setString("menuJson", json2);
-                                                                                      pref.setString("restoIdUsr", idnyaResto);
-                                                                                      pref.setStringList("restoId", restoId);
-                                                                                      pref.setStringList("qty", qty);
-                                                                                      pref.setStringList("note", noted);
-                                                                                      pref.setString("restoNameTrans", nameResto);
-                                                                                      pref.setString("restoPhoneTrans", phone);
-                                                                                      noteProduct = '';
-                                                                                      getNote();
-
-                                                                                      setStateModal(() {});
-                                                                                      setState(() {});
-                                                                                    } else {
-                                                                                      MenuJson m = MenuJson(
-                                                                                        id: promo[index].menu!.id,
-                                                                                        restoId: promo[index].menu!.restoId,
-                                                                                        name: promo[index].menu!.name,
-                                                                                        desc: promo[index].menu!.desc,
-                                                                                        price: promo[index].menu!.price!.original.toString(),
-                                                                                        discount: promo[index].menu!.price!.discounted.toString(),
-                                                                                        pricePlus: promo[index].menu!.price!.delivery.toString(),
-                                                                                        urlImg: promo[index].menu!.urlImg, distance: null, restoName: '',
-                                                                                      );
-                                                                                      menuJson.add(m);
-                                                                                      // List<String> _restoId = [];
-                                                                                      // List<String> _qty = [];
-                                                                                      restoId.add(promo[index].menu!.id.toString());
-                                                                                      qty.add("1");
-                                                                                      noted.add("{${promo[index].menu!.name}: kam5ia_null}");
-                                                                                      inCart = '1';
-
-                                                                                      pref.setString("menuJson", json2.toString().split(']')[0]+', '+jsonEncode(menuJson.map((m) => m.toJson()).toList()).split('[')[1].split(']')[0]+']');
-                                                                                      menuJson = [];
-                                                                                      print('kudune '+menuJson.toString());
-                                                                                      json2 = pref.getString("menuJson");
-                                                                                      pref.setString('inCart', '1');
-                                                                                      pref.setString("menuJson", json2);
-                                                                                      pref.setString("restoIdUsr", idnyaResto);
-                                                                                      pref.setStringList("restoId", restoId);
-                                                                                      pref.setStringList("qty", qty);
-                                                                                      pref.setStringList("note", noted);
-                                                                                      pref.setString("restoNameTrans", nameResto);
-                                                                                      pref.setString("restoPhoneTrans", phone);
-                                                                                      noteProduct = '';
-                                                                                      getNote();
-
-                                                                                      setStateModal(() {});
-                                                                                      setState(() {});
-                                                                                    }
-                                                                                  } else {
+                                                    child: (promo[index].menu!.is_available.toString() == '1')?(isOpen != 'false')?GestureDetector(
+                                                      onTap: ()async{
+                                                        if (checkId == '') {
+                                                          if (inCart == "") {
+                                                            showModalBottomSheet(
+                                                                isScrollControlled: true,
+                                                                shape: RoundedRectangleBorder(
+                                                                    borderRadius: BorderRadius.only(topLeft: Radius.circular(20), topRight: Radius.circular(20))
+                                                                ),
+                                                                context: context,
+                                                                builder: (_){
+                                                                  return Padding(
+                                                                    padding: EdgeInsets.symmetric(horizontal: CustomSize.sizeWidth(context) / 32),
+                                                                    child: Column(
+                                                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                                                      mainAxisSize: MainAxisSize.min,
+                                                                      children: [
+                                                                        SizedBox(height: CustomSize.sizeHeight(context) / 86,),
+                                                                        Padding(
+                                                                          padding: EdgeInsets.symmetric(horizontal: CustomSize.sizeWidth(context) / 2.4),
+                                                                          child: Divider(thickness: 4,),
+                                                                        ),
+                                                                        SizedBox(height: CustomSize.sizeHeight(context) / 52,),
+                                                                        GestureDetector(
+                                                                          onTap: ()async{
+                                                                            SharedPreferences pref = await SharedPreferences.getInstance();
+                                                                            setState(() {
+                                                                              if (can_delivery == 'true') {
+                                                                                print('ini json '+json2.toString()+ cart.toString());
+                                                                                if (cart.toString() == '1') {
+                                                                                  if (json2.toString() != '[]') {
                                                                                     MenuJson m = MenuJson(
                                                                                       id: promo[index].menu!.id,
                                                                                       restoId: promo[index].menu!.restoId,
@@ -1383,7 +1010,7 @@ class _DetailPromoResto extends State<DetailPromoResto> {
                                                                                       price: promo[index].menu!.price!.original.toString(),
                                                                                       discount: promo[index].menu!.price!.discounted.toString(),
                                                                                       pricePlus: promo[index].menu!.price!.delivery.toString(),
-                                                                                      urlImg: promo[index].menu!.urlImg, restoName: '', distance: null,
+                                                                                      urlImg: promo[index].menu!.urlImg, distance: null, restoName: '',
                                                                                     );
                                                                                     menuJson.add(m);
                                                                                     // List<String> _restoId = [];
@@ -1393,616 +1020,652 @@ class _DetailPromoResto extends State<DetailPromoResto> {
                                                                                     noted.add("{${promo[index].menu!.name}: kam5ia_null}");
                                                                                     inCart = '1';
 
-                                                                                    String json1 = jsonEncode(menuJson.map((m) => m.toJson()).toList());
+                                                                                    pref.setString("menuJson", json2.toString().split(']')[0]+', '+jsonEncode(menuJson.map((m) => m.toJson()).toList()).split('[')[1].split(']')[0]+']');
+                                                                                    menuJson = [];
+                                                                                    print('kudune '+menuJson.toString());
+                                                                                    json2 = pref.getString("menuJson")??'';
                                                                                     pref.setString('inCart', '1');
-                                                                                    pref.setString("menuJson", json1);
+                                                                                    pref.setString("menuJson", json2);
                                                                                     pref.setString("restoIdUsr", idnyaResto);
                                                                                     pref.setStringList("restoId", restoId);
                                                                                     pref.setStringList("qty", qty);
                                                                                     pref.setStringList("note", noted);
                                                                                     pref.setString("restoNameTrans", nameResto);
                                                                                     pref.setString("restoPhoneTrans", phone);
+                                                                                    noteProduct = '';
+                                                                                    getNote();
+
+                                                                                    setStateModal(() {});
+                                                                                    setState(() {});
+                                                                                  } else {
+                                                                                    MenuJson m = MenuJson(
+                                                                                      id: promo[index].menu!.id,
+                                                                                      restoId: promo[index].menu!.restoId,
+                                                                                      name: promo[index].menu!.name,
+                                                                                      desc: promo[index].menu!.desc,
+                                                                                      price: promo[index].menu!.price!.original.toString(),
+                                                                                      discount: promo[index].menu!.price!.discounted.toString(),
+                                                                                      pricePlus: promo[index].menu!.price!.delivery.toString(),
+                                                                                      urlImg: promo[index].menu!.urlImg, distance: null, restoName: '',
+                                                                                    );
+                                                                                    menuJson.add(m);
+                                                                                    // List<String> _restoId = [];
+                                                                                    // List<String> _qty = [];
+                                                                                    restoId.add(promo[index].menu!.id.toString());
+                                                                                    qty.add("1");
+                                                                                    noted.add("{${promo[index].menu!.name}: kam5ia_null}");
+                                                                                    inCart = '1';
+
+                                                                                    pref.setString("menuJson", json2.toString().split(']')[0]+', '+jsonEncode(menuJson.map((m) => m.toJson()).toList()).split('[')[1].split(']')[0]+']');
                                                                                     menuJson = [];
                                                                                     print('kudune '+menuJson.toString());
-                                                                                    json2 = pref.getString("menuJson");
-                                                                                    _getData2();
+                                                                                    json2 = pref.getString("menuJson")??'';
+                                                                                    pref.setString('inCart', '1');
+                                                                                    pref.setString("menuJson", json2);
+                                                                                    pref.setString("restoIdUsr", idnyaResto);
+                                                                                    pref.setStringList("restoId", restoId);
+                                                                                    pref.setStringList("qty", qty);
+                                                                                    pref.setStringList("note", noted);
+                                                                                    pref.setString("restoNameTrans", nameResto);
+                                                                                    pref.setString("restoPhoneTrans", phone);
                                                                                     noteProduct = '';
                                                                                     getNote();
 
                                                                                     setStateModal(() {});
                                                                                     setState(() {});
                                                                                   }
+                                                                                } else {
+                                                                                  MenuJson m = MenuJson(
+                                                                                    id: promo[index].menu!.id,
+                                                                                    restoId: promo[index].menu!.restoId,
+                                                                                    name: promo[index].menu!.name,
+                                                                                    desc: promo[index].menu!.desc,
+                                                                                    price: promo[index].menu!.price!.original.toString(),
+                                                                                    discount: promo[index].menu!.price!.discounted.toString(),
+                                                                                    pricePlus: promo[index].menu!.price!.delivery.toString(),
+                                                                                    urlImg: promo[index].menu!.urlImg, distance: null, restoName: '',
+                                                                                  );
+                                                                                  menuJson.add(m);
+                                                                                  // List<String> _restoId = [];
+                                                                                  // List<String> _qty = [];
+                                                                                  restoId.add(promo[index].menu!.id.toString());
+                                                                                  qty.add("1");
+                                                                                  noted.add("{${promo[index].menu!.name}: kam5ia_null}");
+                                                                                  inCart = '1';
 
-                                                                                  setState(() {
-                                                                                    pref.setString("metodeBeli", '3');
-                                                                                  });
-                                                                                  Navigator.pop(context);
-                                                                                },
-                                                                                child: Row(
-                                                                                  children: [
-                                                                                    Container(
-                                                                                      width: CustomSize.sizeWidth(context) / 8,
-                                                                                      height: CustomSize.sizeWidth(context) / 8,
-                                                                                      decoration: BoxDecoration(
-                                                                                          color: CustomColor.primaryLight,
-                                                                                          shape: BoxShape.circle
-                                                                                      ),
-                                                                                      child: Center(
-                                                                                        child: Icon(Icons.restaurant, color: Colors.white, size: 20,),
-                                                                                      ),
-                                                                                    ),
-                                                                                    SizedBox(width: CustomSize.sizeWidth(context) / 32,),
-                                                                                    MediaQuery(
-                                                                                        child: CustomText.textHeading6(text: "Makan Ditempat", minSize: double.parse(((MediaQuery.of(context).size.width*0.035).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.035).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.035).toString()),),
-                                                                                        data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0)
-                                                                                    ),
-                                                                                  ],
+                                                                                  String json1 = jsonEncode(menuJson.map((m) => m.toJson()).toList());
+                                                                                  pref.setString('inCart', '1');
+                                                                                  pref.setString("menuJson", json1);
+                                                                                  pref.setString("restoIdUsr", idnyaResto);
+                                                                                  pref.setStringList("restoId", restoId);
+                                                                                  pref.setStringList("qty", qty);
+                                                                                  pref.setStringList("note", noted);
+                                                                                  pref.setString("restoNameTrans", nameResto);
+                                                                                  pref.setString("restoPhoneTrans", phone);
+                                                                                  menuJson = [];
+                                                                                  print('kudune '+menuJson.toString());
+                                                                                  json2 = pref.getString("menuJson")??'';
+                                                                                  _getData2();
+                                                                                  noteProduct = '';
+                                                                                  getNote();
+
+                                                                                  setStateModal(() {});
+                                                                                  setState(() {});
+                                                                                }
+
+                                                                                pref.setString("metodeBeli", '1');
+                                                                              } else {
+                                                                                Fluttertoast.showToast(msg: "Pesan antar tidak tersedia.");
+                                                                              }
+                                                                            });
+                                                                            Navigator.pop(context);
+                                                                          },
+                                                                          child: Row(
+                                                                            children: [
+                                                                              Container(
+                                                                                width: CustomSize.sizeWidth(context) / 8,
+                                                                                height: CustomSize.sizeWidth(context) / 8,
+                                                                                decoration: BoxDecoration(
+                                                                                    color: CustomColor.primaryLight,
+                                                                                    shape: BoxShape.circle
+                                                                                ),
+                                                                                child: Center(
+                                                                                  child: Icon(FontAwesome.motorcycle, color: Colors.white, size: 20,),
                                                                                 ),
                                                                               ),
-                                                                              SizedBox(height: CustomSize.sizeHeight(context) / 86,),
+                                                                              SizedBox(width: CustomSize.sizeWidth(context) / 32,),
+                                                                              MediaQuery(
+                                                                                  child: CustomText.textHeading6(text: "Pesan Antar", minSize: double.parse(((MediaQuery.of(context).size.width*0.035).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.035).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.035).toString()),),
+                                                                                  data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0)
+                                                                              ),
                                                                             ],
                                                                           ),
-                                                                        );
-                                                                      }
-                                                                  );
-                                                                } else {
-                                                                  SharedPreferences pref = await SharedPreferences.getInstance();
-                                                                  print('ini json '+json2.toString()+ cart.toString());
-                                                                  if (cart.toString() == '1') {
-                                                                    if (json2.toString() != '[]') {
-                                                                      MenuJson m = MenuJson(
-                                                                        id: promo[index].menu!.id,
-                                                                        restoId: promo[index].menu!.restoId,
-                                                                        name: promo[index].menu!.name,
-                                                                        desc: promo[index].menu!.desc,
-                                                                        price: promo[index].menu!.price!.original.toString(),
-                                                                        discount: promo[index].menu!.price!.discounted.toString(),
-                                                                        pricePlus: promo[index].menu!.price!.delivery.toString(),
-                                                                        urlImg: promo[index].menu!.urlImg, distance: null, restoName: '',
-                                                                      );
-                                                                      menuJson.add(m);
-                                                                      // List<String> _restoId = [];
-                                                                      // List<String> _qty = [];
-                                                                      restoId.add(promo[index].menu!.id.toString());
-                                                                      qty.add("1");
-                                                                      noted.add("{${promo[index].menu!.name}: kam5ia_null}");
-                                                                      inCart = '1';
-
-                                                                      pref.setString("menuJson", json2.toString().split(']')[0]+', '+jsonEncode(menuJson.map((m) => m.toJson()).toList()).split('[')[1].split(']')[0]+']');
-                                                                      menuJson = [];
-                                                                      print('kudune '+menuJson.toString());
-                                                                      json2 = pref.getString("menuJson");
-                                                                      pref.setString('inCart', '1');
-                                                                      pref.setString("menuJson", json2);
-                                                                      pref.setString("restoIdUsr", idnyaResto);
-                                                                      pref.setStringList("restoId", restoId);
-                                                                      pref.setStringList("qty", qty);
-                                                                      pref.setStringList("note", noted);
-                                                                      pref.setString("restoNameTrans", nameResto);
-                                                                      pref.setString("restoPhoneTrans", phone);
-                                                                      noteProduct = '';
-                                                                      getNote();
-
-                                                                      setStateModal(() {});
-                                                                      setState(() {});
-                                                                    } else {
-                                                                      MenuJson m = MenuJson(
-                                                                        id: promo[index].menu!.id,
-                                                                        restoId: promo[index].menu!.restoId,
-                                                                        name: promo[index].menu!.name,
-                                                                        desc: promo[index].menu!.desc,
-                                                                        price: promo[index].menu!.price!.original.toString(),
-                                                                        discount: promo[index].menu!.price!.discounted.toString(),
-                                                                        pricePlus: promo[index].menu!.price!.delivery.toString(),
-                                                                        urlImg: promo[index].menu!.urlImg, distance: null, restoName: '',
-                                                                      );
-                                                                      menuJson.add(m);
-                                                                      // List<String> _restoId = [];
-                                                                      // List<String> _qty = [];
-                                                                      restoId.add(promo[index].menu!.id.toString());
-                                                                      qty.add("1");
-                                                                      noted.add("{${promo[index].menu!.name}: kam5ia_null}");
-                                                                      inCart = '1';
-
-                                                                      pref.setString("menuJson", json2.toString().split(']')[0]+', '+jsonEncode(menuJson.map((m) => m.toJson()).toList()).split('[')[1].split(']')[0]+']');
-                                                                      menuJson = [];
-                                                                      print('kudune '+menuJson.toString());
-                                                                      json2 = pref.getString("menuJson");
-                                                                      pref.setString('inCart', '1');
-                                                                      pref.setString("menuJson", json2);
-                                                                      pref.setString("restoIdUsr", idnyaResto);
-                                                                      pref.setStringList("restoId", restoId);
-                                                                      pref.setStringList("qty", qty);
-                                                                      pref.setStringList("note", noted);
-                                                                      pref.setString("restoNameTrans", nameResto);
-                                                                      pref.setString("restoPhoneTrans", phone);
-                                                                      noteProduct = '';
-                                                                      getNote();
-
-                                                                      setStateModal(() {});
-                                                                      setState(() {});
-                                                                    }
-                                                                  } else {
-                                                                    MenuJson m = MenuJson(
-                                                                      id: promo[index].menu!.id,
-                                                                      restoId: promo[index].menu!.restoId,
-                                                                      name: promo[index].menu!.name,
-                                                                      desc: promo[index].menu!.desc,
-                                                                      price: promo[index].menu!.price!.original.toString(),
-                                                                      discount: promo[index].menu!.price!.discounted.toString(),
-                                                                      pricePlus: promo[index].menu!.price!.delivery.toString(),
-                                                                      urlImg: promo[index].menu!.urlImg, restoName: '', distance: null,
-                                                                    );
-                                                                    menuJson.add(m);
-                                                                    // List<String> _restoId = [];
-                                                                    // List<String> _qty = [];
-                                                                    restoId.add(promo[index].menu!.id.toString());
-                                                                    qty.add("1");
-                                                                    noted.add("{${promo[index].menu!.name}: kam5ia_null}");
-                                                                    inCart = '1';
-
-                                                                    String json1 = jsonEncode(menuJson.map((m) => m.toJson()).toList());
-                                                                    pref.setString('inCart', '1');
-                                                                    pref.setString("menuJson", json1);
-                                                                    pref.setString("restoIdUsr", idnyaResto);
-                                                                    pref.setStringList("restoId", restoId);
-                                                                    pref.setStringList("qty", qty);
-                                                                    pref.setStringList("note", noted);
-                                                                    pref.setString("restoNameTrans", nameResto);
-                                                                    pref.setString("restoPhoneTrans", phone);
-                                                                    menuJson = [];
-                                                                    print('kudune '+menuJson.toString());
-                                                                    json2 = pref.getString("menuJson");
-                                                                    _getData2();
-                                                                    noteProduct = '';
-                                                                    getNote();
-
-                                                                    setStateModal(() {});
-                                                                    setState(() {});
-                                                                  }
-
-                                                                  print('ini in cart 1 '+pref.getString('inCart'));
-                                                                }
-                                                              } else if (checkId != idnyaResto) {
-                                                                showDialog(
-                                                                  context: context,
-                                                                  builder: (BuildContext context) {
-                                                                    return AlertDialog(
-                                                                      shape: RoundedRectangleBorder(
-                                                                        borderRadius: BorderRadius.circular(20),
-                                                                      ),
-                                                                      title: new Text("Hapus cart"),
-                                                                      content: new Text("Apakah anda ingin mengganti item di cart dengan item yang baru ?"),
-                                                                      actions: <Widget>[
-                                                                        new FlatButton(
-                                                                          child: new Text("Batal", style: TextStyle(color: CustomColor.primaryLight)),
-                                                                          onPressed: () {
-                                                                            Navigator.of(context).pop();
-                                                                          },
                                                                         ),
-                                                                        new FlatButton(
-                                                                          child: new Text("Oke", style: TextStyle(color: CustomColor.primaryLight)),
-                                                                          onPressed: () async{
+                                                                        SizedBox(height: CustomSize.sizeHeight(context) / 86,),
+                                                                        GestureDetector(
+                                                                          onTap: ()async{
                                                                             SharedPreferences pref = await SharedPreferences.getInstance();
-                                                                            pref.setString("menuJson", "");
-                                                                            pref.setString("restoId", "");
-                                                                            pref.setString("qty", "");
-                                                                            pref.setString("note", "");
-                                                                            pref.remove('address');
-                                                                            pref.remove('inCart');
-                                                                            pref.remove('restoIdUsr');
-                                                                            pref.remove("addressDelivTrans");
-                                                                            pref.remove("distan");
-                                                                            _getData2();
-                                                                            _getData();
-                                                                            await Future.delayed(Duration(seconds: 2));
-                                                                            Navigator.of(context).pop();
-                                                                            // Navigator.pushReplacement(
-                                                                            //     context,
-                                                                            //     PageTransition(
-                                                                            //         type: PageTransitionType.rightToLeft,
-                                                                            //         child: new DetailResto(id)));
-                                                                            // pref.remove('inCart');
-                                                                            // pref.setString("menuJson", "");
-                                                                            // inCart = pref.getString("inCart");
-                                                                            // cart = pref.getString("inCart");
-                                                                            // qty.addAll([]);
-                                                                            // json2 = pref.getString("menuJson");
-                                                                            // pref.setString("qty", "");
-                                                                            // pref.remove("restoIdUsr");
-                                                                            showModalBottomSheet(
-                                                                                isScrollControlled: true,
-                                                                                shape: RoundedRectangleBorder(
-                                                                                    borderRadius: BorderRadius.only(topLeft: Radius.circular(20), topRight: Radius.circular(20))
+                                                                            setState(() {
+                                                                              if (can_takeaway == 'true') {
+                                                                                print('ini json '+json2.toString()+ cart.toString());
+                                                                                if (cart.toString() == '1') {
+                                                                                  if (json2.toString() != '[]') {
+                                                                                    MenuJson m = MenuJson(
+                                                                                      id: promo[index].menu!.id,
+                                                                                      restoId: promo[index].menu!.restoId,
+                                                                                      name: promo[index].menu!.name,
+                                                                                      desc: promo[index].menu!.desc,
+                                                                                      price: promo[index].menu!.price!.original.toString(),
+                                                                                      discount: promo[index].menu!.price!.discounted.toString(),
+                                                                                      pricePlus: promo[index].menu!.price!.delivery.toString(),
+                                                                                      urlImg: promo[index].menu!.urlImg, distance: null, restoName: '',
+                                                                                    );
+                                                                                    menuJson.add(m);
+                                                                                    // List<String> _restoId = [];
+                                                                                    // List<String> _qty = [];
+                                                                                    restoId.add(promo[index].menu!.id.toString());
+                                                                                    qty.add("1");
+                                                                                    noted.add("{${promo[index].menu!.name}: kam5ia_null}");
+                                                                                    inCart = '1';
+
+                                                                                    pref.setString("menuJson", json2.toString().split(']')[0]+', '+jsonEncode(menuJson.map((m) => m.toJson()).toList()).split('[')[1].split(']')[0]+']');
+                                                                                    menuJson = [];
+                                                                                    print('kudune '+menuJson.toString());
+                                                                                    json2 = pref.getString("menuJson")??'';
+                                                                                    pref.setString('inCart', '1');
+                                                                                    pref.setString("menuJson", json2);
+                                                                                    pref.setString("restoIdUsr", idnyaResto);
+                                                                                    pref.setStringList("restoId", restoId);
+                                                                                    pref.setStringList("qty", qty);
+                                                                                    pref.setStringList("note", noted);
+                                                                                    pref.setString("restoNameTrans", nameResto);
+                                                                                    pref.setString("restoPhoneTrans", phone);
+                                                                                    noteProduct = '';
+                                                                                    getNote();
+
+                                                                                    setStateModal(() {});
+                                                                                    setState(() {});
+                                                                                  } else {
+                                                                                    MenuJson m = MenuJson(
+                                                                                      id: promo[index].menu!.id,
+                                                                                      restoId: promo[index].menu!.restoId,
+                                                                                      name: promo[index].menu!.name,
+                                                                                      desc: promo[index].menu!.desc,
+                                                                                      price: promo[index].menu!.price!.original.toString(),
+                                                                                      discount: promo[index].menu!.price!.discounted.toString(),
+                                                                                      pricePlus: promo[index].menu!.price!.delivery.toString(),
+                                                                                      urlImg: promo[index].menu!.urlImg, distance: null, restoName: '',
+                                                                                    );
+                                                                                    menuJson.add(m);
+                                                                                    // List<String> _restoId = [];
+                                                                                    // List<String> _qty = [];
+                                                                                    restoId.add(promo[index].menu!.id.toString());
+                                                                                    qty.add("1");
+                                                                                    noted.add("{${promo[index].menu!.name}: kam5ia_null}");
+                                                                                    inCart = '1';
+
+                                                                                    pref.setString("menuJson", json2.toString().split(']')[0]+', '+jsonEncode(menuJson.map((m) => m.toJson()).toList()).split('[')[1].split(']')[0]+']');
+                                                                                    menuJson = [];
+                                                                                    print('kudune '+menuJson.toString());
+                                                                                    json2 = pref.getString("menuJson")??'';
+                                                                                    pref.setString('inCart', '1');
+                                                                                    pref.setString("menuJson", json2);
+                                                                                    pref.setString("restoIdUsr", idnyaResto);
+                                                                                    pref.setStringList("restoId", restoId);
+                                                                                    pref.setStringList("qty", qty);
+                                                                                    pref.setStringList("note", noted);
+                                                                                    pref.setString("restoNameTrans", nameResto);
+                                                                                    pref.setString("restoPhoneTrans", phone);
+                                                                                    noteProduct = '';
+                                                                                    getNote();
+
+                                                                                    setStateModal(() {});
+                                                                                    setState(() {});
+                                                                                  }
+                                                                                } else {
+                                                                                  MenuJson m = MenuJson(
+                                                                                    id: promo[index].menu!.id,
+                                                                                    restoId: promo[index].menu!.restoId,
+                                                                                    name: promo[index].menu!.name,
+                                                                                    desc: promo[index].menu!.desc,
+                                                                                    price: promo[index].menu!.price!.original.toString(),
+                                                                                    discount: promo[index].menu!.price!.discounted.toString(),
+                                                                                    pricePlus: promo[index].menu!.price!.delivery.toString(),
+                                                                                    urlImg: promo[index].menu!.urlImg, distance: null, restoName: '',
+                                                                                  );
+                                                                                  menuJson.add(m);
+                                                                                  // List<String> _restoId = [];
+                                                                                  // List<String> _qty = [];
+                                                                                  restoId.add(promo[index].menu!.id.toString());
+                                                                                  qty.add("1");
+                                                                                  noted.add("{${promo[index].menu!.name}: kam5ia_null}");
+                                                                                  inCart = '1';
+
+                                                                                  String json1 = jsonEncode(menuJson.map((m) => m.toJson()).toList());
+                                                                                  pref.setString('inCart', '1');
+                                                                                  pref.setString("menuJson", json1);
+                                                                                  pref.setString("restoIdUsr", idnyaResto);
+                                                                                  pref.setStringList("restoId", restoId);
+                                                                                  pref.setStringList("qty", qty);
+                                                                                  pref.setStringList("note", noted);
+                                                                                  pref.setString("restoNameTrans", nameResto);
+                                                                                  pref.setString("restoPhoneTrans", phone);
+                                                                                  menuJson = [];
+                                                                                  print('kudune '+menuJson.toString());
+                                                                                  json2 = pref.getString("menuJson")??'';
+                                                                                  _getData2();
+                                                                                  noteProduct = '';
+                                                                                  getNote();
+
+                                                                                  setStateModal(() {});
+                                                                                  setState(() {});
+                                                                                }
+
+                                                                                pref.setString("metodeBeli", '2');
+                                                                              } else {
+                                                                                Fluttertoast.showToast(msg: "Ambil langsung tidak tersedia.");
+                                                                              }
+                                                                            });
+                                                                            Navigator.pop(context);
+                                                                          },
+                                                                          child: Row(
+                                                                            children: [
+                                                                              Container(
+                                                                                width: CustomSize.sizeWidth(context) / 8,
+                                                                                height: CustomSize.sizeWidth(context) / 8,
+                                                                                decoration: BoxDecoration(
+                                                                                    color: CustomColor.primaryLight,
+                                                                                    shape: BoxShape.circle
                                                                                 ),
-                                                                                context: context,
-                                                                                builder: (_){
-                                                                                  return Padding(
-                                                                                    padding: EdgeInsets.symmetric(horizontal: CustomSize.sizeWidth(context) / 32),
-                                                                                    child: Column(
-                                                                                      crossAxisAlignment: CrossAxisAlignment.start,
-                                                                                      mainAxisSize: MainAxisSize.min,
-                                                                                      children: [
-                                                                                        SizedBox(height: CustomSize.sizeHeight(context) / 86,),
-                                                                                        Padding(
-                                                                                          padding: EdgeInsets.symmetric(horizontal: CustomSize.sizeWidth(context) / 2.4),
-                                                                                          child: Divider(thickness: 4,),
-                                                                                        ),
-                                                                                        SizedBox(height: CustomSize.sizeHeight(context) / 52,),
-                                                                                        GestureDetector(
-                                                                                          onTap: ()async{
-                                                                                            SharedPreferences pref = await SharedPreferences.getInstance();
-                                                                                            setState(() {
-                                                                                              if (can_delivery == 'true') {
-                                                                                                print('ini json '+json2.toString()+ cart.toString());
-                                                                                                if (cart.toString() == '1') {
-                                                                                                  if (json2.toString() != '[]') {
-                                                                                                    MenuJson m = MenuJson(
-                                                                                                      id: promo[index].menu!.id,
-                                                                                                      restoId: promo[index].menu!.restoId,
-                                                                                                      name: promo[index].menu!.name,
-                                                                                                      desc: promo[index].menu!.desc,
-                                                                                                      price: promo[index].menu!.price!.original.toString(),
-                                                                                                      discount: promo[index].menu!.price!.discounted.toString(),
-                                                                                                      pricePlus: promo[index].menu!.price!.delivery.toString(),
-                                                                                                      urlImg: promo[index].menu!.urlImg, distance: null, restoName: '',
-                                                                                                    );
-                                                                                                    menuJson.add(m);
-                                                                                                    // List<String> _restoId = [];
-                                                                                                    // List<String> _qty = [];
-                                                                                                    restoId.add(promo[index].menu!.id.toString());
-                                                                                                    qty.add("1");
-                                                                                                    noted.add("{${promo[index].menu!.name}: kam5ia_null}");
-                                                                                                    inCart = '1';
+                                                                                child: Center(
+                                                                                  child: Icon(MaterialCommunityIcons.shopping, color: Colors.white, size: 20,),
+                                                                                ),
+                                                                              ),
+                                                                              SizedBox(width: CustomSize.sizeWidth(context) / 32,),
+                                                                              MediaQuery(
+                                                                                  child: CustomText.textHeading6(text: "Ambil Langsung", minSize: double.parse(((MediaQuery.of(context).size.width*0.035).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.035).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.035).toString()),),
+                                                                                  data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0)
+                                                                              ),
+                                                                            ],
+                                                                          ),
+                                                                        ),
+                                                                        SizedBox(height: CustomSize.sizeHeight(context) / 86,),
+                                                                        GestureDetector(
+                                                                          onTap: ()async{
+                                                                            SharedPreferences pref = await SharedPreferences.getInstance();
+                                                                            print('ini json '+json2.toString()+ cart.toString());
+                                                                            if (cart.toString() == '1') {
+                                                                              if (json2.toString() != '[]') {
+                                                                                MenuJson m = MenuJson(
+                                                                                  id: promo[index].menu!.id,
+                                                                                  restoId: promo[index].menu!.restoId,
+                                                                                  name: promo[index].menu!.name,
+                                                                                  desc: promo[index].menu!.desc,
+                                                                                  price: promo[index].menu!.price!.original.toString(),
+                                                                                  discount: promo[index].menu!.price!.discounted.toString(),
+                                                                                  pricePlus: promo[index].menu!.price!.delivery.toString(),
+                                                                                  urlImg: promo[index].menu!.urlImg, distance: null, restoName: '',
+                                                                                );
+                                                                                menuJson.add(m);
+                                                                                // List<String> _restoId = [];
+                                                                                // List<String> _qty = [];
+                                                                                restoId.add(promo[index].menu!.id.toString());
+                                                                                qty.add("1");
+                                                                                noted.add("{${promo[index].menu!.name}: kam5ia_null}");
+                                                                                inCart = '1';
 
-                                                                                                    pref.setString("menuJson", json2.toString().split(']')[0]+', '+jsonEncode(menuJson.map((m) => m.toJson()).toList()).split('[')[1].split(']')[0]+']');
-                                                                                                    menuJson = [];
-                                                                                                    print('kudune '+menuJson.toString());
-                                                                                                    json2 = pref.getString("menuJson");
-                                                                                                    pref.setString('inCart', '1');
-                                                                                                    pref.setString("menuJson", json2);
-                                                                                                    pref.setString("restoIdUsr", idnyaResto);
-                                                                                                    pref.setStringList("restoId", restoId);
-                                                                                                    pref.setStringList("qty", qty);
-                                                                                                    pref.setStringList("note", noted);
-                                                                                                    pref.setString("restoNameTrans", nameResto);
-                                                                                                    pref.setString("restoPhoneTrans", phone);
-                                                                                                    noteProduct = '';
-                                                                                                    getNote();
+                                                                                pref.setString("menuJson", json2.toString().split(']')[0]+', '+jsonEncode(menuJson.map((m) => m.toJson()).toList()).split('[')[1].split(']')[0]+']');
+                                                                                menuJson = [];
+                                                                                print('kudune '+menuJson.toString());
+                                                                                json2 = pref.getString("menuJson")??'';
+                                                                                pref.setString('inCart', '1');
+                                                                                pref.setString("menuJson", json2);
+                                                                                pref.setString("restoIdUsr", idnyaResto);
+                                                                                pref.setStringList("restoId", restoId);
+                                                                                pref.setStringList("qty", qty);
+                                                                                pref.setStringList("note", noted);
+                                                                                pref.setString("restoNameTrans", nameResto);
+                                                                                pref.setString("restoPhoneTrans", phone);
+                                                                                noteProduct = '';
+                                                                                getNote();
 
-                                                                                                    setStateModal(() {});
-                                                                                                    setState(() {});
-                                                                                                  } else {
-                                                                                                    MenuJson m = MenuJson(
-                                                                                                      id: promo[index].menu!.id,
-                                                                                                      restoId: promo[index].menu!.restoId,
-                                                                                                      name: promo[index].menu!.name,
-                                                                                                      desc: promo[index].menu!.desc,
-                                                                                                      price: promo[index].menu!.price!.original.toString(),
-                                                                                                      discount: promo[index].menu!.price!.discounted.toString(),
-                                                                                                      pricePlus: promo[index].menu!.price!.delivery.toString(),
-                                                                                                      urlImg: promo[index].menu!.urlImg, distance: null, restoName: '',
-                                                                                                    );
-                                                                                                    menuJson.add(m);
-                                                                                                    // List<String> _restoId = [];
-                                                                                                    // List<String> _qty = [];
-                                                                                                    restoId.add(promo[index].menu!.id.toString());
-                                                                                                    qty.add("1");
-                                                                                                    noted.add("{${promo[index].menu!.name}: kam5ia_null}");
-                                                                                                    inCart = '1';
+                                                                                setStateModal(() {});
+                                                                                setState(() {});
+                                                                              } else {
+                                                                                MenuJson m = MenuJson(
+                                                                                  id: promo[index].menu!.id,
+                                                                                  restoId: promo[index].menu!.restoId,
+                                                                                  name: promo[index].menu!.name,
+                                                                                  desc: promo[index].menu!.desc,
+                                                                                  price: promo[index].menu!.price!.original.toString(),
+                                                                                  discount: promo[index].menu!.price!.discounted.toString(),
+                                                                                  pricePlus: promo[index].menu!.price!.delivery.toString(),
+                                                                                  urlImg: promo[index].menu!.urlImg, distance: null, restoName: '',
+                                                                                );
+                                                                                menuJson.add(m);
+                                                                                // List<String> _restoId = [];
+                                                                                // List<String> _qty = [];
+                                                                                restoId.add(promo[index].menu!.id.toString());
+                                                                                qty.add("1");
+                                                                                noted.add("{${promo[index].menu!.name}: kam5ia_null}");
+                                                                                inCart = '1';
 
-                                                                                                    pref.setString("menuJson", json2.toString().split(']')[0]+', '+jsonEncode(menuJson.map((m) => m.toJson()).toList()).split('[')[1].split(']')[0]+']');
-                                                                                                    menuJson = [];
-                                                                                                    print('kudune '+menuJson.toString());
-                                                                                                    json2 = pref.getString("menuJson");
-                                                                                                    pref.setString('inCart', '1');
-                                                                                                    pref.setString("menuJson", json2);
-                                                                                                    pref.setString("restoIdUsr", idnyaResto);
-                                                                                                    pref.setStringList("restoId", restoId);
-                                                                                                    pref.setStringList("qty", qty);
-                                                                                                    pref.setStringList("note", noted);
-                                                                                                    pref.setString("restoNameTrans", nameResto);
-                                                                                                    pref.setString("restoPhoneTrans", phone);
-                                                                                                    noteProduct = '';
-                                                                                                    getNote();
+                                                                                pref.setString("menuJson", json2.toString().split(']')[0]+', '+jsonEncode(menuJson.map((m) => m.toJson()).toList()).split('[')[1].split(']')[0]+']');
+                                                                                menuJson = [];
+                                                                                print('kudune '+menuJson.toString());
+                                                                                json2 = pref.getString("menuJson")??'';
+                                                                                pref.setString('inCart', '1');
+                                                                                pref.setString("menuJson", json2);
+                                                                                pref.setString("restoIdUsr", idnyaResto);
+                                                                                pref.setStringList("restoId", restoId);
+                                                                                pref.setStringList("qty", qty);
+                                                                                pref.setStringList("note", noted);
+                                                                                pref.setString("restoNameTrans", nameResto);
+                                                                                pref.setString("restoPhoneTrans", phone);
+                                                                                noteProduct = '';
+                                                                                getNote();
 
-                                                                                                    setStateModal(() {});
-                                                                                                    setState(() {});
-                                                                                                  }
-                                                                                                } else {
-                                                                                                  MenuJson m = MenuJson(
-                                                                                                    id: promo[index].menu!.id,
-                                                                                                    restoId: promo[index].menu!.restoId,
-                                                                                                    name: promo[index].menu!.name,
-                                                                                                    desc: promo[index].menu!.desc,
-                                                                                                    price: promo[index].menu!.price!.original.toString(),
-                                                                                                    discount: promo[index].menu!.price!.discounted.toString(),
-                                                                                                    pricePlus: promo[index].menu!.price!.delivery.toString(),
-                                                                                                    urlImg: promo[index].menu!.urlImg, distance: null, restoName: '',
-                                                                                                  );
-                                                                                                  menuJson.add(m);
-                                                                                                  // List<String> _restoId = [];
-                                                                                                  // List<String> _qty = [];
-                                                                                                  restoId.add(promo[index].menu!.id.toString());
-                                                                                                  qty.add("1");
-                                                                                                  noted.add("{${promo[index].menu!.name}: kam5ia_null}");
-                                                                                                  inCart = '1';
+                                                                                setStateModal(() {});
+                                                                                setState(() {});
+                                                                              }
+                                                                            } else {
+                                                                              MenuJson m = MenuJson(
+                                                                                id: promo[index].menu!.id,
+                                                                                restoId: promo[index].menu!.restoId,
+                                                                                name: promo[index].menu!.name,
+                                                                                desc: promo[index].menu!.desc,
+                                                                                price: promo[index].menu!.price!.original.toString(),
+                                                                                discount: promo[index].menu!.price!.discounted.toString(),
+                                                                                pricePlus: promo[index].menu!.price!.delivery.toString(),
+                                                                                urlImg: promo[index].menu!.urlImg, restoName: '', distance: null,
+                                                                              );
+                                                                              menuJson.add(m);
+                                                                              // List<String> _restoId = [];
+                                                                              // List<String> _qty = [];
+                                                                              restoId.add(promo[index].menu!.id.toString());
+                                                                              qty.add("1");
+                                                                              noted.add("{${promo[index].menu!.name}: kam5ia_null}");
+                                                                              inCart = '1';
 
-                                                                                                  String json1 = jsonEncode(menuJson.map((m) => m.toJson()).toList());
-                                                                                                  pref.setString('inCart', '1');
-                                                                                                  pref.setString("menuJson", json1);
-                                                                                                  pref.setString("restoIdUsr", idnyaResto);
-                                                                                                  pref.setStringList("restoId", restoId);
-                                                                                                  pref.setStringList("qty", qty);
-                                                                                                  pref.setStringList("note", noted);
-                                                                                                  pref.setString("restoNameTrans", nameResto);
-                                                                                                  pref.setString("restoPhoneTrans", phone);
-                                                                                                  menuJson = [];
-                                                                                                  print('kudune '+menuJson.toString());
-                                                                                                  json2 = pref.getString("menuJson");
-                                                                                                  _getData2();
-                                                                                                  noteProduct = '';
-                                                                                                  getNote();
+                                                                              String json1 = jsonEncode(menuJson.map((m) => m.toJson()).toList());
+                                                                              pref.setString('inCart', '1');
+                                                                              pref.setString("menuJson", json1);
+                                                                              pref.setString("restoIdUsr", idnyaResto);
+                                                                              pref.setStringList("restoId", restoId);
+                                                                              pref.setStringList("qty", qty);
+                                                                              pref.setStringList("note", noted);
+                                                                              pref.setString("restoNameTrans", nameResto);
+                                                                              pref.setString("restoPhoneTrans", phone);
+                                                                              menuJson = [];
+                                                                              print('kudune '+menuJson.toString());
+                                                                              json2 = pref.getString("menuJson")??'';
+                                                                              _getData2();
+                                                                              noteProduct = '';
+                                                                              getNote();
 
-                                                                                                  setStateModal(() {});
-                                                                                                  setState(() {});
-                                                                                                }
+                                                                              setStateModal(() {});
+                                                                              setState(() {});
+                                                                            }
 
-                                                                                                pref.setString("metodeBeli", '1');
-                                                                                              } else {
-                                                                                                Fluttertoast.showToast(msg: "Pesan antar tidak tersedia.");
-                                                                                              }
-                                                                                            });
-                                                                                            Navigator.pop(_);
-                                                                                          },
-                                                                                          child: Row(
-                                                                                            children: [
-                                                                                              Container(
-                                                                                                width: CustomSize.sizeWidth(context) / 8,
-                                                                                                height: CustomSize.sizeWidth(context) / 8,
-                                                                                                decoration: BoxDecoration(
-                                                                                                    color: CustomColor.primaryLight,
-                                                                                                    shape: BoxShape.circle
-                                                                                                ),
-                                                                                                child: Center(
-                                                                                                  child: Icon(FontAwesome.motorcycle, color: Colors.white, size: 20,),
-                                                                                                ),
-                                                                                              ),
-                                                                                              SizedBox(width: CustomSize.sizeWidth(context) / 32,),
-                                                                                              MediaQuery(
-                                                                                                  child: CustomText.textHeading6(text: "Pesan Antar", minSize: double.parse(((MediaQuery.of(context).size.width*0.035).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.035).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.035).toString()),),
-                                                                                                  data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0)
-                                                                                              ),
-                                                                                            ],
-                                                                                          ),
-                                                                                        ),
-                                                                                        SizedBox(height: CustomSize.sizeHeight(context) / 86,),
-                                                                                        GestureDetector(
-                                                                                          onTap: ()async{
-                                                                                            SharedPreferences pref = await SharedPreferences.getInstance();
-                                                                                            setState(() {
-                                                                                              if (can_takeaway == 'true') {
-                                                                                                print('ini json '+json2.toString()+ cart.toString());
-                                                                                                if (cart.toString() == '1') {
-                                                                                                  if (json2.toString() != '[]') {
-                                                                                                    MenuJson m = MenuJson(
-                                                                                                      id: promo[index].menu!.id,
-                                                                                                      restoId: promo[index].menu!.restoId,
-                                                                                                      name: promo[index].menu!.name,
-                                                                                                      desc: promo[index].menu!.desc,
-                                                                                                      price: promo[index].menu!.price!.original.toString(),
-                                                                                                      discount: promo[index].menu!.price!.discounted.toString(),
-                                                                                                      pricePlus: promo[index].menu!.price!.delivery.toString(),
-                                                                                                      urlImg: promo[index].menu!.urlImg, distance: null, restoName: '',
-                                                                                                    );
-                                                                                                    menuJson.add(m);
-                                                                                                    // List<String> _restoId = [];
-                                                                                                    // List<String> _qty = [];
-                                                                                                    restoId.add(promo[index].menu!.id.toString());
-                                                                                                    qty.add("1");
-                                                                                                    noted.add("{${promo[index].menu!.name}: kam5ia_null}");
-                                                                                                    inCart = '1';
+                                                                            setState(() {
+                                                                              pref.setString("metodeBeli", '3');
+                                                                            });
+                                                                            Navigator.pop(context);
+                                                                          },
+                                                                          child: Row(
+                                                                            children: [
+                                                                              Container(
+                                                                                width: CustomSize.sizeWidth(context) / 8,
+                                                                                height: CustomSize.sizeWidth(context) / 8,
+                                                                                decoration: BoxDecoration(
+                                                                                    color: CustomColor.primaryLight,
+                                                                                    shape: BoxShape.circle
+                                                                                ),
+                                                                                child: Center(
+                                                                                  child: Icon(Icons.restaurant, color: Colors.white, size: 20,),
+                                                                                ),
+                                                                              ),
+                                                                              SizedBox(width: CustomSize.sizeWidth(context) / 32,),
+                                                                              MediaQuery(
+                                                                                  child: CustomText.textHeading6(text: "Makan Ditempat", minSize: double.parse(((MediaQuery.of(context).size.width*0.035).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.035).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.035).toString()),),
+                                                                                  data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0)
+                                                                              ),
+                                                                            ],
+                                                                          ),
+                                                                        ),
+                                                                        SizedBox(height: CustomSize.sizeHeight(context) / 86,),
+                                                                      ],
+                                                                    ),
+                                                                  );
+                                                                }
+                                                            );
+                                                          } else {
+                                                            SharedPreferences pref = await SharedPreferences.getInstance();
+                                                            print('ini json '+json2.toString()+ cart.toString());
+                                                            if (cart.toString() == '1') {
+                                                              if (json2.toString() != '[]') {
+                                                                MenuJson m = MenuJson(
+                                                                  id: promo[index].menu!.id,
+                                                                  restoId: promo[index].menu!.restoId,
+                                                                  name: promo[index].menu!.name,
+                                                                  desc: promo[index].menu!.desc,
+                                                                  price: promo[index].menu!.price!.original.toString(),
+                                                                  discount: promo[index].menu!.price!.discounted.toString(),
+                                                                  pricePlus: promo[index].menu!.price!.delivery.toString(),
+                                                                  urlImg: promo[index].menu!.urlImg, distance: null, restoName: '',
+                                                                );
+                                                                menuJson.add(m);
+                                                                // List<String> _restoId = [];
+                                                                // List<String> _qty = [];
+                                                                restoId.add(promo[index].menu!.id.toString());
+                                                                qty.add("1");
+                                                                noted.add("{${promo[index].menu!.name}: kam5ia_null}");
+                                                                inCart = '1';
 
-                                                                                                    pref.setString("menuJson", json2.toString().split(']')[0]+', '+jsonEncode(menuJson.map((m) => m.toJson()).toList()).split('[')[1].split(']')[0]+']');
-                                                                                                    menuJson = [];
-                                                                                                    print('kudune '+menuJson.toString());
-                                                                                                    json2 = pref.getString("menuJson");
-                                                                                                    pref.setString('inCart', '1');
-                                                                                                    pref.setString("menuJson", json2);
-                                                                                                    pref.setString("restoIdUsr", idnyaResto);
-                                                                                                    pref.setStringList("restoId", restoId);
-                                                                                                    pref.setStringList("qty", qty);
-                                                                                                    pref.setStringList("note", noted);
-                                                                                                    pref.setString("restoNameTrans", nameResto);
-                                                                                                    pref.setString("restoPhoneTrans", phone);
-                                                                                                    noteProduct = '';
-                                                                                                    getNote();
+                                                                pref.setString("menuJson", json2.toString().split(']')[0]+', '+jsonEncode(menuJson.map((m) => m.toJson()).toList()).split('[')[1].split(']')[0]+']');
+                                                                menuJson = [];
+                                                                print('kudune '+menuJson.toString());
+                                                                json2 = pref.getString("menuJson")??'';
+                                                                pref.setString('inCart', '1');
+                                                                pref.setString("menuJson", json2);
+                                                                pref.setString("restoIdUsr", idnyaResto);
+                                                                pref.setStringList("restoId", restoId);
+                                                                pref.setStringList("qty", qty);
+                                                                pref.setStringList("note", noted);
+                                                                pref.setString("restoNameTrans", nameResto);
+                                                                pref.setString("restoPhoneTrans", phone);
+                                                                noteProduct = '';
+                                                                getNote();
 
-                                                                                                    setStateModal(() {});
-                                                                                                    setState(() {});
-                                                                                                  } else {
-                                                                                                    MenuJson m = MenuJson(
-                                                                                                      id: promo[index].menu!.id,
-                                                                                                      restoId: promo[index].menu!.restoId,
-                                                                                                      name: promo[index].menu!.name,
-                                                                                                      desc: promo[index].menu!.desc,
-                                                                                                      price: promo[index].menu!.price!.original.toString(),
-                                                                                                      discount: promo[index].menu!.price!.discounted.toString(),
-                                                                                                      pricePlus: promo[index].menu!.price!.delivery.toString(),
-                                                                                                      urlImg: promo[index].menu!.urlImg, distance: null, restoName: '',
-                                                                                                    );
-                                                                                                    menuJson.add(m);
-                                                                                                    // List<String> _restoId = [];
-                                                                                                    // List<String> _qty = [];
-                                                                                                    restoId.add(promo[index].menu!.id.toString());
-                                                                                                    qty.add("1");
-                                                                                                    noted.add("{${promo[index].menu!.name}: kam5ia_null}");
-                                                                                                    inCart = '1';
+                                                                setStateModal(() {});
+                                                                setState(() {});
+                                                              } else {
+                                                                MenuJson m = MenuJson(
+                                                                  id: promo[index].menu!.id,
+                                                                  restoId: promo[index].menu!.restoId,
+                                                                  name: promo[index].menu!.name,
+                                                                  desc: promo[index].menu!.desc,
+                                                                  price: promo[index].menu!.price!.original.toString(),
+                                                                  discount: promo[index].menu!.price!.discounted.toString(),
+                                                                  pricePlus: promo[index].menu!.price!.delivery.toString(),
+                                                                  urlImg: promo[index].menu!.urlImg, distance: null, restoName: '',
+                                                                );
+                                                                menuJson.add(m);
+                                                                // List<String> _restoId = [];
+                                                                // List<String> _qty = [];
+                                                                restoId.add(promo[index].menu!.id.toString());
+                                                                qty.add("1");
+                                                                noted.add("{${promo[index].menu!.name}: kam5ia_null}");
+                                                                inCart = '1';
 
-                                                                                                    pref.setString("menuJson", json2.toString().split(']')[0]+', '+jsonEncode(menuJson.map((m) => m.toJson()).toList()).split('[')[1].split(']')[0]+']');
-                                                                                                    menuJson = [];
-                                                                                                    print('kudune '+menuJson.toString());
-                                                                                                    json2 = pref.getString("menuJson");
-                                                                                                    pref.setString('inCart', '1');
-                                                                                                    pref.setString("menuJson", json2);
-                                                                                                    pref.setString("restoIdUsr", idnyaResto);
-                                                                                                    pref.setStringList("restoId", restoId);
-                                                                                                    pref.setStringList("qty", qty);
-                                                                                                    pref.setStringList("note", noted);
-                                                                                                    pref.setString("restoNameTrans", nameResto);
-                                                                                                    pref.setString("restoPhoneTrans", phone);
-                                                                                                    noteProduct = '';
-                                                                                                    getNote();
+                                                                pref.setString("menuJson", json2.toString().split(']')[0]+', '+jsonEncode(menuJson.map((m) => m.toJson()).toList()).split('[')[1].split(']')[0]+']');
+                                                                menuJson = [];
+                                                                print('kudune '+menuJson.toString());
+                                                                json2 = pref.getString("menuJson")??'';
+                                                                pref.setString('inCart', '1');
+                                                                pref.setString("menuJson", json2);
+                                                                pref.setString("restoIdUsr", idnyaResto);
+                                                                pref.setStringList("restoId", restoId);
+                                                                pref.setStringList("qty", qty);
+                                                                pref.setStringList("note", noted);
+                                                                pref.setString("restoNameTrans", nameResto);
+                                                                pref.setString("restoPhoneTrans", phone);
+                                                                noteProduct = '';
+                                                                getNote();
 
-                                                                                                    setStateModal(() {});
-                                                                                                    setState(() {});
-                                                                                                  }
-                                                                                                } else {
-                                                                                                  MenuJson m = MenuJson(
-                                                                                                    id: promo[index].menu!.id,
-                                                                                                    restoId: promo[index].menu!.restoId,
-                                                                                                    name: promo[index].menu!.name,
-                                                                                                    desc: promo[index].menu!.desc,
-                                                                                                    price: promo[index].menu!.price!.original.toString(),
-                                                                                                    discount: promo[index].menu!.price!.discounted.toString(),
-                                                                                                    pricePlus: promo[index].menu!.price!.delivery.toString(),
-                                                                                                    urlImg: promo[index].menu!.urlImg, distance: null, restoName: '',
-                                                                                                  );
-                                                                                                  menuJson.add(m);
-                                                                                                  // List<String> _restoId = [];
-                                                                                                  // List<String> _qty = [];
-                                                                                                  restoId.add(promo[index].menu!.id.toString());
-                                                                                                  qty.add("1");
-                                                                                                  noted.add("{${promo[index].menu!.name}: kam5ia_null}");
-                                                                                                  inCart = '1';
+                                                                setStateModal(() {});
+                                                                setState(() {});
+                                                              }
+                                                            } else {
+                                                              MenuJson m = MenuJson(
+                                                                id: promo[index].menu!.id,
+                                                                restoId: promo[index].menu!.restoId,
+                                                                name: promo[index].menu!.name,
+                                                                desc: promo[index].menu!.desc,
+                                                                price: promo[index].menu!.price!.original.toString(),
+                                                                discount: promo[index].menu!.price!.discounted.toString(),
+                                                                pricePlus: promo[index].menu!.price!.delivery.toString(),
+                                                                urlImg: promo[index].menu!.urlImg, restoName: '', distance: null,
+                                                              );
+                                                              menuJson.add(m);
+                                                              // List<String> _restoId = [];
+                                                              // List<String> _qty = [];
+                                                              restoId.add(promo[index].menu!.id.toString());
+                                                              qty.add("1");
+                                                              noted.add("{${promo[index].menu!.name}: kam5ia_null}");
+                                                              inCart = '1';
 
-                                                                                                  String json1 = jsonEncode(menuJson.map((m) => m.toJson()).toList());
-                                                                                                  pref.setString('inCart', '1');
-                                                                                                  pref.setString("menuJson", json1);
-                                                                                                  pref.setString("restoIdUsr", idnyaResto);
-                                                                                                  pref.setStringList("restoId", restoId);
-                                                                                                  pref.setStringList("qty", qty);
-                                                                                                  pref.setStringList("note", noted);
-                                                                                                  pref.setString("restoNameTrans", nameResto);
-                                                                                                  pref.setString("restoPhoneTrans", phone);
-                                                                                                  menuJson = [];
-                                                                                                  print('kudune '+menuJson.toString());
-                                                                                                  json2 = pref.getString("menuJson");
-                                                                                                  _getData2();
-                                                                                                  noteProduct = '';
-                                                                                                  getNote();
+                                                              String json1 = jsonEncode(menuJson.map((m) => m.toJson()).toList());
+                                                              pref.setString('inCart', '1');
+                                                              pref.setString("menuJson", json1);
+                                                              pref.setString("restoIdUsr", idnyaResto);
+                                                              pref.setStringList("restoId", restoId);
+                                                              pref.setStringList("qty", qty);
+                                                              pref.setStringList("note", noted);
+                                                              pref.setString("restoNameTrans", nameResto);
+                                                              pref.setString("restoPhoneTrans", phone);
+                                                              menuJson = [];
+                                                              print('kudune '+menuJson.toString());
+                                                              json2 = pref.getString("menuJson")??'';
+                                                              _getData2();
+                                                              noteProduct = '';
+                                                              getNote();
 
-                                                                                                  setStateModal(() {});
-                                                                                                  setState(() {});
-                                                                                                }
+                                                              setStateModal(() {});
+                                                              setState(() {});
+                                                            }
 
-                                                                                                pref.setString("metodeBeli", '2');
-                                                                                              } else {
-                                                                                                Fluttertoast.showToast(msg: "Ambil langsung tidak tersedia.");
-                                                                                              }
-                                                                                            });
-                                                                                            Navigator.pop(_);
-                                                                                          },
-                                                                                          child: Row(
-                                                                                            children: [
-                                                                                              Container(
-                                                                                                width: CustomSize.sizeWidth(context) / 8,
-                                                                                                height: CustomSize.sizeWidth(context) / 8,
-                                                                                                decoration: BoxDecoration(
-                                                                                                    color: CustomColor.primaryLight,
-                                                                                                    shape: BoxShape.circle
-                                                                                                ),
-                                                                                                child: Center(
-                                                                                                  child: Icon(MaterialCommunityIcons.shopping, color: Colors.white, size: 20,),
-                                                                                                ),
-                                                                                              ),
-                                                                                              SizedBox(width: CustomSize.sizeWidth(context) / 32,),
-                                                                                              MediaQuery(
-                                                                                                  child: CustomText.textHeading6(text: "Ambil Langsung", minSize: double.parse(((MediaQuery.of(context).size.width*0.035).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.035).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.035).toString()),),
-                                                                                                  data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0)
-                                                                                              ),
-                                                                                            ],
-                                                                                          ),
-                                                                                        ),
-                                                                                        SizedBox(height: CustomSize.sizeHeight(context) / 86,),
-                                                                                        GestureDetector(
-                                                                                          onTap: ()async{
-                                                                                            SharedPreferences pref = await SharedPreferences.getInstance();
-                                                                                            print('ini json '+json2.toString()+ cart.toString());
-                                                                                            if (cart.toString() == '1') {
-                                                                                              if (json2.toString() != '[]') {
-                                                                                                MenuJson m = MenuJson(
-                                                                                                  id: promo[index].menu!.id,
-                                                                                                  restoId: promo[index].menu!.restoId,
-                                                                                                  name: promo[index].menu!.name,
-                                                                                                  desc: promo[index].menu!.desc,
-                                                                                                  price: promo[index].menu!.price!.original.toString(),
-                                                                                                  discount: promo[index].menu!.price!.discounted.toString(),
-                                                                                                  pricePlus: promo[index].menu!.price!.delivery.toString(),
-                                                                                                  urlImg: promo[index].menu!.urlImg, distance: null, restoName: '',
-                                                                                                );
-                                                                                                menuJson.add(m);
-                                                                                                // List<String> _restoId = [];
-                                                                                                // List<String> _qty = [];
-                                                                                                restoId.add(promo[index].menu!.id.toString());
-                                                                                                qty.add("1");
-                                                                                                noted.add("{${promo[index].menu!.name}: kam5ia_null}");
-                                                                                                inCart = '1';
+                                                            print('ini in cart 1 '+pref.getString('inCart').toString());
+                                                          }
+                                                        } else if (checkId != idnyaResto) {
+                                                          showDialog(
+                                                            context: context,
+                                                            builder: (BuildContext context) {
+                                                              return AlertDialog(
+                                                                shape: RoundedRectangleBorder(
+                                                                  borderRadius: BorderRadius.circular(20),
+                                                                ),
+                                                                title: new Text("Hapus cart"),
+                                                                content: new Text("Apakah anda ingin mengganti item di cart dengan item yang baru ?"),
+                                                                actions: <Widget>[
+                                                                  new FlatButton(
+                                                                    child: new Text("Batal", style: TextStyle(color: CustomColor.primaryLight)),
+                                                                    onPressed: () {
+                                                                      Navigator.of(context).pop();
+                                                                    },
+                                                                  ),
+                                                                  new FlatButton(
+                                                                    child: new Text("Oke", style: TextStyle(color: CustomColor.primaryLight)),
+                                                                    onPressed: () async{
+                                                                      SharedPreferences pref = await SharedPreferences.getInstance();
+                                                                      pref.setString("menuJson", "");
+                                                                      pref.setString("restoId", "");
+                                                                      pref.setString("qty", "");
+                                                                      pref.setString("note", "");
+                                                                      pref.remove('address');
+                                                                      pref.remove('inCart');
+                                                                      pref.remove('restoIdUsr');
+                                                                      pref.remove("addressDelivTrans");
+                                                                      pref.remove("distan");
+                                                                      _getData2();
+                                                                      _getData();
+                                                                      await Future.delayed(Duration(seconds: 2));
+                                                                      Navigator.of(context).pop();
+                                                                      // Navigator.pushReplacement(
+                                                                      //     context,
+                                                                      //     PageTransition(
+                                                                      //         type: PageTransitionType.rightToLeft,
+                                                                      //         child: new DetailResto(id)));
+                                                                      // pref.remove('inCart');
+                                                                      // pref.setString("menuJson", "");
+                                                                      // inCart = pref.getString("inCart");
+                                                                      // cart = pref.getString("inCart");
+                                                                      // qty.addAll([]);
+                                                                      // json2 = pref.getString("menuJson")??';
+                                                                      // pref.setString("qty", "");
+                                                                      // pref.remove("restoIdUsr");
+                                                                      showModalBottomSheet(
+                                                                          isScrollControlled: true,
+                                                                          shape: RoundedRectangleBorder(
+                                                                              borderRadius: BorderRadius.only(topLeft: Radius.circular(20), topRight: Radius.circular(20))
+                                                                          ),
+                                                                          context: context,
+                                                                          builder: (_){
+                                                                            return Padding(
+                                                                              padding: EdgeInsets.symmetric(horizontal: CustomSize.sizeWidth(context) / 32),
+                                                                              child: Column(
+                                                                                crossAxisAlignment: CrossAxisAlignment.start,
+                                                                                mainAxisSize: MainAxisSize.min,
+                                                                                children: [
+                                                                                  SizedBox(height: CustomSize.sizeHeight(context) / 86,),
+                                                                                  Padding(
+                                                                                    padding: EdgeInsets.symmetric(horizontal: CustomSize.sizeWidth(context) / 2.4),
+                                                                                    child: Divider(thickness: 4,),
+                                                                                  ),
+                                                                                  SizedBox(height: CustomSize.sizeHeight(context) / 52,),
+                                                                                  GestureDetector(
+                                                                                    onTap: ()async{
+                                                                                      SharedPreferences pref = await SharedPreferences.getInstance();
+                                                                                      setState(() {
+                                                                                        if (can_delivery == 'true') {
+                                                                                          print('ini json '+json2.toString()+ cart.toString());
+                                                                                          if (cart.toString() == '1') {
+                                                                                            if (json2.toString() != '[]') {
+                                                                                              MenuJson m = MenuJson(
+                                                                                                id: promo[index].menu!.id,
+                                                                                                restoId: promo[index].menu!.restoId,
+                                                                                                name: promo[index].menu!.name,
+                                                                                                desc: promo[index].menu!.desc,
+                                                                                                price: promo[index].menu!.price!.original.toString(),
+                                                                                                discount: promo[index].menu!.price!.discounted.toString(),
+                                                                                                pricePlus: promo[index].menu!.price!.delivery.toString(),
+                                                                                                urlImg: promo[index].menu!.urlImg, distance: null, restoName: '',
+                                                                                              );
+                                                                                              menuJson.add(m);
+                                                                                              // List<String> _restoId = [];
+                                                                                              // List<String> _qty = [];
+                                                                                              restoId.add(promo[index].menu!.id.toString());
+                                                                                              qty.add("1");
+                                                                                              noted.add("{${promo[index].menu!.name}: kam5ia_null}");
+                                                                                              inCart = '1';
 
-                                                                                                pref.setString("menuJson", json2.toString().split(']')[0]+', '+jsonEncode(menuJson.map((m) => m.toJson()).toList()).split('[')[1].split(']')[0]+']');
-                                                                                                menuJson = [];
-                                                                                                print('kudune '+menuJson.toString());
-                                                                                                json2 = pref.getString("menuJson");
-                                                                                                pref.setString('inCart', '1');
-                                                                                                pref.setString("menuJson", json2);
-                                                                                                pref.setString("restoIdUsr", idnyaResto);
-                                                                                                pref.setStringList("restoId", restoId);
-                                                                                                pref.setStringList("qty", qty);
-                                                                                                pref.setStringList("note", noted);
-                                                                                                pref.setString("restoNameTrans", nameResto);
-                                                                                                pref.setString("restoPhoneTrans", phone);
-                                                                                                noteProduct = '';
-                                                                                                getNote();
+                                                                                              pref.setString("menuJson", json2.toString().split(']')[0]+', '+jsonEncode(menuJson.map((m) => m.toJson()).toList()).split('[')[1].split(']')[0]+']');
+                                                                                              menuJson = [];
+                                                                                              print('kudune '+menuJson.toString());
+                                                                                              json2 = pref.getString("menuJson")??'';
+                                                                                              pref.setString('inCart', '1');
+                                                                                              pref.setString("menuJson", json2);
+                                                                                              pref.setString("restoIdUsr", idnyaResto);
+                                                                                              pref.setStringList("restoId", restoId);
+                                                                                              pref.setStringList("qty", qty);
+                                                                                              pref.setStringList("note", noted);
+                                                                                              pref.setString("restoNameTrans", nameResto);
+                                                                                              pref.setString("restoPhoneTrans", phone);
+                                                                                              noteProduct = '';
+                                                                                              getNote();
 
-                                                                                                setStateModal(() {});
-                                                                                                setState(() {});
-                                                                                              } else {
-                                                                                                MenuJson m = MenuJson(
-                                                                                                  id: promo[index].menu!.id,
-                                                                                                  restoId: promo[index].menu!.restoId,
-                                                                                                  name: promo[index].menu!.name,
-                                                                                                  desc: promo[index].menu!.desc,
-                                                                                                  price: promo[index].menu!.price!.original.toString(),
-                                                                                                  discount: promo[index].menu!.price!.discounted.toString(),
-                                                                                                  pricePlus: promo[index].menu!.price!.delivery.toString(),
-                                                                                                  urlImg: promo[index].menu!.urlImg, distance: null, restoName: '',
-                                                                                                );
-                                                                                                menuJson.add(m);
-                                                                                                // List<String> _restoId = [];
-                                                                                                // List<String> _qty = [];
-                                                                                                restoId.add(promo[index].menu!.id.toString());
-                                                                                                qty.add("1");
-                                                                                                noted.add("{${promo[index].menu!.name}: kam5ia_null}");
-                                                                                                inCart = '1';
-
-                                                                                                pref.setString("menuJson", json2.toString().split(']')[0]+', '+jsonEncode(menuJson.map((m) => m.toJson()).toList()).split('[')[1].split(']')[0]+']');
-                                                                                                menuJson = [];
-                                                                                                print('kudune '+menuJson.toString());
-                                                                                                json2 = pref.getString("menuJson");
-                                                                                                pref.setString('inCart', '1');
-                                                                                                pref.setString("menuJson", json2);
-                                                                                                pref.setString("restoIdUsr", idnyaResto);
-                                                                                                pref.setStringList("restoId", restoId);
-                                                                                                pref.setStringList("qty", qty);
-                                                                                                pref.setStringList("note", noted);
-                                                                                                pref.setString("restoNameTrans", nameResto);
-                                                                                                pref.setString("restoPhoneTrans", phone);
-                                                                                                noteProduct = '';
-                                                                                                getNote();
-
-                                                                                                setStateModal(() {});
-                                                                                                setState(() {});
-                                                                                              }
+                                                                                              setStateModal(() {});
+                                                                                              setState(() {});
                                                                                             } else {
                                                                                               MenuJson m = MenuJson(
                                                                                                 id: promo[index].menu!.id,
@@ -2022,461 +1685,423 @@ class _DetailPromoResto extends State<DetailPromoResto> {
                                                                                               noted.add("{${promo[index].menu!.name}: kam5ia_null}");
                                                                                               inCart = '1';
 
-                                                                                              String json1 = jsonEncode(menuJson.map((m) => m.toJson()).toList());
+                                                                                              pref.setString("menuJson", json2.toString().split(']')[0]+', '+jsonEncode(menuJson.map((m) => m.toJson()).toList()).split('[')[1].split(']')[0]+']');
+                                                                                              menuJson = [];
+                                                                                              print('kudune '+menuJson.toString());
+                                                                                              json2 = pref.getString("menuJson")??'';
                                                                                               pref.setString('inCart', '1');
-                                                                                              pref.setString("menuJson", json1);
+                                                                                              pref.setString("menuJson", json2);
                                                                                               pref.setString("restoIdUsr", idnyaResto);
                                                                                               pref.setStringList("restoId", restoId);
                                                                                               pref.setStringList("qty", qty);
                                                                                               pref.setStringList("note", noted);
                                                                                               pref.setString("restoNameTrans", nameResto);
                                                                                               pref.setString("restoPhoneTrans", phone);
-                                                                                              menuJson = [];
-                                                                                              print('kudune '+menuJson.toString());
-                                                                                              json2 = pref.getString("menuJson");
-                                                                                              _getData2();
                                                                                               noteProduct = '';
                                                                                               getNote();
 
                                                                                               setStateModal(() {});
                                                                                               setState(() {});
                                                                                             }
+                                                                                          } else {
+                                                                                            MenuJson m = MenuJson(
+                                                                                              id: promo[index].menu!.id,
+                                                                                              restoId: promo[index].menu!.restoId,
+                                                                                              name: promo[index].menu!.name,
+                                                                                              desc: promo[index].menu!.desc,
+                                                                                              price: promo[index].menu!.price!.original.toString(),
+                                                                                              discount: promo[index].menu!.price!.discounted.toString(),
+                                                                                              pricePlus: promo[index].menu!.price!.delivery.toString(),
+                                                                                              urlImg: promo[index].menu!.urlImg, distance: null, restoName: '',
+                                                                                            );
+                                                                                            menuJson.add(m);
+                                                                                            // List<String> _restoId = [];
+                                                                                            // List<String> _qty = [];
+                                                                                            restoId.add(promo[index].menu!.id.toString());
+                                                                                            qty.add("1");
+                                                                                            noted.add("{${promo[index].menu!.name}: kam5ia_null}");
+                                                                                            inCart = '1';
 
-                                                                                            setState(() {
-                                                                                              pref.setString("metodeBeli", '3');
-                                                                                            });
-                                                                                            Navigator.pop(_);
-                                                                                          },
-                                                                                          child: Row(
-                                                                                            children: [
-                                                                                              Container(
-                                                                                                width: CustomSize.sizeWidth(context) / 8,
-                                                                                                height: CustomSize.sizeWidth(context) / 8,
-                                                                                                decoration: BoxDecoration(
-                                                                                                    color: CustomColor.primaryLight,
-                                                                                                    shape: BoxShape.circle
-                                                                                                ),
-                                                                                                child: Center(
-                                                                                                  child: Icon(Icons.restaurant, color: Colors.white, size: 20,),
-                                                                                                ),
-                                                                                              ),
-                                                                                              SizedBox(width: CustomSize.sizeWidth(context) / 32,),
-                                                                                              MediaQuery(child: CustomText.textHeading6(text: "Makan Ditempat", minSize: double.parse(((MediaQuery.of(context).size.width*0.035).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.035).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.035).toString()),),
-                                                                                                  data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0)
-                                                                                              ),
-                                                                                            ],
+                                                                                            String json1 = jsonEncode(menuJson.map((m) => m.toJson()).toList());
+                                                                                            pref.setString('inCart', '1');
+                                                                                            pref.setString("menuJson", json1);
+                                                                                            pref.setString("restoIdUsr", idnyaResto);
+                                                                                            pref.setStringList("restoId", restoId);
+                                                                                            pref.setStringList("qty", qty);
+                                                                                            pref.setStringList("note", noted);
+                                                                                            pref.setString("restoNameTrans", nameResto);
+                                                                                            pref.setString("restoPhoneTrans", phone);
+                                                                                            menuJson = [];
+                                                                                            print('kudune '+menuJson.toString());
+                                                                                            json2 = pref.getString("menuJson")??'';
+                                                                                            _getData2();
+                                                                                            noteProduct = '';
+                                                                                            getNote();
+
+                                                                                            setStateModal(() {});
+                                                                                            setState(() {});
+                                                                                          }
+
+                                                                                          pref.setString("metodeBeli", '1');
+                                                                                        } else {
+                                                                                          Fluttertoast.showToast(msg: "Pesan antar tidak tersedia.");
+                                                                                        }
+                                                                                      });
+                                                                                      Navigator.pop(_);
+                                                                                    },
+                                                                                    child: Row(
+                                                                                      children: [
+                                                                                        Container(
+                                                                                          width: CustomSize.sizeWidth(context) / 8,
+                                                                                          height: CustomSize.sizeWidth(context) / 8,
+                                                                                          decoration: BoxDecoration(
+                                                                                              color: CustomColor.primaryLight,
+                                                                                              shape: BoxShape.circle
+                                                                                          ),
+                                                                                          child: Center(
+                                                                                            child: Icon(FontAwesome.motorcycle, color: Colors.white, size: 20,),
                                                                                           ),
                                                                                         ),
-                                                                                        SizedBox(height: CustomSize.sizeHeight(context) / 86,),
+                                                                                        SizedBox(width: CustomSize.sizeWidth(context) / 32,),
+                                                                                        MediaQuery(
+                                                                                            child: CustomText.textHeading6(text: "Pesan Antar", minSize: double.parse(((MediaQuery.of(context).size.width*0.035).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.035).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.035).toString()),),
+                                                                                            data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0)
+                                                                                        ),
                                                                                       ],
                                                                                     ),
-                                                                                  );
-                                                                                }
+                                                                                  ),
+                                                                                  SizedBox(height: CustomSize.sizeHeight(context) / 86,),
+                                                                                  GestureDetector(
+                                                                                    onTap: ()async{
+                                                                                      SharedPreferences pref = await SharedPreferences.getInstance();
+                                                                                      setState(() {
+                                                                                        if (can_takeaway == 'true') {
+                                                                                          print('ini json '+json2.toString()+ cart.toString());
+                                                                                          if (cart.toString() == '1') {
+                                                                                            if (json2.toString() != '[]') {
+                                                                                              MenuJson m = MenuJson(
+                                                                                                id: promo[index].menu!.id,
+                                                                                                restoId: promo[index].menu!.restoId,
+                                                                                                name: promo[index].menu!.name,
+                                                                                                desc: promo[index].menu!.desc,
+                                                                                                price: promo[index].menu!.price!.original.toString(),
+                                                                                                discount: promo[index].menu!.price!.discounted.toString(),
+                                                                                                pricePlus: promo[index].menu!.price!.delivery.toString(),
+                                                                                                urlImg: promo[index].menu!.urlImg, distance: null, restoName: '',
+                                                                                              );
+                                                                                              menuJson.add(m);
+                                                                                              // List<String> _restoId = [];
+                                                                                              // List<String> _qty = [];
+                                                                                              restoId.add(promo[index].menu!.id.toString());
+                                                                                              qty.add("1");
+                                                                                              noted.add("{${promo[index].menu!.name}: kam5ia_null}");
+                                                                                              inCart = '1';
+
+                                                                                              pref.setString("menuJson", json2.toString().split(']')[0]+', '+jsonEncode(menuJson.map((m) => m.toJson()).toList()).split('[')[1].split(']')[0]+']');
+                                                                                              menuJson = [];
+                                                                                              print('kudune '+menuJson.toString());
+                                                                                              json2 = pref.getString("menuJson")??'';
+                                                                                              pref.setString('inCart', '1');
+                                                                                              pref.setString("menuJson", json2);
+                                                                                              pref.setString("restoIdUsr", idnyaResto);
+                                                                                              pref.setStringList("restoId", restoId);
+                                                                                              pref.setStringList("qty", qty);
+                                                                                              pref.setStringList("note", noted);
+                                                                                              pref.setString("restoNameTrans", nameResto);
+                                                                                              pref.setString("restoPhoneTrans", phone);
+                                                                                              noteProduct = '';
+                                                                                              getNote();
+
+                                                                                              setStateModal(() {});
+                                                                                              setState(() {});
+                                                                                            } else {
+                                                                                              MenuJson m = MenuJson(
+                                                                                                id: promo[index].menu!.id,
+                                                                                                restoId: promo[index].menu!.restoId,
+                                                                                                name: promo[index].menu!.name,
+                                                                                                desc: promo[index].menu!.desc,
+                                                                                                price: promo[index].menu!.price!.original.toString(),
+                                                                                                discount: promo[index].menu!.price!.discounted.toString(),
+                                                                                                pricePlus: promo[index].menu!.price!.delivery.toString(),
+                                                                                                urlImg: promo[index].menu!.urlImg, distance: null, restoName: '',
+                                                                                              );
+                                                                                              menuJson.add(m);
+                                                                                              // List<String> _restoId = [];
+                                                                                              // List<String> _qty = [];
+                                                                                              restoId.add(promo[index].menu!.id.toString());
+                                                                                              qty.add("1");
+                                                                                              noted.add("{${promo[index].menu!.name}: kam5ia_null}");
+                                                                                              inCart = '1';
+
+                                                                                              pref.setString("menuJson", json2.toString().split(']')[0]+', '+jsonEncode(menuJson.map((m) => m.toJson()).toList()).split('[')[1].split(']')[0]+']');
+                                                                                              menuJson = [];
+                                                                                              print('kudune '+menuJson.toString());
+                                                                                              json2 = pref.getString("menuJson")??'';
+                                                                                              pref.setString('inCart', '1');
+                                                                                              pref.setString("menuJson", json2);
+                                                                                              pref.setString("restoIdUsr", idnyaResto);
+                                                                                              pref.setStringList("restoId", restoId);
+                                                                                              pref.setStringList("qty", qty);
+                                                                                              pref.setStringList("note", noted);
+                                                                                              pref.setString("restoNameTrans", nameResto);
+                                                                                              pref.setString("restoPhoneTrans", phone);
+                                                                                              noteProduct = '';
+                                                                                              getNote();
+
+                                                                                              setStateModal(() {});
+                                                                                              setState(() {});
+                                                                                            }
+                                                                                          } else {
+                                                                                            MenuJson m = MenuJson(
+                                                                                              id: promo[index].menu!.id,
+                                                                                              restoId: promo[index].menu!.restoId,
+                                                                                              name: promo[index].menu!.name,
+                                                                                              desc: promo[index].menu!.desc,
+                                                                                              price: promo[index].menu!.price!.original.toString(),
+                                                                                              discount: promo[index].menu!.price!.discounted.toString(),
+                                                                                              pricePlus: promo[index].menu!.price!.delivery.toString(),
+                                                                                              urlImg: promo[index].menu!.urlImg, distance: null, restoName: '',
+                                                                                            );
+                                                                                            menuJson.add(m);
+                                                                                            // List<String> _restoId = [];
+                                                                                            // List<String> _qty = [];
+                                                                                            restoId.add(promo[index].menu!.id.toString());
+                                                                                            qty.add("1");
+                                                                                            noted.add("{${promo[index].menu!.name}: kam5ia_null}");
+                                                                                            inCart = '1';
+
+                                                                                            String json1 = jsonEncode(menuJson.map((m) => m.toJson()).toList());
+                                                                                            pref.setString('inCart', '1');
+                                                                                            pref.setString("menuJson", json1);
+                                                                                            pref.setString("restoIdUsr", idnyaResto);
+                                                                                            pref.setStringList("restoId", restoId);
+                                                                                            pref.setStringList("qty", qty);
+                                                                                            pref.setStringList("note", noted);
+                                                                                            pref.setString("restoNameTrans", nameResto);
+                                                                                            pref.setString("restoPhoneTrans", phone);
+                                                                                            menuJson = [];
+                                                                                            print('kudune '+menuJson.toString());
+                                                                                            json2 = pref.getString("menuJson")??'';
+                                                                                            _getData2();
+                                                                                            noteProduct = '';
+                                                                                            getNote();
+
+                                                                                            setStateModal(() {});
+                                                                                            setState(() {});
+                                                                                          }
+
+                                                                                          pref.setString("metodeBeli", '2');
+                                                                                        } else {
+                                                                                          Fluttertoast.showToast(msg: "Ambil langsung tidak tersedia.");
+                                                                                        }
+                                                                                      });
+                                                                                      Navigator.pop(_);
+                                                                                    },
+                                                                                    child: Row(
+                                                                                      children: [
+                                                                                        Container(
+                                                                                          width: CustomSize.sizeWidth(context) / 8,
+                                                                                          height: CustomSize.sizeWidth(context) / 8,
+                                                                                          decoration: BoxDecoration(
+                                                                                              color: CustomColor.primaryLight,
+                                                                                              shape: BoxShape.circle
+                                                                                          ),
+                                                                                          child: Center(
+                                                                                            child: Icon(MaterialCommunityIcons.shopping, color: Colors.white, size: 20,),
+                                                                                          ),
+                                                                                        ),
+                                                                                        SizedBox(width: CustomSize.sizeWidth(context) / 32,),
+                                                                                        MediaQuery(
+                                                                                            child: CustomText.textHeading6(text: "Ambil Langsung", minSize: double.parse(((MediaQuery.of(context).size.width*0.035).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.035).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.035).toString()),),
+                                                                                            data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0)
+                                                                                        ),
+                                                                                      ],
+                                                                                    ),
+                                                                                  ),
+                                                                                  SizedBox(height: CustomSize.sizeHeight(context) / 86,),
+                                                                                  GestureDetector(
+                                                                                    onTap: ()async{
+                                                                                      SharedPreferences pref = await SharedPreferences.getInstance();
+                                                                                      print('ini json '+json2.toString()+ cart.toString());
+                                                                                      if (cart.toString() == '1') {
+                                                                                        if (json2.toString() != '[]') {
+                                                                                          MenuJson m = MenuJson(
+                                                                                            id: promo[index].menu!.id,
+                                                                                            restoId: promo[index].menu!.restoId,
+                                                                                            name: promo[index].menu!.name,
+                                                                                            desc: promo[index].menu!.desc,
+                                                                                            price: promo[index].menu!.price!.original.toString(),
+                                                                                            discount: promo[index].menu!.price!.discounted.toString(),
+                                                                                            pricePlus: promo[index].menu!.price!.delivery.toString(),
+                                                                                            urlImg: promo[index].menu!.urlImg, distance: null, restoName: '',
+                                                                                          );
+                                                                                          menuJson.add(m);
+                                                                                          // List<String> _restoId = [];
+                                                                                          // List<String> _qty = [];
+                                                                                          restoId.add(promo[index].menu!.id.toString());
+                                                                                          qty.add("1");
+                                                                                          noted.add("{${promo[index].menu!.name}: kam5ia_null}");
+                                                                                          inCart = '1';
+
+                                                                                          pref.setString("menuJson", json2.toString().split(']')[0]+', '+jsonEncode(menuJson.map((m) => m.toJson()).toList()).split('[')[1].split(']')[0]+']');
+                                                                                          menuJson = [];
+                                                                                          print('kudune '+menuJson.toString());
+                                                                                          json2 = pref.getString("menuJson")??'';
+                                                                                          pref.setString('inCart', '1');
+                                                                                          pref.setString("menuJson", json2);
+                                                                                          pref.setString("restoIdUsr", idnyaResto);
+                                                                                          pref.setStringList("restoId", restoId);
+                                                                                          pref.setStringList("qty", qty);
+                                                                                          pref.setStringList("note", noted);
+                                                                                          pref.setString("restoNameTrans", nameResto);
+                                                                                          pref.setString("restoPhoneTrans", phone);
+                                                                                          noteProduct = '';
+                                                                                          getNote();
+
+                                                                                          setStateModal(() {});
+                                                                                          setState(() {});
+                                                                                        } else {
+                                                                                          MenuJson m = MenuJson(
+                                                                                            id: promo[index].menu!.id,
+                                                                                            restoId: promo[index].menu!.restoId,
+                                                                                            name: promo[index].menu!.name,
+                                                                                            desc: promo[index].menu!.desc,
+                                                                                            price: promo[index].menu!.price!.original.toString(),
+                                                                                            discount: promo[index].menu!.price!.discounted.toString(),
+                                                                                            pricePlus: promo[index].menu!.price!.delivery.toString(),
+                                                                                            urlImg: promo[index].menu!.urlImg, distance: null, restoName: '',
+                                                                                          );
+                                                                                          menuJson.add(m);
+                                                                                          // List<String> _restoId = [];
+                                                                                          // List<String> _qty = [];
+                                                                                          restoId.add(promo[index].menu!.id.toString());
+                                                                                          qty.add("1");
+                                                                                          noted.add("{${promo[index].menu!.name}: kam5ia_null}");
+                                                                                          inCart = '1';
+
+                                                                                          pref.setString("menuJson", json2.toString().split(']')[0]+', '+jsonEncode(menuJson.map((m) => m.toJson()).toList()).split('[')[1].split(']')[0]+']');
+                                                                                          menuJson = [];
+                                                                                          print('kudune '+menuJson.toString());
+                                                                                          json2 = pref.getString("menuJson")??'';
+                                                                                          pref.setString('inCart', '1');
+                                                                                          pref.setString("menuJson", json2);
+                                                                                          pref.setString("restoIdUsr", idnyaResto);
+                                                                                          pref.setStringList("restoId", restoId);
+                                                                                          pref.setStringList("qty", qty);
+                                                                                          pref.setStringList("note", noted);
+                                                                                          pref.setString("restoNameTrans", nameResto);
+                                                                                          pref.setString("restoPhoneTrans", phone);
+                                                                                          noteProduct = '';
+                                                                                          getNote();
+
+                                                                                          setStateModal(() {});
+                                                                                          setState(() {});
+                                                                                        }
+                                                                                      } else {
+                                                                                        MenuJson m = MenuJson(
+                                                                                          id: promo[index].menu!.id,
+                                                                                          restoId: promo[index].menu!.restoId,
+                                                                                          name: promo[index].menu!.name,
+                                                                                          desc: promo[index].menu!.desc,
+                                                                                          price: promo[index].menu!.price!.original.toString(),
+                                                                                          discount: promo[index].menu!.price!.discounted.toString(),
+                                                                                          pricePlus: promo[index].menu!.price!.delivery.toString(),
+                                                                                          urlImg: promo[index].menu!.urlImg, distance: null, restoName: '',
+                                                                                        );
+                                                                                        menuJson.add(m);
+                                                                                        // List<String> _restoId = [];
+                                                                                        // List<String> _qty = [];
+                                                                                        restoId.add(promo[index].menu!.id.toString());
+                                                                                        qty.add("1");
+                                                                                        noted.add("{${promo[index].menu!.name}: kam5ia_null}");
+                                                                                        inCart = '1';
+
+                                                                                        String json1 = jsonEncode(menuJson.map((m) => m.toJson()).toList());
+                                                                                        pref.setString('inCart', '1');
+                                                                                        pref.setString("menuJson", json1);
+                                                                                        pref.setString("restoIdUsr", idnyaResto);
+                                                                                        pref.setStringList("restoId", restoId);
+                                                                                        pref.setStringList("qty", qty);
+                                                                                        pref.setStringList("note", noted);
+                                                                                        pref.setString("restoNameTrans", nameResto);
+                                                                                        pref.setString("restoPhoneTrans", phone);
+                                                                                        menuJson = [];
+                                                                                        print('kudune '+menuJson.toString());
+                                                                                        json2 = pref.getString("menuJson")??'';
+                                                                                        _getData2();
+                                                                                        noteProduct = '';
+                                                                                        getNote();
+
+                                                                                        setStateModal(() {});
+                                                                                        setState(() {});
+                                                                                      }
+
+                                                                                      setState(() {
+                                                                                        pref.setString("metodeBeli", '3');
+                                                                                      });
+                                                                                      Navigator.pop(_);
+                                                                                    },
+                                                                                    child: Row(
+                                                                                      children: [
+                                                                                        Container(
+                                                                                          width: CustomSize.sizeWidth(context) / 8,
+                                                                                          height: CustomSize.sizeWidth(context) / 8,
+                                                                                          decoration: BoxDecoration(
+                                                                                              color: CustomColor.primaryLight,
+                                                                                              shape: BoxShape.circle
+                                                                                          ),
+                                                                                          child: Center(
+                                                                                            child: Icon(Icons.restaurant, color: Colors.white, size: 20,),
+                                                                                          ),
+                                                                                        ),
+                                                                                        SizedBox(width: CustomSize.sizeWidth(context) / 32,),
+                                                                                        MediaQuery(child: CustomText.textHeading6(text: "Makan Ditempat", minSize: double.parse(((MediaQuery.of(context).size.width*0.035).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.035).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.035).toString()),),
+                                                                                            data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0)
+                                                                                        ),
+                                                                                      ],
+                                                                                    ),
+                                                                                  ),
+                                                                                  SizedBox(height: CustomSize.sizeHeight(context) / 86,),
+                                                                                ],
+                                                                              ),
                                                                             );
-                                                                          },
+                                                                          }
+                                                                      );
+                                                                    },
+                                                                  ),
+                                                                ],
+                                                              );
+                                                            },
+                                                          );
+                                                        } else if (checkId == idnyaResto) {
+                                                          if (inCart == "") {
+                                                            showModalBottomSheet(
+                                                                isScrollControlled: true,
+                                                                shape: RoundedRectangleBorder(
+                                                                    borderRadius: BorderRadius.only(topLeft: Radius.circular(20), topRight: Radius.circular(20))
+                                                                ),
+                                                                context: context,
+                                                                builder: (_){
+                                                                  return Padding(
+                                                                    padding: EdgeInsets.symmetric(horizontal: CustomSize.sizeWidth(context) / 32),
+                                                                    child: Column(
+                                                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                                                      mainAxisSize: MainAxisSize.min,
+                                                                      children: [
+                                                                        SizedBox(height: CustomSize.sizeHeight(context) / 86,),
+                                                                        Padding(
+                                                                          padding: EdgeInsets.symmetric(horizontal: CustomSize.sizeWidth(context) / 2.4),
+                                                                          child: Divider(thickness: 4,),
                                                                         ),
-                                                                      ],
-                                                                    );
-                                                                  },
-                                                                );
-                                                              } else if (checkId == idnyaResto) {
-                                                                if (inCart == "") {
-                                                                  showModalBottomSheet(
-                                                                      isScrollControlled: true,
-                                                                      shape: RoundedRectangleBorder(
-                                                                          borderRadius: BorderRadius.only(topLeft: Radius.circular(20), topRight: Radius.circular(20))
-                                                                      ),
-                                                                      context: context,
-                                                                      builder: (_){
-                                                                        return Padding(
-                                                                          padding: EdgeInsets.symmetric(horizontal: CustomSize.sizeWidth(context) / 32),
-                                                                          child: Column(
-                                                                            crossAxisAlignment: CrossAxisAlignment.start,
-                                                                            mainAxisSize: MainAxisSize.min,
-                                                                            children: [
-                                                                              SizedBox(height: CustomSize.sizeHeight(context) / 86,),
-                                                                              Padding(
-                                                                                padding: EdgeInsets.symmetric(horizontal: CustomSize.sizeWidth(context) / 2.4),
-                                                                                child: Divider(thickness: 4,),
-                                                                              ),
-                                                                              SizedBox(height: CustomSize.sizeHeight(context) / 52,),
-                                                                              GestureDetector(
-                                                                                onTap: ()async{
-                                                                                  SharedPreferences pref = await SharedPreferences.getInstance();
-                                                                                  setState(() {
-                                                                                    if (can_delivery == 'true') {
-                                                                                      print('ini json '+json2.toString()+ cart.toString());
-                                                                                      if (cart.toString() == '1') {
-                                                                                        if (json2.toString() != '[]') {
-                                                                                          MenuJson m = MenuJson(
-                                                                                            id: promo[index].menu!.id,
-                                                                                            restoId: promo[index].menu!.restoId,
-                                                                                            name: promo[index].menu!.name,
-                                                                                            desc: promo[index].menu!.desc,
-                                                                                            price: promo[index].menu!.price!.original.toString(),
-                                                                                            discount: promo[index].menu!.price!.discounted.toString(),
-                                                                                            pricePlus: promo[index].menu!.price!.delivery.toString(),
-                                                                                            urlImg: promo[index].menu!.urlImg, distance: null, restoName: '',
-                                                                                          );
-                                                                                          menuJson.add(m);
-                                                                                          // List<String> _restoId = [];
-                                                                                          // List<String> _qty = [];
-                                                                                          restoId.add(promo[index].menu!.id.toString());
-                                                                                          qty.add("1");
-                                                                                          noted.add("{${promo[index].menu!.name}: kam5ia_null}");
-                                                                                          inCart = '1';
-
-                                                                                          pref.setString("menuJson", json2.toString().split(']')[0]+', '+jsonEncode(menuJson.map((m) => m.toJson()).toList()).split('[')[1].split(']')[0]+']');
-                                                                                          menuJson = [];
-                                                                                          print('kudune '+menuJson.toString());
-                                                                                          json2 = pref.getString("menuJson");
-                                                                                          pref.setString('inCart', '1');
-                                                                                          pref.setString("menuJson", json2);
-                                                                                          pref.setString("restoIdUsr", idnyaResto);
-                                                                                          pref.setStringList("restoId", restoId);
-                                                                                          pref.setStringList("qty", qty);
-                                                                                          pref.setStringList("note", noted);
-                                                                                          pref.setString("restoNameTrans", nameResto);
-                                                                                          pref.setString("restoPhoneTrans", phone);
-                                                                                          noteProduct = '';
-                                                                                          getNote();
-
-                                                                                          setStateModal(() {});
-                                                                                          setState(() {});
-                                                                                        } else {
-                                                                                          MenuJson m = MenuJson(
-                                                                                            id: promo[index].menu!.id,
-                                                                                            restoId: promo[index].menu!.restoId,
-                                                                                            name: promo[index].menu!.name,
-                                                                                            desc: promo[index].menu!.desc,
-                                                                                            price: promo[index].menu!.price!.original.toString(),
-                                                                                            discount: promo[index].menu!.price!.discounted.toString(),
-                                                                                            pricePlus: promo[index].menu!.price!.delivery.toString(),
-                                                                                            urlImg: promo[index].menu!.urlImg, distance: null, restoName: '',
-                                                                                          );
-                                                                                          menuJson.add(m);
-                                                                                          // List<String> _restoId = [];
-                                                                                          // List<String> _qty = [];
-                                                                                          restoId.add(promo[index].menu!.id.toString());
-                                                                                          qty.add("1");
-                                                                                          noted.add("{${promo[index].menu!.name}: kam5ia_null}");
-                                                                                          inCart = '1';
-
-                                                                                          pref.setString("menuJson", json2.toString().split(']')[0]+', '+jsonEncode(menuJson.map((m) => m.toJson()).toList()).split('[')[1].split(']')[0]+']');
-                                                                                          menuJson = [];
-                                                                                          print('kudune '+menuJson.toString());
-                                                                                          json2 = pref.getString("menuJson");
-                                                                                          pref.setString('inCart', '1');
-                                                                                          pref.setString("menuJson", json2);
-                                                                                          pref.setString("restoIdUsr", idnyaResto);
-                                                                                          pref.setStringList("restoId", restoId);
-                                                                                          pref.setStringList("qty", qty);
-                                                                                          pref.setStringList("note", noted);
-                                                                                          pref.setString("restoNameTrans", nameResto);
-                                                                                          pref.setString("restoPhoneTrans", phone);
-                                                                                          noteProduct = '';
-                                                                                          getNote();
-
-                                                                                          setStateModal(() {});
-                                                                                          setState(() {});
-                                                                                        }
-                                                                                      } else {
-                                                                                        MenuJson m = MenuJson(
-                                                                                          id: promo[index].menu!.id,
-                                                                                          restoId: promo[index].menu!.restoId,
-                                                                                          name: promo[index].menu!.name,
-                                                                                          desc: promo[index].menu!.desc,
-                                                                                          price: promo[index].menu!.price!.original.toString(),
-                                                                                          discount: promo[index].menu!.price!.discounted.toString(),
-                                                                                          pricePlus: promo[index].menu!.price!.delivery.toString(),
-                                                                                          urlImg: promo[index].menu!.urlImg, distance: null, restoName: '',
-                                                                                        );
-                                                                                        menuJson.add(m);
-                                                                                        // List<String> _restoId = [];
-                                                                                        // List<String> _qty = [];
-                                                                                        restoId.add(promo[index].menu!.id.toString());
-                                                                                        qty.add("1");
-                                                                                        noted.add("{${promo[index].menu!.name}: kam5ia_null}");
-                                                                                        inCart = '1';
-
-                                                                                        String json1 = jsonEncode(menuJson.map((m) => m.toJson()).toList());
-                                                                                        menuJson = [];
-                                                                                        print('kudune '+menuJson.toString());
-                                                                                        json2 = pref.getString("menuJson");
-                                                                                        pref.setString('inCart', '1');
-                                                                                        pref.setString("menuJson", json1);
-                                                                                        pref.setString("restoIdUsr", idnyaResto);
-                                                                                        pref.setStringList("restoId", restoId);
-                                                                                        pref.setStringList("qty", qty);
-                                                                                        pref.setStringList("note", noted);
-                                                                                        pref.setString("restoNameTrans", nameResto);
-                                                                                        pref.setString("restoPhoneTrans", phone);
-                                                                                        menuJson = [];
-                                                                                        print('kudune '+menuJson.toString());
-                                                                                        json2 = pref.getString("menuJson");
-                                                                                        _getData2();
-                                                                                        noteProduct = '';
-                                                                                        getNote();
-
-                                                                                        setStateModal(() {});
-                                                                                        setState(() {});
-                                                                                      }
-
-                                                                                      pref.setString("metodeBeli", '1');
-                                                                                    } else {
-                                                                                      Fluttertoast.showToast(msg: "Pesan antar tidak tersedia.");
-                                                                                    }
-                                                                                  });
-                                                                                  Navigator.pop(context);
-                                                                                },
-                                                                                child: Row(
-                                                                                  children: [
-                                                                                    Container(
-                                                                                      width: CustomSize.sizeWidth(context) / 8,
-                                                                                      height: CustomSize.sizeWidth(context) / 8,
-                                                                                      decoration: BoxDecoration(
-                                                                                          color: CustomColor.primaryLight,
-                                                                                          shape: BoxShape.circle
-                                                                                      ),
-                                                                                      child: Center(
-                                                                                        child: Icon(FontAwesome.motorcycle, color: Colors.white, size: 20,),
-                                                                                      ),
-                                                                                    ),
-                                                                                    SizedBox(width: CustomSize.sizeWidth(context) / 32,),
-                                                                                    MediaQuery(
-                                                                                        child: CustomText.textHeading6(text: "Pesan Antar", minSize: double.parse(((MediaQuery.of(context).size.width*0.035).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.035).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.035).toString()),),
-                                                                                        data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0)
-                                                                                    ),
-                                                                                  ],
-                                                                                ),
-                                                                              ),
-                                                                              SizedBox(height: CustomSize.sizeHeight(context) / 86,),
-                                                                              GestureDetector(
-                                                                                onTap: ()async{
-                                                                                  SharedPreferences pref = await SharedPreferences.getInstance();
-                                                                                  setState(() {
-                                                                                    if (can_takeaway == 'true') {
-                                                                                      print('ini json '+json2.toString()+ cart.toString());
-                                                                                      if (cart.toString() == '1') {
-                                                                                        if (json2.toString() != '[]') {
-                                                                                          MenuJson m = MenuJson(
-                                                                                            id: promo[index].menu!.id,
-                                                                                            restoId: promo[index].menu!.restoId,
-                                                                                            name: promo[index].menu!.name,
-                                                                                            desc: promo[index].menu!.desc,
-                                                                                            price: promo[index].menu!.price!.original.toString(),
-                                                                                            discount: promo[index].menu!.price!.discounted.toString(),
-                                                                                            pricePlus: promo[index].menu!.price!.delivery.toString(),
-                                                                                            urlImg: promo[index].menu!.urlImg, distance: null, restoName: '',
-                                                                                          );
-                                                                                          menuJson.add(m);
-                                                                                          // List<String> _restoId = [];
-                                                                                          // List<String> _qty = [];
-                                                                                          restoId.add(promo[index].menu!.id.toString());
-                                                                                          qty.add("1");
-                                                                                          noted.add("{${promo[index].menu!.name}: kam5ia_null}");
-                                                                                          inCart = '1';
-
-                                                                                          pref.setString("menuJson", json2.toString().split(']')[0]+', '+jsonEncode(menuJson.map((m) => m.toJson()).toList()).split('[')[1].split(']')[0]+']');
-                                                                                          menuJson = [];
-                                                                                          print('kudune '+menuJson.toString());
-                                                                                          json2 = pref.getString("menuJson");
-                                                                                          pref.setString('inCart', '1');
-                                                                                          pref.setString("menuJson", json2);
-                                                                                          pref.setString("restoIdUsr", idnyaResto);
-                                                                                          pref.setStringList("restoId", restoId);
-                                                                                          pref.setStringList("qty", qty);
-                                                                                          pref.setStringList("note", noted);
-                                                                                          pref.setString("restoNameTrans", nameResto);
-                                                                                          pref.setString("restoPhoneTrans", phone);
-                                                                                          noteProduct = '';
-                                                                                          getNote();
-
-                                                                                          setStateModal(() {});
-                                                                                          setState(() {});
-                                                                                        } else {
-                                                                                          MenuJson m = MenuJson(
-                                                                                            id: promo[index].menu!.id,
-                                                                                            restoId: promo[index].menu!.restoId,
-                                                                                            name: promo[index].menu!.name,
-                                                                                            desc: promo[index].menu!.desc,
-                                                                                            price: promo[index].menu!.price!.original.toString(),
-                                                                                            discount: promo[index].menu!.price!.discounted.toString(),
-                                                                                            pricePlus: promo[index].menu!.price!.delivery.toString(),
-                                                                                            urlImg: promo[index].menu!.urlImg, distance: null, restoName: '',
-                                                                                          );
-                                                                                          menuJson.add(m);
-                                                                                          // List<String> _restoId = [];
-                                                                                          // List<String> _qty = [];
-                                                                                          restoId.add(promo[index].menu!.id.toString());
-                                                                                          qty.add("1");
-                                                                                          noted.add("{${promo[index].menu!.name}: kam5ia_null}");
-                                                                                          inCart = '1';
-
-                                                                                          pref.setString("menuJson", json2.toString().split(']')[0]+', '+jsonEncode(menuJson.map((m) => m.toJson()).toList()).split('[')[1].split(']')[0]+']');
-                                                                                          menuJson = [];
-                                                                                          print('kudune '+menuJson.toString());
-                                                                                          json2 = pref.getString("menuJson");
-                                                                                          pref.setString('inCart', '1');
-                                                                                          pref.setString("menuJson", json2);
-                                                                                          pref.setString("restoIdUsr", idnyaResto);
-                                                                                          pref.setStringList("restoId", restoId);
-                                                                                          pref.setStringList("qty", qty);
-                                                                                          pref.setStringList("note", noted);
-                                                                                          pref.setString("restoNameTrans", nameResto);
-                                                                                          pref.setString("restoPhoneTrans", phone);
-                                                                                          noteProduct = '';
-                                                                                          getNote();
-
-                                                                                          setStateModal(() {});
-                                                                                          setState(() {});
-                                                                                        }
-                                                                                      } else {
-                                                                                        MenuJson m = MenuJson(
-                                                                                          id: promo[index].menu!.id,
-                                                                                          restoId: promo[index].menu!.restoId,
-                                                                                          name: promo[index].menu!.name,
-                                                                                          desc: promo[index].menu!.desc,
-                                                                                          price: promo[index].menu!.price!.original.toString(),
-                                                                                          discount: promo[index].menu!.price!.discounted.toString(),
-                                                                                          pricePlus: promo[index].menu!.price!.delivery.toString(),
-                                                                                          urlImg: promo[index].menu!.urlImg, distance: null, restoName: '',
-                                                                                        );
-                                                                                        menuJson.add(m);
-                                                                                        // List<String> _restoId = [];
-                                                                                        // List<String> _qty = [];
-                                                                                        restoId.add(promo[index].menu!.id.toString());
-                                                                                        qty.add("1");
-                                                                                        noted.add("{${promo[index].menu!.name}: kam5ia_null}");
-                                                                                        inCart = '1';
-
-                                                                                        String json1 = jsonEncode(menuJson.map((m) => m.toJson()).toList());
-                                                                                        pref.setString('inCart', '1');
-                                                                                        pref.setString("menuJson", json1);
-                                                                                        pref.setString("restoIdUsr", idnyaResto);
-                                                                                        pref.setStringList("restoId", restoId);
-                                                                                        pref.setStringList("qty", qty);
-                                                                                        pref.setStringList("note", noted);
-                                                                                        pref.setString("restoNameTrans", nameResto);
-                                                                                        pref.setString("restoPhoneTrans", phone);
-                                                                                        noteProduct = '';
-                                                                                        menuJson = [];
-                                                                                        print('kudune '+menuJson.toString());
-                                                                                        json2 = pref.getString("menuJson");
-                                                                                        _getData2();
-                                                                                        getNote();
-
-                                                                                        setStateModal(() {});
-                                                                                        setState(() {});
-                                                                                      }
-
-                                                                                      pref.setString("metodeBeli", '2');
-                                                                                    } else {
-                                                                                      Fluttertoast.showToast(msg: "Ambil langsung tidak tersedia.");
-                                                                                    }
-                                                                                  });
-                                                                                  Navigator.pop(context);
-                                                                                },
-                                                                                child: Row(
-                                                                                  children: [
-                                                                                    Container(
-                                                                                      width: CustomSize.sizeWidth(context) / 8,
-                                                                                      height: CustomSize.sizeWidth(context) / 8,
-                                                                                      decoration: BoxDecoration(
-                                                                                          color: CustomColor.primaryLight,
-                                                                                          shape: BoxShape.circle
-                                                                                      ),
-                                                                                      child: Center(
-                                                                                        child: Icon(MaterialCommunityIcons.shopping, color: Colors.white, size: 20,),
-                                                                                      ),
-                                                                                    ),
-                                                                                    SizedBox(width: CustomSize.sizeWidth(context) / 32,),
-                                                                                    MediaQuery(
-                                                                                        child: CustomText.textHeading6(text: "Ambil Langsung", minSize: double.parse(((MediaQuery.of(context).size.width*0.035).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.035).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.035).toString())),
-                                                                                        data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0)),
-                                                                                  ],
-                                                                                ),
-                                                                              ),
-                                                                              SizedBox(height: CustomSize.sizeHeight(context) / 86,),
-                                                                              GestureDetector(
-                                                                                onTap: ()async{
-                                                                                  SharedPreferences pref = await SharedPreferences.getInstance();
-                                                                                  print('ini json '+json2.toString()+ cart.toString());
-                                                                                  if (cart.toString() == '1') {
-                                                                                    if (json2.toString() != '[]') {
-                                                                                      MenuJson m = MenuJson(
-                                                                                        id: promo[index].menu!.id,
-                                                                                        restoId: promo[index].menu!.restoId,
-                                                                                        name: promo[index].menu!.name,
-                                                                                        desc: promo[index].menu!.desc,
-                                                                                        price: promo[index].menu!.price!.original.toString(),
-                                                                                        discount: promo[index].menu!.price!.discounted.toString(),
-                                                                                        pricePlus: promo[index].menu!.price!.delivery.toString(),
-                                                                                        urlImg: promo[index].menu!.urlImg, distance: null, restoName: '',
-                                                                                      );
-                                                                                      menuJson.add(m);
-                                                                                      // List<String> _restoId = [];
-                                                                                      // List<String> _qty = [];
-                                                                                      restoId.add(promo[index].menu!.id.toString());
-                                                                                      qty.add("1");
-                                                                                      noted.add("{${promo[index].menu!.name}: kam5ia_null}");
-                                                                                      inCart = '1';
-
-                                                                                      pref.setString("menuJson", json2.toString().split(']')[0]+', '+jsonEncode(menuJson.map((m) => m.toJson()).toList()).split('[')[1].split(']')[0]+']');
-                                                                                      menuJson = [];
-                                                                                      print('kudune '+menuJson.toString());
-                                                                                      json2 = pref.getString("menuJson");
-                                                                                      pref.setString('inCart', '1');
-                                                                                      pref.setString("menuJson", json2);
-                                                                                      pref.setString("restoIdUsr", idnyaResto);
-                                                                                      pref.setStringList("restoId", restoId);
-                                                                                      pref.setStringList("qty", qty);
-                                                                                      pref.setStringList("note", noted);
-                                                                                      pref.setString("restoNameTrans", nameResto);
-                                                                                      pref.setString("restoPhoneTrans", phone);
-                                                                                      noteProduct = '';
-                                                                                      getNote();
-
-                                                                                      setStateModal(() {});
-                                                                                      setState(() {});
-                                                                                    } else {
-                                                                                      MenuJson m = MenuJson(
-                                                                                        id: promo[index].menu!.id,
-                                                                                        restoId: promo[index].menu!.restoId,
-                                                                                        name: promo[index].menu!.name,
-                                                                                        desc: promo[index].menu!.desc,
-                                                                                        price: promo[index].menu!.price!.original.toString(),
-                                                                                        discount: promo[index].menu!.price!.discounted.toString(),
-                                                                                        pricePlus: promo[index].menu!.price!.delivery.toString(),
-                                                                                        urlImg: promo[index].menu!.urlImg, distance: null, restoName: '',
-                                                                                      );
-                                                                                      menuJson.add(m);
-                                                                                      // List<String> _restoId = [];
-                                                                                      // List<String> _qty = [];
-                                                                                      restoId.add(promo[index].menu!.id.toString());
-                                                                                      qty.add("1");
-                                                                                      noted.add("{${promo[index].menu!.name}: kam5ia_null}");
-                                                                                      inCart = '1';
-
-                                                                                      pref.setString("menuJson", json2.toString().split(']')[0]+', '+jsonEncode(menuJson.map((m) => m.toJson()).toList()).split('[')[1].split(']')[0]+']');
-                                                                                      menuJson = [];
-                                                                                      print('kudune '+menuJson.toString());
-                                                                                      json2 = pref.getString("menuJson");
-                                                                                      pref.setString('inCart', '1');
-                                                                                      pref.setString("menuJson", json2);
-                                                                                      pref.setString("restoIdUsr", idnyaResto);
-                                                                                      pref.setStringList("restoId", restoId);
-                                                                                      pref.setStringList("qty", qty);
-                                                                                      pref.setStringList("note", noted);
-                                                                                      pref.setString("restoNameTrans", nameResto);
-                                                                                      pref.setString("restoPhoneTrans", phone);
-                                                                                      noteProduct = '';
-                                                                                      getNote();
-
-                                                                                      setStateModal(() {});
-                                                                                      setState(() {});
-                                                                                    }
-                                                                                  } else {
+                                                                        SizedBox(height: CustomSize.sizeHeight(context) / 52,),
+                                                                        GestureDetector(
+                                                                          onTap: ()async{
+                                                                            SharedPreferences pref = await SharedPreferences.getInstance();
+                                                                            setState(() {
+                                                                              if (can_delivery == 'true') {
+                                                                                print('ini json '+json2.toString()+ cart.toString());
+                                                                                if (cart.toString() == '1') {
+                                                                                  if (json2.toString() != '[]') {
                                                                                     MenuJson m = MenuJson(
                                                                                       id: promo[index].menu!.id,
                                                                                       restoId: promo[index].menu!.restoId,
@@ -2485,7 +2110,7 @@ class _DetailPromoResto extends State<DetailPromoResto> {
                                                                                       price: promo[index].menu!.price!.original.toString(),
                                                                                       discount: promo[index].menu!.price!.discounted.toString(),
                                                                                       pricePlus: promo[index].menu!.price!.delivery.toString(),
-                                                                                      urlImg: promo[index].menu!.urlImg, restoName: '', distance: null,
+                                                                                      urlImg: promo[index].menu!.urlImg, distance: null, restoName: '',
                                                                                     );
                                                                                     menuJson.add(m);
                                                                                     // List<String> _restoId = [];
@@ -2495,208 +2120,650 @@ class _DetailPromoResto extends State<DetailPromoResto> {
                                                                                     noted.add("{${promo[index].menu!.name}: kam5ia_null}");
                                                                                     inCart = '1';
 
-                                                                                    String json1 = jsonEncode(menuJson.map((m) => m.toJson()).toList());
+                                                                                    pref.setString("menuJson", json2.toString().split(']')[0]+', '+jsonEncode(menuJson.map((m) => m.toJson()).toList()).split('[')[1].split(']')[0]+']');
+                                                                                    menuJson = [];
+                                                                                    print('kudune '+menuJson.toString());
+                                                                                    json2 = pref.getString("menuJson")??'';
                                                                                     pref.setString('inCart', '1');
-                                                                                    pref.setString("menuJson", json1);
+                                                                                    pref.setString("menuJson", json2);
                                                                                     pref.setString("restoIdUsr", idnyaResto);
                                                                                     pref.setStringList("restoId", restoId);
                                                                                     pref.setStringList("qty", qty);
                                                                                     pref.setStringList("note", noted);
                                                                                     pref.setString("restoNameTrans", nameResto);
                                                                                     pref.setString("restoPhoneTrans", phone);
+                                                                                    noteProduct = '';
+                                                                                    getNote();
+
+                                                                                    setStateModal(() {});
+                                                                                    setState(() {});
+                                                                                  } else {
+                                                                                    MenuJson m = MenuJson(
+                                                                                      id: promo[index].menu!.id,
+                                                                                      restoId: promo[index].menu!.restoId,
+                                                                                      name: promo[index].menu!.name,
+                                                                                      desc: promo[index].menu!.desc,
+                                                                                      price: promo[index].menu!.price!.original.toString(),
+                                                                                      discount: promo[index].menu!.price!.discounted.toString(),
+                                                                                      pricePlus: promo[index].menu!.price!.delivery.toString(),
+                                                                                      urlImg: promo[index].menu!.urlImg, distance: null, restoName: '',
+                                                                                    );
+                                                                                    menuJson.add(m);
+                                                                                    // List<String> _restoId = [];
+                                                                                    // List<String> _qty = [];
+                                                                                    restoId.add(promo[index].menu!.id.toString());
+                                                                                    qty.add("1");
+                                                                                    noted.add("{${promo[index].menu!.name}: kam5ia_null}");
+                                                                                    inCart = '1';
+
+                                                                                    pref.setString("menuJson", json2.toString().split(']')[0]+', '+jsonEncode(menuJson.map((m) => m.toJson()).toList()).split('[')[1].split(']')[0]+']');
                                                                                     menuJson = [];
                                                                                     print('kudune '+menuJson.toString());
-                                                                                    json2 = pref.getString("menuJson");
-                                                                                    _getData2();
+                                                                                    json2 = pref.getString("menuJson")??'';
+                                                                                    pref.setString('inCart', '1');
+                                                                                    pref.setString("menuJson", json2);
+                                                                                    pref.setString("restoIdUsr", idnyaResto);
+                                                                                    pref.setStringList("restoId", restoId);
+                                                                                    pref.setStringList("qty", qty);
+                                                                                    pref.setStringList("note", noted);
+                                                                                    pref.setString("restoNameTrans", nameResto);
+                                                                                    pref.setString("restoPhoneTrans", phone);
                                                                                     noteProduct = '';
                                                                                     getNote();
 
                                                                                     setStateModal(() {});
                                                                                     setState(() {});
                                                                                   }
+                                                                                } else {
+                                                                                  MenuJson m = MenuJson(
+                                                                                    id: promo[index].menu!.id,
+                                                                                    restoId: promo[index].menu!.restoId,
+                                                                                    name: promo[index].menu!.name,
+                                                                                    desc: promo[index].menu!.desc,
+                                                                                    price: promo[index].menu!.price!.original.toString(),
+                                                                                    discount: promo[index].menu!.price!.discounted.toString(),
+                                                                                    pricePlus: promo[index].menu!.price!.delivery.toString(),
+                                                                                    urlImg: promo[index].menu!.urlImg, distance: null, restoName: '',
+                                                                                  );
+                                                                                  menuJson.add(m);
+                                                                                  // List<String> _restoId = [];
+                                                                                  // List<String> _qty = [];
+                                                                                  restoId.add(promo[index].menu!.id.toString());
+                                                                                  qty.add("1");
+                                                                                  noted.add("{${promo[index].menu!.name}: kam5ia_null}");
+                                                                                  inCart = '1';
 
-                                                                                  setState(() {
-                                                                                    pref.setString("metodeBeli", '3');
-                                                                                  });
-                                                                                  Navigator.pop(context);
-                                                                                },
-                                                                                child: Row(
-                                                                                  children: [
-                                                                                    Container(
-                                                                                      width: CustomSize.sizeWidth(context) / 8,
-                                                                                      height: CustomSize.sizeWidth(context) / 8,
-                                                                                      decoration: BoxDecoration(
-                                                                                          color: CustomColor.primaryLight,
-                                                                                          shape: BoxShape.circle
-                                                                                      ),
-                                                                                      child: Center(
-                                                                                        child: Icon(Icons.restaurant, color: Colors.white, size: 20,),
-                                                                                      ),
-                                                                                    ),
-                                                                                    SizedBox(width: CustomSize.sizeWidth(context) / 32,),
-                                                                                    MediaQuery(
-                                                                                        child: CustomText.textHeading6(text: "Makan Ditempat", minSize: double.parse(((MediaQuery.of(context).size.width*0.035).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.035).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.035).toString())),
-                                                                                        data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0)
-                                                                                    ),
-                                                                                  ],
+                                                                                  String json1 = jsonEncode(menuJson.map((m) => m.toJson()).toList());
+                                                                                  menuJson = [];
+                                                                                  print('kudune '+menuJson.toString());
+                                                                                  json2 = pref.getString("menuJson")??'';
+                                                                                  pref.setString('inCart', '1');
+                                                                                  pref.setString("menuJson", json1);
+                                                                                  pref.setString("restoIdUsr", idnyaResto);
+                                                                                  pref.setStringList("restoId", restoId);
+                                                                                  pref.setStringList("qty", qty);
+                                                                                  pref.setStringList("note", noted);
+                                                                                  pref.setString("restoNameTrans", nameResto);
+                                                                                  pref.setString("restoPhoneTrans", phone);
+                                                                                  menuJson = [];
+                                                                                  print('kudune '+menuJson.toString());
+                                                                                  json2 = pref.getString("menuJson")??'';
+                                                                                  _getData2();
+                                                                                  noteProduct = '';
+                                                                                  getNote();
+
+                                                                                  setStateModal(() {});
+                                                                                  setState(() {});
+                                                                                }
+
+                                                                                pref.setString("metodeBeli", '1');
+                                                                              } else {
+                                                                                Fluttertoast.showToast(msg: "Pesan antar tidak tersedia.");
+                                                                              }
+                                                                            });
+                                                                            Navigator.pop(context);
+                                                                          },
+                                                                          child: Row(
+                                                                            children: [
+                                                                              Container(
+                                                                                width: CustomSize.sizeWidth(context) / 8,
+                                                                                height: CustomSize.sizeWidth(context) / 8,
+                                                                                decoration: BoxDecoration(
+                                                                                    color: CustomColor.primaryLight,
+                                                                                    shape: BoxShape.circle
+                                                                                ),
+                                                                                child: Center(
+                                                                                  child: Icon(FontAwesome.motorcycle, color: Colors.white, size: 20,),
                                                                                 ),
                                                                               ),
-                                                                              SizedBox(height: CustomSize.sizeHeight(context) / 86,),
+                                                                              SizedBox(width: CustomSize.sizeWidth(context) / 32,),
+                                                                              MediaQuery(
+                                                                                  child: CustomText.textHeading6(text: "Pesan Antar", minSize: double.parse(((MediaQuery.of(context).size.width*0.035).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.035).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.035).toString()),),
+                                                                                  data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0)
+                                                                              ),
                                                                             ],
                                                                           ),
-                                                                        );
-                                                                      }
+                                                                        ),
+                                                                        SizedBox(height: CustomSize.sizeHeight(context) / 86,),
+                                                                        GestureDetector(
+                                                                          onTap: ()async{
+                                                                            SharedPreferences pref = await SharedPreferences.getInstance();
+                                                                            setState(() {
+                                                                              if (can_takeaway == 'true') {
+                                                                                print('ini json '+json2.toString()+ cart.toString());
+                                                                                if (cart.toString() == '1') {
+                                                                                  if (json2.toString() != '[]') {
+                                                                                    MenuJson m = MenuJson(
+                                                                                      id: promo[index].menu!.id,
+                                                                                      restoId: promo[index].menu!.restoId,
+                                                                                      name: promo[index].menu!.name,
+                                                                                      desc: promo[index].menu!.desc,
+                                                                                      price: promo[index].menu!.price!.original.toString(),
+                                                                                      discount: promo[index].menu!.price!.discounted.toString(),
+                                                                                      pricePlus: promo[index].menu!.price!.delivery.toString(),
+                                                                                      urlImg: promo[index].menu!.urlImg, distance: null, restoName: '',
+                                                                                    );
+                                                                                    menuJson.add(m);
+                                                                                    // List<String> _restoId = [];
+                                                                                    // List<String> _qty = [];
+                                                                                    restoId.add(promo[index].menu!.id.toString());
+                                                                                    qty.add("1");
+                                                                                    noted.add("{${promo[index].menu!.name}: kam5ia_null}");
+                                                                                    inCart = '1';
+
+                                                                                    pref.setString("menuJson", json2.toString().split(']')[0]+', '+jsonEncode(menuJson.map((m) => m.toJson()).toList()).split('[')[1].split(']')[0]+']');
+                                                                                    menuJson = [];
+                                                                                    print('kudune '+menuJson.toString());
+                                                                                    json2 = pref.getString("menuJson")??'';
+                                                                                    pref.setString('inCart', '1');
+                                                                                    pref.setString("menuJson", json2);
+                                                                                    pref.setString("restoIdUsr", idnyaResto);
+                                                                                    pref.setStringList("restoId", restoId);
+                                                                                    pref.setStringList("qty", qty);
+                                                                                    pref.setStringList("note", noted);
+                                                                                    pref.setString("restoNameTrans", nameResto);
+                                                                                    pref.setString("restoPhoneTrans", phone);
+                                                                                    noteProduct = '';
+                                                                                    getNote();
+
+                                                                                    setStateModal(() {});
+                                                                                    setState(() {});
+                                                                                  } else {
+                                                                                    MenuJson m = MenuJson(
+                                                                                      id: promo[index].menu!.id,
+                                                                                      restoId: promo[index].menu!.restoId,
+                                                                                      name: promo[index].menu!.name,
+                                                                                      desc: promo[index].menu!.desc,
+                                                                                      price: promo[index].menu!.price!.original.toString(),
+                                                                                      discount: promo[index].menu!.price!.discounted.toString(),
+                                                                                      pricePlus: promo[index].menu!.price!.delivery.toString(),
+                                                                                      urlImg: promo[index].menu!.urlImg, distance: null, restoName: '',
+                                                                                    );
+                                                                                    menuJson.add(m);
+                                                                                    // List<String> _restoId = [];
+                                                                                    // List<String> _qty = [];
+                                                                                    restoId.add(promo[index].menu!.id.toString());
+                                                                                    qty.add("1");
+                                                                                    noted.add("{${promo[index].menu!.name}: kam5ia_null}");
+                                                                                    inCart = '1';
+
+                                                                                    pref.setString("menuJson", json2.toString().split(']')[0]+', '+jsonEncode(menuJson.map((m) => m.toJson()).toList()).split('[')[1].split(']')[0]+']');
+                                                                                    menuJson = [];
+                                                                                    print('kudune '+menuJson.toString());
+                                                                                    json2 = pref.getString("menuJson")??'';
+                                                                                    pref.setString('inCart', '1');
+                                                                                    pref.setString("menuJson", json2);
+                                                                                    pref.setString("restoIdUsr", idnyaResto);
+                                                                                    pref.setStringList("restoId", restoId);
+                                                                                    pref.setStringList("qty", qty);
+                                                                                    pref.setStringList("note", noted);
+                                                                                    pref.setString("restoNameTrans", nameResto);
+                                                                                    pref.setString("restoPhoneTrans", phone);
+                                                                                    noteProduct = '';
+                                                                                    getNote();
+
+                                                                                    setStateModal(() {});
+                                                                                    setState(() {});
+                                                                                  }
+                                                                                } else {
+                                                                                  MenuJson m = MenuJson(
+                                                                                    id: promo[index].menu!.id,
+                                                                                    restoId: promo[index].menu!.restoId,
+                                                                                    name: promo[index].menu!.name,
+                                                                                    desc: promo[index].menu!.desc,
+                                                                                    price: promo[index].menu!.price!.original.toString(),
+                                                                                    discount: promo[index].menu!.price!.discounted.toString(),
+                                                                                    pricePlus: promo[index].menu!.price!.delivery.toString(),
+                                                                                    urlImg: promo[index].menu!.urlImg, distance: null, restoName: '',
+                                                                                  );
+                                                                                  menuJson.add(m);
+                                                                                  // List<String> _restoId = [];
+                                                                                  // List<String> _qty = [];
+                                                                                  restoId.add(promo[index].menu!.id.toString());
+                                                                                  qty.add("1");
+                                                                                  noted.add("{${promo[index].menu!.name}: kam5ia_null}");
+                                                                                  inCart = '1';
+
+                                                                                  String json1 = jsonEncode(menuJson.map((m) => m.toJson()).toList());
+                                                                                  pref.setString('inCart', '1');
+                                                                                  pref.setString("menuJson", json1);
+                                                                                  pref.setString("restoIdUsr", idnyaResto);
+                                                                                  pref.setStringList("restoId", restoId);
+                                                                                  pref.setStringList("qty", qty);
+                                                                                  pref.setStringList("note", noted);
+                                                                                  pref.setString("restoNameTrans", nameResto);
+                                                                                  pref.setString("restoPhoneTrans", phone);
+                                                                                  noteProduct = '';
+                                                                                  menuJson = [];
+                                                                                  print('kudune '+menuJson.toString());
+                                                                                  json2 = pref.getString("menuJson")??'';
+                                                                                  _getData2();
+                                                                                  getNote();
+
+                                                                                  setStateModal(() {});
+                                                                                  setState(() {});
+                                                                                }
+
+                                                                                pref.setString("metodeBeli", '2');
+                                                                              } else {
+                                                                                Fluttertoast.showToast(msg: "Ambil langsung tidak tersedia.");
+                                                                              }
+                                                                            });
+                                                                            Navigator.pop(context);
+                                                                          },
+                                                                          child: Row(
+                                                                            children: [
+                                                                              Container(
+                                                                                width: CustomSize.sizeWidth(context) / 8,
+                                                                                height: CustomSize.sizeWidth(context) / 8,
+                                                                                decoration: BoxDecoration(
+                                                                                    color: CustomColor.primaryLight,
+                                                                                    shape: BoxShape.circle
+                                                                                ),
+                                                                                child: Center(
+                                                                                  child: Icon(MaterialCommunityIcons.shopping, color: Colors.white, size: 20,),
+                                                                                ),
+                                                                              ),
+                                                                              SizedBox(width: CustomSize.sizeWidth(context) / 32,),
+                                                                              MediaQuery(
+                                                                                  child: CustomText.textHeading6(text: "Ambil Langsung", minSize: double.parse(((MediaQuery.of(context).size.width*0.035).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.035).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.035).toString())),
+                                                                                  data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0)),
+                                                                            ],
+                                                                          ),
+                                                                        ),
+                                                                        SizedBox(height: CustomSize.sizeHeight(context) / 86,),
+                                                                        GestureDetector(
+                                                                          onTap: ()async{
+                                                                            SharedPreferences pref = await SharedPreferences.getInstance();
+                                                                            print('ini json '+json2.toString()+ cart.toString());
+                                                                            if (cart.toString() == '1') {
+                                                                              if (json2.toString() != '[]') {
+                                                                                MenuJson m = MenuJson(
+                                                                                  id: promo[index].menu!.id,
+                                                                                  restoId: promo[index].menu!.restoId,
+                                                                                  name: promo[index].menu!.name,
+                                                                                  desc: promo[index].menu!.desc,
+                                                                                  price: promo[index].menu!.price!.original.toString(),
+                                                                                  discount: promo[index].menu!.price!.discounted.toString(),
+                                                                                  pricePlus: promo[index].menu!.price!.delivery.toString(),
+                                                                                  urlImg: promo[index].menu!.urlImg, distance: null, restoName: '',
+                                                                                );
+                                                                                menuJson.add(m);
+                                                                                // List<String> _restoId = [];
+                                                                                // List<String> _qty = [];
+                                                                                restoId.add(promo[index].menu!.id.toString());
+                                                                                qty.add("1");
+                                                                                noted.add("{${promo[index].menu!.name}: kam5ia_null}");
+                                                                                inCart = '1';
+
+                                                                                pref.setString("menuJson", json2.toString().split(']')[0]+', '+jsonEncode(menuJson.map((m) => m.toJson()).toList()).split('[')[1].split(']')[0]+']');
+                                                                                menuJson = [];
+                                                                                print('kudune '+menuJson.toString());
+                                                                                json2 = pref.getString("menuJson")??'';
+                                                                                pref.setString('inCart', '1');
+                                                                                pref.setString("menuJson", json2);
+                                                                                pref.setString("restoIdUsr", idnyaResto);
+                                                                                pref.setStringList("restoId", restoId);
+                                                                                pref.setStringList("qty", qty);
+                                                                                pref.setStringList("note", noted);
+                                                                                pref.setString("restoNameTrans", nameResto);
+                                                                                pref.setString("restoPhoneTrans", phone);
+                                                                                noteProduct = '';
+                                                                                getNote();
+
+                                                                                setStateModal(() {});
+                                                                                setState(() {});
+                                                                              } else {
+                                                                                MenuJson m = MenuJson(
+                                                                                  id: promo[index].menu!.id,
+                                                                                  restoId: promo[index].menu!.restoId,
+                                                                                  name: promo[index].menu!.name,
+                                                                                  desc: promo[index].menu!.desc,
+                                                                                  price: promo[index].menu!.price!.original.toString(),
+                                                                                  discount: promo[index].menu!.price!.discounted.toString(),
+                                                                                  pricePlus: promo[index].menu!.price!.delivery.toString(),
+                                                                                  urlImg: promo[index].menu!.urlImg, distance: null, restoName: '',
+                                                                                );
+                                                                                menuJson.add(m);
+                                                                                // List<String> _restoId = [];
+                                                                                // List<String> _qty = [];
+                                                                                restoId.add(promo[index].menu!.id.toString());
+                                                                                qty.add("1");
+                                                                                noted.add("{${promo[index].menu!.name}: kam5ia_null}");
+                                                                                inCart = '1';
+
+                                                                                pref.setString("menuJson", json2.toString().split(']')[0]+', '+jsonEncode(menuJson.map((m) => m.toJson()).toList()).split('[')[1].split(']')[0]+']');
+                                                                                menuJson = [];
+                                                                                print('kudune '+menuJson.toString());
+                                                                                json2 = pref.getString("menuJson")??'';
+                                                                                pref.setString('inCart', '1');
+                                                                                pref.setString("menuJson", json2);
+                                                                                pref.setString("restoIdUsr", idnyaResto);
+                                                                                pref.setStringList("restoId", restoId);
+                                                                                pref.setStringList("qty", qty);
+                                                                                pref.setStringList("note", noted);
+                                                                                pref.setString("restoNameTrans", nameResto);
+                                                                                pref.setString("restoPhoneTrans", phone);
+                                                                                noteProduct = '';
+                                                                                getNote();
+
+                                                                                setStateModal(() {});
+                                                                                setState(() {});
+                                                                              }
+                                                                            } else {
+                                                                              MenuJson m = MenuJson(
+                                                                                id: promo[index].menu!.id,
+                                                                                restoId: promo[index].menu!.restoId,
+                                                                                name: promo[index].menu!.name,
+                                                                                desc: promo[index].menu!.desc,
+                                                                                price: promo[index].menu!.price!.original.toString(),
+                                                                                discount: promo[index].menu!.price!.discounted.toString(),
+                                                                                pricePlus: promo[index].menu!.price!.delivery.toString(),
+                                                                                urlImg: promo[index].menu!.urlImg, restoName: '', distance: null,
+                                                                              );
+                                                                              menuJson.add(m);
+                                                                              // List<String> _restoId = [];
+                                                                              // List<String> _qty = [];
+                                                                              restoId.add(promo[index].menu!.id.toString());
+                                                                              qty.add("1");
+                                                                              noted.add("{${promo[index].menu!.name}: kam5ia_null}");
+                                                                              inCart = '1';
+
+                                                                              String json1 = jsonEncode(menuJson.map((m) => m.toJson()).toList());
+                                                                              pref.setString('inCart', '1');
+                                                                              pref.setString("menuJson", json1);
+                                                                              pref.setString("restoIdUsr", idnyaResto);
+                                                                              pref.setStringList("restoId", restoId);
+                                                                              pref.setStringList("qty", qty);
+                                                                              pref.setStringList("note", noted);
+                                                                              pref.setString("restoNameTrans", nameResto);
+                                                                              pref.setString("restoPhoneTrans", phone);
+                                                                              menuJson = [];
+                                                                              print('kudune '+menuJson.toString());
+                                                                              json2 = pref.getString("menuJson")??'';
+                                                                              _getData2();
+                                                                              noteProduct = '';
+                                                                              getNote();
+
+                                                                              setStateModal(() {});
+                                                                              setState(() {});
+                                                                            }
+
+                                                                            setState(() {
+                                                                              pref.setString("metodeBeli", '3');
+                                                                            });
+                                                                            Navigator.pop(context);
+                                                                          },
+                                                                          child: Row(
+                                                                            children: [
+                                                                              Container(
+                                                                                width: CustomSize.sizeWidth(context) / 8,
+                                                                                height: CustomSize.sizeWidth(context) / 8,
+                                                                                decoration: BoxDecoration(
+                                                                                    color: CustomColor.primaryLight,
+                                                                                    shape: BoxShape.circle
+                                                                                ),
+                                                                                child: Center(
+                                                                                  child: Icon(Icons.restaurant, color: Colors.white, size: 20,),
+                                                                                ),
+                                                                              ),
+                                                                              SizedBox(width: CustomSize.sizeWidth(context) / 32,),
+                                                                              MediaQuery(
+                                                                                  child: CustomText.textHeading6(text: "Makan Ditempat", minSize: double.parse(((MediaQuery.of(context).size.width*0.035).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.035).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.035).toString())),
+                                                                                  data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0)
+                                                                              ),
+                                                                            ],
+                                                                          ),
+                                                                        ),
+                                                                        SizedBox(height: CustomSize.sizeHeight(context) / 86,),
+                                                                      ],
+                                                                    ),
                                                                   );
-                                                                } else {
-                                                                  SharedPreferences pref = await SharedPreferences.getInstance();
-                                                                  print('ini json '+json2.toString()+ cart.toString());
-                                                                  if (cart.toString() == '1') {
-                                                                    if (json2.toString() != '[]') {
-                                                                      MenuJson m = MenuJson(
-                                                                        id: promo[index].menu!.id,
-                                                                        restoId: promo[index].menu!.restoId,
-                                                                        name: promo[index].menu!.name,
-                                                                        desc: promo[index].menu!.desc,
-                                                                        price: promo[index].menu!.price!.original.toString(),
-                                                                        discount: promo[index].menu!.price!.discounted.toString(),
-                                                                        pricePlus: promo[index].menu!.price!.delivery.toString(),
-                                                                        urlImg: promo[index].menu!.urlImg, distance: null, restoName: '',
-                                                                      );
-                                                                      menuJson.add(m);
-                                                                      // List<String> _restoId = [];
-                                                                      // List<String> _qty = [];
-                                                                      restoId.add(promo[index].menu!.id.toString());
-                                                                      qty.add("1");
-                                                                      noted.add("{${promo[index].menu!.name}: kam5ia_null}");
-                                                                      inCart = '1';
-
-                                                                      pref.setString("menuJson", json2.toString().split(']')[0]+', '+jsonEncode(menuJson.map((m) => m.toJson()).toList()).split('[')[1].split(']')[0]+']');
-                                                                      menuJson = [];
-                                                                      print('kudune '+menuJson.toString());
-                                                                      json2 = pref.getString("menuJson");
-                                                                      pref.setString('inCart', '1');
-                                                                      pref.setString("menuJson", json2);
-                                                                      pref.setString("restoIdUsr", idnyaResto);
-                                                                      pref.setStringList("restoId", restoId);
-                                                                      pref.setStringList("qty", qty);
-                                                                      pref.setStringList("note", noted);
-                                                                      pref.setString("restoNameTrans", nameResto);
-                                                                      pref.setString("restoPhoneTrans", phone);
-                                                                      noteProduct = '';
-                                                                      getNote();
-
-                                                                      setStateModal(() {});
-                                                                      setState(() {});
-                                                                    } else {
-                                                                      MenuJson m = MenuJson(
-                                                                        id: promo[index].menu!.id,
-                                                                        restoId: promo[index].menu!.restoId,
-                                                                        name: promo[index].menu!.name,
-                                                                        desc: promo[index].menu!.desc,
-                                                                        price: promo[index].menu!.price!.original.toString(),
-                                                                        discount: promo[index].menu!.price!.discounted.toString(),
-                                                                        pricePlus: promo[index].menu!.price!.delivery.toString(),
-                                                                        urlImg: promo[index].menu!.urlImg, distance: null, restoName: '',
-                                                                      );
-                                                                      menuJson.add(m);
-                                                                      // List<String> _restoId = [];
-                                                                      // List<String> _qty = [];
-                                                                      restoId.add(promo[index].menu!.id.toString());
-                                                                      qty.add("1");
-                                                                      noted.add("{${promo[index].menu!.name}: kam5ia_null}");
-                                                                      inCart = '1';
-
-                                                                      pref.setString("menuJson", json2.toString().split(']')[0]+', '+jsonEncode(menuJson.map((m) => m.toJson()).toList()).split('[')[1].split(']')[0]+']');
-                                                                      menuJson = [];
-                                                                      print('kudune '+menuJson.toString());
-                                                                      json2 = pref.getString("menuJson");
-                                                                      pref.setString('inCart', '1');
-                                                                      pref.setString("menuJson", json2);
-                                                                      pref.setString("restoIdUsr", idnyaResto);
-                                                                      pref.setStringList("restoId", restoId);
-                                                                      pref.setStringList("qty", qty);
-                                                                      pref.setStringList("note", noted);
-                                                                      pref.setString("restoNameTrans", nameResto);
-                                                                      pref.setString("restoPhoneTrans", phone);
-                                                                      noteProduct = '';
-                                                                      getNote();
-
-                                                                      setStateModal(() {});
-                                                                      setState(() {});
-                                                                    }
-                                                                  } else {
-                                                                    MenuJson m = MenuJson(
-                                                                      id: promo[index].menu!.id,
-                                                                      restoId: promo[index].menu!.restoId,
-                                                                      name: promo[index].menu!.name,
-                                                                      desc: promo[index].menu!.desc,
-                                                                      price: promo[index].menu!.price!.original.toString(),
-                                                                      discount: promo[index].menu!.price!.discounted.toString(),
-                                                                      pricePlus: promo[index].menu!.price!.delivery.toString(),
-                                                                      urlImg: promo[index].menu!.urlImg, restoName: '', distance: null,
-                                                                    );
-                                                                    menuJson.add(m);
-                                                                    // List<String> _restoId = [];
-                                                                    // List<String> _qty = [];
-                                                                    restoId.add(promo[index].menu!.id.toString());
-                                                                    qty.add("1");
-                                                                    noted.add("{${promo[index].menu!.name}: kam5ia_null}");
-                                                                    inCart = '1';
-
-                                                                    String json1 = jsonEncode(menuJson.map((m) => m.toJson()).toList());
-                                                                    pref.setString('inCart', '1');
-                                                                    pref.setString("menuJson", json1);
-                                                                    pref.setString("restoIdUsr", idnyaResto);
-                                                                    pref.setStringList("restoId", restoId);
-                                                                    pref.setStringList("qty", qty);
-                                                                    pref.setStringList("note", noted);
-                                                                    pref.setString("restoNameTrans", nameResto);
-                                                                    pref.setString("restoPhoneTrans", phone);
-                                                                    menuJson = [];
-                                                                    print('kudune '+menuJson.toString());
-                                                                    json2 = pref.getString("menuJson");
-                                                                    _getData2();
-                                                                    noteProduct = '';
-                                                                    getNote();
-
-                                                                    setStateModal(() {});
-                                                                    setState(() {});
-                                                                  }
-
-                                                                  print('ini in cart 1 '+pref.getString('inCart'));
                                                                 }
-                                                              }
-                                                              SharedPreferences pref = await SharedPreferences.getInstance();
-                                                              pref.setString("alamateResto", address);
+                                                            );
+                                                          } else {
+                                                            SharedPreferences pref = await SharedPreferences.getInstance();
+                                                            print('ini json '+json2.toString()+ cart.toString());
+                                                            if (cart.toString() == '1') {
+                                                              if (json2.toString() != '[]') {
+                                                                MenuJson m = MenuJson(
+                                                                  id: promo[index].menu!.id,
+                                                                  restoId: promo[index].menu!.restoId,
+                                                                  name: promo[index].menu!.name,
+                                                                  desc: promo[index].menu!.desc,
+                                                                  price: promo[index].menu!.price!.original.toString(),
+                                                                  discount: promo[index].menu!.price!.discounted.toString(),
+                                                                  pricePlus: promo[index].menu!.price!.delivery.toString(),
+                                                                  urlImg: promo[index].menu!.urlImg, distance: null, restoName: '',
+                                                                );
+                                                                menuJson.add(m);
+                                                                // List<String> _restoId = [];
+                                                                // List<String> _qty = [];
+                                                                restoId.add(promo[index].menu!.id.toString());
+                                                                qty.add("1");
+                                                                noted.add("{${promo[index].menu!.name}: kam5ia_null}");
+                                                                inCart = '1';
 
-                                                              // print('ini in cart 3 '+pref.getString('menuJson'));
-                                                              setState(() {});
+                                                                pref.setString("menuJson", json2.toString().split(']')[0]+', '+jsonEncode(menuJson.map((m) => m.toJson()).toList()).split('[')[1].split(']')[0]+']');
+                                                                menuJson = [];
+                                                                print('kudune '+menuJson.toString());
+                                                                json2 = pref.getString("menuJson")??'';
+                                                                pref.setString('inCart', '1');
+                                                                pref.setString("menuJson", json2);
+                                                                pref.setString("restoIdUsr", idnyaResto);
+                                                                pref.setStringList("restoId", restoId);
+                                                                pref.setStringList("qty", qty);
+                                                                pref.setStringList("note", noted);
+                                                                pref.setString("restoNameTrans", nameResto);
+                                                                pref.setString("restoPhoneTrans", phone);
+                                                                noteProduct = '';
+                                                                getNote();
+
+                                                                setStateModal(() {});
+                                                                setState(() {});
+                                                              } else {
+                                                                MenuJson m = MenuJson(
+                                                                  id: promo[index].menu!.id,
+                                                                  restoId: promo[index].menu!.restoId,
+                                                                  name: promo[index].menu!.name,
+                                                                  desc: promo[index].menu!.desc,
+                                                                  price: promo[index].menu!.price!.original.toString(),
+                                                                  discount: promo[index].menu!.price!.discounted.toString(),
+                                                                  pricePlus: promo[index].menu!.price!.delivery.toString(),
+                                                                  urlImg: promo[index].menu!.urlImg, distance: null, restoName: '',
+                                                                );
+                                                                menuJson.add(m);
+                                                                // List<String> _restoId = [];
+                                                                // List<String> _qty = [];
+                                                                restoId.add(promo[index].menu!.id.toString());
+                                                                qty.add("1");
+                                                                noted.add("{${promo[index].menu!.name}: kam5ia_null}");
+                                                                inCart = '1';
+
+                                                                pref.setString("menuJson", json2.toString().split(']')[0]+', '+jsonEncode(menuJson.map((m) => m.toJson()).toList()).split('[')[1].split(']')[0]+']');
+                                                                menuJson = [];
+                                                                print('kudune '+menuJson.toString());
+                                                                json2 = pref.getString("menuJson")??'';
+                                                                pref.setString('inCart', '1');
+                                                                pref.setString("menuJson", json2);
+                                                                pref.setString("restoIdUsr", idnyaResto);
+                                                                pref.setStringList("restoId", restoId);
+                                                                pref.setStringList("qty", qty);
+                                                                pref.setStringList("note", noted);
+                                                                pref.setString("restoNameTrans", nameResto);
+                                                                pref.setString("restoPhoneTrans", phone);
+                                                                noteProduct = '';
+                                                                getNote();
+
+                                                                setStateModal(() {});
+                                                                setState(() {});
+                                                              }
+                                                            } else {
+                                                              MenuJson m = MenuJson(
+                                                                id: promo[index].menu!.id,
+                                                                restoId: promo[index].menu!.restoId,
+                                                                name: promo[index].menu!.name,
+                                                                desc: promo[index].menu!.desc,
+                                                                price: promo[index].menu!.price!.original.toString(),
+                                                                discount: promo[index].menu!.price!.discounted.toString(),
+                                                                pricePlus: promo[index].menu!.price!.delivery.toString(),
+                                                                urlImg: promo[index].menu!.urlImg, restoName: '', distance: null,
+                                                              );
+                                                              menuJson.add(m);
+                                                              // List<String> _restoId = [];
+                                                              // List<String> _qty = [];
+                                                              restoId.add(promo[index].menu!.id.toString());
+                                                              qty.add("1");
+                                                              noted.add("{${promo[index].menu!.name}: kam5ia_null}");
+                                                              inCart = '1';
+
+                                                              String json1 = jsonEncode(menuJson.map((m) => m.toJson()).toList());
+                                                              pref.setString('inCart', '1');
+                                                              pref.setString("menuJson", json1);
+                                                              pref.setString("restoIdUsr", idnyaResto);
+                                                              pref.setStringList("restoId", restoId);
+                                                              pref.setStringList("qty", qty);
+                                                              pref.setStringList("note", noted);
+                                                              pref.setString("restoNameTrans", nameResto);
+                                                              pref.setString("restoPhoneTrans", phone);
+                                                              menuJson = [];
+                                                              print('kudune '+menuJson.toString());
+                                                              json2 = pref.getString("menuJson")??'';
+                                                              _getData2();
+                                                              noteProduct = '';
+                                                              getNote();
+
                                                               setStateModal(() {});
-                                                              SharedPreferences pref2 = await SharedPreferences.getInstance();
-                                                              pref2.setString('latResto1', pref2.getString('latResto'));
-                                                              pref2.setString('longResto1', pref2.getString('longResto'));
-                                                            },
-                                                            child: Center(child: MediaQuery(
-                                                                child: CustomText.bodyRegular16(text: "Add to cart", color: Colors.white, minSize: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.04)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.04)).toString())),
-                                                                data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0)
-                                                            ))
+                                                              setState(() {});
+                                                            }
+
+                                                            print('ini in cart 1 '+pref.getString('inCart').toString());
+                                                          }
+                                                        }
+                                                        SharedPreferences pref = await SharedPreferences.getInstance();
+                                                        pref.setString("alamateResto", address);
+
+                                                        // print('ini in cart 3 '+pref.getString('menuJson'));
+                                                        setState(() {});
+                                                        setStateModal(() {});
+                                                        SharedPreferences pref2 = await SharedPreferences.getInstance();
+                                                        pref2.setString('latResto1', pref2.getString('latResto')??'');
+                                                        pref2.setString('longResto1', pref2.getString('longResto')??'');
+                                                      },
+                                                      child: Container(
+                                                          width: CustomSize.sizeWidth(context) / 1.1,
+                                                          height: CustomSize.sizeHeight(context) / 14,
+                                                          decoration: BoxDecoration(
+                                                              color: (promo[index].menu!.is_available.toString() == '1')?(isOpen != 'false')?CustomColor.primaryLight:Colors.grey:Colors.grey,
+                                                              borderRadius: BorderRadius.circular(20)
+                                                          ),
+                                                          child: Center(child: MediaQuery(
+                                                              child: CustomText.bodyRegular16(text: "Add to cart", color: Colors.white, minSize: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.04)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.04)).toString())),
+                                                              data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0)
+                                                          ))
+                                                              // :GestureDetector(
+                                                              // onTap: ()async{
+                                                              //   Fluttertoast.showToast(msg: 'Maaf toko sedang tutup');
+                                                              // },
+                                                              // child: Center(child: MediaQuery(
+                                                              //     child: CustomText.bodyRegular16(text: "Add to cart", color: Colors.white, minSize: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.04)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.04)).toString())),
+                                                              //     data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0)
+                                                              // )))
+                                                              // :GestureDetector(
+                                                              // onTap: ()async{
+                                                              //   Fluttertoast.showToast(msg: 'Maaf menu sedang tidak tersedia');
+                                                              // },
+                                                              // child: Center(child: MediaQuery(
+                                                              //     child: CustomText.bodyRegular16(text: "Menu tidak tersedia", color: Colors.white, minSize: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.04)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.04)).toString())),
+                                                              //     data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0)
+                                                              // )))
+                                                      ),
+                                                    )
+                                                        :GestureDetector(
+                                                      onTap: ()async{
+                                                        Fluttertoast.showToast(msg: 'Maaf toko sedang tutup');
+                                                      },
+                                                          child: Container(
+                                                          width: CustomSize.sizeWidth(context) / 1.1,
+                                                          height: CustomSize.sizeHeight(context) / 14,
+                                                          decoration: BoxDecoration(
+                                                              color: (promo[index].menu!.is_available.toString() == '1')?(isOpen != 'false')?CustomColor.primaryLight:Colors.grey:Colors.grey,
+                                                              borderRadius: BorderRadius.circular(20)
+                                                          ),
+                                                          child: Center(child: MediaQuery(
+                                                              child: CustomText.bodyRegular16(text: "Add to cart", color: Colors.white, minSize: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.04)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.04)).toString())),
+                                                              data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0)
+                                                          ))
+                                                      // :GestureDetector(
+                                                      // onTap: ()async{
+                                                      //   Fluttertoast.showToast(msg: 'Maaf toko sedang tutup');
+                                                      // },
+                                                      // child: Center(child: MediaQuery(
+                                                      //     child: CustomText.bodyRegular16(text: "Add to cart", color: Colors.white, minSize: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.04)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.04)).toString())),
+                                                      //     data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0)
+                                                      // )))
+                                                      // :GestureDetector(
+                                                      // onTap: ()async{
+                                                      //   Fluttertoast.showToast(msg: 'Maaf menu sedang tidak tersedia');
+                                                      // },
+                                                      // child: Center(child: MediaQuery(
+                                                      //     child: CustomText.bodyRegular16(text: "Menu tidak tersedia", color: Colors.white, minSize: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.04)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.04)).toString())),
+                                                      //     data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0)
+                                                      // )))
+                                                    ),
                                                         )
-                                                            :GestureDetector(
-                                                            onTap: ()async{
-                                                              Fluttertoast.showToast(msg: 'Maaf toko sedang tutup');
-                                                            },
-                                                            child: Center(child: MediaQuery(
-                                                                child: CustomText.bodyRegular16(text: "Add to cart", color: Colors.white, minSize: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.04)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.04)).toString())),
-                                                                data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0)
-                                                            )))
-                                                            :GestureDetector(
-                                                            onTap: ()async{
-                                                              Fluttertoast.showToast(msg: 'Maaf menu sedang tidak tersedia');
-                                                            },
-                                                            child: Center(child: MediaQuery(
-                                                                child: CustomText.bodyRegular16(text: "Menu tidak tersedia", color: Colors.white, minSize: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.04)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.04)).toString())),
-                                                                data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0)
-                                                            )))
+                                                    :GestureDetector(
+                                                      onTap: ()async{
+                                                        Fluttertoast.showToast(msg: 'Maaf menu sedang tidak tersedia');
+                                                      },
+                                                      child: Container(
+                                                          width: CustomSize.sizeWidth(context) / 1.1,
+                                                          height: CustomSize.sizeHeight(context) / 14,
+                                                          decoration: BoxDecoration(
+                                                              color: (promo[index].menu!.is_available.toString() == '1')?(isOpen != 'false')?CustomColor.primaryLight:Colors.grey:Colors.grey,
+                                                              borderRadius: BorderRadius.circular(20)
+                                                          ),
+                                                          child: Center(child: MediaQuery(
+                                                              child: CustomText.bodyRegular16(text: "Menu tidak tersedia", color: Colors.white, minSize: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.04)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.04)).toString())),
+                                                              data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0)
+                                                          ))
+                                                        // :GestureDetector(
+                                                        // onTap: ()async{
+                                                        //   Fluttertoast.showToast(msg: 'Maaf toko sedang tutup');
+                                                        // },
+                                                        // child: Center(child: MediaQuery(
+                                                        //     child: CustomText.bodyRegular16(text: "Add to cart", color: Colors.white, minSize: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.04)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.04)).toString())),
+                                                        //     data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0)
+                                                        // )))
+                                                        // :GestureDetector(
+                                                        // onTap: ()async{
+                                                        //   Fluttertoast.showToast(msg: 'Maaf menu sedang tidak tersedia');
+                                                        // },
+                                                        // child: Center(child: MediaQuery(
+                                                        //     child: CustomText.bodyRegular16(text: "Menu tidak tersedia", color: Colors.white, minSize: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.04)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.04)).toString())),
+                                                        //     data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0)
+                                                        // )))
+                                                      ),
                                                     ),
                                                   )
                                                       :SizedBox(),
@@ -2818,12 +2885,12 @@ class _DetailPromoResto extends State<DetailPromoResto> {
                                             SizedBox(height: CustomSize.sizeHeight(context) * 0.00626,),
                                             (homepg != "1")?CustomText.textHeading4(
                                                 text: promo[index].menu!.name,
-                                                minSize: double.parse(((MediaQuery.of(context).size.width*0.045).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.045)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.045)).toString()),
-                                                maxLines: 1
+                                                sizeNew: double.parse(((MediaQuery.of(context).size.width*0.045).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.045)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.045)).toString()),
+                                                maxLines: 2
                                             ):CustomText.textHeading4(
                                                 text: promoResto[index].menu!.name,
-                                                minSize: double.parse(((MediaQuery.of(context).size.width*0.045).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.045)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.045)).toString()),
-                                                maxLines: 1
+                                                sizeNew: double.parse(((MediaQuery.of(context).size.width*0.045).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.045)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.045)).toString()),
+                                                maxLines: 2
                                             ),
                                             // CustomText.bodyMedium12(text: promo[index].menu!.restoName, minSize: 12),
                                             SizedBox(height: CustomSize.sizeHeight(context) * 0.00126,),

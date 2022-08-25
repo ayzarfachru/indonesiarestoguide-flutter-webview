@@ -27,12 +27,13 @@ class _ReservationPendingState extends State<ReservationPending> {
   bool ksg = false;
 
   List<Transaction> transaction = [];
+  String deposit = '';
   Future _getTrans()async{
     List<Transaction> _transaction = [];
 
     SharedPreferences pref = await SharedPreferences.getInstance();
     String token = pref.getString("token") ?? "";
-    var apiResult = await http.get(Links.mainUrl + '/resto/reservation', headers: {
+    var apiResult = await http.get(Uri.parse(Links.mainUrl + '/resto/reservation'), headers: {
       "Accept": "Application/json",
       "Authorization": "Bearer $token"
     });
@@ -60,8 +61,17 @@ class _ReservationPendingState extends State<ReservationPending> {
       ksg = true;
     }
 
+    String id = pref.getString("idHomeResto") ?? "";
+    var apiResult2 = await http
+        .get(Uri.parse(Links.mainUrl + "/deposit/$id"), headers: {
+      "Accept": "Application/json",
+      "Authorization": "Bearer $token"
+    });
+    var data2 = json.decode(apiResult2.body);
+
     setState(() {
       transaction = _transaction;
+      deposit = data2['balance'].toString();
     });
   }
 
@@ -69,7 +79,7 @@ class _ReservationPendingState extends State<ReservationPending> {
   Future getUser()async{
     SharedPreferences pref = await SharedPreferences.getInstance();
     setState(() {
-      userName = (pref.getString('name'));
+      userName = (pref.getString('name')??'');
     });
   }
 
@@ -92,7 +102,7 @@ class _ReservationPendingState extends State<ReservationPending> {
 
     SharedPreferences pref = await SharedPreferences.getInstance();
     String token = pref.getString("token") ?? "";
-    var apiResult = await http.get(Links.mainUrl + '/resto/reservation/$Id', headers: {
+    var apiResult = await http.get(Uri.parse(Links.mainUrl + '/resto/reservation/$Id'), headers: {
       "Accept": "Application/json",
       "Authorization": "Bearer $token"
     });
@@ -194,8 +204,8 @@ class _ReservationPendingState extends State<ReservationPending> {
                                 SizedBox(height: CustomSize.sizeHeight(context) / 100,),
                                 Row(mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                   children: [
-                                    CustomText.bodyLight16(text: "Platform fee", sizeNew: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.04).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.04).toString())),
-                                    CustomText.bodyLight16(text: '1000',
+                                    CustomText.bodyLight16(text: "Harga per meja", sizeNew: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.04).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.04).toString())),
+                                    CustomText.bodyLight16(text: NumberFormat.currency(locale: 'id', symbol: '', decimalDigits: 0).format(10000),
                                         sizeNew: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.04).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.04).toString())
                                       // totalOngkir
                                     ),
@@ -206,7 +216,7 @@ class _ReservationPendingState extends State<ReservationPending> {
                                 Row(mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                   children: [
                                     CustomText.textTitle3(text: "Total Pembayaran", sizeNew: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.04).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.04).toString())),
-                                    CustomText.textTitle3(text: NumberFormat.currency(locale: 'id', symbol: '', decimalDigits: 0).format(int.parse(total)+1000),
+                                    CustomText.textTitle3(text: NumberFormat.currency(locale: 'id', symbol: '', decimalDigits: 0).format(int.parse(total)),
                                         sizeNew: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.04).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.04).toString())
                                       // NumberFormat.currency(locale: 'id', symbol: '', decimalDigits: 0).format(int.parse(totalHarga))
                                     ),
@@ -326,83 +336,125 @@ class _ReservationPendingState extends State<ReservationPending> {
                               ],
                             ),
                             SizedBox(height: CustomSize.sizeHeight(context) / 86,),
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceAround,
-                              children: [
-                                GestureDetector(
-                                  onTap: (){
-                                    _Operation(operation = "cancel", id!);
-                                    setStateModal(() {});
-                                    Future.delayed(Duration(seconds: 0)).then((_) {
-                                      Navigator.pushReplacement(
-                                          context,
-                                          PageTransition(
-                                              type: PageTransitionType.fade,
-                                              child: ReservationRestoActivity()));
-                                    });
-                                  },
+                            GestureDetector(
+                              onTap: (){
+                                _Operation(operation = "cancel", id!);
+                                setStateModal(() {});
+                                Future.delayed(Duration(seconds: 0)).then((_) {
+                                  Navigator.pushReplacement(
+                                      context,
+                                      PageTransition(
+                                          type: PageTransitionType.fade,
+                                          child: ReservationRestoActivity()));
+                                });
+                              },
+                              child: Center(
+                                child: Container(
+                                  width: CustomSize.sizeWidth(context) / 1,
+                                  height: CustomSize.sizeHeight(context) / 14,
+                                  decoration: BoxDecoration(
+                                      color: CustomColor.redBtn,
+                                      borderRadius: BorderRadius.circular(50)
+                                  ),
                                   child: Center(
-                                    child: Container(
-                                      width: CustomSize.sizeWidth(context) / 2.3,
-                                      height: CustomSize.sizeHeight(context) / 14,
-                                      decoration: BoxDecoration(
-                                          color: CustomColor.redBtn,
-                                          borderRadius: BorderRadius.circular(50)
-                                      ),
-                                      child: Center(
-                                        child: Padding(
-                                          padding: const EdgeInsets.symmetric(horizontal: 20.0),
-                                          child: Column(
-                                            mainAxisAlignment: MainAxisAlignment.center,
-                                            crossAxisAlignment: CrossAxisAlignment.center,
-                                            children: [
-                                              CustomText.textHeading7(text: "Tolak", color: Colors.white, sizeNew: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.04).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.04).toString())),
-                                              CustomText.textHeading7(text: "Pesanan", color: Colors.white, sizeNew: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.04).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.04).toString())),
-                                            ],
-                                          ),
-                                        ),
+                                    child: Padding(
+                                      padding: const EdgeInsets.symmetric(horizontal: 20.0),
+                                      child: Column(
+                                        mainAxisAlignment: MainAxisAlignment.center,
+                                        crossAxisAlignment: CrossAxisAlignment.center,
+                                        children: [
+                                          CustomText.textHeading7(text: "Tolak", color: Colors.white, sizeNew: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.04).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.04).toString())),
+                                          CustomText.textHeading7(text: "Pesanan", color: Colors.white, sizeNew: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.04).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.04).toString())),
+                                        ],
                                       ),
                                     ),
                                   ),
                                 ),
-                                GestureDetector(
-                                  onTap: (){
-                                    _Operation(operation = "process", id!);
-                                    setStateModal(() {});
-                                    Future.delayed(Duration(seconds: 0)).then((_) {
-                                      Navigator.pushReplacement(
-                                          context,
-                                          PageTransition(
-                                              type: PageTransitionType.fade,
-                                              child: ReservationRestoActivity()));
-                                    });
-                                  },
-                                  child: Center(
-                                    child: Container(
-                                      width: CustomSize.sizeWidth(context) / 2.3,
-                                      height: CustomSize.sizeHeight(context) / 14,
-                                      decoration: BoxDecoration(
-                                          color: CustomColor.accent,
-                                          borderRadius: BorderRadius.circular(50)
-                                      ),
-                                      child: Center(
-                                        child: Padding(
-                                          padding: const EdgeInsets.symmetric(horizontal: 20.0),
-                                          child: Column(
-                                            mainAxisAlignment: MainAxisAlignment.center,
-                                            crossAxisAlignment: CrossAxisAlignment.center,
-                                            children: [
-                                              CustomText.textHeading7(text: "Terima", color: Colors.white, sizeNew: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.04).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.04).toString())),
-                                              CustomText.textHeading7(text: "Pesanan", color: Colors.white, sizeNew: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.04).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.04).toString())),
-                                            ],
-                                          ),
-                                        ),
-                                      ),
-                                    ),
-                                  ),
-                                ),
-                              ],
+                              ),
                             ),
+
+                            // Row(
+                            //   mainAxisAlignment: MainAxisAlignment.spaceAround,
+                            //   children: [
+                            //     GestureDetector(
+                            //       onTap: (){
+                            //         _Operation(operation = "cancel", id!);
+                            //         setStateModal(() {});
+                            //         Future.delayed(Duration(seconds: 0)).then((_) {
+                            //           Navigator.pushReplacement(
+                            //               context,
+                            //               PageTransition(
+                            //                   type: PageTransitionType.fade,
+                            //                   child: ReservationRestoActivity()));
+                            //         });
+                            //       },
+                            //       child: Center(
+                            //         child: Container(
+                            //           width: CustomSize.sizeWidth(context) / 2.3,
+                            //           height: CustomSize.sizeHeight(context) / 14,
+                            //           decoration: BoxDecoration(
+                            //               color: CustomColor.redBtn,
+                            //               borderRadius: BorderRadius.circular(50)
+                            //           ),
+                            //           child: Center(
+                            //             child: Padding(
+                            //               padding: const EdgeInsets.symmetric(horizontal: 20.0),
+                            //               child: Column(
+                            //                 mainAxisAlignment: MainAxisAlignment.center,
+                            //                 crossAxisAlignment: CrossAxisAlignment.center,
+                            //                 children: [
+                            //                   CustomText.textHeading7(text: "Tolak", color: Colors.white, sizeNew: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.04).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.04).toString())),
+                            //                   CustomText.textHeading7(text: "Pesanan", color: Colors.white, sizeNew: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.04).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.04).toString())),
+                            //                 ],
+                            //               ),
+                            //             ),
+                            //           ),
+                            //         ),
+                            //       ),
+                            //     ),
+                            //     GestureDetector(
+                            //       onTap: (){
+                            //         if (int.parse(deposit) >= (int.parse(total) / 2)) {
+                            //           _Operation(operation = "process", id!);
+                            //           setStateModal(() {});
+                            //           Future.delayed(Duration(seconds: 0)).then((_) {
+                            //             Navigator.pushReplacement(
+                            //                 context,
+                            //                 PageTransition(
+                            //                     type: PageTransitionType.fade,
+                            //                     child: ReservationRestoActivity()));
+                            //           });
+                            //         } else {
+                            //           Fluttertoast.showToast(
+                            //             msg: 'Saldo deposit anda tidak mencukupi untuk melanjutkan transaksi ini!',);
+                            //         }
+                            //       },
+                            //       child: Center(
+                            //         child: Container(
+                            //           width: CustomSize.sizeWidth(context) / 2.3,
+                            //           height: CustomSize.sizeHeight(context) / 14,
+                            //           decoration: BoxDecoration(
+                            //               color: CustomColor.accent,
+                            //               borderRadius: BorderRadius.circular(50)
+                            //           ),
+                            //           child: Center(
+                            //             child: Padding(
+                            //               padding: const EdgeInsets.symmetric(horizontal: 20.0),
+                            //               child: Column(
+                            //                 mainAxisAlignment: MainAxisAlignment.center,
+                            //                 crossAxisAlignment: CrossAxisAlignment.center,
+                            //                 children: [
+                            //                   CustomText.textHeading7(text: "Terima", color: Colors.white, sizeNew: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.04).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.04).toString())),
+                            //                   CustomText.textHeading7(text: "Pesanan", color: Colors.white, sizeNew: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.04).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.04).toString())),
+                            //                 ],
+                            //               ),
+                            //             ),
+                            //           ),
+                            //         ),
+                            //       ),
+                            //     ),
+                            //   ],
+                            // ),
                           ],
                         ),
                         SizedBox(height: CustomSize.sizeHeight(context) / 94,),
@@ -441,7 +493,7 @@ class _ReservationPendingState extends State<ReservationPending> {
 
     SharedPreferences pref = await SharedPreferences.getInstance();
     String token = pref.getString("token") ?? "";
-    var apiResult = await http.get(Links.mainUrl + '/reservation/op/open/$id', headers: {
+    var apiResult = await http.get(Uri.parse(Links.mainUrl + '/reservation/op/open/$id'), headers: {
       "Accept": "Application/json",
       "Authorization": "Bearer $token"
     });
@@ -472,7 +524,7 @@ class _ReservationPendingState extends State<ReservationPending> {
 
     SharedPreferences pref = await SharedPreferences.getInstance();
     String token = pref.getString("token") ?? "";
-    var apiResult = await http.get(Links.mainUrl + '/reservation/op/$operation/$id', headers: {
+    var apiResult = await http.get(Uri.parse(Links.mainUrl + '/reservation/op/$operation/$id'), headers: {
       "Accept": "Application/json",
       "Authorization": "Bearer $token"
     });
@@ -628,7 +680,7 @@ class _ReservationPendingState extends State<ReservationPending> {
                                             SizedBox(height: CustomSize.sizeHeight(context) * 0.00468,),
                                             CustomText.bodyMedium12(
                                                 // text: transaction[index].type.toString(),
-                                                text: (transaction[index].total! + 1000).toString(),
+                                                text: (transaction[index].total).toString(),
                                                 maxLines: 1,
                                                 sizeNew: double.parse(((MediaQuery.of(context).size.width*0.033).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.033).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.033).toString())
                                             ),

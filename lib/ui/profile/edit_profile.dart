@@ -7,6 +7,7 @@ import 'package:flutter_datetime_picker/flutter_datetime_picker.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:flutter/services.dart';
+import 'package:intl/intl.dart';
 import 'package:kam5ia/ui/ui_resto/home/home_activity.dart';
 import 'package:kam5ia/utils/utils.dart';
 import 'package:flutter_icons/flutter_icons.dart';
@@ -45,17 +46,17 @@ class _EditProfileState extends State<EditProfile> {
   getPref() async {
     SharedPreferences pref = await SharedPreferences.getInstance();
     setState(() {
-      name = (pref.getString('name'));
+      name = (pref.getString('name')??'');
       print(name);
-      email = (pref.getString('email'));
+      email = (pref.getString('email')??'');
       print(email);
-      img = (pref.getString('img'));
+      img = (pref.getString('img')??'');
       print(img);
-      notelp = (pref.getString('notelp'));
+      notelp = (pref.getString('notelp')??'');
       print(notelp);
-      gender = (pref.getString('gender'));
+      gender = (pref.getString('gender')??'');
       print(gender);
-      tgl = (pref.getString('tgl'));
+      tgl = (pref.getString('tgl')??'');
       print(tgl);
     });
   }
@@ -69,7 +70,7 @@ class _EditProfileState extends State<EditProfile> {
   getEmail() async {
     SharedPreferences pref = await SharedPreferences.getInstance();
     setState(() {
-      email = (pref.getString('email'));
+      email = (pref.getString('email')??'');
       print(email);
     });
   }
@@ -83,7 +84,7 @@ class _EditProfileState extends State<EditProfile> {
   getImg() async {
     SharedPreferences pref = await SharedPreferences.getInstance();
     setState(() {
-      img = pref.getString('img');
+      img = pref.getString('img')??'';
       print(img);
     });
   }
@@ -101,7 +102,7 @@ class _EditProfileState extends State<EditProfile> {
   getNotelp() async {
     SharedPreferences pref = await SharedPreferences.getInstance();
     setState(() {
-      notelp = (pref.getString('notelp'));
+      notelp = (pref.getString('notelp')??'');
       print(notelp);
     });
   }
@@ -115,7 +116,7 @@ class _EditProfileState extends State<EditProfile> {
   getGender() async {
     SharedPreferences pref = await SharedPreferences.getInstance();
     setState(() {
-      gender = (pref.getString('gender'));
+      gender = (pref.getString('gender')??'');
       print(gender);
     });
   }
@@ -137,7 +138,7 @@ class _EditProfileState extends State<EditProfile> {
   getTgl() async {
     SharedPreferences pref = await SharedPreferences.getInstance();
     setState(() {
-      tgl = (pref.getString('tgl'));
+      tgl = (pref.getString('tgl')??'');
       print(tgl);
     });
   }
@@ -152,7 +153,7 @@ class _EditProfileState extends State<EditProfile> {
     final pickedFile = await picker.getImage(source: ImageSource.gallery);
 
     setState(() {
-      image = File(pickedFile.path);
+      image = File(pickedFile!.path);
       extension = pickedFile.path.split('.').last;
     });
   }
@@ -280,7 +281,7 @@ class _EditProfileState extends State<EditProfile> {
     List<User> _user = [];
     SharedPreferences pref = await SharedPreferences.getInstance();
     String token = pref.getString("token") ?? "";
-    var apiResult = await http.post(Links.mainUrl + '/auth/password',
+    var apiResult = await http.post(Uri.parse(Links.mainUrl + '/auth/password'),
         body: {
           'password': _newPass.text,
         },
@@ -334,7 +335,7 @@ class _EditProfileState extends State<EditProfile> {
   getHomePg() async {
     SharedPreferences pref = await SharedPreferences.getInstance();
     setState(() {
-      homepg = (pref.getString('homepg'));
+      homepg = (pref.getString('homepg')??'');
       print(homepg);
     });
   }
@@ -342,7 +343,7 @@ class _EditProfileState extends State<EditProfile> {
   getInitial() async {
     SharedPreferences pref = await SharedPreferences.getInstance();
     setState(() {
-      initial = (pref.getString('name').substring(0, 1).toUpperCase());
+      initial = (pref.getString('name')!.substring(0, 1).toUpperCase());
       print(initial);
     });
   }
@@ -525,6 +526,7 @@ class _EditProfileState extends State<EditProfile> {
                         height: CustomSize.sizeHeight(context) * 0.005,
                       ),
                       TextField(
+                        readOnly: true,
                         controller: _loginEmailName,
                         keyboardType: TextInputType.emailAddress,
                         cursorColor: Colors.black,
@@ -761,8 +763,8 @@ class _EditProfileState extends State<EditProfile> {
                           SharedPreferences pref = await SharedPreferences.getInstance();
                           pref.setString('name',_loginTextName.text.toString());
                           print(newPass.text.toString().length.toString() + 'Ini Image');
-                          if (_loginEmailName.text == '') {
-                            Fluttertoast.showToast(msg: 'Email wajib diisi!');
+                          if (_loginEmailName.text == '' || _loginNotelpName.text == '' || _loginTextName.text == '') {
+                            Fluttertoast.showToast(msg: 'Data wajib diisi!');
                           } else {
                             if (Pass == false) {
                               if (image != null) {

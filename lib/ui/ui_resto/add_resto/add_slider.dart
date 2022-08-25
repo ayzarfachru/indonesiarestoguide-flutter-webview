@@ -139,7 +139,7 @@ class _AddSliderState extends State<AddSlider> {
                 child: Text("Simpan", style: TextStyle(color: CustomColor.accent),),
                 onPressed: () async{
                   SharedPreferences pref = await SharedPreferences.getInstance();
-                  pref.setString("tipeMenu", tipe);
+                  pref.setString("tipeMenu", tipe.toString());
                   setState(() {
                     print(tipe);
                     getTipeMenu();
@@ -160,7 +160,7 @@ class _AddSliderState extends State<AddSlider> {
   getInitial() async {
     SharedPreferences pref = await SharedPreferences.getInstance();
     setState(() {
-      initial = (pref.getString('name').substring(0, 1).toUpperCase());
+      initial = (pref.getString('name')!.substring(0, 1).toUpperCase());
       print(initial);
     });
   }
@@ -174,7 +174,7 @@ class _AddSliderState extends State<AddSlider> {
     final pickedFile = await picker.getImage(source: ImageSource.gallery);
 
     setState(() {
-      image = File(pickedFile.path);
+      image = File(pickedFile!.path);
       extension = pickedFile.path.split('.').last;
     });
   }
@@ -189,7 +189,7 @@ class _AddSliderState extends State<AddSlider> {
     });
     SharedPreferences pref = await SharedPreferences.getInstance();
     String token = pref.getString("token") ?? "";
-    var apiResult = await http.post(Links.mainUrl + '/resto/img',
+    var apiResult = await http.post(Uri.parse(Links.mainUrl + '/resto/img'),
         body: {
           'resto': id,
           'img': 'data:image/$extension;base64,'+base64Encode(image!.readAsBytesSync()).toString(),
@@ -226,7 +226,7 @@ class _AddSliderState extends State<AddSlider> {
   Future<void> getType() async {
     SharedPreferences pref = await SharedPreferences.getInstance();
     var token = pref.getString("token") ?? "";
-    var data = await http.get(Links.mainUrl +'/util/data?q=menutype',
+    var data = await http.get(Uri.parse(Links.mainUrl +'/util/data?q=menutype'),
         headers: {
           "Accept": "application/json",
           "Authorization": "Bearer $token"

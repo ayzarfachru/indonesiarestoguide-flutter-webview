@@ -3,6 +3,7 @@ import 'package:kam5ia/ui/home/home_activity.dart';
 import 'package:kam5ia/ui/ui_resto/home/home_activity.dart';
 import 'package:kam5ia/utils/utils.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:in_app_update/in_app_update.dart';
 
 class SplashScreen extends StatefulWidget {
   @override
@@ -16,6 +17,53 @@ class _SplashScreenState extends State<SplashScreen> {
     return pref.getString("akses") ?? "";
   }
 
+
+  AppUpdateInfo? _updateInfo;
+  bool _flexibleUpdateAvailable = false;
+
+  Future<void> checkForUpdate() async {
+
+    InAppUpdate.checkForUpdate().then((info) {
+
+      setState(() {
+
+        _updateInfo = info;
+
+        if (_updateInfo?.updateAvailability == UpdateAvailability.updateAvailable) {
+          InAppUpdate.performImmediateUpdate().catchError((e) => showSnack(e.toString()));
+        } else {
+          _checkForSession().then((status) {
+            if (status) {
+              Navigator.of(context).pushReplacement(MaterialPageRoute(
+                  builder: (BuildContext context) => (homepg != "1")?HomeActivity():HomeActivityResto()));
+            }
+          });
+        }
+
+      });
+
+    }).catchError((e) {
+
+      showSnack(e.toString());
+
+    });
+  }
+
+  final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey();
+
+  void showSnack(String text) {
+
+    if (_scaffoldKey.currentContext != null) {
+
+      ScaffoldMessenger.of(_scaffoldKey.currentContext!)
+
+          .showSnackBar(SnackBar(content: Text(text)));
+
+    }
+
+  }
+
+
   Future<bool> _checkForSession() async {
     await Future.delayed(Duration(milliseconds: 3000), () {});
 
@@ -25,7 +73,7 @@ class _SplashScreenState extends State<SplashScreen> {
   getHomePg() async {
     SharedPreferences pref = await SharedPreferences.getInstance();
     setState(() {
-      homepg = (pref.getString('homepg'));
+      homepg = (pref.getString('homepg')??'');
       print(homepg);
     });
   }
@@ -33,13 +81,8 @@ class _SplashScreenState extends State<SplashScreen> {
   @override
   void initState() {
     super.initState();
+    checkForUpdate();
     getHomePg();
-    _checkForSession().then((status) {
-      if (status) {
-        Navigator.of(context).pushReplacement(MaterialPageRoute(
-            builder: (BuildContext context) => (homepg != "1")?HomeActivity():HomeActivityResto()));
-      }
-    });
   }
 
   @override

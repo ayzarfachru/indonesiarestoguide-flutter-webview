@@ -28,7 +28,7 @@ class _FollowersActivityState extends State<FollowersActivity> {
   getImg() async {
     SharedPreferences pref = await SharedPreferences.getInstance();
     setState(() {
-      img = (pref.getString('img'));
+      img = (pref.getString('img')??'');
       print(img);
     });
   }
@@ -42,7 +42,7 @@ class _FollowersActivityState extends State<FollowersActivity> {
     });
     SharedPreferences pref = await SharedPreferences.getInstance();
     String token = pref.getString("token") ?? "";
-    var apiResult = await http.get(Links.mainUrl + '/resto/follower', headers: {
+    var apiResult = await http.get(Uri.parse(Links.mainUrl + '/resto/follower'), headers: {
       "Accept": "Application/json",
       "Authorization": "Bearer $token"
     });
@@ -70,7 +70,7 @@ class _FollowersActivityState extends State<FollowersActivity> {
   getHomePg() async {
     SharedPreferences pref = await SharedPreferences.getInstance();
     setState(() {
-      homepg = (pref.getString('homepg'));
+      homepg = (pref.getString('homepg')??'');
       print(homepg);
     });
   }
@@ -102,7 +102,7 @@ class _FollowersActivityState extends State<FollowersActivity> {
     });
     SharedPreferences pref = await SharedPreferences.getInstance();
     String token = pref.getString("token") ?? "";
-    var apiResult = await http.get(Links.mainUrl + '/karyawan/delete/$id', headers: {
+    var apiResult = await http.get(Uri.parse(Links.mainUrl + '/karyawan/delete/$id'), headers: {
       "Accept": "Application/json",
       "Authorization": "Bearer $token"
     });

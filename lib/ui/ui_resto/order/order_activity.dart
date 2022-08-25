@@ -110,7 +110,7 @@ class _OrderActivityState extends State<OrderActivity> {
                             child: Container(
                               child: Align(
                                 alignment: Alignment.center,
-                                child: Text("Process", style: TextStyle(fontSize: 15)),
+                                child: Text("Proses", style: TextStyle(fontSize: 15)),
                               ),
                             ),
                           ),
@@ -118,7 +118,7 @@ class _OrderActivityState extends State<OrderActivity> {
                             child: Container(
                               child: Align(
                                 alignment: Alignment.center,
-                                child: Text("Ready", style: TextStyle(fontSize: 15)),
+                                child: Text("Selesai", style: TextStyle(fontSize: 15)),
                               ),
                             ),
                           ),

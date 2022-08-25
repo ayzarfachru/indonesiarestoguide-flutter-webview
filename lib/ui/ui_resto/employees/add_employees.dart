@@ -39,7 +39,7 @@ class _AddEmployeesActivityState extends State<AddEmployeesActivity> {
   getName() async {
     SharedPreferences pref = await SharedPreferences.getInstance();
     setState(() {
-      name = (pref.getString('name'));
+      name = (pref.getString('name')??'');
       print(name);
     });
   }
@@ -53,7 +53,7 @@ class _AddEmployeesActivityState extends State<AddEmployeesActivity> {
   getEmail() async {
     SharedPreferences pref = await SharedPreferences.getInstance();
     setState(() {
-      email = (pref.getString('email'));
+      email = (pref.getString('email')??'');
       print(email);
     });
   }
@@ -61,7 +61,7 @@ class _AddEmployeesActivityState extends State<AddEmployeesActivity> {
   getImg() async {
     SharedPreferences pref = await SharedPreferences.getInstance();
     setState(() {
-      img = (pref.getString('img'));
+      img = (pref.getString('img')??'');
       print(img);
     });
   }
@@ -90,7 +90,7 @@ class _AddEmployeesActivityState extends State<AddEmployeesActivity> {
   getGender() async {
     SharedPreferences pref = await SharedPreferences.getInstance();
     setState(() {
-      gender = (pref.getString('gender'));
+      gender = (pref.getString('gender')??'');
       print(gender);
     });
   }
@@ -112,7 +112,7 @@ class _AddEmployeesActivityState extends State<AddEmployeesActivity> {
   getTgl() async {
     SharedPreferences pref = await SharedPreferences.getInstance();
     setState(() {
-      tgl = (pref.getString('tgl'));
+      tgl = (pref.getString('tgl')??'');
       print(tgl);
     });
   }
@@ -126,7 +126,7 @@ class _AddEmployeesActivityState extends State<AddEmployeesActivity> {
     final pickedFile = await picker.getImage(source: ImageSource.gallery);
 
     setState(() {
-      image = File(pickedFile.path);
+      image = File(pickedFile!.path);
       extension = pickedFile.path.split('.').last;
     });
   }
@@ -136,7 +136,7 @@ class _AddEmployeesActivityState extends State<AddEmployeesActivity> {
     var token = pref.getString("token") ?? "";
     var id = pref.getInt("id") ?? "";
 
-    var apiResult = await http.post(Links.mainUrl + '/karyawan',
+    var apiResult = await http.post(Uri.parse(Links.mainUrl + '/karyawan'),
         body: {
           'email': _loginEmailName.text,
         },

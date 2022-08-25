@@ -341,7 +341,7 @@ class _EditDetailRestoState extends State<EditDetailResto> {
     SharedPreferences pref = await SharedPreferences.getInstance();
     imgSelfie = pref.getString("imgSelfie") ?? "";
     imgKtp = pref.getString("imgKTP") ?? "";
-    karyawan = (pref.getString("karyawan"));
+    karyawan = (pref.getString("karyawan")??'');
   }
 
   getHargaPerMeja() async {
@@ -400,7 +400,7 @@ class _EditDetailRestoState extends State<EditDetailResto> {
       isLoading = true;
     });
 
-    var apiResult = await http.post(Links.mainUrl + '/resto/userdata',
+    var apiResult = await http.post(Uri.parse(Links.mainUrl + '/resto/userdata'),
         body: {
           'data_email': email,
           'data_pt': badanUsaha,
@@ -520,7 +520,7 @@ class _EditDetailRestoState extends State<EditDetailResto> {
       isLoading = true;
     });
 
-    var apiResult = await http.post(Links.mainUrl + '/resto/userdata',
+    var apiResult = await http.post(Uri.parse(Links.mainUrl + '/resto/userdata'),
         body: {
           'data_email': email,
           'data_pt': badanUsaha,
@@ -622,93 +622,186 @@ class _EditDetailRestoState extends State<EditDetailResto> {
       isLoading = true;
     });
 
-    var apiResult = await http.post(Links.mainUrl + '/resto/$idResto',
-        body: {
-          'name': name,
-          'data_email': email,
-          'desc': desc,
-          'latitude': latitude,
-          'longitude': longitude,
-          'address': address,
-          'phone': phone,
-          'ongkir': (_Ongkir.text.toString() != null)?_Ongkir.text.toString():'0',
-          're_price': (reservation != false)?(_HargaPerMeja.text.toString() != '')?_HargaPerMeja.text.toString():'':'0',
-          'takeaway': (takeaway == true)?'1':'',
-          'img': img,
-          'type': _Tipe.text.toString(),
-          // 'type': (_Tipe.text.toString() == 'Indonesian Food' || _Tipe.text.toString() == 'Chinese Food' || _Tipe.text.toString() == 'Japanese Food' || _Tipe.text.toString() == 'Australian Food' || _Tipe.text.toString() == 'Korean Food' || _Tipe.text.toString() == 'Coffe' || _Tipe.text.toString() == 'Orther Drinks')?'Indonesian':_Tipe.text.toString(),
-          'fasilitas': _Fasilitas.text.toString(),
-          // 'fasilitas': (_Fasilitas.text.toString() == 'Kaki Lima' || _Fasilitas.text.toString() == 'Food Stall' || _Fasilitas.text.toString() == 'Food Truck' || _Fasilitas.text.toString() == 'Toko Roti/Kue' || _Fasilitas.text.toString() == 'Toko Oleh-Oleh' || _Fasilitas.text.toString() == 'Other')?'Smoking Area':_Fasilitas.text.toString(),
-          'table': (_JumlahMeja.text.toString() != '')?_JumlahMeja.text.toString():'',
+    if (reservation == true) {
+      var apiResult = await http.post(Uri.parse(Links.mainUrl + '/resto/$idResto'),
+          body: {
+            'name': name,
+            'data_email': email,
+            'desc': desc,
+            'latitude': latitude,
+            'longitude': longitude,
+            'address': address,
+            'phone': phone,
+            'ongkir': (_Ongkir.text.toString() != null)?_Ongkir.text.toString():'0',
+            // 're_price': (reservation != false)?(_HargaPerMeja.text.toString() != '')?_HargaPerMeja.text.toString():'':'0',
+            're_price': '1000',
+            'takeaway': (takeaway == true)?'1':'',
+            'img': img,
+            'type': _Tipe.text.toString(),
+            // 'type': (_Tipe.text.toString() == 'Indonesian Food' || _Tipe.text.toString() == 'Chinese Food' || _Tipe.text.toString() == 'Japanese Food' || _Tipe.text.toString() == 'Australian Food' || _Tipe.text.toString() == 'Korean Food' || _Tipe.text.toString() == 'Coffe' || _Tipe.text.toString() == 'Orther Drinks')?'Indonesian':_Tipe.text.toString(),
+            'fasilitas': _Fasilitas.text.toString(),
+            // 'fasilitas': (_Fasilitas.text.toString() == 'Kaki Lima' || _Fasilitas.text.toString() == 'Food Stall' || _Fasilitas.text.toString() == 'Food Truck' || _Fasilitas.text.toString() == 'Toko Roti/Kue' || _Fasilitas.text.toString() == 'Toko Oleh-Oleh' || _Fasilitas.text.toString() == 'Other')?'Smoking Area':_Fasilitas.text.toString(),
+            'table': (_JumlahMeja.text.toString() != '')?_JumlahMeja.text.toString():'',
 
+            // 'name': name,
+            // 'desc': desc,
+            // 'latitude': latitude,
+            // 'longitude': longitude,
+            // 'address': address,
+            // 'phone': phone,
+            // 'hours': buka + ',' + tutup,
+            // 'ongkir': (_Ongkir.text.toString() != null)?_Ongkir.text.toString():'',
+            // 're_price': (_HargaPerMeja.text.toString() != '')?_HargaPerMeja.text.toString():'',
+            // 'takeaway': (takeaway == true)?'1':'',
+            // 'img': img,
+            // 'type': _Tipe.text.toString(),
+            // 'fasilitas': _Fasilitas.text.toString(),
+            // 'table': (_JumlahMeja.text.toString() != '')?_JumlahMeja.text.toString():''
+          },
+          headers: {
+            "Accept": "Application/json",
+            "Authorization": "Bearer $token"
+          });
+      // print(apiResult);
+      var data = json.decode(apiResult.body);
+
+      if(data['status_code'] == 200){
+        print("success");
+        print(_HargaPerMeja.text.toString());
+        print('inii '+latitude);
+        print('inii '+longitude);
+        print(json.encode({
+          'data_selfie_pj': imgSelfie,
+          'data_ktp': imgKtp,
           // 'name': name,
           // 'desc': desc,
           // 'latitude': latitude,
           // 'longitude': longitude,
           // 'address': address,
           // 'phone': phone,
-          // 'hours': buka + ',' + tutup,
           // 'ongkir': (_Ongkir.text.toString() != null)?_Ongkir.text.toString():'',
           // 're_price': (_HargaPerMeja.text.toString() != '')?_HargaPerMeja.text.toString():'',
           // 'takeaway': (takeaway == true)?'1':'',
           // 'img': img,
           // 'type': _Tipe.text.toString(),
           // 'fasilitas': _Fasilitas.text.toString(),
-          // 'table': (_JumlahMeja.text.toString() != '')?_JumlahMeja.text.toString():''
-        },
-        headers: {
-          "Accept": "Application/json",
-          "Authorization": "Bearer $token"
-        });
-    // print(apiResult);
-    var data = json.decode(apiResult.body);
-
-    if(data['status_code'] == 200){
-      print("success");
-      print(_HargaPerMeja.text.toString());
-      print('inii '+latitude);
-      print('inii '+longitude);
-      print(json.encode({
-        'data_selfie_pj': imgSelfie,
-        'data_ktp': imgKtp,
-        // 'name': name,
-        // 'desc': desc,
-        // 'latitude': latitude,
-        // 'longitude': longitude,
-        // 'address': address,
-        // 'phone': phone,
-        // 'ongkir': (_Ongkir.text.toString() != null)?_Ongkir.text.toString():'',
-        // 're_price': (_HargaPerMeja.text.toString() != '')?_HargaPerMeja.text.toString():'',
-        // 'takeaway': (takeaway == true)?'1':'',
-        // 'img': img,
-        // 'type': _Tipe.text.toString(),
-        // 'fasilitas': _Fasilitas.text.toString(),
-      }));
-      Navigator.pop(context);
-      Navigator.pop(context);
-      Navigator.pushReplacement(context, PageTransition(type: PageTransitionType.fade, child: HomeActivityResto()));
-      // SharedPreferences preferences = await SharedPreferences.getInstance();
-      // await preferences.remove('menuJson');
-      // await preferences.remove('restoId');
-      // await preferences.remove('qty');
-      // await preferences.remove('address');
-      // await preferences.remove('inCart');
+        }));
+        Navigator.pop(context);
+        Navigator.pop(context);
+        Navigator.pushReplacement(context, PageTransition(type: PageTransitionType.fade, child: HomeActivityResto()));
+        // SharedPreferences preferences = await SharedPreferences.getInstance();
+        // await preferences.remove('menuJson');
+        // await preferences.remove('restoId');
+        // await preferences.remove('qty');
+        // await preferences.remove('address');
+        // await preferences.remove('inCart');
+      } else {
+        print(data);
+        print(json.encode({
+          // 'name': name,
+          // 'desc': desc,
+          // 'latitude': latitude,
+          // 'longitude': longitude,
+          // 'address': address,
+          // 'phone': phone,
+          // 'ongkir': (_Ongkir.text.toString() != null)?_Ongkir.text.toString():'',
+          // 're_price': (_HargaPerMeja.text.toString() != '')?_HargaPerMeja.text.toString():'',
+          // 'takeaway': (takeaway == true)?'1':'',
+          // 'img': img,
+          // 'type': _Tipe.text.toString(),
+          // 'fasilitas': _Fasilitas.text.toString(),
+        }));
+      }
     } else {
-      print(data);
-      print(json.encode({
-        // 'name': name,
-        // 'desc': desc,
-        // 'latitude': latitude,
-        // 'longitude': longitude,
-        // 'address': address,
-        // 'phone': phone,
-        // 'ongkir': (_Ongkir.text.toString() != null)?_Ongkir.text.toString():'',
-        // 're_price': (_HargaPerMeja.text.toString() != '')?_HargaPerMeja.text.toString():'',
-        // 'takeaway': (takeaway == true)?'1':'',
-        // 'img': img,
-        // 'type': _Tipe.text.toString(),
-        // 'fasilitas': _Fasilitas.text.toString(),
-      }));
+      var apiResult = await http.post(Uri.parse(Links.mainUrl + '/resto/$idResto'),
+          body: {
+            'name': name,
+            'data_email': email,
+            'desc': desc,
+            'latitude': latitude,
+            'longitude': longitude,
+            'address': address,
+            'phone': phone,
+            'ongkir': (_Ongkir.text.toString() != null)?_Ongkir.text.toString():'0',
+            // 're_price': (reservation != false)?(_HargaPerMeja.text.toString() != '')?_HargaPerMeja.text.toString():'':'0',
+            // 're_price': '1000',
+            'takeaway': (takeaway == true)?'1':'',
+            'img': img,
+            'type': _Tipe.text.toString(),
+            // 'type': (_Tipe.text.toString() == 'Indonesian Food' || _Tipe.text.toString() == 'Chinese Food' || _Tipe.text.toString() == 'Japanese Food' || _Tipe.text.toString() == 'Australian Food' || _Tipe.text.toString() == 'Korean Food' || _Tipe.text.toString() == 'Coffe' || _Tipe.text.toString() == 'Orther Drinks')?'Indonesian':_Tipe.text.toString(),
+            'fasilitas': _Fasilitas.text.toString(),
+            // 'fasilitas': (_Fasilitas.text.toString() == 'Kaki Lima' || _Fasilitas.text.toString() == 'Food Stall' || _Fasilitas.text.toString() == 'Food Truck' || _Fasilitas.text.toString() == 'Toko Roti/Kue' || _Fasilitas.text.toString() == 'Toko Oleh-Oleh' || _Fasilitas.text.toString() == 'Other')?'Smoking Area':_Fasilitas.text.toString(),
+            'table': (_JumlahMeja.text.toString() != '')?_JumlahMeja.text.toString():'',
+
+            // 'name': name,
+            // 'desc': desc,
+            // 'latitude': latitude,
+            // 'longitude': longitude,
+            // 'address': address,
+            // 'phone': phone,
+            // 'hours': buka + ',' + tutup,
+            // 'ongkir': (_Ongkir.text.toString() != null)?_Ongkir.text.toString():'',
+            // 're_price': (_HargaPerMeja.text.toString() != '')?_HargaPerMeja.text.toString():'',
+            // 'takeaway': (takeaway == true)?'1':'',
+            // 'img': img,
+            // 'type': _Tipe.text.toString(),
+            // 'fasilitas': _Fasilitas.text.toString(),
+            // 'table': (_JumlahMeja.text.toString() != '')?_JumlahMeja.text.toString():''
+          },
+          headers: {
+            "Accept": "Application/json",
+            "Authorization": "Bearer $token"
+          });
+      // print(apiResult);
+      var data = json.decode(apiResult.body);
+
+      if(data['status_code'] == 200){
+        print("success");
+        print(_HargaPerMeja.text.toString());
+        print('inii '+latitude);
+        print('inii '+longitude);
+        print(json.encode({
+          'data_selfie_pj': imgSelfie,
+          'data_ktp': imgKtp,
+          // 'name': name,
+          // 'desc': desc,
+          // 'latitude': latitude,
+          // 'longitude': longitude,
+          // 'address': address,
+          // 'phone': phone,
+          // 'ongkir': (_Ongkir.text.toString() != null)?_Ongkir.text.toString():'',
+          // 're_price': (_HargaPerMeja.text.toString() != '')?_HargaPerMeja.text.toString():'',
+          // 'takeaway': (takeaway == true)?'1':'',
+          // 'img': img,
+          // 'type': _Tipe.text.toString(),
+          // 'fasilitas': _Fasilitas.text.toString(),
+        }));
+        Navigator.pop(context);
+        Navigator.pop(context);
+        Navigator.pushReplacement(context, PageTransition(type: PageTransitionType.fade, child: HomeActivityResto()));
+        // SharedPreferences preferences = await SharedPreferences.getInstance();
+        // await preferences.remove('menuJson');
+        // await preferences.remove('restoId');
+        // await preferences.remove('qty');
+        // await preferences.remove('address');
+        // await preferences.remove('inCart');
+      } else {
+        print(data);
+        print(json.encode({
+          // 'name': name,
+          // 'desc': desc,
+          // 'latitude': latitude,
+          // 'longitude': longitude,
+          // 'address': address,
+          // 'phone': phone,
+          // 'ongkir': (_Ongkir.text.toString() != null)?_Ongkir.text.toString():'',
+          // 're_price': (_HargaPerMeja.text.toString() != '')?_HargaPerMeja.text.toString():'',
+          // 'takeaway': (takeaway == true)?'1':'',
+          // 'img': img,
+          // 'type': _Tipe.text.toString(),
+          // 'fasilitas': _Fasilitas.text.toString(),
+        }));
+      }
     }
   }
 
@@ -734,90 +827,182 @@ class _EditDetailRestoState extends State<EditDetailResto> {
       isLoading = true;
     });
 
-    var apiResult = await http.post(Links.mainUrl + '/resto/$idResto',
-        body: {
-          'name': name,
-          'data_email': email,
-          'desc': desc,
-          'latitude': latitude,
-          'longitude': longitude,
-          'address': address,
-          'phone': phone,
-          're_price': (reservation != false)?(_HargaPerMeja.text.toString() != '')?_HargaPerMeja.text.toString():'':'0',
-          'takeaway': (takeaway == true)?'1':'',
-          'img': img,
-          'type': _Tipe.text.toString(),
-          // 'type': (_Tipe.text.toString() == 'Indonesian Food' || _Tipe.text.toString() == 'Chinese Food' || _Tipe.text.toString() == 'Japanese Food' || _Tipe.text.toString() == 'Australian Food' || _Tipe.text.toString() == 'Korean Food' || _Tipe.text.toString() == 'Coffe' || _Tipe.text.toString() == 'Orther Drinks')?'Indonesian':_Tipe.text.toString(),
-          'fasilitas': _Fasilitas.text.toString(),
-          // 'fasilitas': (_Fasilitas.text.toString() == 'Kaki Lima' || _Fasilitas.text.toString() == 'Food Stall' || _Fasilitas.text.toString() == 'Food Truck' || _Fasilitas.text.toString() == 'Toko Roti/Kue' || _Fasilitas.text.toString() == 'Toko Oleh-Oleh' || _Fasilitas.text.toString() == 'Other')?'Smoking Area':_Fasilitas.text.toString(),
-          'table': (_JumlahMeja.text.toString() != '')?_JumlahMeja.text.toString():'',
+    if (reservation == true) {
+      var apiResult = await http.post(Uri.parse(Links.mainUrl + '/resto/$idResto'),
+          body: {
+            'name': name,
+            'data_email': email,
+            'desc': desc,
+            'latitude': latitude,
+            'longitude': longitude,
+            'address': address,
+            'phone': phone,
+            // 're_price': (reservation != false)?(_HargaPerMeja.text.toString() != '')?_HargaPerMeja.text.toString():'':'0',
+            're_price': '1000',
+            'takeaway': (takeaway == true)?'1':'',
+            'img': img,
+            'type': _Tipe.text.toString(),
+            // 'type': (_Tipe.text.toString() == 'Indonesian Food' || _Tipe.text.toString() == 'Chinese Food' || _Tipe.text.toString() == 'Japanese Food' || _Tipe.text.toString() == 'Australian Food' || _Tipe.text.toString() == 'Korean Food' || _Tipe.text.toString() == 'Coffe' || _Tipe.text.toString() == 'Orther Drinks')?'Indonesian':_Tipe.text.toString(),
+            'fasilitas': _Fasilitas.text.toString(),
+            // 'fasilitas': (_Fasilitas.text.toString() == 'Kaki Lima' || _Fasilitas.text.toString() == 'Food Stall' || _Fasilitas.text.toString() == 'Food Truck' || _Fasilitas.text.toString() == 'Toko Roti/Kue' || _Fasilitas.text.toString() == 'Toko Oleh-Oleh' || _Fasilitas.text.toString() == 'Other')?'Smoking Area':_Fasilitas.text.toString(),
+            'table': (_JumlahMeja.text.toString() != '')?_JumlahMeja.text.toString():'',
 
+            // 'name': name,
+            // 'desc': desc,
+            // 'latitude': latitude,
+            // 'longitude': longitude,
+            // 'address': address,
+            // 'phone': phone,
+            // 'hours': buka + ',' + tutup,
+            // 'ongkir': (_Ongkir.text.toString() != null)?_Ongkir.text.toString():'',
+            // 're_price': (_HargaPerMeja.text.toString() != '')?_HargaPerMeja.text.toString():'',
+            // 'takeaway': (takeaway == true)?'1':'',
+            // 'img': img,
+            // 'type': _Tipe.text.toString(),
+            // 'fasilitas': _Fasilitas.text.toString(),
+            // 'table': (_JumlahMeja.text.toString() != '')?_JumlahMeja.text.toString():''
+          },
+          headers: {
+            "Accept": "Application/json",
+            "Authorization": "Bearer $token"
+          });
+      print(apiResult);
+      var data = json.decode(apiResult.body);
+
+      if(data['status_code'] == 200){
+        print("success");
+        print(norek);
+        print(json.encode({
+          'data_selfie_pj': imgSelfie,
+          'data_ktp': imgKtp,
           // 'name': name,
           // 'desc': desc,
           // 'latitude': latitude,
           // 'longitude': longitude,
           // 'address': address,
           // 'phone': phone,
-          // 'hours': buka + ',' + tutup,
           // 'ongkir': (_Ongkir.text.toString() != null)?_Ongkir.text.toString():'',
           // 're_price': (_HargaPerMeja.text.toString() != '')?_HargaPerMeja.text.toString():'',
           // 'takeaway': (takeaway == true)?'1':'',
           // 'img': img,
           // 'type': _Tipe.text.toString(),
           // 'fasilitas': _Fasilitas.text.toString(),
-          // 'table': (_JumlahMeja.text.toString() != '')?_JumlahMeja.text.toString():''
-        },
-        headers: {
-          "Accept": "Application/json",
-          "Authorization": "Bearer $token"
-        });
-    print(apiResult);
-    var data = json.decode(apiResult.body);
-
-    if(data['status_code'] == 200){
-      print("success");
-      print(norek);
-      print(json.encode({
-        'data_selfie_pj': imgSelfie,
-        'data_ktp': imgKtp,
-        // 'name': name,
-        // 'desc': desc,
-        // 'latitude': latitude,
-        // 'longitude': longitude,
-        // 'address': address,
-        // 'phone': phone,
-        // 'ongkir': (_Ongkir.text.toString() != null)?_Ongkir.text.toString():'',
-        // 're_price': (_HargaPerMeja.text.toString() != '')?_HargaPerMeja.text.toString():'',
-        // 'takeaway': (takeaway == true)?'1':'',
-        // 'img': img,
-        // 'type': _Tipe.text.toString(),
-        // 'fasilitas': _Fasilitas.text.toString(),
-      }));
-      Navigator.pop(context);
-      Navigator.pop(context);
-      Navigator.pushReplacement(context, PageTransition(type: PageTransitionType.fade, child: HomeActivityResto()));
-      // SharedPreferences preferences = await SharedPreferences.getInstance();
-      // await preferences.remove('menuJson');
-      // await preferences.remove('restoId');
-      // await preferences.remove('qty');
-      // await preferences.remove('address');
-      // await preferences.remove('inCart');
+        }));
+        Navigator.pop(context);
+        Navigator.pop(context);
+        Navigator.pushReplacement(context, PageTransition(type: PageTransitionType.fade, child: HomeActivityResto()));
+        // SharedPreferences preferences = await SharedPreferences.getInstance();
+        // await preferences.remove('menuJson');
+        // await preferences.remove('restoId');
+        // await preferences.remove('qty');
+        // await preferences.remove('address');
+        // await preferences.remove('inCart');
+      } else {
+        print(data);
+        print(json.encode({
+          'name': name,
+          'desc': desc,
+          'latitude': latitude,
+          'longitude': longitude,
+          'address': address,
+          'phone': phone,
+          'ongkir': (_Ongkir.text.toString() != null)?_Ongkir.text.toString():'',
+          // 're_price': (_HargaPerMeja.text.toString() != '')?_HargaPerMeja.text.toString():'',
+          're_price': '1000',
+          'takeaway': (takeaway == true)?'1':'',
+          'img': img,
+          'type': _Tipe.text.toString(),
+          'fasilitas': _Fasilitas.text.toString(),
+        }));
+      }
     } else {
-      print(data);
-      print(json.encode({
-        'name': name,
-        'desc': desc,
-        'latitude': latitude,
-        'longitude': longitude,
-        'address': address,
-        'phone': phone,
-        'ongkir': (_Ongkir.text.toString() != null)?_Ongkir.text.toString():'',
-        're_price': (_HargaPerMeja.text.toString() != '')?_HargaPerMeja.text.toString():'',
-        'takeaway': (takeaway == true)?'1':'',
-        'img': img,
-        'type': _Tipe.text.toString(),
-        'fasilitas': _Fasilitas.text.toString(),
-      }));
+      var apiResult = await http.post(Uri.parse(Links.mainUrl + '/resto/$idResto'),
+          body: {
+            'name': name,
+            'data_email': email,
+            'desc': desc,
+            'latitude': latitude,
+            'longitude': longitude,
+            'address': address,
+            'phone': phone,
+            // 're_price': (reservation != false)?(_HargaPerMeja.text.toString() != '')?_HargaPerMeja.text.toString():'':'0',
+            're_price': '1000',
+            'takeaway': (takeaway == true)?'1':'',
+            'img': img,
+            'type': _Tipe.text.toString(),
+            // 'type': (_Tipe.text.toString() == 'Indonesian Food' || _Tipe.text.toString() == 'Chinese Food' || _Tipe.text.toString() == 'Japanese Food' || _Tipe.text.toString() == 'Australian Food' || _Tipe.text.toString() == 'Korean Food' || _Tipe.text.toString() == 'Coffe' || _Tipe.text.toString() == 'Orther Drinks')?'Indonesian':_Tipe.text.toString(),
+            'fasilitas': _Fasilitas.text.toString(),
+            // 'fasilitas': (_Fasilitas.text.toString() == 'Kaki Lima' || _Fasilitas.text.toString() == 'Food Stall' || _Fasilitas.text.toString() == 'Food Truck' || _Fasilitas.text.toString() == 'Toko Roti/Kue' || _Fasilitas.text.toString() == 'Toko Oleh-Oleh' || _Fasilitas.text.toString() == 'Other')?'Smoking Area':_Fasilitas.text.toString(),
+            'table': (_JumlahMeja.text.toString() != '')?_JumlahMeja.text.toString():'',
+
+            // 'name': name,
+            // 'desc': desc,
+            // 'latitude': latitude,
+            // 'longitude': longitude,
+            // 'address': address,
+            // 'phone': phone,
+            // 'hours': buka + ',' + tutup,
+            // 'ongkir': (_Ongkir.text.toString() != null)?_Ongkir.text.toString():'',
+            // 're_price': (_HargaPerMeja.text.toString() != '')?_HargaPerMeja.text.toString():'',
+            // 'takeaway': (takeaway == true)?'1':'',
+            // 'img': img,
+            // 'type': _Tipe.text.toString(),
+            // 'fasilitas': _Fasilitas.text.toString(),
+            // 'table': (_JumlahMeja.text.toString() != '')?_JumlahMeja.text.toString():''
+          },
+          headers: {
+            "Accept": "Application/json",
+            "Authorization": "Bearer $token"
+          });
+      print(apiResult);
+      var data = json.decode(apiResult.body);
+
+      if(data['status_code'] == 200){
+        print("success");
+        print(norek);
+        print(json.encode({
+          'data_selfie_pj': imgSelfie,
+          'data_ktp': imgKtp,
+          // 'name': name,
+          // 'desc': desc,
+          // 'latitude': latitude,
+          // 'longitude': longitude,
+          // 'address': address,
+          // 'phone': phone,
+          // 'ongkir': (_Ongkir.text.toString() != null)?_Ongkir.text.toString():'',
+          // 're_price': (_HargaPerMeja.text.toString() != '')?_HargaPerMeja.text.toString():'',
+          // 'takeaway': (takeaway == true)?'1':'',
+          // 'img': img,
+          // 'type': _Tipe.text.toString(),
+          // 'fasilitas': _Fasilitas.text.toString(),
+        }));
+        Navigator.pop(context);
+        Navigator.pop(context);
+        Navigator.pushReplacement(context, PageTransition(type: PageTransitionType.fade, child: HomeActivityResto()));
+        // SharedPreferences preferences = await SharedPreferences.getInstance();
+        // await preferences.remove('menuJson');
+        // await preferences.remove('restoId');
+        // await preferences.remove('qty');
+        // await preferences.remove('address');
+        // await preferences.remove('inCart');
+      } else {
+        print(data);
+        print(json.encode({
+          'name': name,
+          'desc': desc,
+          'latitude': latitude,
+          'longitude': longitude,
+          'address': address,
+          'phone': phone,
+          'ongkir': (_Ongkir.text.toString() != null)?_Ongkir.text.toString():'',
+          // 're_price': (_HargaPerMeja.text.toString() != '')?_HargaPerMeja.text.toString():'',
+          // 're_price': '1000',
+          'takeaway': (takeaway == true)?'1':'',
+          'img': img,
+          'type': _Tipe.text.toString(),
+          'fasilitas': _Fasilitas.text.toString(),
+        }));
+      }
     }
   }
 
@@ -825,7 +1010,7 @@ class _EditDetailRestoState extends State<EditDetailResto> {
   Future<void> getDataCuisine() async {
     SharedPreferences pref = await SharedPreferences.getInstance();
     var token = pref.getString("token") ?? "";
-    var data = await http.get(Links.mainUrl +'/util/data?q=cuisine',
+    var data = await http.get(Uri.parse(Links.mainUrl +'/util/data?q=cuisine'),
         headers: {
           "Accept": "application/json",
           "Authorization": "Bearer $token"
@@ -843,7 +1028,7 @@ class _EditDetailRestoState extends State<EditDetailResto> {
   Future<void> getDataFacility() async {
     SharedPreferences pref = await SharedPreferences.getInstance();
     var token = pref.getString("token") ?? "";
-    var data = await http.get(Links.mainUrl +'/util/data?q=facility',
+    var data = await http.get(Uri.parse(Links.mainUrl +'/util/data?q=facility'),
         headers: {
           "Accept": "application/json",
           "Authorization": "Bearer $token"
@@ -861,7 +1046,7 @@ class _EditDetailRestoState extends State<EditDetailResto> {
   Future check()async{
     SharedPreferences pref = await SharedPreferences.getInstance();
     print((pref.getString("imgSelfie") != '')?'ini ktp':'Oy');
-    print('ini ktp '+pref.getString("imgKTP"));
+    print('ini ktp '+pref.getString("imgKTP").toString());
   }
 
   @override
@@ -1111,27 +1296,27 @@ class _EditDetailRestoState extends State<EditDetailResto> {
                         ],
                       ),
                       //------------------------------------- harga pesan ----------------------------------------
-                      (reservation)?CustomText.bodyLight12(text: "Harga pesan per meja (1 meja 4 kursi)", sizeNew: double.parse(((MediaQuery.of(context).size.width*0.03).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.03).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.03).toString())):Container(),
-                      (reservation)?TextField(
-                        controller: _HargaPerMeja,
-                        keyboardType: TextInputType.number,
-                        cursorColor: Colors.black,
-                        style: GoogleFonts.poppins(
-                            textStyle:
-                            TextStyle(fontSize: 18, color: Colors.black, fontWeight: FontWeight.w600)),
-                        decoration: InputDecoration(
-                          isDense: true,
-                          contentPadding: EdgeInsets.only(bottom: CustomSize.sizeHeight(context) / 86),
-                          hintStyle: GoogleFonts.poppins(
-                              textStyle:
-                              TextStyle(fontSize: 14, color: Colors.grey)),
-                          helperStyle: GoogleFonts.poppins(
-                              textStyle: TextStyle(fontSize: 14)),
-                          enabledBorder: UnderlineInputBorder(),
-                          focusedBorder: UnderlineInputBorder(),
-                        ),
-                      ):Container(),
-                      (reservation)?SizedBox(height: CustomSize.sizeHeight(context) / 48,):Container(),
+                      // (reservation)?CustomText.bodyLight12(text: "Harga pesan per meja (1 meja 4 kursi)", sizeNew: double.parse(((MediaQuery.of(context).size.width*0.03).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.03).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.03).toString())):Container(),
+                      // (reservation)?TextField(
+                      //   controller: _HargaPerMeja,
+                      //   keyboardType: TextInputType.number,
+                      //   cursorColor: Colors.black,
+                      //   style: GoogleFonts.poppins(
+                      //       textStyle:
+                      //       TextStyle(fontSize: 18, color: Colors.black, fontWeight: FontWeight.w600)),
+                      //   decoration: InputDecoration(
+                      //     isDense: true,
+                      //     contentPadding: EdgeInsets.only(bottom: CustomSize.sizeHeight(context) / 86),
+                      //     hintStyle: GoogleFonts.poppins(
+                      //         textStyle:
+                      //         TextStyle(fontSize: 14, color: Colors.grey)),
+                      //     helperStyle: GoogleFonts.poppins(
+                      //         textStyle: TextStyle(fontSize: 14)),
+                      //     enabledBorder: UnderlineInputBorder(),
+                      //     focusedBorder: UnderlineInputBorder(),
+                      //   ),
+                      // ):Container(),
+                      // (reservation)?SizedBox(height: CustomSize.sizeHeight(context) / 48,):Container(),
                       // ------------------------------------ checkbox takeaway -------------------------------------
                       Row(
                         mainAxisSize: MainAxisSize.max,

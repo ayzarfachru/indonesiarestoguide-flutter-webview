@@ -141,7 +141,7 @@ class _ScheduleActivityState extends State<ScheduleActivity> {
                 child: Text("Simpan", style: TextStyle(color: CustomColor.accent),),
                 onPressed: () async{
                   SharedPreferences pref = await SharedPreferences.getInstance();
-                  pref.setString("openDay", openDay);
+                  pref.setString("openDay", openDay.toString());
                   setState(() {
                     print(openDay);
                     getHariBuka();
@@ -185,7 +185,7 @@ class _ScheduleActivityState extends State<ScheduleActivity> {
                 child: Text("Simpan", style: TextStyle(color: CustomColor.accent),),
                 onPressed: () async{
                   SharedPreferences pref = await SharedPreferences.getInstance();
-                  pref.setString("closeDay", closeDay);
+                  pref.setString("closeDay", closeDay.toString());
                   setState(() {
                     print(closeDay);
                     getHariTutup();
@@ -206,7 +206,7 @@ class _ScheduleActivityState extends State<ScheduleActivity> {
   getHomePg() async {
     SharedPreferences pref = await SharedPreferences.getInstance();
     setState(() {
-      homepg = (pref.getString('homepg'));
+      homepg = (pref.getString('homepg')??'');
       print(homepg);
     });
   }
@@ -329,7 +329,7 @@ class _ScheduleActivityState extends State<ScheduleActivity> {
   getOpenAndClose() async {
     SharedPreferences pref = await SharedPreferences.getInstance();
     setState(() {
-      openAndClose = pref.getString('openclose');
+      openAndClose = pref.getString('openclose')??'';
       print(openAndClose);
       // isOpen = pref.getString('isOpen');
     });
@@ -341,7 +341,7 @@ class _ScheduleActivityState extends State<ScheduleActivity> {
   Future<void> _getSchedule() async {
     SharedPreferences pref = await SharedPreferences.getInstance();
     var token = pref.getString("token") ?? "";
-    var data = await http.get(Links.mainUrl +'/resto/day',
+    var data = await http.get(Uri.parse(Links.mainUrl +'/resto/day'),
         headers: {
           "Accept": "application/json",
           "Authorization": "Bearer $token"
@@ -372,7 +372,7 @@ class _ScheduleActivityState extends State<ScheduleActivity> {
     });
     SharedPreferences pref = await SharedPreferences.getInstance();
     String token = pref.getString("token") ?? "";
-    var apiResult = await http.post(Links.mainUrl + '/resto/close',
+    var apiResult = await http.post(Uri.parse(Links.mainUrl + '/resto/close'),
         body: {},
         headers: {
           "Accept": "Application/json",
@@ -403,7 +403,7 @@ class _ScheduleActivityState extends State<ScheduleActivity> {
   Future _getDetail()async{
     SharedPreferences pref = await SharedPreferences.getInstance();
     String token = pref.getString("token") ?? "";
-    var apiResult = await http.get(Links.mainUrl + '/resto/detail/$id', headers: {
+    var apiResult = await http.get(Uri.parse(Links.mainUrl + '/resto/detail/$id'), headers: {
       "Accept": "Application/json",
       "Authorization": "Bearer $token"
     });
@@ -433,6 +433,42 @@ class _ScheduleActivityState extends State<ScheduleActivity> {
     return Future.value(true);
   }
 
+  String statusPay = 'ongoing';
+  Future checkTest() async{
+    SharedPreferences pref = await SharedPreferences.getInstance();
+    String token = pref.getString("token") ?? "";
+
+    var apiResult = await http
+        .post(Uri.parse(Links.mainUrl + '/payment/inquiry'), headers: {
+      "Accept": "Application/json",
+      "Authorization": "Bearer $token"
+    });
+    print('inquiry '+apiResult.body.toString());
+    var data = json.decode(apiResult.body);
+
+    // if(data['code'] != null){
+    //   setState(() {
+    //     code = data['code'];
+    //   });
+    //
+    //   return true;
+    // }else{
+    //   Fluttertoast.showToast(
+    //     msg: "Mohon maaf masih dalam perbaikan",);
+    //
+    //   return false;
+    // }
+
+    statusPay = data['status'];
+    isOpen = (statusPay == 'done')?isOpen:'false';
+    setState(() {});
+    if (apiResult.statusCode == 200) {
+      if (statusPay == 'ongoing') {
+        // Navigator.pushReplacement(context, PageTransition(type: PageTransitionType.fade, child: HomeActivity()));
+      }
+    }
+  }
+
   @override
   void initState() {
     getOpenAndClose();
@@ -442,7 +478,9 @@ class _ScheduleActivityState extends State<ScheduleActivity> {
     getBuka();
     getHariBuka();
     print(selectedDateList);
-    _getDetail();
+    _getDetail().whenComplete(() {
+      checkTest();
+    });
     super.initState();
   }
 
@@ -556,7 +594,7 @@ class _ScheduleActivityState extends State<ScheduleActivity> {
                                                   SizedBox(
                                                     width: CustomSize.sizeWidth(context) / 32,
                                                   ),
-                                                  (schedule[index].open_at == "00:00:00" && schedule[index].open_at == "00:00:00")?
+                                                  (schedule[index].open_at == "00:00:00" && schedule[index].closed_at == "00:00:00")?
                                                   CustomText.bodyMedium12(
                                                       text: "Hari ini tutup",
                                                       color: CustomColor.redBtn,

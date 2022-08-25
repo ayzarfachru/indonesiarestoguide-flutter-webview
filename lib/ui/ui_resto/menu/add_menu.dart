@@ -142,7 +142,7 @@ class _AddMenuState extends State<AddMenu> {
                 child: Text("Simpan", style: TextStyle(color: CustomColor.accent),),
                 onPressed: () async{
                   SharedPreferences pref = await SharedPreferences.getInstance();
-                  pref.setString("tipeMenu", tipe);
+                  pref.setString("tipeMenu", tipe.toString());
                   setState(() {
                     print(tipe);
                     getTipeMenu();
@@ -163,7 +163,7 @@ class _AddMenuState extends State<AddMenu> {
   getInitial() async {
     SharedPreferences pref = await SharedPreferences.getInstance();
     setState(() {
-      initial = (pref.getString('name').substring(0, 1).toUpperCase());
+      initial = (pref.getString('name')!.substring(0, 1).toUpperCase());
       print(initial);
     });
   }
@@ -177,24 +177,25 @@ class _AddMenuState extends State<AddMenu> {
     final pickedFile = await picker.getImage(source: ImageSource.gallery);
 
     setState(() {
-      image = File(pickedFile.path);
+      image = File(pickedFile!.path);
       extension = pickedFile.path.split('.').last;
     });
   }
 
 
   String is_available = '1';
-
+  bool wait = false;
   List<Menu> menu = [];
   Future<void> AddMenu()async{
     List<Menu> _menu = [];
 
     setState(() {
+      wait = true;
       isLoading = true;
     });
     SharedPreferences pref = await SharedPreferences.getInstance();
     String token = pref.getString("token") ?? "";
-    var apiResult = await http.post(Links.mainUrl + '/resto/menu',
+    var apiResult = await http.post(Uri.parse(Links.mainUrl + '/resto/menu'),
         body: {
           'name': namaMenu.text,
           'desc': deskMenu.text,
@@ -213,6 +214,7 @@ class _AddMenuState extends State<AddMenu> {
     var data = json.decode(apiResult.body);
 
     if(data['status_code'] == 200){
+      bool wait = false;
       print("success");
       print(json.encode({
         // 'name': namaMenu.text,
@@ -252,7 +254,7 @@ class _AddMenuState extends State<AddMenu> {
   Future<void> getType() async {
     SharedPreferences pref = await SharedPreferences.getInstance();
     var token = pref.getString("token") ?? "";
-    var data = await http.get(Links.mainUrl +'/util/data?q=menutype',
+    var data = await http.get(Uri.parse(Links.mainUrl +'/util/data?q=menutype'),
         headers: {
           "Accept": "application/json",
           "Authorization": "Bearer $token"
@@ -298,13 +300,11 @@ class _AddMenuState extends State<AddMenu> {
                       //     });
                       //   },
                       // ),
-                      OutlineButton(
-                        // minWidth: CustomSize.sizeWidth(context),
-                        shape: StadiumBorder(),
-                        highlightedBorderColor: CustomColor.secondary,
-                        borderSide: BorderSide(
-                            width: 2,
-                            color: CustomColor.accent
+                      FlatButton(
+                        color: CustomColor.accent,
+                        textColor: Colors.white,
+                        shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.all(Radius.circular(10))
                         ),
                         child: Text('Oke'),
                         onPressed: () async{
@@ -715,7 +715,11 @@ class _AddMenuState extends State<AddMenu> {
                                     setState(() {
                                       isLoading = false;
                                     });
-                                    AddMenu();
+                                    if (wait == false) {
+                                      AddMenu();
+                                    } else {
+                                      Fluttertoast.showToast(msg: 'Tunggu data anda sedang diproses');
+                                    }
                                   } else {
                                     Fluttertoast.showToast(msg: 'Lengkapi data menu terlebih dahulu!');
                                   }
@@ -735,7 +739,11 @@ class _AddMenuState extends State<AddMenu> {
                                   setState(() {
                                     isLoading = false;
                                   });
-                                  AddMenu();
+                                  if (wait == false) {
+                                    AddMenu();
+                                  } else {
+                                    Fluttertoast.showToast(msg: 'Tunggu data anda sedang diproses');
+                                  }
                                 } else {
                                   Fluttertoast.showToast(msg: 'Lengkapi data menu terlebih dahulu!');
                                 }

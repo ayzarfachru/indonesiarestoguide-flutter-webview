@@ -26,7 +26,7 @@ class _HistoryActivityState extends State<HistoryActivity> {
   getImg() async {
     SharedPreferences pref = await SharedPreferences.getInstance();
     setState(() {
-      img = (pref.getString('img'));
+      img = (pref.getString('img')??'');
       print(img);
     });
   }
@@ -41,21 +41,23 @@ class _HistoryActivityState extends State<HistoryActivity> {
     });
     SharedPreferences pref = await SharedPreferences.getInstance();
     String token = pref.getString("token") ?? "";
-    var apiResult = await http.get(Links.mainUrl + '/page/history', headers: {
+    var apiResult = await http.get(Uri.parse(Links.mainUrl + '/page/history'), headers: {
       "Accept": "Application/json",
       "Authorization": "Bearer $token"
     });
+    print('History User');
     print(apiResult.body);
     var data = json.decode(apiResult.body);
 
     for(var v in data['trans']){
       History h = History(
-          id: v['id'],
-          name: v['resto_name'],
-          time: v['time'],
-          price: v['price'],
-          img: v['resto_img'],
-          type: v['type']
+        id: v['id'],
+        name: v['resto_name'],
+        time: v['time'],
+        price: v['price'],
+        img: v['resto_img'],
+        type: v['type'],
+        status: v['status'],
       );
       _history.add(h);
     }
@@ -85,7 +87,7 @@ class _HistoryActivityState extends State<HistoryActivity> {
     });
     SharedPreferences pref = await SharedPreferences.getInstance();
     String token = pref.getString("token") ?? "";
-    var apiResult = await http.get(Links.mainUrl + '/page/history?resto=$id', headers: {
+    var apiResult = await http.get(Uri.parse(Links.mainUrl + '/page/history?resto=$id'), headers: {
       "Accept": "Application/json",
       "Authorization": "Bearer $token"
     });
@@ -95,12 +97,13 @@ class _HistoryActivityState extends State<HistoryActivity> {
     if (data['trans'] != null) {
       for(var v in data['trans']){
         History h = History(
-            id: v['id'],
-            name: v['resto_name'],
-            time: v['time'],
-            price: v['price'],
-            img: v['resto_img'],
-            type: v['type']
+          id: v['id'],
+          name: v['resto_name'],
+          time: v['time'],
+          price: v['price'],
+          img: v['resto_img'],
+          type: v['type'],
+          status: v['status'],
         );
         _user.add(h);
       }
@@ -123,7 +126,7 @@ class _HistoryActivityState extends State<HistoryActivity> {
   getHomePg() async {
     SharedPreferences pref = await SharedPreferences.getInstance();
     setState(() {
-      homepg = (pref.getString('homepg'));
+      homepg = (pref.getString('homepg')??'');
       print(homepg);
     });
     Future.delayed(Duration(seconds: 1)).then((_) {
@@ -316,10 +319,10 @@ class _HistoryActivityState extends State<HistoryActivity> {
                                               sizeNew: double.parse(((MediaQuery.of(context).size.width*0.03).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.03)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.03)).toString())
                                           ),
                                           CustomText.bodyLight12(
-                                              text: (homepg != "1")?"Selesai":"",
+                                              text: (homepg != "1")?(history[index].status == 'done')?"Selesai":'Dibatalkan':(user[index].status == 'done')?"Selesai":'Dibatalkan',
                                               maxLines: 1,
-                                              sizeNew: double.parse(((MediaQuery.of(context).size.width*0.03).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.03)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.03)).toString()),
-                                              color: CustomColor.accent
+                                              minSize: double.parse(((MediaQuery.of(context).size.width*0.03).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.03)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.03)).toString()),
+                                              color: (homepg != "1")?(history[index].status == 'done')?CustomColor.accent:CustomColor.redBtn:(user[index].status == 'done')?CustomColor.accent:CustomColor.redBtn
                                           ),
                                           Row(
                                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -459,10 +462,10 @@ class _HistoryActivityState extends State<HistoryActivity> {
                                                   sizeNew: double.parse(((MediaQuery.of(context).size.width*0.03).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.03)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.03)).toString())
                                               ),
                                               CustomText.bodyLight12(
-                                                  text: (homepg != "1")?"Selesai":"",
+                                                  text: (homepg != "1")?(history[index].status == 'done')?"Selesai":'Dibatalkan':(user[index].status == 'done')?"Selesai":'Dibatalkan',
                                                   maxLines: 1,
-                                                  sizeNew: double.parse(((MediaQuery.of(context).size.width*0.03).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.03)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.03)).toString()),
-                                                  color: CustomColor.accent
+                                                  minSize: double.parse(((MediaQuery.of(context).size.width*0.03).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.03)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.03)).toString()),
+                                                  color: (homepg != "1")?(history[index].status == 'done')?CustomColor.accent:CustomColor.redBtn:(user[index].status == 'done')?CustomColor.accent:CustomColor.redBtn
                                               ),
                                               Row(
                                                 mainAxisAlignment: MainAxisAlignment.spaceBetween,

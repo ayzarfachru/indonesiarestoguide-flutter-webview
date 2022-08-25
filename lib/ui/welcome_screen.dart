@@ -13,11 +13,11 @@ class WelcomeScreen extends StatefulWidget {
 class _WelcomeScreenState extends State<WelcomeScreen> {
 
   Future idPlayer() async{
-    var status = await OneSignal.shared.getPermissionSubscriptionState();
-    playerId = status.subscriptionStatus.userId;
+    var status = await OneSignal.shared.getDeviceState();
+    playerId = status?.userId;
 
     SharedPreferences pref = await SharedPreferences.getInstance();
-    pref.setString("playerId", playerId);
+    pref.setString("playerId", playerId.toString());
 
     print('player id'+playerId.toString());
     setState(() {});

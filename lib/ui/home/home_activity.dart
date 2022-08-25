@@ -1,7 +1,8 @@
 import 'dart:convert';
 
-import 'package:barcode_scan/barcode_scan.dart';
+// import 'package:barcode_scan/barcode_scan.dart';
 import 'package:carousel_slider/carousel_slider.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_dynamic_links/firebase_dynamic_links.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -9,12 +10,13 @@ import 'package:flutter/services.dart';
 import 'package:flutter_icons/flutter_icons.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:in_app_update/in_app_update.dart';
 import 'package:kam5ia/model/Menu.dart';
 import 'package:kam5ia/model/MenuJson.dart';
 import 'package:kam5ia/model/Price.dart';
 import 'package:kam5ia/model/Promo.dart';
 import 'package:kam5ia/model/Resto.dart';
-import 'package:kam5ia/model/Transaction.dart';
+import 'package:kam5ia/model/Transaction.dart' as trans;
 import 'package:kam5ia/model/imgBanner.dart';
 import 'package:kam5ia/ui/auth/login_activity.dart';
 import 'package:kam5ia/ui/bonus/es_activity.dart';
@@ -44,6 +46,7 @@ import 'package:kam5ia/utils/utils.dart';
 import 'package:intl/intl.dart';
 import 'package:location/location.dart';
 import 'package:location_platform_interface/location_platform_interface.dart';
+import 'package:onesignal_flutter/onesignal_flutter.dart';
 import 'package:page_transition/page_transition.dart';
 import 'package:pull_to_refresh/pull_to_refresh.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -149,6 +152,353 @@ class _HomeActivityState extends State<HomeActivity> with WidgetsBindingObserver
 
   int totalCuisine = 0;
 
+
+  String NameDriver = 'Tunggu';
+  String PhoneDriver = '0';
+  String PhotoDriver = '';
+  String StatusDriver = 'Tunggu sebentar';
+  Future<void> _getDriver(String id)async{
+    // List<Menu> _menu = [];
+
+    setState(() {
+      // isLoading = true;
+    });
+    SharedPreferences pref = await SharedPreferences.getInstance();
+    String token = pref.getString("token") ?? "";
+    var apiResult = await http.get(Uri.parse('https://qurir.devastic.com/api/borzo?transaction_id=IRG-$id'), headers: {
+      "Accept": "Application/json",
+      "Authorization": "Bearer $token"
+    });
+    var data = json.decode(apiResult.body);
+    print(data);
+
+    print('driver puki '+apiResult.body.toString());
+    // print('driver '+idResto.toString());
+    if (apiResult.body.toString() != '"not found"') {
+      if (data['status'].toString() == 'parcel_picked_up') {
+        _getPending('ready', id.toString());
+      } else {
+        if (data['courier'].toString().contains('name') == false) {
+          StatusDriver = (apiResult.body.toString() != '"not found"')?data['status'].toString():'Tidak Ditemukan';
+        } else {
+          NameDriver = (apiResult.body.toString() != '"not found"')?data['courier']['name'].toString():'Tidak Ditemukan';
+          PhoneDriver = (apiResult.body.toString() != '"not found"')?data['courier']['phone'].toString():'0';
+          PhotoDriver = (apiResult.body.toString() != '"not found"')?data['courier']['photo'].toString():'';
+          StatusDriver = (apiResult.body.toString() != '"not found"')?(data['status'].toString() != 'active')?'Sudah sampai':data['status'].toString():'Tidak Ditemukan';
+        }
+      }
+    } else {
+      NameDriver = 'Tidak Ditemukan';
+      PhoneDriver = '0';
+      PhotoDriver = '';
+      StatusDriver = 'Tidak Ditemukan';
+    }
+    if (NameDriver != 'Tidak Ditemukan' && NameDriver != 'Tunggu' && NameDriver != '"not found"') {
+      // _getProcess(operation = "ready", id);
+      print('MOSOK');
+      print(NameDriver);
+    }
+    // for(var v in data['menu']){
+    //   Menu p = Menu(
+    //       id: v['id'],
+    //       name: v['name'],
+    //       desc: v['desc'],
+    //       urlImg: v['img'],
+    //       type: v['type'],
+    //       is_recommended: v['is_recommended'],
+    //       price: Price(original: int.parse(v['price'].toString()), discounted: null, delivery: null),
+    //       delivery_price: Price(original: int.parse(v['price']), delivery: null, discounted: null), restoId: '', restoName: '', distance: null, qty: ''
+    //   );
+    //   _menu.add(p);
+    // }
+    setState(() {
+      // emailTokoTrans = data['email'].toString();
+      // ownerTokoTrans = data['name_owner'].toString();
+      // pjTokoTrans = data['name_pj'].toString();
+      // // bankTokoTrans = data['bank'].toString();
+      // // nameNorekTokoTrans = data['namaNorek'].toString();
+      // nameRekening = data['nama_norek'].toString();
+      // nameBank = data['bank_norek'].toString();
+      // norekTokoTrans = data['norek'].toString();
+      // phone = data['resto']['phone_number'].toString();
+      // addressRes = data['resto']['address'].toString();
+      // nameRestoTrans = data['resto']['name'];
+      // restoAddress = data['resto']['address'];
+      // isLoading = false;
+    });
+
+    // if (apiResult.statusCode == 200 && menu.toString() == '[]') {
+    //   kosong = true;
+    // }
+  }
+
+  Future _getProcess(String operation, String id)async{
+    List<Transaction> _transaction = [];
+
+    SharedPreferences pref = await SharedPreferences.getInstance();
+    String token = pref.getString("token") ?? "";
+    var apiResult = await http.get(Uri.parse(Links.mainUrl + '/trans/op/$operation/$id'), headers: {
+      "Accept": "Application/json",
+      "Authorization": "Bearer $token"
+    });
+    print(apiResult.body);
+    var data = json.decode(apiResult.body);
+    print(data);
+
+    // for(var v in data['trx']['process']){
+    //   Transaction r = Transaction.resto(
+    //       id: v['id'],
+    //       status: v['status'],
+    //       username: v['username'],
+    //       total: int.parse(v['total']),
+    //       type: v['type']
+    //   );
+    //   _transaction.add(r);
+    // }
+
+    setState(() {
+      _getDataHome(latitude.toString(), longitude.toString());
+      // transaction = _transaction;
+      print(operation+'   '+id);
+    });
+  }
+
+  Future _getPending(String operation, String id)async{
+    List<Transaction> _transaction = [];
+
+    SharedPreferences pref = await SharedPreferences.getInstance();
+    String token = pref.getString("token") ?? "";
+    var apiResult = await http.get(Uri.parse(Links.mainUrl + '/trans/op/$operation/$id'), headers: {
+      "Accept": "Application/json",
+      "Authorization": "Bearer $token"
+    });
+    print(apiResult.body);
+    var data = json.decode(apiResult.body);
+    print(data);
+
+    Navigator.push(
+        context,
+        PageTransition(
+            type: PageTransitionType.fade,
+            child: new HomeActivity()));
+    setState(() {});
+
+    // for(var v in data['trx']['process']){
+    //   Transaction r = Transaction.resto(
+    //       id: v['id'],
+    //       status: v['status'],
+    //       username: v['username'],
+    //       total: int.parse(v['total']),
+    //       type: v['type']
+    //   );
+    //   _transaction.add(r);
+    // }
+
+    setState(() {
+      // transaction = _transaction;
+      print(operation+'   '+id);
+    });
+  }
+
+  Future<void> _checkPayFirst(String id)async{
+    // List<Menu> _menu = [];
+
+    setState(() {
+      // isLoadChekPayFirst = true;
+    });
+    // Fluttertoast.showToast(
+    //   msg: "Tunggu sebentar!",);
+    SharedPreferences pref = await SharedPreferences.getInstance();
+    String token = pref.getString("token") ?? "";
+    var apiResult = await http.get(Uri.parse('https://erp.devastic.com:443/api/bca/inquiry?app_id=IRG&trx_id=$id'),
+      // body: {'app_id': 'IRG', 'trx_id': id.toString(), 'amount': (totalAll+1000).toString()},
+      // headers: {
+      //   "Accept": "Application/json",
+      //   "Authorization": "Bearer $token"
+      // }
+    );
+    print(apiResult.statusCode);
+    if (apiResult.statusCode == 500) {
+      // isLoadChekPayFirst = false;
+      // if (type == 'dinein') {
+        // statusPay = pref.getString("statusPay") ?? "true";
+      // } else {
+      //   statusPay = 'true';
+      // }
+      setState((){});
+    }
+    var data = json.decode(apiResult.body);
+    print('QR CODE 2');
+    print(data);
+    print(data['response']['detail_info'].toString().contains('Unpaid').toString());
+    // statusPay = data['response']['detail_info'].toString().contains('Unpaid').toString();
+    if (data['response']['detail_info'].toString().contains('Unpaid') == true) {
+      // Fluttertoast.showToast(
+      //   msg: "Anda belum membayar!",);
+    } else {
+      // statusPay = 'false';
+      _getPending('process', id.toString());
+      // if (type == 'delivery' && statusTrans == 'pending') {
+      //   _getPending('process', id.toString());
+      // }
+      // _getDetail(idResto).whenComplete((){
+      //   _getDetailTrans(id.toString()).whenComplete((){
+      //     cariKurir();
+      //   });
+      // });
+      // Navigator.pop(context);
+      // _getPending('process', id.toString());
+      // Fluttertoast.showToast(
+      //   msg: "Pembayaran berhasil",);
+    }
+    // _base64 = data['response']['qr_image'];
+    // Uint8List bytes = Base64Codec().decode(_base64);
+
+    // if (_base64 != '') {
+    //   showModalBottomSheet(
+    //       isScrollControlled: true,
+    //       shape: RoundedRectangleBorder(
+    //           borderRadius: BorderRadius.only(topLeft: Radius.circular(20), topRight: Radius.circular(20))
+    //       ),
+    //       context: context,
+    //       builder: (_){
+    //         return Column(
+    //           crossAxisAlignment: CrossAxisAlignment.start,
+    //           mainAxisSize: MainAxisSize.min,
+    //           children: [
+    //             SizedBox(height: CustomSize.sizeHeight(context) / 86,),
+    //             Padding(
+    //               padding: EdgeInsets.symmetric(horizontal: CustomSize.sizeWidth(context) / 2.4),
+    //               child: Divider(thickness: 4,),
+    //             ),
+    //             SizedBox(height: CustomSize.sizeHeight(context) / 106,),
+    //             Center(
+    //               child: CustomText.textHeading2(
+    //                   text: "Qris",
+    //                   minSize: double.parse(((MediaQuery.of(context).size.width*0.05).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.05)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.05)).toString()),
+    //                   maxLines: 1
+    //               ),
+    //             ),
+    //             SizedBox(height: CustomSize.sizeHeight(context) * 0.003,),
+    //             Center(
+    //               child: FullScreenWidget(
+    //                 child: Image.memory(bytes,
+    //                   width: CustomSize.sizeWidth(context) / 1.2,
+    //                   height: CustomSize.sizeWidth(context) / 1.2,
+    //                 ),
+    //                 backgroundColor: Colors.white,
+    //               ),
+    //             ),
+    //             SizedBox(height: CustomSize.sizeHeight(context) / 106,),
+    //             Center(
+    //               child: Container(
+    //                 alignment: Alignment.center,
+    //                 width: CustomSize.sizeWidth(context) / 1.2,
+    //                 child: Row(
+    //                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
+    //                   children: [
+    //                     CustomText.textTitle2(
+    //                         text: 'Total harga:',
+    //                         minSize: double.parse(((MediaQuery.of(context).size.width*0.045).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.045)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.045)).toString()),
+    //                         maxLines: 1
+    //                     ),
+    //                     CustomText.textTitle2(
+    //                         text: 'Rp '+NumberFormat.currency(locale: 'id', symbol: '', decimalDigits: 0).format(int.parse((totalAll+1000).toString())),
+    //                         minSize: double.parse(((MediaQuery.of(context).size.width*0.045).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.045)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.045)).toString()),
+    //                         maxLines: 1
+    //                     ),
+    //                   ],
+    //                 ),
+    //               ),
+    //             ),
+    //             SizedBox(height: CustomSize.sizeHeight(context) * 0.005,),
+    //             Center(
+    //               child: Container(
+    //                 alignment: Alignment.center,
+    //                 width: CustomSize.sizeWidth(context) / 1.2,
+    //                 child: CustomText.textTitle1(
+    //                     text: 'Scan disini untuk melakukan pembayaran',
+    //                     minSize: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.04)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.04)).toString()),
+    //                     maxLines: 1
+    //                 ),
+    //               ),
+    //             ),
+    //             Center(
+    //               child: Container(
+    //                 alignment: Alignment.center,
+    //                 width: CustomSize.sizeWidth(context) / 1.2,
+    //                 child: CustomText.textTitle1(
+    //                     text: 'ke $nameRestoTrans!',
+    //                     minSize: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.04)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.04)).toString()),
+    //                     maxLines: 3
+    //                 ),
+    //               ),
+    //             ),
+    //             SizedBox(height: CustomSize.sizeHeight(context) / 48,),
+    //             GestureDetector(
+    //               onTap: ()async{
+    //                 Fluttertoast.showToast(
+    //                   msg: "Anda belum membayar!",);
+    //               },
+    //               child: Center(
+    //                 child: Container(
+    //                   width: CustomSize.sizeWidth(context) / 1.1,
+    //                   height: CustomSize.sizeHeight(context) / 14,
+    //                   decoration: BoxDecoration(
+    //                     // color: (menuReady.contains(false))?CustomColor.textBody:CustomColor.primaryLight,
+    //                       borderRadius: BorderRadius.circular(50)
+    //                   ),
+    //                   child: Center(
+    //                     child: Padding(
+    //                       padding: const EdgeInsets.symmetric(horizontal: 20.0),
+    //                       child: CustomText.textTitle3(text: "Sudah Membayar", color: Colors.white, minSize: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.04)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.04)).toString())),
+    //                     ),
+    //                   ),
+    //                 ),
+    //               ),
+    //             ),
+    //             SizedBox(height: CustomSize.sizeHeight(context) / 54,),
+    //             // SizedBox(height: CustomSize.sizeHeight(context) / 106,),
+    //           ],
+    //         );
+    //       }
+    //   );
+    // }
+    // for(var v in data['menu']){
+    //   Menu p = Menu(
+    //       id: v['id'],
+    //       name: v['name'],
+    //       desc: v['desc'],
+    //       urlImg: v['img'],
+    //       type: v['type'],
+    //       is_recommended: v['is_recommended'],
+    //       price: Price(original: int.parse(v['price'].toString()), discounted: null, delivery: null),
+    //       delivery_price: Price(original: int.parse(v['price']), delivery: null, discounted: null), restoId: '', restoName: '', distance: null, qty: ''
+    //   );
+    //   _menu.add(p);
+    // }
+    setState(() {
+      // isLoadChekPayFirst = false;
+      // emailTokoTrans = data['email'].toString();
+      // ownerTokoTrans = data['name_owner'].toString();
+      // pjTokoTrans = data['name_pj'].toString();
+      // // bankTokoTrans = data['bank'].toString();
+      // // nameNorekTokoTrans = data['namaNorek'].toString();
+      // nameRekening = data['nama_norek'].toString();
+      // nameBank = data['bank_norek'].toString();
+      // norekTokoTrans = data['norek'].toString();
+      // phone = data['resto']['phone_number'].toString();
+      // addressRes = data['resto']['address'].toString();
+      // nameRestoTrans = data['resto']['name'];
+      // restoAddress = data['resto']['address'];
+      // isLoading = false;
+    });
+
+    // if (apiResult.statusCode == 200 && menu.toString() == '[]') {
+    //   kosong = true;
+    // }
+  }
+
   List<MenuJson> menuJson = [];
   List<String> restoId = [];
   List<String> startCuisine = [];
@@ -162,7 +512,7 @@ class _HomeActivityState extends State<HomeActivity> with WidgetsBindingObserver
   List<Resto> tokooleh = [];
   List<Resto> again = [];
   List<Menu> promo = [];
-  List<Transaction> transaction = [];
+  List<trans.Transaction> transaction = [];
   String note = '';
   Future _getDataHome(String lat, String long)async{
     List<Resto> _resto = [];
@@ -182,7 +532,7 @@ class _HomeActivityState extends State<HomeActivity> with WidgetsBindingObserver
     List<Resto> _tokooleh = [];
     List<Resto> _again = [];
     List<Menu> _promo = [];
-    List<Transaction> _transaction = [];
+    List<trans.Transaction> _transaction = [];
     List<imgBanner> _images = [];
 
     setState(() {
@@ -190,16 +540,16 @@ class _HomeActivityState extends State<HomeActivity> with WidgetsBindingObserver
     });
     SharedPreferences pref = await SharedPreferences.getInstance();
     String token = pref.getString("token") ?? "";
-    var apiResult = await http.get(Links.mainUrl + '/page/home?lat=$lat&long=$long', headers: {
+    var apiResult = await http.get(Uri.parse(Links.mainUrl + '/page/home?lat=$lat&long=$long'), headers: {
       "Accept": "Application/json",
       "Authorization": "Bearer $token"
     });
-    // print('all data'+apiResult.body.toString());
+    print('all data'+apiResult.body.toString());
     var data = json.decode(apiResult.body);
     // print('all data'+data['tipename'].toString().split(',').length.toString());
     // print('all data'+data['tipe'][0].toString());
-    print('all data'+data['tipename'].toString());
-    print('all data'+data['tipename'].toString().split(',').length.toString());
+    print('all data'+data['tipe'][0].toString());
+    print('all data1'+data['trans'].toString());
     print('all data'+lat.toString());
     print('all data'+long.toString());
     // print(data['resto']);
@@ -207,7 +557,7 @@ class _HomeActivityState extends State<HomeActivity> with WidgetsBindingObserver
     // print('ini banner '+data['banner'].toString());
     // for(var v in data['banner']){
     //   imgBanner t = imgBanner(
-    //       id: int.parse(v['resto_id'].toString()),
+    //       id: (v['img'].toString().split('/banner/')[1].split('_')[0] != 'banner')?int.parse(v['resto_id'].toString()):0,
     //       urlImg: v['img']
     //   );
     //   _images.add(t);
@@ -215,7 +565,7 @@ class _HomeActivityState extends State<HomeActivity> with WidgetsBindingObserver
 
     if (data.toString().contains('trans')) {
       for(var v in data['trans']){
-        Transaction t = Transaction.all2(
+        trans.Transaction t = trans.Transaction.all2(
             id: v['id'],
             idResto: v['restaurants_id'].toString(),
             date: v['date'],
@@ -228,6 +578,13 @@ class _HomeActivityState extends State<HomeActivity> with WidgetsBindingObserver
             chat_user: v['chat_resto'].toString(),
             // address: v['address'].toString(),
         );
+        if (v['type_text'] == 'Pesan antar' && v['status'] == 'process') {
+          _getDriver(v['id'].toString()).whenComplete((){
+            // _getDetail(idResto);
+          });
+        } else if (v['type_text'] == 'Pesan antar' && v['status'] == 'pending') {
+          _checkPayFirst(v['id'].toString());
+        }
         if (v['type_text'].startsWith('Reservasi') == true && v['status'] == '') {
 
         } else {
@@ -529,7 +886,7 @@ class _HomeActivityState extends State<HomeActivity> with WidgetsBindingObserver
 
     SharedPreferences pref = await SharedPreferences.getInstance();
     String token = pref.getString("token") ?? "";
-    var apiResult = await http.get(Links.mainUrl + '/page/home?lat=$lat&long=$long&page=$page', headers: {
+    var apiResult = await http.get(Uri.parse(Links.mainUrl + '/page/home?lat=$lat&long=$long&page=$page'), headers: {
       "Accept": "Application/json",
       "Authorization": "Bearer $token"
     });
@@ -541,7 +898,7 @@ class _HomeActivityState extends State<HomeActivity> with WidgetsBindingObserver
     print('Puki');
     print('all data2'+page.toString());
     // print('all data2'+data.toString());
-    print('all data2'+data['tipe'].toString());
+    print('all data2'+data['tipe'][0].toString());
     print('all data2'+data['tipename'].toString());
     // print('all data2'+data['tipe'][0].toString());
     // print(data['resto']);
@@ -925,11 +1282,11 @@ class _HomeActivityState extends State<HomeActivity> with WidgetsBindingObserver
     // List<History> _history = [];
 
     setState(() {
-      isLoading = true;
+      // isLoading = true;
     });
     SharedPreferences pref = await SharedPreferences.getInstance();
     String token = pref.getString("token") ?? "";
-    var apiResult = await http.get(Links.mainUrl + '/resto', headers: {
+    var apiResult = await http.get(Uri.parse(Links.mainUrl + '/resto'), headers: {
       "Accept": "Application/json",
       "Authorization": "Bearer $token"
     });
@@ -950,7 +1307,7 @@ class _HomeActivityState extends State<HomeActivity> with WidgetsBindingObserver
 
     setState(() {
       // history = _history;
-      isLoading = false;
+      // isLoading = false;
     });
   }
 
@@ -974,8 +1331,8 @@ class _HomeActivityState extends State<HomeActivity> with WidgetsBindingObserver
               type: PageTransitionType.fade,
               child: new HomeActivity()));
       setState(() {
-        latitude = value.latitude;
-        longitude = value.longitude;
+        latitude = value.latitude!;
+        longitude = value.longitude!;
       });
     });
     _getData();
@@ -1126,7 +1483,7 @@ class _HomeActivityState extends State<HomeActivity> with WidgetsBindingObserver
     SharedPreferences pref = await SharedPreferences.getInstance();
     var token = pref.getString("token") ?? "";
 
-    var apiResult = await http.get(Links.mainUrl + '/page/search?q=nasi goreng&type=$type&lat=$lat&long=$long&limit=10',
+    var apiResult = await http.get(Uri.parse(Links.mainUrl + '/page/search?q=nasi goreng&type=$type&lat=$lat&long=$long&limit=10'),
         headers: {
           "Accept": "Application/json",
           "Authorization": "Bearer $token"
@@ -1176,7 +1533,7 @@ class _HomeActivityState extends State<HomeActivity> with WidgetsBindingObserver
     SharedPreferences pref = await SharedPreferences.getInstance();
     var token = pref.getString("token") ?? "";
 
-    var apiResult = await http.get(Links.mainUrl + '/page/search?q=es&type=$type&lat=$lat&long=$long&limit=10',
+    var apiResult = await http.get(Uri.parse(Links.mainUrl + '/page/search?q=es&type=$type&lat=$lat&long=$long&limit=10'),
         headers: {
           "Accept": "Application/json",
           "Authorization": "Bearer $token"
@@ -1239,11 +1596,11 @@ class _HomeActivityState extends State<HomeActivity> with WidgetsBindingObserver
     // List<History> _history = [];
 
     setState(() {
-      isLoading = true;
+      // isLoading = true;
     });
     SharedPreferences pref = await SharedPreferences.getInstance();
     String token = pref.getString("token") ?? "";
-    var apiResult = await http.post(Links.mainUrl + '/auth/logout', headers: {
+    var apiResult = await http.post(Uri.parse(Links.mainUrl + '/auth/logout'), headers: {
       "Accept": "Application/json",
       "Authorization": "Bearer $token"
     });
@@ -1296,7 +1653,7 @@ class _HomeActivityState extends State<HomeActivity> with WidgetsBindingObserver
   Future<void> getCuisine() async {
     SharedPreferences pref = await SharedPreferences.getInstance();
     var token = pref.getString("token") ?? "";
-    var data = await http.get(Links.mainUrl +'/util/data?q=cuisine',
+    var data = await http.get(Uri.parse(Links.mainUrl +'/util/data?q=cuisine'),
         headers: {
           "Accept": "application/json",
           "Authorization": "Bearer $token"
@@ -1387,7 +1744,7 @@ class _HomeActivityState extends State<HomeActivity> with WidgetsBindingObserver
     SharedPreferences pref = await SharedPreferences.getInstance();
     var token = pref.getString("token") ?? "";
     // print("kota1 = $kota1 ");
-    var apiResult = await http.get(Links.mainUrl + '/page/search?q=$q&type=$tipe&lat=$lat&long=$long&limit=0&city=$kota1&facility=$facilityList2',
+    var apiResult = await http.get(Uri.parse(Links.mainUrl + '/page/search?q=$q&type=$tipe&lat=$lat&long=$long&limit=0&city=$kota1&facility=$facilityList2'),
         headers: {
           "Accept": "Application/json",
           "Authorization": "Bearer $token"
@@ -1441,7 +1798,7 @@ class _HomeActivityState extends State<HomeActivity> with WidgetsBindingObserver
     SharedPreferences pref = await SharedPreferences.getInstance();
     var token = pref.getString("token") ?? "";
     // print("kota1 = $kota1 ");
-    var apiResult = await http.get(Links.mainUrl + '/page/search?q=$q&type=$tipe2&lat=$lat&long=$long&limit=0&city=$kota1&facility=$facilityList2',
+    var apiResult = await http.get(Uri.parse(Links.mainUrl + '/page/search?q=$q&type=$tipe2&lat=$lat&long=$long&limit=0&city=$kota1&facility=$facilityList2'),
         headers: {
           "Accept": "Application/json",
           "Authorization": "Bearer $token"
@@ -1494,7 +1851,7 @@ class _HomeActivityState extends State<HomeActivity> with WidgetsBindingObserver
     SharedPreferences pref = await SharedPreferences.getInstance();
     var token = pref.getString("token") ?? "";
     // print("kota1 = $kota1 ");
-    var apiResult = await http.get(Links.mainUrl + '/page/search?q=$q&type=$tipe3&lat=$lat&long=$long&limit=0&city=$kota1&facility=$facilityList2',
+    var apiResult = await http.get(Uri.parse(Links.mainUrl + '/page/search?q=$q&type=$tipe3&lat=$lat&long=$long&limit=0&city=$kota1&facility=$facilityList2'),
         headers: {
           "Accept": "Application/json",
           "Authorization": "Bearer $token"
@@ -1547,7 +1904,7 @@ class _HomeActivityState extends State<HomeActivity> with WidgetsBindingObserver
     SharedPreferences pref = await SharedPreferences.getInstance();
     var token = pref.getString("token") ?? "";
     // print("kota1 = $kota1 ");
-    var apiResult = await http.get(Links.mainUrl + '/page/search?q=$q&type=$tipe4&lat=$lat&long=$long&limit=0&city=$kota1&facility=$facilityList2',
+    var apiResult = await http.get(Uri.parse(Links.mainUrl + '/page/search?q=$q&type=$tipe4&lat=$lat&long=$long&limit=0&city=$kota1&facility=$facilityList2'),
         headers: {
           "Accept": "Application/json",
           "Authorization": "Bearer $token"
@@ -1600,7 +1957,7 @@ class _HomeActivityState extends State<HomeActivity> with WidgetsBindingObserver
     SharedPreferences pref = await SharedPreferences.getInstance();
     var token = pref.getString("token") ?? "";
     // print("kota1 = $kota1 ");
-    var apiResult = await http.get(Links.mainUrl + '/page/search?q=$q&type=$tipe5&lat=$lat&long=$long&limit=0&city=$kota1&facility=$facilityList2',
+    var apiResult = await http.get(Uri.parse(Links.mainUrl + '/page/search?q=$q&type=$tipe5&lat=$lat&long=$long&limit=0&city=$kota1&facility=$facilityList2'),
         headers: {
           "Accept": "Application/json",
           "Authorization": "Bearer $token"
@@ -1653,7 +2010,7 @@ class _HomeActivityState extends State<HomeActivity> with WidgetsBindingObserver
     SharedPreferences pref = await SharedPreferences.getInstance();
     var token = pref.getString("token") ?? "";
     // print("kota1 = $kota1 ");
-    var apiResult = await http.get(Links.mainUrl + '/page/search?q=$q&type=$tipe6&lat=$lat&long=$long&limit=0&city=$kota1&facility=$facilityList2',
+    var apiResult = await http.get(Uri.parse(Links.mainUrl + '/page/search?q=$q&type=$tipe6&lat=$lat&long=$long&limit=0&city=$kota1&facility=$facilityList2'),
         headers: {
           "Accept": "Application/json",
           "Authorization": "Bearer $token"
@@ -1706,7 +2063,7 @@ class _HomeActivityState extends State<HomeActivity> with WidgetsBindingObserver
     SharedPreferences pref = await SharedPreferences.getInstance();
     var token = pref.getString("token") ?? "";
     // print("kota1 = $kota1 ");
-    var apiResult = await http.get(Links.mainUrl + '/page/search?q=$q&type=$tipe7&lat=$lat&long=$long&limit=0&city=$kota1&facility=$facilityList2',
+    var apiResult = await http.get(Uri.parse(Links.mainUrl + '/page/search?q=$q&type=$tipe7&lat=$lat&long=$long&limit=0&city=$kota1&facility=$facilityList2'),
         headers: {
           "Accept": "Application/json",
           "Authorization": "Bearer $token"
@@ -1759,7 +2116,7 @@ class _HomeActivityState extends State<HomeActivity> with WidgetsBindingObserver
     SharedPreferences pref = await SharedPreferences.getInstance();
     var token = pref.getString("token") ?? "";
     // print("kota1 = $kota1 ");
-    var apiResult = await http.get(Links.mainUrl + '/page/search?q=$q&type=$tipe8&lat=$lat&long=$long&limit=0&city=$kota1&facility=$facilityList2',
+    var apiResult = await http.get(Uri.parse(Links.mainUrl + '/page/search?q=$q&type=$tipe8&lat=$lat&long=$long&limit=0&city=$kota1&facility=$facilityList2'),
         headers: {
           "Accept": "Application/json",
           "Authorization": "Bearer $token"
@@ -1812,7 +2169,7 @@ class _HomeActivityState extends State<HomeActivity> with WidgetsBindingObserver
     SharedPreferences pref = await SharedPreferences.getInstance();
     var token = pref.getString("token") ?? "";
     // print("kota1 = $kota1 ");
-    var apiResult = await http.get(Links.mainUrl + '/page/search?q=$q&type=$tipe9&lat=$lat&long=$long&limit=0&city=$kota1&facility=$facilityList2',
+    var apiResult = await http.get(Uri.parse(Links.mainUrl + '/page/search?q=$q&type=$tipe9&lat=$lat&long=$long&limit=0&city=$kota1&facility=$facilityList2'),
         headers: {
           "Accept": "Application/json",
           "Authorization": "Bearer $token"
@@ -1865,7 +2222,7 @@ class _HomeActivityState extends State<HomeActivity> with WidgetsBindingObserver
     SharedPreferences pref = await SharedPreferences.getInstance();
     var token = pref.getString("token") ?? "";
     // print("kota1 = $kota1 ");
-    var apiResult = await http.get(Links.mainUrl + '/page/search?q=$q&type=$tipe10&lat=$lat&long=$long&limit=0&city=$kota1&facility=$facilityList2',
+    var apiResult = await http.get(Uri.parse(Links.mainUrl + '/page/search?q=$q&type=$tipe10&lat=$lat&long=$long&limit=0&city=$kota1&facility=$facilityList2'),
         headers: {
           "Accept": "Application/json",
           "Authorization": "Bearer $token"
@@ -2304,16 +2661,13 @@ class _HomeActivityState extends State<HomeActivity> with WidgetsBindingObserver
 
     if (data != null){
       return getRoute(data.link);
+    } else {
+      FirebaseDynamicLinks.instance.onLink.listen((PendingDynamicLinkData dynamicLink) async {
+        print('pppp');
+        print(dynamicLink.link);
+        getRoute(dynamicLink.link);
+      });
     }
-    FirebaseDynamicLinks.instance.onLink(
-        onSuccess: (PendingDynamicLinkData dynamicLink) async {
-          print('pppp');
-          print(dynamicLink.link);
-          return getRoute(dynamicLink.link);
-        }, onError: (OnLinkErrorException e) async {
-      print('onLinkError');
-      return e.message;
-    });
     return HomeActivity();
   }
 
@@ -2337,11 +2691,223 @@ class _HomeActivityState extends State<HomeActivity> with WidgetsBindingObserver
   }
 
   Future toDet(id) async {
-    Navigator.push(
-        context,
-        PageTransition(
-            type: PageTransitionType.fade,
-            child: DetailResto(id)));
+    if (id.toString().contains('-') == true) {
+      SharedPreferences pref = await SharedPreferences.getInstance();
+      pref.setString("resumed", '1');
+      pref.setString('idMenus', id.toString().split('-')[1]);
+      print('TOL');
+      Navigator.push(
+          context,
+          PageTransition(
+              type: PageTransitionType.fade,
+              child: DetailResto(id.toString().split('-')[0])));
+      // return DetailResto(id.toString().split('-')[0]);
+    } else if (id.toString().contains('-') == false) {
+      print('PUK');
+      Navigator.push(
+          context,
+          PageTransition(
+              type: PageTransitionType.fade,
+              child: DetailResto(id)));
+      // return DetailResto(id);
+    }
+  }
+
+
+  String chatroom = '';
+  Future<void> getData(String id)async{
+    // List<Menu> _menu = [];
+    // List<String> _menu2 = [];
+    // List<MenuJson> _menu3 = [];
+    // List<String> _menu4 = [];
+    // List<String> _menu5 = [];
+
+    setState(() {
+      // isLoading = true;
+    });
+    SharedPreferences pref = await SharedPreferences.getInstance();
+    var token = pref.getString("token") ?? "";
+
+    var apiResult = await http.get(Uri.parse(Links.mainUrl + '/trans/$id'),
+        headers: {
+          "Accept": "Application/json",
+          "Authorization": "Bearer $token"
+        });
+    print(apiResult.body);
+    print('TRANS?');
+    print(id);
+    var data = json.decode(apiResult.body);
+
+    // for(var v in data['menu']){
+    //   Menu m = Menu(
+    //       id: v['menus_id'],
+    //       qty: v['qty'].toString(),
+    //       price: Price(original: v['price'], discounted: null, delivery: null),
+    //       name: v['name'],
+    //       urlImg: v['image'],
+    //       is_available: '',
+    //       desc: v['desc'], is_recommended: '', restoName: '', type: '', distance: null, restoId: '', delivery_price: null
+    //   );
+    //   _menu.add(m);
+    // }
+    // for(var v in data['menu']){
+    //   MenuJson j = MenuJson(
+    //     id: v['menus_id'],
+    //     restoId: pref.getString('idnyatransRes')??'',
+    //     name: v['name'],
+    //     desc: v['desc'],
+    //     price: v['price'].toString(),
+    //     discount: v['discount'],
+    //     pricePlus: (v['pricePlus']??0).toString(),
+    //     urlImg: v['image'], restoName: '', distance: null,
+    //   );
+    //   _menu3.add(j);
+    // }
+    // for(var v in data['menu']){
+    //   // Menu m = Menu.qty(
+    //   //     ['qty'].toString(),
+    //   // );
+    //   _menu2.add(v['qty'].toString());
+    // }
+    // // _menu3.add(jsonEncode(data['menu']));
+    // for(var v in data['menu']){
+    //   // Menu m = Menu.qty(
+    //   //     ['qty'].toString(),
+    //   // );
+    //   _menu4.add(v['menus_id'].toString());
+    //   print('ini '+v['menus_id'].toString());
+    // }
+    // for(var v in data['menu']){
+    //   // Menu m = Menu.qty(
+    //   //     ['qty'].toString(),
+    //   // );
+    //   _menu5.add(v['name'].toString()+": kam5ia_null}");
+    // }
+    setState(() {
+      // menu = _menu;
+      // menu2 = _menu2;
+      // menu3 = _menu3;
+      // menu4 = _menu4;
+      // menu5 = _menu5;
+      // type = data['trans']['type'];
+      // if (type == 'delivery' && statusTrans == 'process' || statusTrans == 'ready') {
+      //   _getDriver().whenComplete((){
+      //     _getDetail(idResto);
+      //   });
+      // } else if (type == 'delivery' && statusTrans == 'pending') {
+      //   tungguProses = 'true';
+      // }
+      // address = data['trans']['address']??'';
+      // ongkir = data['trans']['ongkir'];
+      // total = data['trans']['total'];
+      // totalAll = data['trans']['total']+data['trans']['ongkir'];
+      // harga = data['trans']['total'] - data['trans']['ongkir'];
+      chatroom = data['chatroom'].toString();
+      // _checkPayFirst();
+      // phone = data['phone_number'].toString();
+      // isLoading = false;
+    });
+    print(chatroom);
+  }
+
+  String operation ='';
+  Future _getReady(String operation, String id)async{
+    // List<Transaction> _transaction = [];
+
+    SharedPreferences pref = await SharedPreferences.getInstance();
+    String token = pref.getString("token") ?? "";
+    var apiResult = await http.get(Uri.parse(Links.mainUrl + '/trans/op/$operation/$id'), headers: {
+      "Accept": "Application/json",
+      "Authorization": "Bearer $token"
+    });
+    print(apiResult.body);
+    var data = json.decode(apiResult.body);
+    print(data);
+
+    FirebaseFirestore.instance.collection('room').doc(chatroom).collection('messages').get().then((snapshot) {
+      for (DocumentSnapshot ds in snapshot.docs){
+        ds.reference.delete();
+      }
+    });
+
+    // try {
+    //   FirebaseFirestore.instance.collection("room").doc(chatroom).delete();
+    //   // FirebaseFirestore.instance
+    //   //     .collection("room")
+    //   //     .document(chatroom)
+    //   //     // .collection('messages')
+    //   //     // .doc()
+    //   //     .delete()
+    //   //     .then((_) {
+    //   //   print("BERHASIL!");
+    //   // });
+    // }
+    // catch (e) {
+    //   print("ERROR DURING DELETE");
+    // }
+    print('delete room chat: '+chatroom);
+
+    // for(var v in data['trx']['process']){
+    //   Transaction r = Transaction.resto(
+    //       id: v['id'],
+    //       status: v['status'],
+    //       username: v['username'],
+    //       total: int.parse(v['total']),
+    //       type: v['type']
+    //   );
+    //   _transaction.add(r);
+    // }
+
+    setState(() {
+      // transaction = _transaction;
+      print(operation+'   '+id);
+    });
+  }
+
+
+  AppUpdateInfo? _updateInfo;
+  bool _flexibleUpdateAvailable = false;
+
+  Future<void> checkForUpdate() async {
+
+    InAppUpdate.checkForUpdate().then((info) {
+
+      setState(() {
+
+        _updateInfo = info;
+
+        if (_updateInfo?.updateAvailability == UpdateAvailability.updateAvailable) {
+          InAppUpdate.performImmediateUpdate().catchError((e) => showSnack(e.toString()));
+        } else {
+          // _checkForSession().then((status) {
+          //   if (status) {
+          //     Navigator.of(context).pushReplacement(MaterialPageRoute(
+          //         builder: (BuildContext context) => (homepg != "1")?HomeActivity():HomeActivityResto()));
+          //   }
+          // });
+        }
+
+      });
+
+    }).catchError((e) {
+
+      showSnack(e.toString());
+
+    });
+  }
+
+  final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey();
+
+  void showSnack(String text) {
+
+    if (_scaffoldKey.currentContext != null) {
+
+      ScaffoldMessenger.of(_scaffoldKey.currentContext!)
+
+          .showSnackBar(SnackBar(content: Text(text)));
+
+    }
+
   }
 
 
@@ -2373,9 +2939,10 @@ class _HomeActivityState extends State<HomeActivity> with WidgetsBindingObserver
     });
     Location.instance.getLocation().then((value) {
       setState(() {
+        checkForUpdate();
         _getDataHome(value.latitude.toString(), value.longitude.toString());
-        latitude = value.latitude;
-        longitude = value.longitude;
+        latitude = value.latitude!;
+        longitude = value.longitude!;
         lat = latitude.toString();
         long = longitude.toString();
       });
@@ -2625,7 +3192,7 @@ class _HomeActivityState extends State<HomeActivity> with WidgetsBindingObserver
                                   height: CustomSize.sizeHeight(context) / 3.8,
                                   scrollDirection: Axis.horizontal,
                                 ),
-                                items: images2.map((e) {
+                                items: (images != [])?images2.map((e) {
                                   return GestureDetector(
                                     // onTap: (){
                                     //   Navigator.push(
@@ -2640,6 +3207,28 @@ class _HomeActivityState extends State<HomeActivity> with WidgetsBindingObserver
                                           image: DecorationImage(
                                               // image: NetworkImage(Links.subUrl + e.urlImg),
                                               image: AssetImage(e),
+                                              fit: BoxFit.cover
+                                          )
+                                      ),
+                                    ),
+                                  );
+                                }).toList():images.map((e) {
+                                  return GestureDetector(
+                                    onTap: (){
+                                      if (e.id != 0) {
+                                        Navigator.push(
+                                            context,
+                                            PageTransition(
+                                                type: PageTransitionType.rightToLeft,
+                                                child: new DetailResto(e.id.toString())));
+                                      }
+                                      print(e.id.toString());
+                                    },
+                                    child: Container(
+                                      decoration: BoxDecoration(
+                                          image: DecorationImage(
+                                              image: NetworkImage(e.urlImg),
+                                              // image: AssetImage(e),
                                               fit: BoxFit.cover
                                           )
                                       ),
@@ -2872,9 +3461,17 @@ class _HomeActivityState extends State<HomeActivity> with WidgetsBindingObserver
                                           pref.setString("chatUserCount", transaction[index].chat_user);
                                           pref.setString("idnyatrans", transaction[index].id.toString());
                                           pref.setString("idnyatransRes", transaction[index].idResto.toString());
-                                          pref.setString("restoNameTrans99", transaction[index].nameResto);
-                                          pref.setString("alamateResto99", transaction[index].address);
+                                          pref.setString("restoNameTrans99", transaction[index].nameResto.toString());
+                                          pref.setString("alamateResto99", transaction[index].address.toString());
+                                          pref.setString("statusTrans", transaction[index].status.toString());
                                           pref.setString('rev', '0');
+                                          if (transaction[index].type == 'Makan Ditempat') {
+                                            if (transaction[index].status != 'pending') {
+                                              pref.setString("statusPay", 'false');
+                                            } else {
+                                              pref.setString("statusPay", 'true');
+                                            }
+                                          }
                                           Navigator.pushReplacement(
                                               context,
                                               PageTransition(
@@ -2886,18 +3483,27 @@ class _HomeActivityState extends State<HomeActivity> with WidgetsBindingObserver
                                           pref.setString("chatUserCount", transaction[index].chat_user);
                                           pref.setString("idnyatrans", transaction[index].id.toString());
                                           pref.setString("idnyatransRes", transaction[index].idResto.toString());
-                                          pref.setString("restoNameTrans99", transaction[index].nameResto);
-                                          pref.setString("alamateResto99", transaction[index].address);
+                                          pref.setString("restoNameTrans99", transaction[index].nameResto.toString());
+                                          pref.setString("alamateResto99", transaction[index].address.toString());
                                           pref.setString("jmlhMeja", transaction[index].type.toString().replaceAll('Reservasi untuk ', '').replaceAll(' orang', ''));
                                           pref.setString("tglReser", transaction[index].date.toString().split(',')[0]);
                                           pref.setString("jamReser", transaction[index].date.toString().split(', ')[1]);
                                           pref.setString("hargaReser", (int.parse(transaction[index].total.toString())/int.parse(transaction[index].type.toString().replaceAll('Reservasi untuk ', '').replaceAll(' orang', '').toString())).toString());
                                           pref.setString("totalReser", transaction[index].total.toString());
+                                          pref.setString("statusTrans", transaction[index].status.toString());
+                                          print('OL');
+                                          print(transaction[0].id!);
+                                          print(transaction[0].status!);
+                                          print(transaction[0].note!);
+                                          print(transaction[0].idResto!);
                                           Navigator.pushReplacement(
                                               context,
                                               PageTransition(
                                                   type: PageTransitionType.rightToLeft,
                                                   child: new DetailTransactionReser(transaction[index].id!, transaction[index].status!, transaction[index].note!, transaction[index].idResto!)));
+                                        } else if (transaction[index].type!.startsWith('Reservasi') == true && transaction[index].status == 'process') {
+                                          Fluttertoast.showToast(
+                                            msg: "Reservasi telah disetujui",);
                                         }
                                       },
                                       child: Container(
@@ -2948,7 +3554,10 @@ class _HomeActivityState extends State<HomeActivity> with WidgetsBindingObserver
                                                             children: [
                                                               Container(
                                                                   width: (transaction[index].chat_user != '0' && transaction[index].chat_user != 'null')?CustomSize.sizeWidth(context) / 2.6:CustomSize.sizeWidth(context) / 2.2,
-                                                                  child: MediaQuery(child: CustomText.bodyMedium14(text: transaction[index].nameResto.toString(), sizeNew: double.parse(((MediaQuery.of(context).size.width*0.035).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.035)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.035)).toString()), maxLines: 1),
+                                                                  child: MediaQuery(child: Container(
+                                                                      width: CustomSize.sizeWidth(context) / 2.2,
+                                                                      child: CustomText.bodyMedium14(text: transaction[index].nameResto.toString(), sizeNew: double.parse(((MediaQuery.of(context).size.width*0.035).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.035)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.035)).toString()), maxLines: 2)
+                                                                  ),
                                                                     data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0),)),
                                                               (transaction[index].chat_user != '0' && transaction[index].chat_user != 'null')?Stack(
                                                                 alignment: Alignment.center,
@@ -2960,7 +3569,15 @@ class _HomeActivityState extends State<HomeActivity> with WidgetsBindingObserver
                                                               ):Container()
                                                             ],
                                                           ),
-                                                          MediaQuery(child: CustomText.bodyLight12(text: transaction[index].date, sizeNew: double.parse(((MediaQuery.of(context).size.width*0.03).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.03)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.03)).toString())),
+                                                          (transaction[index].type!.startsWith('Reservasi'))?Column(
+                                                            crossAxisAlignment: CrossAxisAlignment.start,
+                                                            children: [
+                                                              MediaQuery(child: CustomText.bodyLight12(text: 'untuk tanggal '+transaction[index].date.toString().split(', ')[0], sizeNew: double.parse(((MediaQuery.of(context).size.width*0.03).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.03)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.03)).toString())),
+                                                                data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0),),
+                                                              MediaQuery(child: CustomText.bodyLight12(text: 'jam '+transaction[index].date.toString().split(', ')[1].replaceAll(', ', ''), sizeNew: double.parse(((MediaQuery.of(context).size.width*0.03).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.03)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.03)).toString())),
+                                                                data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0),),
+                                                            ],
+                                                          ):MediaQuery(child: CustomText.bodyLight12(text: transaction[index].date, sizeNew: double.parse(((MediaQuery.of(context).size.width*0.03).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.03)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.03)).toString())),
                                                             data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0),),
                                                           (transaction[index].type!.startsWith('Reservasi'))
                                                               ?MediaQuery(child: CustomText.bodyMedium10(text: transaction[index].type.toString().replaceAll('untuk ', '').replaceAll('orang', 'meja'), sizeNew: double.parse(((MediaQuery.of(context).size.width*0.025).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.025)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.025)).toString())),
@@ -2973,12 +3590,50 @@ class _HomeActivityState extends State<HomeActivity> with WidgetsBindingObserver
                                                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                                         children: [
                                                           MediaQuery(
-                                                            child: CustomText.bodyLight12(text: (transaction[index].status != 'cancel')?(transaction[index].status != 'pending')?(transaction[index].status != 'process')?(transaction[index].status != 'ready')?'Selesai':'Selesai':(transaction[index].type.toString().contains('Reservasi'))?'Telah disetujui':'Diproses':'Menunggu':'Dibatalkan', sizeNew: double.parse(((MediaQuery.of(context).size.width*0.03).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.03)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.03)).toString()),
+                                                            child: CustomText.bodyLight12(text: (transaction[index].status != 'cancel')?(transaction[index].status != 'pending')?(transaction[index].status != 'process')?(transaction[index].status == 'ready')?(transaction[index].type != 'Pesan antar')?'Pesanan Siap':'Sudah diterima?':'Selesai':(transaction[index].type.toString().contains('Reservasi'))?'Telah disetujui':'Diproses':'Menunggu':'Dibatalkan', sizeNew: double.parse(((MediaQuery.of(context).size.width*0.03).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.03)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.03)).toString()),
                                                             // CustomText.bodyLight12(text: (transaction[index].status != 'cancel')?(transaction[index].status != 'pending')?(transaction[index].status != 'process')?(transaction[index].status != 'ready')?Colors.amberAccent:Colors.amberAccent:Colors.green:Colors.blue:CustomColor.redBtn, minSize: 12,
                                                                 color: (transaction[index].status != 'cancel')?(transaction[index].status != 'pending')?(transaction[index].status != 'process')?(transaction[index].status != 'ready')?CustomColor.primary:CustomColor.primary:Colors.green:Colors.blue:CustomColor.redBtn),
                                                             data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0),
                                                           ),
-                                                          MediaQuery(child: CustomText.bodyMedium14(text: NumberFormat.currency(locale: 'id', symbol: '', decimalDigits: 0).format((transaction[index].type!.startsWith('Reservasi'))?(transaction[index].total!+1000):(transaction[index].total!+1000)), sizeNew: double.parse(((MediaQuery.of(context).size.width*0.035).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.035)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.035)).toString())),
+                                                          (transaction[index].status == 'ready')?(transaction[index].type != 'Pesan antar')?MediaQuery(child: CustomText.bodyMedium14(text: NumberFormat.currency(locale: 'id', symbol: '', decimalDigits: 0).format((transaction[index].type!.startsWith('Reservasi'))?(transaction[index].total!):(transaction[index].total!+1000)), sizeNew: double.parse(((MediaQuery.of(context).size.width*0.035).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.035)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.035)).toString())),
+                                                            data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0),):
+                                                          GestureDetector(
+                                                            onTap: (){
+                                                              // _search(recomMenu[index], '');
+                                                              // _loginTextName.text = recomMenu[index];
+                                                              setState(() {
+                                                                getData(transaction[index].id!.toString()).whenComplete((){
+                                                                  _getReady(operation = "done", transaction[index].id!.toString()).whenComplete((){
+                                                                    Navigator.pushReplacement(context, PageTransition(
+                                                                        type: PageTransitionType.rightToLeft,
+                                                                        child: HomeActivity()));
+                                                                  });
+                                                                });
+                                                                // _getReady(operation = "done", transaction[index].id!.toString());
+                                                                print('hehe');
+                                                                // isSearch = true;
+                                                              });
+                                                            },
+                                                            child: Container(
+                                                              // height: CustomSize.sizeHeight(context) / 19,
+                                                              decoration: BoxDecoration(
+                                                                  borderRadius: BorderRadius.circular(20),
+                                                                  border: Border.all(color: CustomColor.accent),
+                                                                  color: Colors.white
+                                                              ),
+                                                              child: Padding(
+                                                                padding: EdgeInsets.symmetric(horizontal: CustomSize.sizeWidth(context) / 48, vertical: CustomSize.sizeWidth(context) * 0.01),
+                                                                child: Center(
+                                                                  child: CustomText.textTitle2(
+                                                                      text: 'Iya',
+                                                                      color:  CustomColor.accent,
+                                                                      minSize: double.parse(((MediaQuery.of(context).size.width*0.03).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.03)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.03)).toString())
+                                                                  ),
+                                                                ),
+                                                              ),
+                                                            ),
+                                                          ):
+                                                          MediaQuery(child: CustomText.bodyMedium14(text: NumberFormat.currency(locale: 'id', symbol: '', decimalDigits: 0).format((transaction[index].type!.startsWith('Reservasi'))?(transaction[index].total!):(transaction[index].total!+1000)), sizeNew: double.parse(((MediaQuery.of(context).size.width*0.035).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.035)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.035)).toString())),
                                                             data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0),),
                                                         ],
                                                       )
@@ -4234,9 +4889,12 @@ class _HomeActivityState extends State<HomeActivity> with WidgetsBindingObserver
                                                 data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0),),
                                             ),
                                             Padding(
-                                              padding: EdgeInsets.only(left: CustomSize.sizeWidth(context) / 24),
-                                              child: MediaQuery(child: CustomText.bodyMedium16(text: randomRes1[index].name, sizeNew: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.04).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.04).toString()),),
-                                                data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0),),
+                                              padding: EdgeInsets.only(left: CustomSize.sizeWidth(context) / 24, right: CustomSize.sizeWidth(context) / 34),
+                                              child: Container(
+                                                height: CustomSize.sizeWidth(context) / 12,
+                                                child: MediaQuery(child: CustomText.bodyMedium16(text: randomRes1[index].name, maxLines: 2, sizeNew: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.04).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.04).toString()),),
+                                                  data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0),),
+                                              ),
                                             ),
                                           ],
                                         ),
@@ -4395,9 +5053,12 @@ class _HomeActivityState extends State<HomeActivity> with WidgetsBindingObserver
                                                 data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0),),
                                             ),
                                             Padding(
-                                              padding: EdgeInsets.only(left: CustomSize.sizeWidth(context) / 24),
-                                              child: MediaQuery(child: CustomText.bodyMedium16(text: randomRes2[index].name, sizeNew: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.04).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.04).toString())),
-                                                data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0),),
+                                              padding: EdgeInsets.only(left: CustomSize.sizeWidth(context) / 24, right: CustomSize.sizeWidth(context) / 34),
+                                              child: Container(
+                                                height: CustomSize.sizeWidth(context) / 12,
+                                                child: MediaQuery(child: CustomText.bodyMedium16(maxLines: 2, text: randomRes2[index].name, sizeNew: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.04).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.04).toString())),
+                                                  data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0),),
+                                              ),
                                             ),
                                           ],
                                         ),
@@ -4556,9 +5217,12 @@ class _HomeActivityState extends State<HomeActivity> with WidgetsBindingObserver
                                                 data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0),),
                                             ),
                                             Padding(
-                                              padding: EdgeInsets.only(left: CustomSize.sizeWidth(context) / 24),
-                                              child: MediaQuery(child: CustomText.bodyMedium16(text: randomRes3[index].name, sizeNew: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.04).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.04).toString())),
-                                                data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0),),
+                                              padding: EdgeInsets.only(left: CustomSize.sizeWidth(context) / 24, right: CustomSize.sizeWidth(context) / 34),
+                                              child: Container(
+                                                height: CustomSize.sizeWidth(context) / 12,
+                                                child: MediaQuery(child: CustomText.bodyMedium16(maxLines: 2, text: randomRes3[index].name, sizeNew: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.04).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.04).toString())),
+                                                  data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0),),
+                                              ),
                                             ),
                                           ],
                                         ),
@@ -4717,9 +5381,12 @@ class _HomeActivityState extends State<HomeActivity> with WidgetsBindingObserver
                                                 data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0),),
                                             ),
                                             Padding(
-                                              padding: EdgeInsets.only(left: CustomSize.sizeWidth(context) / 24),
-                                              child: MediaQuery(child: CustomText.bodyMedium16(text: randomRes4[index].name, sizeNew: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.04).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.04).toString())),
-                                                data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0),),
+                                              padding: EdgeInsets.only(left: CustomSize.sizeWidth(context) / 24, right: CustomSize.sizeWidth(context) / 34),
+                                              child: Container(
+                                                height: CustomSize.sizeWidth(context) / 12,
+                                                child: MediaQuery(child: CustomText.bodyMedium16(maxLines: 2, text: randomRes4[index].name, sizeNew: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.04).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.04).toString())),
+                                                  data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0),),
+                                              ),
                                             ),
                                           ],
                                         ),
@@ -4878,9 +5545,12 @@ class _HomeActivityState extends State<HomeActivity> with WidgetsBindingObserver
                                                 data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0),),
                                             ),
                                             Padding(
-                                              padding: EdgeInsets.only(left: CustomSize.sizeWidth(context) / 24),
-                                              child: MediaQuery(child: CustomText.bodyMedium16(text: randomRes5[index].name, sizeNew: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.04).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.04).toString())),
-                                                data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0),),
+                                              padding: EdgeInsets.only(left: CustomSize.sizeWidth(context) / 24, right: CustomSize.sizeWidth(context) / 34),
+                                              child: Container(
+                                                height: CustomSize.sizeWidth(context) / 12,
+                                                child: MediaQuery(child: CustomText.bodyMedium16(maxLines: 2, text: randomRes5[index].name, sizeNew: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.04).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.04).toString())),
+                                                  data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0),),
+                                              ),
                                             ),
                                           ],
                                         ),
@@ -5039,9 +5709,12 @@ class _HomeActivityState extends State<HomeActivity> with WidgetsBindingObserver
                                                 data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0),),
                                             ),
                                             Padding(
-                                              padding: EdgeInsets.only(left: CustomSize.sizeWidth(context) / 24),
-                                              child: MediaQuery(child: CustomText.bodyMedium16(text: randomRes6[index].name, sizeNew: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.04).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.04).toString())),
-                                                data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0),),
+                                              padding: EdgeInsets.only(left: CustomSize.sizeWidth(context) / 24, right: CustomSize.sizeWidth(context) / 34),
+                                              child: Container(
+                                                height: CustomSize.sizeWidth(context) / 12,
+                                                child: MediaQuery(child: CustomText.bodyMedium16(maxLines: 2, text: randomRes6[index].name, sizeNew: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.04).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.04).toString())),
+                                                  data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0),),
+                                              ),
                                             ),
                                           ],
                                         ),
@@ -5200,9 +5873,12 @@ class _HomeActivityState extends State<HomeActivity> with WidgetsBindingObserver
                                                 data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0),),
                                             ),
                                             Padding(
-                                              padding: EdgeInsets.only(left: CustomSize.sizeWidth(context) / 24),
-                                              child: MediaQuery(child: CustomText.bodyMedium16(text: randomRes7[index].name, sizeNew: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.04).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.04).toString())),
-                                                data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0),),
+                                              padding: EdgeInsets.only(left: CustomSize.sizeWidth(context) / 24, right: CustomSize.sizeWidth(context) / 34),
+                                              child: Container(
+                                                height: CustomSize.sizeWidth(context) / 12,
+                                                child: MediaQuery(child: CustomText.bodyMedium16(maxLines: 2, text: randomRes7[index].name, sizeNew: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.04).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.04).toString())),
+                                                  data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0),),
+                                              ),
                                             ),
                                           ],
                                         ),
@@ -5361,9 +6037,12 @@ class _HomeActivityState extends State<HomeActivity> with WidgetsBindingObserver
                                                 data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0),),
                                             ),
                                             Padding(
-                                              padding: EdgeInsets.only(left: CustomSize.sizeWidth(context) / 24),
-                                              child: MediaQuery(child: CustomText.bodyMedium16(text: randomRes8[index].name, sizeNew: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.04).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.04).toString())),
-                                                data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0),),
+                                              padding: EdgeInsets.only(left: CustomSize.sizeWidth(context) / 24, right: CustomSize.sizeWidth(context) / 34),
+                                              child: Container(
+                                                height: CustomSize.sizeWidth(context) / 12,
+                                                child: MediaQuery(child: CustomText.bodyMedium16(maxLines: 2, text: randomRes8[index].name, sizeNew: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.04).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.04).toString())),
+                                                  data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0),),
+                                              ),
                                             ),
                                           ],
                                         ),
@@ -5522,9 +6201,12 @@ class _HomeActivityState extends State<HomeActivity> with WidgetsBindingObserver
                                                 data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0),),
                                             ),
                                             Padding(
-                                              padding: EdgeInsets.only(left: CustomSize.sizeWidth(context) / 24),
-                                              child: MediaQuery(child: CustomText.bodyMedium16(text: randomRes9[index].name, sizeNew: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.04).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.04).toString())),
-                                                data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0),),
+                                              padding: EdgeInsets.only(left: CustomSize.sizeWidth(context) / 24, right: CustomSize.sizeWidth(context) / 34),
+                                              child: Container(
+                                                height: CustomSize.sizeWidth(context) / 12,
+                                                child: MediaQuery(child: CustomText.bodyMedium16(maxLines: 2, text: randomRes9[index].name, sizeNew: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.04).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.04).toString())),
+                                                  data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0),),
+                                              ),
                                             ),
                                           ],
                                         ),
@@ -5683,9 +6365,12 @@ class _HomeActivityState extends State<HomeActivity> with WidgetsBindingObserver
                                                 data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0),),
                                             ),
                                             Padding(
-                                              padding: EdgeInsets.only(left: CustomSize.sizeWidth(context) / 24),
-                                              child: MediaQuery(child: CustomText.bodyMedium16(text: randomRes10[index].name, sizeNew: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.04).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.04).toString())),
-                                                data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0),),
+                                              padding: EdgeInsets.only(left: CustomSize.sizeWidth(context) / 24, right: CustomSize.sizeWidth(context) / 34),
+                                              child: Container(
+                                                height: CustomSize.sizeWidth(context) / 12,
+                                                child: MediaQuery(child: CustomText.bodyMedium16(maxLines: 2, text: randomRes10[index].name, sizeNew: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.04).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.04).toString())),
+                                                  data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0),),
+                                              ),
                                             ),
                                           ],
                                         ),
@@ -5844,9 +6529,12 @@ class _HomeActivityState extends State<HomeActivity> with WidgetsBindingObserver
                                                 data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0),),
                                             ),
                                             Padding(
-                                              padding: EdgeInsets.only(left: CustomSize.sizeWidth(context) / 24),
-                                              child: MediaQuery(child: CustomText.bodyMedium16(text: randomRes11[index].name, sizeNew: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.04).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.04).toString())),
-                                                data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0),),
+                                              padding: EdgeInsets.only(left: CustomSize.sizeWidth(context) / 24, right: CustomSize.sizeWidth(context) / 34),
+                                              child: Container(
+                                                height: CustomSize.sizeWidth(context) / 12,
+                                                child: MediaQuery(child: CustomText.bodyMedium16(maxLines: 2, text: randomRes11[index].name, sizeNew: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.04).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.04).toString())),
+                                                  data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0),),
+                                              ),
                                             ),
                                           ],
                                         ),
@@ -6005,9 +6693,12 @@ class _HomeActivityState extends State<HomeActivity> with WidgetsBindingObserver
                                                 data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0),),
                                             ),
                                             Padding(
-                                              padding: EdgeInsets.only(left: CustomSize.sizeWidth(context) / 24),
-                                              child: MediaQuery(child: CustomText.bodyMedium16(text: randomRes12[index].name, sizeNew: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.04).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.04).toString())),
-                                                data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0),),
+                                              padding: EdgeInsets.only(left: CustomSize.sizeWidth(context) / 24, right: CustomSize.sizeWidth(context) / 34),
+                                              child: Container(
+                                                height: CustomSize.sizeWidth(context) / 12,
+                                                child: MediaQuery(child: CustomText.bodyMedium16(maxLines: 2, text: randomRes12[index].name, sizeNew: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.04).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.04).toString())),
+                                                  data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0),),
+                                              ),
                                             ),
                                           ],
                                         ),
@@ -6166,9 +6857,12 @@ class _HomeActivityState extends State<HomeActivity> with WidgetsBindingObserver
                                                 data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0),),
                                             ),
                                             Padding(
-                                              padding: EdgeInsets.only(left: CustomSize.sizeWidth(context) / 24),
-                                              child: MediaQuery(child: CustomText.bodyMedium16(text: randomRes13[index].name, sizeNew: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.04).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.04).toString())),
-                                                data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0),),
+                                              padding: EdgeInsets.only(left: CustomSize.sizeWidth(context) / 24, right: CustomSize.sizeWidth(context) / 34),
+                                              child: Container(
+                                                height: CustomSize.sizeWidth(context) / 12,
+                                                child: MediaQuery(child: CustomText.bodyMedium16(maxLines: 2, text: randomRes13[index].name, sizeNew: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.04).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.04).toString())),
+                                                  data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0),),
+                                              ),
                                             ),
                                           ],
                                         ),
@@ -6327,9 +7021,12 @@ class _HomeActivityState extends State<HomeActivity> with WidgetsBindingObserver
                                                 data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0),),
                                             ),
                                             Padding(
-                                              padding: EdgeInsets.only(left: CustomSize.sizeWidth(context) / 24),
-                                              child: MediaQuery(child: CustomText.bodyMedium16(text: randomRes14[index].name, sizeNew: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.04).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.04).toString())),
-                                                data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0),),
+                                              padding: EdgeInsets.only(left: CustomSize.sizeWidth(context) / 24, right: CustomSize.sizeWidth(context) / 34),
+                                              child: Container(
+                                                height: CustomSize.sizeWidth(context) / 12,
+                                                child: MediaQuery(child: CustomText.bodyMedium16(maxLines: 2, text: randomRes14[index].name, sizeNew: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.04).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.04).toString())),
+                                                  data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0),),
+                                              ),
                                             ),
                                           ],
                                         ),
@@ -6488,9 +7185,12 @@ class _HomeActivityState extends State<HomeActivity> with WidgetsBindingObserver
                                                 data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0),),
                                             ),
                                             Padding(
-                                              padding: EdgeInsets.only(left: CustomSize.sizeWidth(context) / 24),
-                                              child: MediaQuery(child: CustomText.bodyMedium16(text: randomRes15[index].name, sizeNew: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.04).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.04).toString())),
-                                                data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0),),
+                                              padding: EdgeInsets.only(left: CustomSize.sizeWidth(context) / 24, right: CustomSize.sizeWidth(context) / 34),
+                                              child: Container(
+                                                height: CustomSize.sizeWidth(context) / 12,
+                                                child: MediaQuery(child: CustomText.bodyMedium16(maxLines: 2, text: randomRes15[index].name, sizeNew: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.04).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.04).toString())),
+                                                  data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0),),
+                                              ),
                                             ),
                                           ],
                                         ),
@@ -6649,9 +7349,12 @@ class _HomeActivityState extends State<HomeActivity> with WidgetsBindingObserver
                                                 data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0),),
                                             ),
                                             Padding(
-                                              padding: EdgeInsets.only(left: CustomSize.sizeWidth(context) / 24),
-                                              child: MediaQuery(child: CustomText.bodyMedium16(text: randomRes16[index].name, sizeNew: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.04).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.04).toString())),
-                                                data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0),),
+                                              padding: EdgeInsets.only(left: CustomSize.sizeWidth(context) / 24, right: CustomSize.sizeWidth(context) / 34),
+                                              child: Container(
+                                                height: CustomSize.sizeWidth(context) / 12,
+                                                child: MediaQuery(child: CustomText.bodyMedium16(maxLines: 2, text: randomRes16[index].name, sizeNew: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.04).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.04).toString())),
+                                                  data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0),),
+                                              ),
                                             ),
                                           ],
                                         ),
@@ -6810,9 +7513,12 @@ class _HomeActivityState extends State<HomeActivity> with WidgetsBindingObserver
                                                 data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0),),
                                             ),
                                             Padding(
-                                              padding: EdgeInsets.only(left: CustomSize.sizeWidth(context) / 24),
-                                              child: MediaQuery(child: CustomText.bodyMedium16(text: randomRes17[index].name, sizeNew: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.04).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.04).toString())),
-                                                data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0),),
+                                              padding: EdgeInsets.only(left: CustomSize.sizeWidth(context) / 24, right: CustomSize.sizeWidth(context) / 34),
+                                              child: Container(
+                                                height: CustomSize.sizeWidth(context) / 12,
+                                                child: MediaQuery(child: CustomText.bodyMedium16(maxLines: 2, text: randomRes17[index].name, sizeNew: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.04).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.04).toString())),
+                                                  data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0),),
+                                              ),
                                             ),
                                           ],
                                         ),
@@ -6971,9 +7677,12 @@ class _HomeActivityState extends State<HomeActivity> with WidgetsBindingObserver
                                                 data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0),),
                                             ),
                                             Padding(
-                                              padding: EdgeInsets.only(left: CustomSize.sizeWidth(context) / 24),
-                                              child: MediaQuery(child: CustomText.bodyMedium16(text: randomRes18[index].name, sizeNew: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.04).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.04).toString())),
-                                                data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0),),
+                                              padding: EdgeInsets.only(left: CustomSize.sizeWidth(context) / 24, right: CustomSize.sizeWidth(context) / 34),
+                                              child: Container(
+                                                height: CustomSize.sizeWidth(context) / 12,
+                                                child: MediaQuery(child: CustomText.bodyMedium16(maxLines: 2, text: randomRes18[index].name, sizeNew: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.04).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.04).toString())),
+                                                  data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0),),
+                                              ),
                                             ),
                                           ],
                                         ),
@@ -7132,9 +7841,12 @@ class _HomeActivityState extends State<HomeActivity> with WidgetsBindingObserver
                                                 data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0),),
                                             ),
                                             Padding(
-                                              padding: EdgeInsets.only(left: CustomSize.sizeWidth(context) / 24),
-                                              child: MediaQuery(child: CustomText.bodyMedium16(text: randomRes19[index].name, sizeNew: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.04).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.04).toString())),
-                                                data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0),),
+                                              padding: EdgeInsets.only(left: CustomSize.sizeWidth(context) / 24, right: CustomSize.sizeWidth(context) / 34),
+                                              child: Container(
+                                                height: CustomSize.sizeWidth(context) / 12,
+                                                child: MediaQuery(child: CustomText.bodyMedium16(maxLines: 2, text: randomRes19[index].name, sizeNew: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.04).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.04).toString())),
+                                                  data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0),),
+                                              ),
                                             ),
                                           ],
                                         ),
@@ -7293,9 +8005,12 @@ class _HomeActivityState extends State<HomeActivity> with WidgetsBindingObserver
                                                 data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0),),
                                             ),
                                             Padding(
-                                              padding: EdgeInsets.only(left: CustomSize.sizeWidth(context) / 24),
-                                              child: MediaQuery(child: CustomText.bodyMedium16(text: randomRes20[index].name, sizeNew: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.04).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.04).toString())),
-                                                data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0),),
+                                              padding: EdgeInsets.only(left: CustomSize.sizeWidth(context) / 24, right: CustomSize.sizeWidth(context) / 34),
+                                              child: Container(
+                                                height: CustomSize.sizeWidth(context) / 12,
+                                                child: MediaQuery(child: CustomText.bodyMedium16(maxLines: 2, text: randomRes20[index].name, sizeNew: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.04).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.04).toString())),
+                                                  data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0),),
+                                              ),
                                             ),
                                           ],
                                         ),
@@ -7454,9 +8169,12 @@ class _HomeActivityState extends State<HomeActivity> with WidgetsBindingObserver
                                                 data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0),),
                                             ),
                                             Padding(
-                                              padding: EdgeInsets.only(left: CustomSize.sizeWidth(context) / 24),
-                                              child: MediaQuery(child: CustomText.bodyMedium16(text: randomRes21[index].name, sizeNew: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.04).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.04).toString())),
-                                                data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0),),
+                                              padding: EdgeInsets.only(left: CustomSize.sizeWidth(context) / 24, right: CustomSize.sizeWidth(context) / 34),
+                                              child: Container(
+                                                height: CustomSize.sizeWidth(context) / 12,
+                                                child: MediaQuery(child: CustomText.bodyMedium16(maxLines: 2, text: randomRes21[index].name, sizeNew: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.04).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.04).toString())),
+                                                  data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0),),
+                                              ),
                                             ),
                                           ],
                                         ),
@@ -7615,9 +8333,12 @@ class _HomeActivityState extends State<HomeActivity> with WidgetsBindingObserver
                                                 data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0),),
                                             ),
                                             Padding(
-                                              padding: EdgeInsets.only(left: CustomSize.sizeWidth(context) / 24),
-                                              child: MediaQuery(child: CustomText.bodyMedium16(text: randomRes22[index].name, sizeNew: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.04).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.04).toString())),
-                                                data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0),),
+                                              padding: EdgeInsets.only(left: CustomSize.sizeWidth(context) / 24, right: CustomSize.sizeWidth(context) / 34),
+                                              child: Container(
+                                                height: CustomSize.sizeWidth(context) / 12,
+                                                child: MediaQuery(child: CustomText.bodyMedium16(maxLines: 2, text: randomRes22[index].name, sizeNew: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.04).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.04).toString())),
+                                                  data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0),),
+                                              ),
                                             ),
                                           ],
                                         ),
@@ -7776,9 +8497,12 @@ class _HomeActivityState extends State<HomeActivity> with WidgetsBindingObserver
                                                 data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0),),
                                             ),
                                             Padding(
-                                              padding: EdgeInsets.only(left: CustomSize.sizeWidth(context) / 24),
-                                              child: MediaQuery(child: CustomText.bodyMedium16(text: randomRes23[index].name, sizeNew: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.04).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.04).toString())),
-                                                data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0),),
+                                              padding: EdgeInsets.only(left: CustomSize.sizeWidth(context) / 24, right: CustomSize.sizeWidth(context) / 34),
+                                              child: Container(
+                                                height: CustomSize.sizeWidth(context) / 12,
+                                                child: MediaQuery(child: CustomText.bodyMedium16(maxLines: 2, text: randomRes23[index].name, sizeNew: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.04).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.04).toString())),
+                                                  data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0),),
+                                              ),
                                             ),
                                           ],
                                         ),
@@ -7937,9 +8661,12 @@ class _HomeActivityState extends State<HomeActivity> with WidgetsBindingObserver
                                                 data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0),),
                                             ),
                                             Padding(
-                                              padding: EdgeInsets.only(left: CustomSize.sizeWidth(context) / 24),
-                                              child: MediaQuery(child: CustomText.bodyMedium16(text: randomRes24[index].name, sizeNew: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.04).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.04).toString())),
-                                                data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0),),
+                                              padding: EdgeInsets.only(left: CustomSize.sizeWidth(context) / 24, right: CustomSize.sizeWidth(context) / 34),
+                                              child: Container(
+                                                height: CustomSize.sizeWidth(context) / 12,
+                                                child: MediaQuery(child: CustomText.bodyMedium16(maxLines: 2, text: randomRes24[index].name, sizeNew: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.04).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.04).toString())),
+                                                  data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0),),
+                                              ),
                                             ),
                                           ],
                                         ),
@@ -8098,9 +8825,12 @@ class _HomeActivityState extends State<HomeActivity> with WidgetsBindingObserver
                                                 data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0),),
                                             ),
                                             Padding(
-                                              padding: EdgeInsets.only(left: CustomSize.sizeWidth(context) / 24),
-                                              child: MediaQuery(child: CustomText.bodyMedium16(text: randomRes25[index].name, sizeNew: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.04).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.04).toString())),
-                                                data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0),),
+                                              padding: EdgeInsets.only(left: CustomSize.sizeWidth(context) / 24, right: CustomSize.sizeWidth(context) / 34),
+                                              child: Container(
+                                                height: CustomSize.sizeWidth(context) / 12,
+                                                child: MediaQuery(child: CustomText.bodyMedium16(maxLines: 2, text: randomRes25[index].name, sizeNew: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.04).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.04).toString())),
+                                                  data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0),),
+                                              ),
                                             ),
                                           ],
                                         ),
@@ -8259,9 +8989,12 @@ class _HomeActivityState extends State<HomeActivity> with WidgetsBindingObserver
                                                 data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0),),
                                             ),
                                             Padding(
-                                              padding: EdgeInsets.only(left: CustomSize.sizeWidth(context) / 24),
-                                              child: MediaQuery(child: CustomText.bodyMedium16(text: randomRes26[index].name, sizeNew: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.04).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.04).toString())),
-                                                data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0),),
+                                              padding: EdgeInsets.only(left: CustomSize.sizeWidth(context) / 24, right: CustomSize.sizeWidth(context) / 34),
+                                              child: Container(
+                                                height: CustomSize.sizeWidth(context) / 12,
+                                                child: MediaQuery(child: CustomText.bodyMedium16(maxLines: 2, text: randomRes26[index].name, sizeNew: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.04).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.04).toString())),
+                                                  data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0),),
+                                              ),
                                             ),
                                           ],
                                         ),
@@ -8420,9 +9153,12 @@ class _HomeActivityState extends State<HomeActivity> with WidgetsBindingObserver
                                                 data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0),),
                                             ),
                                             Padding(
-                                              padding: EdgeInsets.only(left: CustomSize.sizeWidth(context) / 24),
-                                              child: MediaQuery(child: CustomText.bodyMedium16(text: randomRes27[index].name, sizeNew: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.04).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.04).toString())),
-                                                data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0),),
+                                              padding: EdgeInsets.only(left: CustomSize.sizeWidth(context) / 24, right: CustomSize.sizeWidth(context) / 34),
+                                              child: Container(
+                                                height: CustomSize.sizeWidth(context) / 12,
+                                                child: MediaQuery(child: CustomText.bodyMedium16(maxLines: 2, text: randomRes27[index].name, sizeNew: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.04).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.04).toString())),
+                                                  data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0),),
+                                              ),
                                             ),
                                           ],
                                         ),
@@ -8581,9 +9317,12 @@ class _HomeActivityState extends State<HomeActivity> with WidgetsBindingObserver
                                                 data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0),),
                                             ),
                                             Padding(
-                                              padding: EdgeInsets.only(left: CustomSize.sizeWidth(context) / 24),
-                                              child: MediaQuery(child: CustomText.bodyMedium16(text: randomRes28[index].name, sizeNew: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.04).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.04).toString())),
-                                                data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0),),
+                                              padding: EdgeInsets.only(left: CustomSize.sizeWidth(context) / 24, right: CustomSize.sizeWidth(context) / 34),
+                                              child: Container(
+                                                height: CustomSize.sizeWidth(context) / 12,
+                                                child: MediaQuery(child: CustomText.bodyMedium16(maxLines: 2, text: randomRes28[index].name, sizeNew: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.04).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.04).toString())),
+                                                  data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0),),
+                                              ),
                                             ),
                                           ],
                                         ),
@@ -8908,9 +9647,12 @@ class _HomeActivityState extends State<HomeActivity> with WidgetsBindingObserver
                                                 data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0),),
                                             ),
                                             Padding(
-                                              padding: EdgeInsets.only(left: CustomSize.sizeWidth(context) / 24),
-                                              child: MediaQuery(child: CustomText.bodyMedium16(text: again[index].name, sizeNew: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.04).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.04).toString())),
-                                                data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0),),
+                                              padding: EdgeInsets.only(left: CustomSize.sizeWidth(context) / 24, right: CustomSize.sizeWidth(context) / 34),
+                                              child: Container(
+                                                height: CustomSize.sizeWidth(context) / 12,
+                                                child: MediaQuery(child: CustomText.bodyMedium16(maxLines: 2, text: again[index].name, sizeNew: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.04).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.04).toString())),
+                                                  data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0),),
+                                              ),
                                             ),
                                           ],
                                         ),
@@ -9002,14 +9744,14 @@ class _HomeActivityState extends State<HomeActivity> with WidgetsBindingObserver
                       Navigator.push(context, PageTransition(type: PageTransitionType.rightToLeft, child: new ProfileActivity()));
                     });
                   },
-                  onLongPress: ()async{
-                    logOut();
-                    SharedPreferences pref = await SharedPreferences.getInstance();
-                    pref.clear();
-                    setState(() {
-                      Navigator.pushReplacement(context, PageTransition(type: PageTransitionType.fade, child: new LoginActivity()));
-                    });
-                  },
+                  // onLongPress: ()async{
+                  //   logOut();
+                  //   SharedPreferences pref = await SharedPreferences.getInstance();
+                  //   pref.clear();
+                  //   setState(() {
+                  //     Navigator.pushReplacement(context, PageTransition(type: PageTransitionType.fade, child: new LoginActivity()));
+                  //   });
+                  // },
                   child: Icon(Ionicons.md_person, size: 32, color: Colors.white,),
                 ),
               ],

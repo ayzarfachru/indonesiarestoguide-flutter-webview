@@ -45,7 +45,7 @@ class _AddDataUsahaState extends State<AddDataUsaha> {
   getInitial() async {
     SharedPreferences pref = await SharedPreferences.getInstance();
     setState(() {
-      initial = (pref.getString('name').substring(0, 1).toUpperCase());
+      initial = (pref.getString('name')!.substring(0, 1).toUpperCase());
       print(initial);
     });
   }
@@ -60,7 +60,7 @@ class _AddDataUsahaState extends State<AddDataUsaha> {
     final pickedFile = await picker2.getImage(source: ImageSource.gallery);
 
     setState(() {
-      image2 = File(pickedFile.path);
+      image2 = File(pickedFile!.path);
       extension = pickedFile.path.split('.').last;
     });
   }
@@ -73,7 +73,7 @@ class _AddDataUsahaState extends State<AddDataUsaha> {
     final pickedFile = await picker3.getImage(source: ImageSource.gallery);
 
     setState(() {
-      image3 = File(pickedFile.path);
+      image3 = File(pickedFile!.path);
       extension = pickedFile.path.split('.').last;
     });
   }

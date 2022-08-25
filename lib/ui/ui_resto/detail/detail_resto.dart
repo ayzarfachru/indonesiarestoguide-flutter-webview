@@ -6,7 +6,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_icons/flutter_icons.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'package:full_screen_image/full_screen_image.dart';
+import 'package:full_screen_image_null_safe/full_screen_image_null_safe.dart';
+// import 'package:full_screen_image/full_screen_image.dart';
 import 'package:kam5ia/model/CategoryMenu.dart';
 import 'package:kam5ia/model/Cuisine.dart';
 import 'package:kam5ia/model/Menu.dart';
@@ -121,7 +122,7 @@ class _DetailRestoAdminState extends State<DetailRestoAdmin> {
     });
     SharedPreferences pref = await SharedPreferences.getInstance();
     String token = pref.getString("token") ?? "";
-    var apiResult = await http.get(Links.mainUrl + '/resto/detail/$id', headers: {
+    var apiResult = await http.get(Uri.parse(Links.mainUrl + '/resto/detail/$id'), headers: {
       "Accept": "Application/json",
       "Authorization": "Bearer $token"
     });
@@ -259,7 +260,7 @@ class _DetailRestoAdminState extends State<DetailRestoAdmin> {
   getHomePg() async {
     SharedPreferences pref = await SharedPreferences.getInstance();
     setState(() {
-      homepg = (pref.getString('homepg'));
+      homepg = (pref.getString('homepg')??'');
       print(homepg);
     });
   }
@@ -274,7 +275,7 @@ class _DetailRestoAdminState extends State<DetailRestoAdmin> {
     });
     SharedPreferences pref = await SharedPreferences.getInstance();
     String token = pref.getString("token") ?? "";
-    var apiResult = await http.get(Links.mainUrl + '/resto/userdata', headers: {
+    var apiResult = await http.get(Uri.parse(Links.mainUrl + '/resto/userdata'), headers: {
       "Accept": "Application/json",
       "Authorization": "Bearer $token"
     });
@@ -302,7 +303,8 @@ class _DetailRestoAdminState extends State<DetailRestoAdmin> {
   }
 
   _launchURL() async {
-    var url = 'https://www.google.co.id/maps/place/' + address;
+    SharedPreferences pref2 = await SharedPreferences.getInstance();
+    var url = 'https://www.google.co.id/maps/place/' + pref2.getString('latResto')!+', '+pref2.getString('longResto')!;
     if (await canLaunch(url)) {
       await launch(url);
     } else {
@@ -335,7 +337,7 @@ class _DetailRestoAdminState extends State<DetailRestoAdmin> {
     });
     SharedPreferences pref = await SharedPreferences.getInstance();
     String token = pref.getString("token") ?? "";
-    var apiResult = await http.get(Links.mainUrl + '/resto/img/delete/$id', headers: {
+    var apiResult = await http.get(Uri.parse(Links.mainUrl + '/resto/img/delete/$id'), headers: {
       "Accept": "Application/json",
       "Authorization": "Bearer $token"
     });
@@ -360,7 +362,7 @@ class _DetailRestoAdminState extends State<DetailRestoAdmin> {
     });
     SharedPreferences pref = await SharedPreferences.getInstance();
     String token = pref.getString("token") ?? "";
-    var apiResult = await http.get(Links.mainUrl + '/resto/img', headers: {
+    var apiResult = await http.get(Uri.parse(Links.mainUrl + '/resto/img'), headers: {
       "Accept": "Application/json",
       "Authorization": "Bearer $token"
     });
@@ -420,6 +422,8 @@ class _DetailRestoAdminState extends State<DetailRestoAdmin> {
     );
   }
 
+  FirebaseDynamicLinks dynamicLinks = FirebaseDynamicLinks.instance;
+
   Future<String> createDynamicLink() async {
 
     var parameters = DynamicLinkParameters(
@@ -428,13 +432,13 @@ class _DetailRestoAdminState extends State<DetailRestoAdmin> {
       androidParameters: AndroidParameters(
         packageName: "com.devus.indonesiarestoguide",
       ),
-      iosParameters: IosParameters(
+      iosParameters: IOSParameters(
         bundleId: "com.exmple.test",
         appStoreId: '1498909115',
       ),
     );
-    var dynamicUrl = await parameters.buildUrl();
-    var shortLink = await parameters.buildShortLink();
+    var dynamicUrl = await dynamicLinks.buildLink(parameters);
+    var shortLink = await dynamicLinks.buildShortLink(parameters);
     var shortUrl = shortLink.shortUrl;
     print(shortUrl.toString());
 
@@ -576,7 +580,7 @@ class _DetailRestoAdminState extends State<DetailRestoAdmin> {
                             child: GestureDetector(
                               onTap: (){
                                 createDynamicLink().whenComplete((){
-                                  Share.share('Kunjungi restaurant kami "' + name + '" di '+link);
+                                  Share.share('Kunjungi resto kami "' + name + '" di '+link);
                                 });
                               },
                               child: Container(

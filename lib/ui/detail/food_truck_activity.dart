@@ -116,8 +116,8 @@ class _FoodTruckActivityState extends State<FoodTruckActivity> {
   getHomePg() async {
     SharedPreferences pref = await SharedPreferences.getInstance();
     setState(() {
-      homepg = (pref.getString('homepg'));
-      pgtipe = (pref.getString('pgtipe'));
+      homepg = (pref.getString('homepg')??'');
+      pgtipe = (pref.getString('pgtipe')??'');
       tipe = pgtipe;
       print(homepg);
     });
@@ -159,7 +159,7 @@ class _FoodTruckActivityState extends State<FoodTruckActivity> {
     });
     SharedPreferences pref = await SharedPreferences.getInstance();
     String token = pref.getString("token") ?? "";
-    var apiResult = await http.get(Links.mainUrl + '/page/home?lat=$lat&long=$long&limit=0', headers: {
+    var apiResult = await http.get(Uri.parse(Links.mainUrl + '/page/home?lat=$lat&long=$long&limit=0'), headers: {
       "Accept": "Application/json",
       "Authorization": "Bearer $token"
     });
@@ -320,7 +320,7 @@ class _FoodTruckActivityState extends State<FoodTruckActivity> {
     });
     SharedPreferences pref = await SharedPreferences.getInstance();
     String token = pref.getString("token") ?? "";
-    var apiResult = await http.get(Links.mainUrl + '/page/promo?lat=$lat&long=$long', headers: {
+    var apiResult = await http.get(Uri.parse(Links.mainUrl + '/page/promo?lat=$lat&long=$long'), headers: {
       "Accept": "Application/json",
       "Authorization": "Bearer $token"
     });
@@ -356,7 +356,7 @@ class _FoodTruckActivityState extends State<FoodTruckActivity> {
     });
     SharedPreferences pref = await SharedPreferences.getInstance();
     String token = pref.getString("token") ?? "";
-    var apiResult = await http.get(Links.mainUrl + '/promo', headers: {
+    var apiResult = await http.get(Uri.parse(Links.mainUrl + '/promo'), headers: {
       "Accept": "Application/json",
       "Authorization": "Bearer $token"
     });
@@ -406,8 +406,8 @@ class _FoodTruckActivityState extends State<FoodTruckActivity> {
         Location.instance.getLocation().then((value) {
           _getData(value.latitude.toString(), value.longitude.toString());
           setState(() {
-            latitude = value.latitude;
-            longitude = value.longitude;
+            latitude = value.latitude!;
+            longitude = value.longitude!;
           });
           // _getPromo(value.latitude.toString(), value.longitude.toString());
         });
@@ -470,7 +470,7 @@ class _FoodTruckActivityState extends State<FoodTruckActivity> {
     });
     SharedPreferences pref = await SharedPreferences.getInstance();
     String token = pref.getString("token") ?? "";
-    var apiResult = await http.get(Links.mainUrl + '/promo/delete/$id', headers: {
+    var apiResult = await http.get(Uri.parse(Links.mainUrl + '/promo/delete/$id'), headers: {
       "Accept": "Application/json",
       "Authorization": "Bearer $token"
     });
@@ -502,7 +502,7 @@ class _FoodTruckActivityState extends State<FoodTruckActivity> {
     SharedPreferences pref = await SharedPreferences.getInstance();
     var token = pref.getString("token") ?? "";
     // print("kota1 = $kota1 ");
-    var apiResult = await http.get(Links.mainUrl + '/page/search?q=$q&type=$tipe&lat=$lat&long=$long&limit=0&city=$kota1&facility=$facilityList2',
+    var apiResult = await http.get(Uri.parse(Links.mainUrl + '/page/search?q=$q&type=$tipe&lat=$lat&long=$long&limit=0&city=$kota1&facility=$facilityList2'),
         headers: {
           "Accept": "Application/json",
           "Authorization": "Bearer $token"
@@ -574,8 +574,8 @@ class _FoodTruckActivityState extends State<FoodTruckActivity> {
         Location.instance.getLocation().then((value) {
           // _getData(value.latitude.toString(), value.longitude.toString());
           setState(() {
-            latitude = value.latitude;
-            longitude = value.longitude;
+            latitude = value.latitude!;
+            longitude = value.longitude!;
             lat = latitude.toString();
             long = longitude.toString();
           });
@@ -774,8 +774,10 @@ class _FoodTruckActivityState extends State<FoodTruckActivity> {
                                   child: CustomText.bodyRegular14(text: randomRes1[index].distance.toString() + " Km", sizeNew: double.parse(((MediaQuery.of(context).size.width*0.035).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.035).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.035).toString())),
                                 ),
                                 Padding(
-                                  padding: EdgeInsets.only(left: CustomSize.sizeWidth(context) / 24),
-                                  child: CustomText.bodyMedium16(text: randomRes1[index].name, sizeNew: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.04).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.04).toString())),
+                                  padding: EdgeInsets.only(left: CustomSize.sizeWidth(context) / 24, right: CustomSize.sizeWidth(context) / 34),
+                                  child: Container(
+                                      height: CustomSize.sizeWidth(context) / 12,
+                                      child: CustomText.bodyMedium16(maxLines: 2, text: randomRes1[index].name, sizeNew: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.04).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.04).toString()))),
                                 ),
                               ],
                             ),

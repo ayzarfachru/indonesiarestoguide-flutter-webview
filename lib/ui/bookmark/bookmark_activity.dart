@@ -108,7 +108,7 @@ class _BookmarkActivityState extends State<BookmarkActivity> {
     });
     SharedPreferences pref = await SharedPreferences.getInstance();
     String token = pref.getString("token") ?? "";
-    var apiResult = await http.get(Links.mainUrl + '/page/favresto?lat=$lat&long=$long', headers: {
+    var apiResult = await http.get(Uri.parse(Links.mainUrl + '/page/favresto?lat=$lat&long=$long'), headers: {
       "Accept": "Application/json",
       "Authorization": "Bearer $token"
     });

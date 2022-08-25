@@ -1,19 +1,17 @@
 buildscript {
     repositories {
-        mavenCentral()
+        google()
         maven { url 'https://plugins.gradle.org/m2/' }
-        maven {
-            url "https://maven.google.com"
-        }
+        mavenCentral()
+        gradlePluginPortal()
+        jcenter()
     }
     dependencies {
         // OneSignal-Gradle-Plugin
-        classpath 'gradle.plugin.com.onesignal:onesignal-gradle-plugin:[0.12.6, 0.99.99]'
+        classpath 'gradle.plugin.com.onesignal:onesignal-gradle-plugin:[0.14.0, 0.99.99]'
+//        classpath 'gradle.plugin.com.onesignal:onesignal-gradle-plugin:[0.14.0, 0.99.99]'
     }
 }
-
-apply plugin: 'com.onesignal.androidsdk.onesignal-gradle-plugin'
-
 
 def localProperties = new Properties()
 def localPropertiesFile = rootProject.file('local.properties')
@@ -23,6 +21,8 @@ if (localPropertiesFile.exists()) {
     }
 }
 
+apply plugin: 'com.onesignal.androidsdk.onesignal-gradle-plugin'
+
 def flutterRoot = localProperties.getProperty('flutter.sdk')
 if (flutterRoot == null) {
     throw new GradleException("Flutter SDK not found. Define location with flutter.sdk in the local.properties file.")
@@ -30,12 +30,12 @@ if (flutterRoot == null) {
 
 def flutterVersionCode = localProperties.getProperty('flutter.versionCode')
 if (flutterVersionCode == null) {
-    flutterVersionCode = '1'
+    flutterVersionCode = '30'
 }
 
 def flutterVersionName = localProperties.getProperty('flutter.versionName')
 if (flutterVersionName == null) {
-    flutterVersionName = '1.0'
+    flutterVersionName = '30.0'
 }
 
 apply plugin: 'com.android.application'
@@ -49,23 +49,37 @@ if (keystorePropertiesFile.exists()) {
 }
 
 android {
-    compileSdkVersion 30
+    compileSdkVersion 31
+//    ndkVersion flutter.ndkVersion
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
+
+    kotlinOptions {
+        jvmTarget = '1.8'
+    }
+
+    lintOptions {
+        checkReleaseBuilds false
+    }
 
     sourceSets {
         main.java.srcDirs += 'src/main/kotlin'
     }
 
-    lintOptions {
-        disable 'InvalidPackage'
-    }
-
     defaultConfig {
         // TODO: Specify your own unique Application ID (https://developer.android.com/studio/build/application-id.html).
         applicationId "com.devus.indonesiarestoguide"
-        minSdkVersion 21
-        targetSdkVersion 30
+        // You can update the following values to match your application needs.
+        // For more information, see: https://docs.flutter.dev/deployment/android#reviewing-the-build-configuration.
+        minSdkVersion 20
+        targetSdkVersion 31
+        compileSdkVersion 31
         versionCode flutterVersionCode.toInteger()
         versionName flutterVersionName
+        multiDexEnabled true
     }
 
     signingConfigs {
@@ -78,6 +92,8 @@ android {
     }
     buildTypes {
         release {
+            shrinkResources false
+            minifyEnabled false
             signingConfig signingConfigs.release
         }
     }
@@ -90,9 +106,10 @@ flutter {
 dependencies {
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
 
-    implementation platform('com.google.firebase:firebase-bom:26.7.0')
+    implementation platform('com.google.firebase:firebase-bom:30.0.1')
     implementation 'com.google.firebase:firebase-analytics-ktx'
-    implementation 'com.google.firebase:firebase-messaging:17.3.0'
+    implementation 'com.google.firebase:firebase-messaging:23.0.2'
+    // implementation 'com.google.firebase:firebase-messaging:17.3.0'
     implementation "com.google.android.gms:play-services-location:15.0.1"
     implementation "com.google.android.gms:play-services-ads-identifier:15.0.1"
     implementation "com.google.android.gms:play-services-base:15.0.1"

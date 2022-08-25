@@ -45,7 +45,7 @@ class _MejaActivityState extends State<MejaActivity> {
     });
     SharedPreferences pref = await SharedPreferences.getInstance();
     String token = pref.getString("token") ?? "";
-    var apiResult = await http.get(Links.mainUrl + '/resto/table', headers: {
+    var apiResult = await http.get(Uri.parse(Links.mainUrl + '/resto/table'), headers: {
       "Accept": "Application/json",
       "Authorization": "Bearer $token"
     });
@@ -110,7 +110,7 @@ class _MejaActivityState extends State<MejaActivity> {
     });
     SharedPreferences pref = await SharedPreferences.getInstance();
     String token = pref.getString("token") ?? "";
-    var apiResult = await http.get(Links.mainUrl + '/resto/table/delete/$id', headers: {
+    var apiResult = await http.get(Uri.parse(Links.mainUrl + '/resto/table/delete/$id'), headers: {
       "Accept": "Application/json",
       "Authorization": "Bearer $token"
     });
@@ -139,7 +139,7 @@ class _MejaActivityState extends State<MejaActivity> {
     });
     SharedPreferences pref = await SharedPreferences.getInstance();
     String token = pref.getString("token") ?? "";
-    var apiResult = await http.get(Links.mainUrl + '/resto/qrcode', headers: {
+    var apiResult = await http.get(Uri.parse(Links.mainUrl + '/resto/qrcode'), headers: {
       "Accept": "Application/json",
       "Authorization": "Bearer $token"
     });
@@ -155,14 +155,15 @@ class _MejaActivityState extends State<MejaActivity> {
     });
   }
 
+  bool isLoading2 = false;
   Future<void> AddMeja()async{
 
     setState(() {
-      isLoading = true;
+      isLoading2 = true;
     });
     SharedPreferences pref = await SharedPreferences.getInstance();
     String token = pref.getString("token") ?? "";
-    var apiResult = await http.post(Links.mainUrl + '/table', headers: {
+    var apiResult = await http.post(Uri.parse(Links.mainUrl + '/table'), headers: {
       "Accept": "Application/json",
       "Authorization": "Bearer $token"
     });
@@ -178,7 +179,7 @@ class _MejaActivityState extends State<MejaActivity> {
       // downloadAll = data['link'];
       // print(url + 'aa');
       // meja = _meja;
-      isLoading = false;
+      isLoading2 = false;
     });
   }
 
@@ -447,7 +448,7 @@ class _MejaActivityState extends State<MejaActivity> {
                   //     PageTransition(
                   //         type: PageTransitionType.rightToLeft,
                   //         child: AddMenu()));
-                  if (meja.length == 100) {
+                  if (meja.length == 500) {
                     Fluttertoast.showToast(
                         msg: "Meja terlalu banyak",
                         backgroundColor: Colors.grey,
@@ -455,9 +456,12 @@ class _MejaActivityState extends State<MejaActivity> {
                         fontSize: 16.0
                     );
                   } else {
-                    AddMeja();
-                    Fluttertoast.showToast(
-                      msg: "Tunggu sebentar.",);
+                    if (isLoading2 == true) {
+                      // Fluttertoast.showToast(
+                      //   msg: "Tunggu sebentar.",);
+                    } else if (isLoading2 == false) {
+                      AddMeja();
+                    }
                   }
                 },
                 child: Container(

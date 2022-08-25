@@ -110,7 +110,7 @@ class _NasgorActivityState extends State<NasgorActivity> {
   getHomePg() async {
     SharedPreferences pref = await SharedPreferences.getInstance();
     setState(() {
-      homepg = (pref.getString('homepg'));
+      homepg = (pref.getString('homepg')??'');
       print(homepg);
     });
   }
@@ -124,7 +124,7 @@ class _NasgorActivityState extends State<NasgorActivity> {
     });
     SharedPreferences pref = await SharedPreferences.getInstance();
     String token = pref.getString("token") ?? "";
-    var apiResult = await http.get(Links.mainUrl + '/page/promo?lat=$lat&long=$long', headers: {
+    var apiResult = await http.get(Uri.parse(Links.mainUrl + '/page/promo?lat=$lat&long=$long'), headers: {
       "Accept": "Application/json",
       "Authorization": "Bearer $token"
     });
@@ -160,7 +160,7 @@ class _NasgorActivityState extends State<NasgorActivity> {
     });
     SharedPreferences pref = await SharedPreferences.getInstance();
     String token = pref.getString("token") ?? "";
-    var apiResult = await http.get(Links.mainUrl + '/promo', headers: {
+    var apiResult = await http.get(Uri.parse(Links.mainUrl + '/promo'), headers: {
       "Accept": "Application/json",
       "Authorization": "Bearer $token"
     });
@@ -268,7 +268,7 @@ class _NasgorActivityState extends State<NasgorActivity> {
     });
     SharedPreferences pref = await SharedPreferences.getInstance();
     String token = pref.getString("token") ?? "";
-    var apiResult = await http.get(Links.mainUrl + '/promo/delete/$id', headers: {
+    var apiResult = await http.get(Uri.parse(Links.mainUrl + '/promo/delete/$id'), headers: {
       "Accept": "Application/json",
       "Authorization": "Bearer $token"
     });
@@ -312,7 +312,7 @@ class _NasgorActivityState extends State<NasgorActivity> {
     SharedPreferences pref = await SharedPreferences.getInstance();
     var token = pref.getString("token") ?? "";
 
-    var apiResult = await http.get(Links.mainUrl + '/page/search?q=nasi goreng&type=$type&lat=$lat&long=$long&limit=0',
+    var apiResult = await http.get(Uri.parse(Links.mainUrl + '/page/search?q=nasi goreng&type=$type&lat=$lat&long=$long&limit=0'),
         headers: {
           "Accept": "Application/json",
           "Authorization": "Bearer $token"
@@ -373,8 +373,8 @@ class _NasgorActivityState extends State<NasgorActivity> {
     });
     Location.instance.getLocation().then((value) {
       setState(() {
-        latitude = value.latitude;
-        longitude = value.longitude;
+        latitude = value.latitude!;
+        longitude = value.longitude!;
       });
     });
     lat = latitude.toString();

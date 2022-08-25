@@ -10,6 +10,7 @@ import 'package:flutter_datetime_picker/flutter_datetime_picker.dart';
 import 'package:flutter_icons/flutter_icons.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:intl/intl.dart';
 import 'package:kam5ia/model/Menu.dart';
 import 'package:kam5ia/model/User.dart';
 import 'package:kam5ia/ui/promo/pilih_menu.dart';
@@ -110,7 +111,7 @@ class _AddPromoState extends State<AddPromo> {
   String tgl = "";
   String notelp = "";
 
-  bool isLoading = true;
+  bool isLoading = false;
 
   bool favorite = false;
   bool reservation = false;
@@ -147,7 +148,7 @@ class _AddPromoState extends State<AddPromo> {
                 child: Text("Simpan", style: TextStyle(color: CustomColor.accent),),
                 onPressed: () async{
                   SharedPreferences pref = await SharedPreferences.getInstance();
-                  pref.setString("tipeMenu", tipe);
+                  pref.setString("tipeMenu", tipe.toString());
                   setState(() {
                     print(tipe);
                     getTipePromo();
@@ -173,8 +174,8 @@ class _AddPromoState extends State<AddPromo> {
   getInitial() async {
     SharedPreferences pref = await SharedPreferences.getInstance();
     setState(() {
-      initial = (pref.getString('name').substring(0, 1).toUpperCase());
-      nameRes = (pref.getString('resProm'));
+      initial = (pref.getString('name')!.substring(0, 1).toUpperCase());
+      nameRes = (pref.getString('resProm')??'');
       print(initial);
       print('Name Rest '+nameRes.toString());
     });
@@ -204,7 +205,7 @@ class _AddPromoState extends State<AddPromo> {
     final pickedFile = await picker.getImage(source: ImageSource.gallery);
 
     setState(() {
-      image = File(pickedFile.path);
+      image = File(pickedFile!.path);
       extension = pickedFile.path.split('.').last;
     });
   }
@@ -259,7 +260,7 @@ class _AddPromoState extends State<AddPromo> {
     });
     SharedPreferences pref = await SharedPreferences.getInstance();
     String token = pref.getString("token") ?? "";
-    var apiResult = await http.get(Links.mainUrl + '/resto/menu', headers: {
+    var apiResult = await http.get(Uri.parse(Links.mainUrl + '/resto/menu'), headers: {
       "Accept": "Application/json",
       "Authorization": "Bearer $token"
     });
@@ -291,13 +292,18 @@ class _AddPromoState extends State<AddPromo> {
     });
   }
 
+  String idRes = '';
   String idMenu = '';
+  List ArridMenu = [];
   String nameMenu = '';
   getMenu() async {
     SharedPreferences pref = await SharedPreferences.getInstance();
     setState(() {
-      idMenu = (pref.getString('idMenu'));
-      nameMenu = (pref.getString('nameMenu'));
+      idRes = (pref.getString('idHomeResto')??'');
+      idMenu = (pref.getString('idMenu')??'');
+      ArridMenu = (idMenu != '' || idMenu != '[]')?json.decode(idMenu.toString()):[];
+      nameMenu = (pref.getString('nameMenu').toString() != '')?pref.getString('nameMenu').toString().replaceAll('[', '').replaceAll(']', ''):'';
+      // nameMenu = (pref.getString('nameMenu')??'');
       tipeMenu = TextEditingController(text: nameMenu);
       print(idMenu);
       print(nameMenu);
@@ -322,42 +328,59 @@ class _AddPromoState extends State<AddPromo> {
     });
     SharedPreferences pref = await SharedPreferences.getInstance();
     String token = pref.getString("token") ?? "";
-    var apiResult = await http.post(Links.mainUrl + '/promo',
-        body: {
+    for(var v in ArridMenu){
+      print('v');
+      print(v);
+      var apiResult = await http.post(Uri.parse(Links.mainUrl + '/promo'),
+          body: {
+            'menu_id': v.toString(),
+            'desc': descPromo.text,
+            'expire': _dateController.text+' '+_Jam.text,
+            'type': typePromo.text,
+            'amount': percentPromo.text,
+          },
+          headers: {
+            "Accept": "Application/json",
+            "Authorization": "Bearer $token"
+          });
+      print(apiResult.body);
+      var data = json.decode(apiResult.body);
+
+      if(data['status_code'] == 200){
+        print("success");
+        print(json.encode({
+          'menu': idMenu,
+          'deskripsi': descPromo.text,
+          'expire': _dateController.text+' '+_Jam.text,
+          'type': typePromo.text,
+          'amount': percentPromo.text,
+        }));
+        // Navigator.pushReplacement(context, PageTransition(type: PageTransitionType.fade, child: HomeActivityResto()));
+      } else {
+        // print(data);
+        print(json.encode({
           'menu_id': idMenu,
           'desc': descPromo.text,
           'expire': _dateController.text+' '+_Jam.text,
           'type': typePromo.text,
           'amount': percentPromo.text,
-        },
-        headers: {
-          "Accept": "Application/json",
-          "Authorization": "Bearer $token"
-        });
-    print(apiResult.body);
-    var data = json.decode(apiResult.body);
-
-    if(data['status_code'] == 200){
-      print("success");
-      print(json.encode({
-        'menu': idMenu,
-        'deskripsi': descPromo.text,
-        'expire': _dateController.text+' '+_Jam.text,
-        'type': typePromo.text,
-        'amount': percentPromo.text,
-      }));
-      // Navigator.pushReplacement(context, PageTransition(type: PageTransitionType.fade, child: HomeActivityResto()));
-    } else {
-      // print(data);
-      print(json.encode({
-        'menu_id': idMenu,
-        'desc': descPromo.text,
-        'expire': _dateController.text+' '+_Jam.text,
-        'type': typePromo.text,
-        'amount': percentPromo.text,
-      }));
+        }));
+      }
+      // Menu p = Menu(
+      //     id: v['id'],
+      //     name: v['name'],
+      //     desc: v['desc'],
+      //     urlImg: v['img'],
+      //     type: v['type'],
+      //     is_recommended: v['is_recommended'],
+      //     is_available: v['is_available'],
+      //     price: Price(original: int.parse(v['price'].toString()), discounted: null, delivery: null),
+      //     delivery_price: Price(original: int.parse(v['price']), delivery: null, discounted: null), restoId: '', distance: null, restoName: '', qty: ''
+      // );
+      // _menu.add(p);
     }
     setState(() {
+      _getKaryawan();
       isLoading = false;
     });
   }
@@ -373,7 +396,7 @@ class _AddPromoState extends State<AddPromo> {
     });
     SharedPreferences pref = await SharedPreferences.getInstance();
     String token = pref.getString("token") ?? "";
-    var apiResult = await http.get(Links.mainUrl + '/resto/follower', headers: {
+    var apiResult = await http.get(Uri.parse(Links.mainUrl + '/resto/follower'), headers: {
       "Accept": "Application/json",
       "Authorization": "Bearer $token"
     });
@@ -390,7 +413,9 @@ class _AddPromoState extends State<AddPromo> {
         playerIds: id,
         heading: "Ada promo baru di $nameRes nih...",
         content: "Cek sekarang !",
-        androidChannelId: "28c77296-719c-46b3-9331-93a100bac57c",
+        androidChannelId: "9980651f-315e-46e7-8125-5154969e84a0",
+        collapseId: "forUser_$idRes",
+        androidSound: 'irg_promo.wav',
       ));
       // await OneSignal.shared.postNotificationWithJson();
       user3.add(v['device_id']);
@@ -419,7 +444,7 @@ class _AddPromoState extends State<AddPromo> {
     });
     SharedPreferences pref = await SharedPreferences.getInstance();
     String token = pref.getString("token") ?? "";
-    var apiResult = await http.get(Links.mainUrl + '/resto/follower', headers: {
+    var apiResult = await http.get(Uri.parse(Links.mainUrl + '/resto/follower'), headers: {
       "Accept": "Application/json",
       "Authorization": "Bearer $token"
     });
@@ -469,9 +494,9 @@ class _AddPromoState extends State<AddPromo> {
     getInitial();
     _getMenu();
     getMenu();
-    _getKaryawan2().whenComplete((){
-      print('print u3 '+tipeMenu.text.toString()+'O');
-    });
+    // _getKaryawan2().whenComplete((){
+    //   print('print u3 '+tipeMenu.text.toString()+'O');
+    // });
     typePromo = TextEditingController(text: 'diskon');
     // Future.delayed(Duration.zero, () async {
     //
@@ -783,7 +808,7 @@ class _AddPromoState extends State<AddPromo> {
                                       blurredBackground: true,
                                       accentColor: Colors.blue[400],
                                       context: context,
-                                      value: (jam != null)?jam:null,
+                                      value: (jam != null)?jam:TimeOfDay.now(),
                                       onChange: onTimeOpenChanged,
                                       minuteInterval: MinuteInterval.ONE,
                                       disableHour: false,
@@ -838,17 +863,25 @@ class _AddPromoState extends State<AddPromo> {
         floatingActionButton:
         GestureDetector(
           onTap: () async{
-            setState(() {
-              isLoading = false;
-            });
-            if (tipeMenu.text != '' && descPromo.text != '' && percentPromo.text != '' && _dateController.text != '' && _Jam.text != '') {
-              AddPromo().whenComplete((){
-                _getKaryawan();
-                Navigator.pop(context);
-                Navigator.pushReplacement(context, PageTransition(type: PageTransitionType.fade, child: new PromoActivity()));
-              });
+            // setState(() {
+            //   isLoading = false;
+            // });
+            if (isLoading != true) {
+              if (tipeMenu.text != '' && descPromo.text != '' && percentPromo.text != '' && _dateController.text != '' && _Jam.text != '') {
+                if (typePromo.text == 'diskon' && int.parse(percentPromo.text) < 10 || int.parse(percentPromo.text) > 100) {
+                  Fluttertoast.showToast(msg: 'Promo tidak boleh dibawah 10 persen dan diatas 100!');
+                } else {
+                  AddPromo().whenComplete((){
+                    // _getKaryawan();
+                    Navigator.pop(context);
+                    Navigator.pushReplacement(context, PageTransition(type: PageTransitionType.fade, child: new PromoActivity()));
+                  });
+                }
+              } else {
+                Fluttertoast.showToast(msg: 'Lengkapi data promo terlebih dahulu!');
+              }
             } else {
-              Fluttertoast.showToast(msg: 'Lengkapi data promo terlebih dahulu!');
+              Fluttertoast.showToast(msg: 'Tunggu sebentar!');
             }
             // SharedPreferences pref = await SharedPreferences.getInstance();
             // pref.setString("name", descPromo.text.toString());

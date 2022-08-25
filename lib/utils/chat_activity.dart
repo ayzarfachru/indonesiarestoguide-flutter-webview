@@ -6,7 +6,7 @@ import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:fluttertoast/fluttertoast.dart';
-import 'package:full_screen_image/full_screen_image.dart';
+import 'package:full_screen_image_null_safe/full_screen_image_null_safe.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:kam5ia/ui/home/home_activity.dart';
 import 'package:kam5ia/ui/ui_resto/home/home_activity.dart';
@@ -57,9 +57,9 @@ class _ChatActivityState extends State<ChatActivity> {
 
   Future uploadFile() async {
     String fileName = DateTime.now().millisecondsSinceEpoch.toString();
-    StorageReference reference = FirebaseStorage.instance.ref().child(fileName);
-    StorageUploadTask uploadTask = reference.putFile(imageFile);
-    StorageTaskSnapshot storageTaskSnapshot = await uploadTask.onComplete;
+    Reference reference = FirebaseStorage.instance.ref().child(fileName);
+    UploadTask uploadTask = reference.putFile(imageFile!);
+    TaskSnapshot storageTaskSnapshot = await uploadTask;
     setState(() {
       isLoading = true;
     });
@@ -114,7 +114,7 @@ class _ChatActivityState extends State<ChatActivity> {
     });
     SharedPreferences pref = await SharedPreferences.getInstance();
     String token = pref.getString("token") ?? "";
-    var apiResult = await http.post(Links.mainUrl + '/trans/chat',
+    var apiResult = await http.post(Uri.parse(Links.mainUrl + '/trans/chat'),
         body: {
           'amount': totalChat.toString(),
           'type': 'user',
@@ -151,7 +151,7 @@ class _ChatActivityState extends State<ChatActivity> {
     });
     SharedPreferences pref = await SharedPreferences.getInstance();
     String token = pref.getString("token") ?? "";
-    var apiResult = await http.post(Links.mainUrl + '/trans/chat',
+    var apiResult = await http.post(Uri.parse(Links.mainUrl + '/trans/chat'),
         body: {
           'amount': totalChat.toString(),
           'type': 'resto',
@@ -188,7 +188,7 @@ class _ChatActivityState extends State<ChatActivity> {
     });
     SharedPreferences pref = await SharedPreferences.getInstance();
     String token = pref.getString("token") ?? "";
-    var apiResult = await http.post(Links.mainUrl + '/reservation/chat',
+    var apiResult = await http.post(Uri.parse(Links.mainUrl + '/reservation/chat'),
         body: {
           'amount': totalChat.toString(),
           'type': 'user',
@@ -227,7 +227,7 @@ class _ChatActivityState extends State<ChatActivity> {
     String token = pref.getString("token") ?? "";
     print(totalChat.toString());
     print(idnyatrans.toString());
-    var apiResult = await http.post(Links.mainUrl + '/reservation/chat',
+    var apiResult = await http.post(Uri.parse(Links.mainUrl + '/reservation/chat'),
         body: {
           'amount': totalChat.toString(),
           'type': 'resto',
@@ -267,7 +267,7 @@ class _ChatActivityState extends State<ChatActivity> {
     });
     SharedPreferences pref = await SharedPreferences.getInstance();
     String token = pref.getString("token") ?? "";
-    var apiResult = await http.post(Links.mainUrl + '/trans/chat',
+    var apiResult = await http.post(Uri.parse(Links.mainUrl + '/trans/chat'),
         body: {
           'amount': '0',
           'type': (homepg != "1")?'chat_user':'chat_resto',
@@ -304,7 +304,7 @@ class _ChatActivityState extends State<ChatActivity> {
     });
     SharedPreferences pref = await SharedPreferences.getInstance();
     String token = pref.getString("token") ?? "";
-    var apiResult = await http.post(Links.mainUrl + '/trans/chat',
+    var apiResult = await http.post(Uri.parse(Links.mainUrl + '/trans/chat'),
         body: {
           'amount': '0',
           'type': 'resto',
@@ -341,7 +341,7 @@ class _ChatActivityState extends State<ChatActivity> {
     });
     SharedPreferences pref = await SharedPreferences.getInstance();
     String token = pref.getString("token") ?? "";
-    var apiResult = await http.post(Links.mainUrl + '/reservation/chat',
+    var apiResult = await http.post(Uri.parse(Links.mainUrl + '/reservation/chat'),
         body: {
           'amount': '0',
           'type': (homepg != "1")?'chat_user':'chat_resto',
@@ -378,7 +378,7 @@ class _ChatActivityState extends State<ChatActivity> {
     });
     SharedPreferences pref = await SharedPreferences.getInstance();
     String token = pref.getString("token") ?? "";
-    var apiResult = await http.post(Links.mainUrl + '/reservation/chat',
+    var apiResult = await http.post(Uri.parse(Links.mainUrl + '/reservation/chat'),
         body: {
           'amount': '0',
           'type': 'resto',
@@ -416,12 +416,12 @@ class _ChatActivityState extends State<ChatActivity> {
     SharedPreferences pref = await SharedPreferences.getInstance();
     setState(() {
       pref.setString("timeLog", DateTime.now().toString().toString().split('-')[2].replaceAll('.', '').replaceAll(':', '').replaceAll('T', '')).toString();
-      timeNow = (pref.getString('timeLog'));
-      homepg = (pref.getString('homepg'));
-      email = (pref.getString('email'));
-      print('homepg '+homepg);
-      rev = (pref.getString('rev'));
-      idnyatrans = (pref.getString('idnyatrans'));
+      timeNow = (pref.getString('timeLog')??'');
+      homepg = (pref.getString('homepg')??'');
+      email = (pref.getString('email')??'');
+      print('homepg '+email);
+      rev = (pref.getString('rev')??'');
+      idnyatrans = (pref.getString('idnyatrans')??'');
       print(homepg);
     });
   }
@@ -497,7 +497,7 @@ class _ChatActivityState extends State<ChatActivity> {
         txt = messageController.text;
         messageController.clear();
         await _firestore.collection("room")
-            .document(chatRoom)
+            .doc(chatRoom)
             .collection('messages').add({
           'type': "0",
           'text': txt,
@@ -529,7 +529,7 @@ class _ChatActivityState extends State<ChatActivity> {
         }
       }
       setState(() {
-        imageFile = File(pickedFile.path);
+        imageFile = File(pickedFile!.path);
         isLoading = false;
         Fluttertoast.showToast(
             msg: "Wait for a moment",
@@ -642,7 +642,7 @@ class _ChatActivityState extends State<ChatActivity> {
                       from: doc.get('from'),
                       text: doc.get('text'),
                       img: doc.get('img'),
-                      me: userName == doc.get('from'),
+                      me: email == doc.get('from'),
                       date: doc.get('date'),
                     ))
                         .toList();

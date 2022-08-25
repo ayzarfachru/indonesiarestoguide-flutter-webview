@@ -2,13 +2,14 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
-import 'package:geocoder/geocoder.dart';
+// import 'package:geocoder/geocoder.dart';
 import 'package:geocoding/geocoding.dart' as geo;
 import 'package:geolocator/geolocator.dart';
+import 'package:geocoding/geocoding.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:flutter_polyline_points/flutter_polyline_points.dart';
-import 'package:kam5ia/ui/cart/cart_activity.dart';
+import 'package:kam5ia/ui/cart/cart_activity.dart' as cart;
 import 'package:kam5ia/utils/utils.dart';
 import 'package:page_transition/page_transition.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -139,8 +140,8 @@ class _SearchAddressMapsState extends State<SearchAddressMaps> {
   double long1 = 0.0;
   Future getLatLong()async{
     SharedPreferences pref = await SharedPreferences.getInstance();
-    lat1 = double.parse(pref.getString('latResto1'));
-    long1 = double.parse(pref.getString('longResto1'));
+    lat1 = double.parse(pref.getString('latResto1')??'');
+    long1 = double.parse(pref.getString('longResto1')??'');
   }
 
   @override
@@ -182,11 +183,31 @@ class _SearchAddressMapsState extends State<SearchAddressMaps> {
                   myLocationButtonEnabled: true,
                   mapToolbarEnabled: true,
                   onCameraIdle: () async{
-                    var addresses = await Geocoder.local.findAddressesFromCoordinates(new Coordinates(_lat, _long));
-                    var first = addresses.first;
+                    var addresses = await
+                    placemarkFromCoordinates(double.parse(_lat.toString()), double.parse(_long.toString()),
+                        localeIdentifier: 'id_ID').then((placemarks) async {
+                      setState(() {
+                        // latitude = widget.lat!;
+                        // longitude = widget.long!;
+                        address = placemarks[0].street! +
+                            ', ' +
+                            placemarks[0].subLocality! +
+                            ', ' +
+                            placemarks[0].locality! +
+                            ', ' +
+                            placemarks[0].subAdministrativeArea! +
+                            ', ' +
+                            placemarks[0].administrativeArea! +
+                            ' ' +
+                            placemarks[0].postalCode! +
+                            ', ' +
+                            placemarks[0].country!;
+                      });
+                    });
+                    var first = addresses.streetAddress;
                     setState(() {
                       isMove = false;
-                      address = first.addressLine ;
+                      address = first.toString();
                     });
                   },
                   onCameraMoveStarted: (){
@@ -248,7 +269,7 @@ class _SearchAddressMapsState extends State<SearchAddressMaps> {
                                 SharedPreferences pref = await SharedPreferences.getInstance();
                                 latitude = lat1;
                                 longitude = long1;
-                                distan = await Geolocator.distanceBetween( latitude, longitude, _lat, _long,);
+                                distan = await Geolocator.distanceBetween( latitude, longitude, double.parse(_lat.toString()), double.parse(_long.toString()),);
                                 print(distan.toString());
                                 print(distan.toString().length);
                                 pref.setString("addressDelivTrans", address);
@@ -314,14 +335,15 @@ class _SearchAddressMapsState extends State<SearchAddressMaps> {
                         cursorColor: Colors.black,
                         textInputAction: TextInputAction.search,
                         onSubmitted: (v)async{
-                          var addresses = await Geocoder.local.findAddressesFromQuery(v);
+                          // var addresses = await Geocoder.local.findAddressesFromQuery(v);
+                          List<Location> addresses = await locationFromAddress(v);
 
                           CameraPosition cPosition = CameraPosition(
                             zoom: 18,
                             // tilt: 80,
                             // bearing: 30,
-                            target: LatLng(addresses[0].coordinates.latitude,
-                                addresses[0].coordinates.longitude),
+                            target: LatLng(addresses[0].latitude,
+                                addresses[0].longitude),
                           );
 
                           final GoogleMapController controller = await _controller.future;

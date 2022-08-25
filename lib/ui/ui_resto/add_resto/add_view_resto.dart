@@ -4,6 +4,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_datetime_picker/flutter_datetime_picker.dart';
+// import 'package:geocoder/geocoder.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:image_picker/image_picker.dart';
@@ -44,7 +45,7 @@ class _AddViewRestoState extends State<AddViewResto> {
   getInitial() async {
     SharedPreferences pref = await SharedPreferences.getInstance();
     setState(() {
-      initial = (pref.getString('name').substring(0, 1).toUpperCase());
+      initial = (pref.getString('name')!.substring(0, 1).toUpperCase());
       print(initial);
     });
   }
@@ -59,7 +60,7 @@ class _AddViewRestoState extends State<AddViewResto> {
     final pickedFile = await picker.getImage(source: ImageSource.gallery);
 
     setState(() {
-      image = File(pickedFile.path);
+      image = File(pickedFile!.path);
       extension = pickedFile.path.split('.').last;
     });
   }
@@ -278,6 +279,17 @@ class _AddViewRestoState extends State<AddViewResto> {
                                 // print(latitude);
                                 // print(longitude);
                               }
+                              // var addresses = await Geocoder.local.findAddressesFromQuery(_Address.text.toString());
+                              // var first = addresses.first;
+                              // setState(() {
+                              //   pref.setString('latitudeResto', first.coordinates.latitude.toString());
+                              //   pref.setString('longitudeResto', first.coordinates.longitude.toString());
+                              //   // latUser = first.coordinates.latitude.toString();
+                              //   // longUser = first.coordinates.longitude.toString();
+                              //   print('latt');
+                              //   print(pref.getString('latitudeResto'));
+                              //   print(pref.getString('longitudeResto'));
+                              // });
                               setState(() {});
                               //search alamat menggunakan text
                             },
@@ -420,7 +432,7 @@ class _AddViewRestoState extends State<AddViewResto> {
                                   pref.setString("addressResto", _Address.text.toString());
                                   print(pref.getString("imgResto"));
                                   print(pref.getString("nameResto"));
-                                  print('ini loh email '+pref.getString("emailResto"));
+                                  print('ini loh email '+pref.getString("emailResto").toString());
                                   print(pref.getString("latitudeResto"));
                                   print(pref.getString("longitudeResto"));
                                   print(pref.getString("notelpResto"));

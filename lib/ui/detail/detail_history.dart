@@ -2,7 +2,8 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_icons/flutter_icons.dart';
-import 'package:full_screen_image/full_screen_image.dart';
+import 'package:full_screen_image_null_safe/full_screen_image_null_safe.dart';
+// import 'package:full_screen_image/full_screen_image.dart';
 import 'package:kam5ia/model/Menu.dart';
 import 'package:kam5ia/model/Price.dart';
 import 'package:kam5ia/ui/detail/detail_resto.dart';
@@ -43,8 +44,8 @@ class _DetailHistoryState extends State<DetailHistory> {
   getHomePg() async {
     SharedPreferences pref = await SharedPreferences.getInstance();
     setState(() {
-      homepg = (pref.getString('homepg'));
-      karyawan = (pref.getString("karyawan"));
+      homepg = (pref.getString('homepg')??'');
+      karyawan = (pref.getString("karyawan")??'');
       print(homepg);
     });
   }
@@ -60,7 +61,7 @@ class _DetailHistoryState extends State<DetailHistory> {
     var token = pref.getString("token") ?? "";
     print(karyawan);
 
-    var apiResult = await http.get(Links.mainUrl + '/page/history?id=$id',
+    var apiResult = await http.get(Uri.parse(Links.mainUrl + '/page/history?id=$id'),
         headers: {
           "Accept": "Application/json",
           "Authorization": "Bearer $token"
@@ -101,7 +102,7 @@ class _DetailHistoryState extends State<DetailHistory> {
 
     SharedPreferences pref = await SharedPreferences.getInstance();
     String token = pref.getString("token") ?? "";
-    var apiResult = await http.get(Links.mainUrl + '/trans/op/$operation/$id', headers: {
+    var apiResult = await http.get(Uri.parse(Links.mainUrl + '/trans/op/$operation/$id'), headers: {
       "Accept": "Application/json",
       "Authorization": "Bearer $token"
     });

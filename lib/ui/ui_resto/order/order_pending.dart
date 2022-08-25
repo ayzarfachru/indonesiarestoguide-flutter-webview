@@ -3,8 +3,10 @@ import 'dart:convert';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_icons/flutter_icons.dart';
-import 'package:full_screen_image/full_screen_image.dart';
-import 'package:geocoder/geocoder.dart';
+import 'package:full_screen_image_null_safe/full_screen_image_null_safe.dart';
+import 'package:geocoding/geocoding.dart';
+// import 'package:full_screen_image/full_screen_image.dart';
+// import 'package:geocoder/geocoder.dart';
 import 'package:kam5ia/model/Meja.dart';
 import 'package:kam5ia/model/Transaction.dart';
 import 'package:kam5ia/model/User.dart';
@@ -41,9 +43,9 @@ class _OrderPendingState extends State<OrderPending> {
     List<Transaction> _transaction = [];
 
     SharedPreferences pref = await SharedPreferences.getInstance();
-    checkId = pref.getString('idHomeResto');
+    checkId = pref.getString('idHomeResto')??'';
     String token = pref.getString("token") ?? "";
-    var apiResult = await http.get(Links.mainUrl + '/resto/trans', headers: {
+    var apiResult = await http.get(Uri.parse(Links.mainUrl + '/resto/trans'), headers: {
       "Accept": "Application/json",
       "Authorization": "Bearer $token"
     });
@@ -90,7 +92,7 @@ class _OrderPendingState extends State<OrderPending> {
 
     SharedPreferences pref = await SharedPreferences.getInstance();
     String token = pref.getString("token") ?? "";
-    var apiResult = await http.get(Links.mainUrl + '/resto/trans/$id', headers: {
+    var apiResult = await http.get(Uri.parse(Links.mainUrl + '/resto/trans/$id'), headers: {
       "Accept": "Application/json",
       "Authorization": "Bearer $token"
     });
@@ -119,8 +121,219 @@ class _OrderPendingState extends State<OrderPending> {
   Future getUser()async{
     SharedPreferences pref = await SharedPreferences.getInstance();
     setState(() {
-      userName = (pref.getString('name'));
+      userName = (pref.getString('name')??'');
     });
+  }
+
+  Future<void> _checkPayBCA(String idTransaction)async {
+    // List<Menu> _menu = [];
+
+    setState(() {
+      // isLoadChekPay = true;
+    });
+    Fluttertoast.showToast(
+      msg: "Tunggu sebentar!",);
+    SharedPreferences pref = await SharedPreferences.getInstance();
+    String token = pref.getString("token") ?? "";
+    var apiResult = await http.get(Uri.parse(
+        'https://erp.devastic.com:443/api/bca/inquiry?app_id=IRG&trx_id=$idTransaction'),
+      // body: {'app_id': 'IRG', 'trx_id': id.toString(), 'amount': (totalAll+1000).toString()},
+      // headers: {
+      //   "Accept": "Application/json",
+      //   "Authorization": "Bearer $token"
+      // }
+    );
+    print('QR CODE 2');
+    print(apiResult.statusCode);
+    if (apiResult.statusCode.toString() == '500') {
+      _getPending(operation = "cancel", idTransaction);
+      Future.delayed(Duration(seconds: 0)).then((_) {
+        Navigator.pushReplacement(
+            context,
+            PageTransition(
+                type: PageTransitionType.fade,
+                child: OrderActivity()));
+      });
+    }
+    var data = json.decode(apiResult.body);
+    print('QR CODE 2');
+    print(data);
+    print(data['response']['detail_info'].toString()
+        .contains('Unpaid')
+        .toString());
+    // statusPay = data['response']['detail_info'].toString().contains('Unpaid').toString();
+    if (data['response']['detail_info'].toString().contains('Unpaid') == true) {
+      // Fluttertoast.showToast(
+      //   msg: "Anda belum membayar!",);
+      _getPending(operation = "cancel", idTransaction);
+      Future.delayed(Duration(seconds: 0)).then((_) {
+        Navigator.pushReplacement(
+            context,
+            PageTransition(
+                type: PageTransitionType.fade,
+                child: OrderActivity()));
+      });
+    } else {
+      Fluttertoast.showToast(
+        msg: "Customer telah membayar, anda tidak dapat menolak pemesanan ini!",);
+      //   _getDetail(idResto).whenComplete((){
+      //     _getDetailTrans(id.toString()).whenComplete((){
+      //       cariKurir();
+      //     });
+      //   });
+      //   statusPay = 'false';
+      //   Navigator.pop(context);
+      //   _getPending('process', id.toString());
+      //   Fluttertoast.showToast(
+      //     msg: "Pembayaran berhasil",);
+      // }
+      // _base64 = data['response']['qr_image'];
+      // Uint8List bytes = Base64Codec().decode(_base64);
+
+      // if (_base64 != '') {
+      //   showModalBottomSheet(
+      //       isScrollControlled: true,
+      //       shape: RoundedRectangleBorder(
+      //           borderRadius: BorderRadius.only(topLeft: Radius.circular(20), topRight: Radius.circular(20))
+      //       ),
+      //       context: context,
+      //       builder: (_){
+      //         return Column(
+      //           crossAxisAlignment: CrossAxisAlignment.start,
+      //           mainAxisSize: MainAxisSize.min,
+      //           children: [
+      //             SizedBox(height: CustomSize.sizeHeight(context) / 86,),
+      //             Padding(
+      //               padding: EdgeInsets.symmetric(horizontal: CustomSize.sizeWidth(context) / 2.4),
+      //               child: Divider(thickness: 4,),
+      //             ),
+      //             SizedBox(height: CustomSize.sizeHeight(context) / 106,),
+      //             Center(
+      //               child: CustomText.textHeading2(
+      //                   text: "Qris",
+      //                   minSize: double.parse(((MediaQuery.of(context).size.width*0.05).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.05)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.05)).toString()),
+      //                   maxLines: 1
+      //               ),
+      //             ),
+      //             SizedBox(height: CustomSize.sizeHeight(context) * 0.003,),
+      //             Center(
+      //               child: FullScreenWidget(
+      //                 child: Image.memory(bytes,
+      //                   width: CustomSize.sizeWidth(context) / 1.2,
+      //                   height: CustomSize.sizeWidth(context) / 1.2,
+      //                 ),
+      //                 backgroundColor: Colors.white,
+      //               ),
+      //             ),
+      //             SizedBox(height: CustomSize.sizeHeight(context) / 106,),
+      //             Center(
+      //               child: Container(
+      //                 alignment: Alignment.center,
+      //                 width: CustomSize.sizeWidth(context) / 1.2,
+      //                 child: Row(
+      //                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      //                   children: [
+      //                     CustomText.textTitle2(
+      //                         text: 'Total harga:',
+      //                         minSize: double.parse(((MediaQuery.of(context).size.width*0.045).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.045)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.045)).toString()),
+      //                         maxLines: 1
+      //                     ),
+      //                     CustomText.textTitle2(
+      //                         text: 'Rp '+NumberFormat.currency(locale: 'id', symbol: '', decimalDigits: 0).format(int.parse((totalAll+1000).toString())),
+      //                         minSize: double.parse(((MediaQuery.of(context).size.width*0.045).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.045)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.045)).toString()),
+      //                         maxLines: 1
+      //                     ),
+      //                   ],
+      //                 ),
+      //               ),
+      //             ),
+      //             SizedBox(height: CustomSize.sizeHeight(context) * 0.005,),
+      //             Center(
+      //               child: Container(
+      //                 alignment: Alignment.center,
+      //                 width: CustomSize.sizeWidth(context) / 1.2,
+      //                 child: CustomText.textTitle1(
+      //                     text: 'Scan disini untuk melakukan pembayaran',
+      //                     minSize: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.04)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.04)).toString()),
+      //                     maxLines: 1
+      //                 ),
+      //               ),
+      //             ),
+      //             Center(
+      //               child: Container(
+      //                 alignment: Alignment.center,
+      //                 width: CustomSize.sizeWidth(context) / 1.2,
+      //                 child: CustomText.textTitle1(
+      //                     text: 'ke $nameRestoTrans!',
+      //                     minSize: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.04)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.04)).toString()),
+      //                     maxLines: 3
+      //                 ),
+      //               ),
+      //             ),
+      //             SizedBox(height: CustomSize.sizeHeight(context) / 48,),
+      //             GestureDetector(
+      //               onTap: ()async{
+      //                 Fluttertoast.showToast(
+      //                   msg: "Anda belum membayar!",);
+      //               },
+      //               child: Center(
+      //                 child: Container(
+      //                   width: CustomSize.sizeWidth(context) / 1.1,
+      //                   height: CustomSize.sizeHeight(context) / 14,
+      //                   decoration: BoxDecoration(
+      //                     // color: (menuReady.contains(false))?CustomColor.textBody:CustomColor.primaryLight,
+      //                       borderRadius: BorderRadius.circular(50)
+      //                   ),
+      //                   child: Center(
+      //                     child: Padding(
+      //                       padding: const EdgeInsets.symmetric(horizontal: 20.0),
+      //                       child: CustomText.textTitle3(text: "Sudah Membayar", color: Colors.white, minSize: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.04)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.04)).toString())),
+      //                     ),
+      //                   ),
+      //                 ),
+      //               ),
+      //             ),
+      //             SizedBox(height: CustomSize.sizeHeight(context) / 54,),
+      //             // SizedBox(height: CustomSize.sizeHeight(context) / 106,),
+      //           ],
+      //         );
+      //       }
+      //   );
+      // }
+      // for(var v in data['menu']){
+      //   Menu p = Menu(
+      //       id: v['id'],
+      //       name: v['name'],
+      //       desc: v['desc'],
+      //       urlImg: v['img'],
+      //       type: v['type'],
+      //       is_recommended: v['is_recommended'],
+      //       price: Price(original: int.parse(v['price'].toString()), discounted: null, delivery: null),
+      //       delivery_price: Price(original: int.parse(v['price']), delivery: null, discounted: null), restoId: '', restoName: '', distance: null, qty: ''
+      //   );
+      //   _menu.add(p);
+      // }
+      setState(() {
+        // isLoadChekPay = false;
+        // emailTokoTrans = data['email'].toString();
+        // ownerTokoTrans = data['name_owner'].toString();
+        // pjTokoTrans = data['name_pj'].toString();
+        // // bankTokoTrans = data['bank'].toString();
+        // // nameNorekTokoTrans = data['namaNorek'].toString();
+        // nameRekening = data['nama_norek'].toString();
+        // nameBank = data['bank_norek'].toString();
+        // norekTokoTrans = data['norek'].toString();
+        // phone = data['resto']['phone_number'].toString();
+        // addressRes = data['resto']['address'].toString();
+        // nameRestoTrans = data['resto']['name'];
+        // restoAddress = data['resto']['address'];
+        // isLoading = false;
+      });
+
+      // if (apiResult.statusCode == 200 && menu.toString() == '[]') {
+      //   kosong = true;
+      // }
+    }
   }
 
   String address = "";
@@ -162,7 +375,7 @@ class _OrderPendingState extends State<OrderPending> {
 
     SharedPreferences pref = await SharedPreferences.getInstance();
     String token = pref.getString("token") ?? "";
-    var apiResult = await http.get(Links.mainUrl + '/resto/trans/$Id', headers: {
+    var apiResult = await http.get(Uri.parse(Links.mainUrl + '/resto/trans/$Id'), headers: {
       "Accept": "Application/json",
       "Authorization": "Bearer $token"
     });
@@ -213,11 +426,38 @@ class _OrderPendingState extends State<OrderPending> {
     // }
 
     if (data['trx']['type'].toString() == 'Pesan antar') {
-      var addresses = await Geocoder.local.findAddressesFromQuery(data['trx']['address'].toString());
-      var first = addresses.first;
+      var addresses = await
+      locationFromAddress(data['trx']['address'].toString(),
+          localeIdentifier: 'id_ID')
+          .then((placemarks) async {
+        setState(() {
+          latUser = placemarks[0].latitude.toString();
+          longUser = placemarks[0].longitude.toString();
+          print('latUser');
+          print(latUser);
+          print(longUser);
+          // address = placemarks[0].street +
+          //     ', ' +
+          //     placemarks[0].subLocality! +
+          //     ', ' +
+          //     placemarks[0].locality! +
+          //     ', ' +
+          //     placemarks[0].subAdministrativeArea! +
+          //     ', ' +
+          //     placemarks[0].administrativeArea! +
+          //     ' ' +
+          //     placemarks[0].postalCode! +
+          //     ', ' +
+          //     placemarks[0].country!;
+        });
+      });
+      // geoCode.forwardGeocoding(
+      //     address: data['trx']['address'].toString());
+      // Geocoder2.getDataFromAddress(address: data['trx']['address'].toString(), googleMapApiKey: 'AIzaSyDZH54AvqWFepAGB7wh2VQPAhASjFzI-lE');
+      var first = addresses;
       setState(() {
-        latUser = first.coordinates.latitude.toString();
-        longUser = first.coordinates.longitude.toString();
+        // latUser = first.latitude.toString();
+        // longUser = first.longitude.toString();
         print('latt');
         print(latUser);
         print(longUser);
@@ -587,7 +827,7 @@ class _OrderPendingState extends State<OrderPending> {
                                                       child: CustomText.textHeading7(text: address,
                                                         // (_transCode == 1)?
                                                         maxLines: 3,
-                                                        sizeNew: double.parse(((MediaQuery.of(context).size.width*0.033).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.033)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.033)).toString())
+                                                        sizeNew: double.parse(((MediaQuery.of(context).size.width*0.03).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.03)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.03)).toString())
                                                         // :(_transCode == 2)?"Ambil Langsung":"Makan Ditempat"
                                                         ,),
                                                     ):Container(),
@@ -720,99 +960,165 @@ class _OrderPendingState extends State<OrderPending> {
                                 ],
                               ),
                               SizedBox(height: CustomSize.sizeHeight(context) / 86,),
-                              Row(
-                                mainAxisAlignment: MainAxisAlignment.spaceAround,
-                                children: [
-                                  GestureDetector(
-                                    onTap: (){
-                                      _getPending(operation = "cancel", id!);
-                                      setStateModal(() {});
-                                      Future.delayed(Duration(seconds: 0)).then((_) {
-                                        Navigator.pushReplacement(
-                                            context,
-                                            PageTransition(
-                                                type: PageTransitionType.fade,
-                                                child: OrderActivity()));
-                                      });
-                                      setState(() { });
-                                    },
+
+                              GestureDetector(
+                                onTap: (){
+                                  _checkPayBCA(id!);
+                                  setState(() { });
+                                },
+                                child: Center(
+                                  child: Container(
+                                    width: CustomSize.sizeWidth(context) / 1,
+                                    height: CustomSize.sizeHeight(context) / 14,
+                                    decoration: BoxDecoration(
+                                        color: CustomColor.redBtn,
+                                        borderRadius: BorderRadius.circular(50)
+                                    ),
                                     child: Center(
-                                      child: Container(
-                                        width: CustomSize.sizeWidth(context) / 2.3,
-                                        height: CustomSize.sizeHeight(context) / 14,
-                                        decoration: BoxDecoration(
-                                            color: CustomColor.redBtn,
-                                            borderRadius: BorderRadius.circular(50)
-                                        ),
-                                        child: Center(
-                                          child: Padding(
-                                            padding: const EdgeInsets.symmetric(horizontal: 20.0),
-                                            child: Column(
-                                              mainAxisAlignment: MainAxisAlignment.center,
-                                              crossAxisAlignment: CrossAxisAlignment.center,
-                                              children: [
-                                                CustomText.textHeading7(text: "Tolak", color: Colors.white, sizeNew: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.04)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.04)).toString())),
-                                                CustomText.textHeading7(text: "Pesanan", color: Colors.white, sizeNew: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.04)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.04)).toString())),
-                                              ],
-                                            ),
-                                          ),
+                                      child: Padding(
+                                        padding: const EdgeInsets.symmetric(horizontal: 20.0),
+                                        child: Column(
+                                          mainAxisAlignment: MainAxisAlignment.center,
+                                          crossAxisAlignment: CrossAxisAlignment.center,
+                                          children: [
+                                            CustomText.textHeading7(text: "Tolak", color: Colors.white, sizeNew: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.04)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.04)).toString())),
+                                            CustomText.textHeading7(text: "Pesanan", color: Colors.white, sizeNew: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.04)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.04)).toString())),
+                                          ],
                                         ),
                                       ),
                                     ),
                                   ),
-                                  GestureDetector(
-                                    onTap: (){
-                                      if (type == 'delivery') {
-                                        cariKurir()!.whenComplete((){
-                                          _getPending(operation = "process", id!);
-                                          Future.delayed(Duration(seconds: 0)).then((_) {
-                                            Navigator.pushReplacement(
-                                                context,
-                                                PageTransition(
-                                                    type: PageTransitionType.fade,
-                                                    child: OrderActivity()));
-                                          });
-                                        });
-                                      } else {
-                                        _getPending(operation = "process", id!).whenComplete((){
-                                          Future.delayed(Duration(seconds: 0)).then((_) {
-                                            Navigator.pushReplacement(
-                                                context,
-                                                PageTransition(
-                                                    type: PageTransitionType.fade,
-                                                    child: OrderActivity()));
-                                          });
-                                        });
-                                      }
-                                      setStateModal(() {});
-                                      setState(() { });
-                                    },
-                                    child: Center(
-                                      child: Container(
-                                        width: CustomSize.sizeWidth(context) / 2.3,
-                                        height: CustomSize.sizeHeight(context) / 14,
-                                        decoration: BoxDecoration(
-                                            color: CustomColor.accent,
-                                            borderRadius: BorderRadius.circular(50)
-                                        ),
-                                        child: Center(
-                                          child: Padding(
-                                            padding: const EdgeInsets.symmetric(horizontal: 20.0),
-                                            child: Column(
-                                              mainAxisAlignment: MainAxisAlignment.center,
-                                              crossAxisAlignment: CrossAxisAlignment.center,
-                                              children: [
-                                                CustomText.textHeading7(text: "Proses", color: Colors.white, sizeNew: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.04)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.04)).toString())),
-                                                CustomText.textHeading7(text: "Pesanan", color: Colors.white, sizeNew: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.04)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.04)).toString())),
-                                              ],
-                                            ),
-                                          ),
-                                        ),
-                                      ),
-                                    ),
-                                  ),
-                                ],
+                                ),
                               ),
+
+                              // Row(
+                              //   mainAxisAlignment: MainAxisAlignment.spaceAround,
+                              //   children: [
+                              //     GestureDetector(
+                              //       onTap: (){
+                              //         _getPending(operation = "cancel", id!);
+                              //         setStateModal(() {});
+                              //         Future.delayed(Duration(seconds: 0)).then((_) {
+                              //           Navigator.pushReplacement(
+                              //               context,
+                              //               PageTransition(
+                              //                   type: PageTransitionType.fade,
+                              //                   child: OrderActivity()));
+                              //         });
+                              //         setState(() { });
+                              //       },
+                              //       child: Center(
+                              //         child: Container(
+                              //           width: CustomSize.sizeWidth(context) / 2.3,
+                              //           height: CustomSize.sizeHeight(context) / 14,
+                              //           decoration: BoxDecoration(
+                              //               color: CustomColor.redBtn,
+                              //               borderRadius: BorderRadius.circular(50)
+                              //           ),
+                              //           child: Center(
+                              //             child: Padding(
+                              //               padding: const EdgeInsets.symmetric(horizontal: 20.0),
+                              //               child: Column(
+                              //                 mainAxisAlignment: MainAxisAlignment.center,
+                              //                 crossAxisAlignment: CrossAxisAlignment.center,
+                              //                 children: [
+                              //                   CustomText.textHeading7(text: "Tolak", color: Colors.white, sizeNew: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.04)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.04)).toString())),
+                              //                   CustomText.textHeading7(text: "Pesanan", color: Colors.white, sizeNew: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.04)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.04)).toString())),
+                              //                 ],
+                              //               ),
+                              //             ),
+                              //           ),
+                              //         ),
+                              //       ),
+                              //     ),
+                              //     GestureDetector(
+                              //       onTap: (){
+                              //           if (type == 'delivery') {
+                              //             _getPending(operation = "process", id!);
+                              //             Future.delayed(Duration(seconds: 0)).then((_) {
+                              //               Navigator.pushReplacement(
+                              //                   context,
+                              //                   PageTransition(
+                              //                       type: PageTransitionType.fade,
+                              //                       child: OrderActivity()));
+                              //             });
+                              //             // if (int.parse(deposit) >= (ongkir+1000)) {
+                              //             //   // cariKurir()!.whenComplete((){
+                              //             //     _getPending(operation = "process", id!);
+                              //             //     Future.delayed(Duration(seconds: 0)).then((_) {
+                              //             //       Navigator.pushReplacement(
+                              //             //           context,
+                              //             //           PageTransition(
+                              //             //               type: PageTransitionType.fade,
+                              //             //               child: OrderActivity()));
+                              //             //     });
+                              //             //   // });
+                              //             // } else {
+                              //             //   Fluttertoast.showToast(
+                              //             //     msg: 'Saldo deposit anda tidak mencukupi untuk melanjutkan transaksi ini!',);
+                              //             // }
+                              //             // _getPending(operation = "process", id!);
+                              //             // Future.delayed(Duration(seconds: 0)).then((_) {
+                              //             //   Navigator.pushReplacement(
+                              //             //       context,
+                              //             //       PageTransition(
+                              //             //           type: PageTransitionType.fade,
+                              //             //           child: OrderActivity()));
+                              //             // });
+                              //           } else {
+                              //             _getPending(operation = "process", id!).whenComplete(() {
+                              //               Future.delayed(Duration(seconds: 0)).then((_) {
+                              //                 Navigator.pushReplacement(
+                              //                     context,
+                              //                     PageTransition(
+                              //                         type: PageTransitionType.fade,
+                              //                         child: OrderActivity()));
+                              //               });
+                              //             });
+                              //             // if (int.parse(deposit) >= (1000)) {
+                              //             //   _getPending(operation = "process", id!).whenComplete(() {
+                              //             //     Future.delayed(Duration(seconds: 0)).then((_) {
+                              //             //       Navigator.pushReplacement(
+                              //             //           context,
+                              //             //           PageTransition(
+                              //             //               type: PageTransitionType.fade,
+                              //             //               child: OrderActivity()));
+                              //             //     });
+                              //             //   });
+                              //             // } else {
+                              //             //   Fluttertoast.showToast(
+                              //             //     msg: 'Saldo deposit anda tidak mencukupi untuk melanjutkan transaksi ini!',);
+                              //             // }
+                              //           }
+                              //         setStateModal(() {});
+                              //         setState(() { });
+                              //       },
+                              //       child: Center(
+                              //         child: Container(
+                              //           width: CustomSize.sizeWidth(context) / 2.3,
+                              //           height: CustomSize.sizeHeight(context) / 14,
+                              //           decoration: BoxDecoration(
+                              //               color: CustomColor.accent,
+                              //               borderRadius: BorderRadius.circular(50)
+                              //           ),
+                              //           child: Center(
+                              //             child: Padding(
+                              //               padding: const EdgeInsets.symmetric(horizontal: 20.0),
+                              //               child: Column(
+                              //                 mainAxisAlignment: MainAxisAlignment.center,
+                              //                 crossAxisAlignment: CrossAxisAlignment.center,
+                              //                 children: [
+                              //                   CustomText.textHeading7(text: "Proses", color: Colors.white, sizeNew: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.04)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.04)).toString())),
+                              //                   CustomText.textHeading7(text: "Pesanan", color: Colors.white, sizeNew: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.04)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.04)).toString())),
+                              //                 ],
+                              //               ),
+                              //             ),
+                              //           ),
+                              //         ),
+                              //       ),
+                              //     ),
+                              //   ],
+                              // ),
                             ],
                           ),
                           SizedBox(height: CustomSize.sizeHeight(context) / 56,),
@@ -876,7 +1182,7 @@ class _OrderPendingState extends State<OrderPending> {
     SharedPreferences pref = await SharedPreferences.getInstance();
     var token = pref.getString("token") ?? "";
 
-    var apiResult = await http.post('https://qurir.devastic.com/api/borzo/checkout',
+    var apiResult = await http.post(Uri.parse('https://qurir.devastic.com/api/borzo/checkout'),
         body: {
           'address_pick_up': restoAddress,
           'name_pick_up': pjTokoTrans,
@@ -955,7 +1261,7 @@ class _OrderPendingState extends State<OrderPending> {
 
     SharedPreferences pref = await SharedPreferences.getInstance();
     String token = pref.getString("token") ?? "";
-    var apiResult = await http.get(Links.mainUrl + '/trans/op/open/$id', headers: {
+    var apiResult = await http.get(Uri.parse(Links.mainUrl + '/trans/op/open/$id'), headers: {
       "Accept": "Application/json",
       "Authorization": "Bearer $token"
     });
@@ -986,7 +1292,7 @@ class _OrderPendingState extends State<OrderPending> {
 
     SharedPreferences pref = await SharedPreferences.getInstance();
     String token = pref.getString("token") ?? "";
-    var apiResult = await http.get(Links.mainUrl + '/trans/op/$operation/$id', headers: {
+    var apiResult = await http.get(Uri.parse(Links.mainUrl + '/trans/op/$operation/$id'), headers: {
       "Accept": "Application/json",
       "Authorization": "Bearer $token"
     });
@@ -1029,6 +1335,7 @@ class _OrderPendingState extends State<OrderPending> {
   }
 
   List<Meja2> meja = [];
+  String deposit = '';
   Future<void> _getQr()async{
     List<Meja2> _meja = [];
 
@@ -1037,7 +1344,7 @@ class _OrderPendingState extends State<OrderPending> {
     // });
     SharedPreferences pref = await SharedPreferences.getInstance();
     String token = pref.getString("token") ?? "";
-    var apiResult = await http.get(Links.mainUrl + '/resto/table', headers: {
+    var apiResult = await http.get(Uri.parse(Links.mainUrl + '/resto/table'), headers: {
       "Accept": "Application/json",
       "Authorization": "Bearer $token"
     });
@@ -1059,6 +1366,15 @@ class _OrderPendingState extends State<OrderPending> {
       meja = _meja;
       // isLoading = false;
     });
+
+    String id = pref.getString("idHomeResto") ?? "";
+    var apiResult2 = await http
+        .get(Uri.parse(Links.mainUrl + "/deposit/$id"), headers: {
+      "Accept": "Application/json",
+      "Authorization": "Bearer $token"
+    });
+    var data2 = json.decode(apiResult2.body);
+    deposit = data2['balance'].toString();
   }
 
   @override
@@ -1075,7 +1391,7 @@ class _OrderPendingState extends State<OrderPending> {
     // });
     SharedPreferences pref = await SharedPreferences.getInstance();
     String token = pref.getString("token") ?? "";
-    var apiResult = await http.get(Links.mainUrl + '/resto/userdata/'+checkId, headers: {
+    var apiResult = await http.get(Uri.parse(Links.mainUrl + '/resto/userdata/'+checkId), headers: {
       "Accept": "Application/json",
       "Authorization": "Bearer $token"
     });
@@ -1125,7 +1441,7 @@ class _OrderPendingState extends State<OrderPending> {
     // waiting = true;
     SharedPreferences pref = await SharedPreferences.getInstance();
     String token = pref.getString("token") ?? "";
-    var apiResult = await http.get(Links.mainUrl + '/resto/detail/$checkId', headers: {
+    var apiResult = await http.get(Uri.parse(Links.mainUrl + '/resto/detail/$checkId'), headers: {
       "Accept": "Application/json",
       "Authorization": "Bearer $token"
     });
@@ -1139,6 +1455,44 @@ class _OrderPendingState extends State<OrderPending> {
       longRes = data['data']['long'].toString();
       // waiting = false;
     });
+    if (latRes == 'null' || longRes == 'null') {
+      var addresses = await
+      locationFromAddress(restoAddress.toString(),
+          localeIdentifier: 'id_ID')
+          .then((placemarks) async {
+        setState(() {
+          latRes = placemarks[0].latitude.toString();
+          longRes = placemarks[0].longitude.toString();
+          print('latRes');
+          print(latRes);
+          print(longRes);
+          // address = placemarks[0].street +
+          //     ', ' +
+          //     placemarks[0].subLocality! +
+          //     ', ' +
+          //     placemarks[0].locality! +
+          //     ', ' +
+          //     placemarks[0].subAdministrativeArea! +
+          //     ', ' +
+          //     placemarks[0].administrativeArea! +
+          //     ' ' +
+          //     placemarks[0].postalCode! +
+          //     ', ' +
+          //     placemarks[0].country!;
+        });
+      });
+      // geoCode.forwardGeocoding(
+      //     address: restoAddress.toString());
+      // Geocoder2.getDataFromAddress(address: restoAddress.toString(), googleMapApiKey: 'AIzaSyDZH54AvqWFepAGB7wh2VQPAhASjFzI-lE');
+      var first = addresses;
+      setState(() {
+        // latRes = first.latitude.toString();
+        // longRes = first.longitude.toString();
+        // print('latt');
+        // print(latUser);
+        // print(longUser);
+      });
+    }
   }
 
   @override
@@ -1483,7 +1837,7 @@ class _OrderPendingState extends State<OrderPending> {
                                               SizedBox(height: CustomSize.sizeHeight(context) / 26,),
                                               Row(
                                                 children: [
-                                                  CustomText.bodyRegular12(text: transaction[index].total.toString(), sizeNew: double.parse(((MediaQuery.of(context).size.width*0.035).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.035)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.035)).toString())),
+                                                  CustomText.bodyRegular12(text: (transaction[index].total!+1000).toString(), sizeNew: double.parse(((MediaQuery.of(context).size.width*0.035).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.035)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.035)).toString())),
                                                 ],
                                               )
                                             ],

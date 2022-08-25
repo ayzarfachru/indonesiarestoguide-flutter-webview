@@ -1,12 +1,12 @@
 import 'dart:convert';
 import 'dart:typed_data';
 
-import 'package:barcode_scan/barcode_scan.dart';
+// import 'package:barcode_scan/barcode_scan.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_icons/flutter_icons.dart';
-import 'package:full_screen_image/full_screen_image.dart';
+// import 'package:full_screen_image/full_screen_image.dart';
 import 'package:kam5ia/utils/map_cart/map_address.dart';
 import 'package:onesignal_flutter/onesignal_flutter.dart';
 import 'package:fluttertoast/fluttertoast.dart';
@@ -29,6 +29,9 @@ import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
 import 'package:screenshot/screenshot.dart';
+
+import '../../model/Transaction.dart';
+import '../detail/detail_transaction_reser.dart';
 
 class Location {
   /// Initializes the plugin and starts listening for potential platform events.
@@ -154,6 +157,7 @@ class _FinalTransReserState extends State<FinalTransReser> {
   String jamReser = "";
   String hargaReser = "";
   String totalReser = "";
+  int total = 0;
   Future _getData()async{
     List<MenuJson> _menuJson = [];
     List<String> _menuId = [];
@@ -172,14 +176,15 @@ class _FinalTransReserState extends State<FinalTransReser> {
     tglReser = (pref2.getString('tglReser')??"");
     jamReser = (pref2.getString('jamReser')??"");
     hargaReser = (pref2.getString('hargaReser')??"");
-    totalReser = (pref2.getString('totalReser')??"");
+    // totalReser = (pref2.getString('totalReser')??"");
+    total = (pref2.getInt('totalReser')??0);
     nameUser = (pref2.getString('name')??"");
     playerId = (pref2.getString('playerId')??"");
     restoAddress = (pref2.getString('alamateResto')??"");
     print('ini name '+name.toString());
     restoId.addAll(pref2.getStringList('restoId')??[]);
-    nameRestoTrans = pref2.getString("restoNameTrans");
-    phoneRestoTrans = pref2.getString("restoPhoneTrans");
+    nameRestoTrans = pref2.getString("restoNameTrans")??'';
+    phoneRestoTrans = pref2.getString("restoPhoneTrans")??'';
     print('nama Rest '+nameRestoTrans);
     qty.addAll(pref2.getStringList('qty')??[]);
     noted.addAll(pref2.getStringList('note')??[]);
@@ -219,8 +224,8 @@ class _FinalTransReserState extends State<FinalTransReser> {
 
     SharedPreferences pref = await SharedPreferences.getInstance();
     String token = pref.getString("token") ?? "";
-    can_delivery = pref.getString('can_deliveryUser');
-    can_takeaway = pref.getString('can_take_awayUser');
+    can_delivery = pref.getString('can_deliveryUser')??'';
+    can_takeaway = pref.getString('can_take_awayUser')??'';
     checkId = pref.getString('restoIdUsr')??'';
     _getUserDataResto();
     print('ini '+checkId);
@@ -303,12 +308,12 @@ class _FinalTransReserState extends State<FinalTransReser> {
 
     SharedPreferences pref = await SharedPreferences.getInstance();
     String token = pref.getString("token") ?? "";
-    can_delivery = pref.getString('can_deliveryUser');
-    can_takeaway = pref.getString('can_take_awayUser');
+    can_delivery = pref.getString('can_deliveryUser')??'';
+    can_takeaway = pref.getString('can_take_awayUser')??'';
     checkId = pref.getString('restoIdUsr')??'';
     print('ini '+checkId);
 
-    var apiResult = await http.post(Links.mainUrl + '/trans/check',
+    var apiResult = await http.post(Uri.parse(Links.mainUrl + '/trans/check'),
         body: {'menu': _menuId.toString().split('[')[1].split(']')[0].replaceAll(' ', '')},
         headers: {
           "Accept": "Application/json",
@@ -336,7 +341,7 @@ class _FinalTransReserState extends State<FinalTransReser> {
     });
 
     if (apiResult.statusCode == 200) {
-      isLoading = false;
+      // isLoading = false;
       Future.delayed(const Duration(seconds: 0), () {
         makeTransaction(qrscan);
         setState(() {
@@ -363,7 +368,7 @@ class _FinalTransReserState extends State<FinalTransReser> {
     });
     SharedPreferences pref = await SharedPreferences.getInstance();
     String token = pref.getString("token") ?? "";
-    var apiResult = await http.get(Links.mainUrl + '/resto/userdata/$checkId', headers: {
+    var apiResult = await http.get(Uri.parse(Links.mainUrl + '/resto/userdata/$checkId'), headers: {
       "Accept": "Application/json",
       "Authorization": "Bearer $token"
     });
@@ -398,7 +403,7 @@ class _FinalTransReserState extends State<FinalTransReser> {
 
     if (apiResult.statusCode == 200) {
       // kosong = true;
-      isLoading = false;
+      // isLoading = false;
     }
   }
 
@@ -407,7 +412,7 @@ class _FinalTransReserState extends State<FinalTransReser> {
     SharedPreferences pref = await SharedPreferences.getInstance();
     var token = pref.getString("token") ?? "";
 
-    var apiResult = await http.post(Links.mainUrl + '/trans',
+    var apiResult = await http.post(Uri.parse(Links.mainUrl + '/trans'),
         body: {
           'address': (_transCode == 1)?_srchAddress.text.toString():'',
           'type': (_transCode == 1)?'delivery':(_transCode == 2)?'takeaway':'dinein',
@@ -522,10 +527,84 @@ class _FinalTransReserState extends State<FinalTransReser> {
     // print(noteProduct.split(': ')[1]);
   }
 
+  List<Transaction> transaction = [];
+  // String note = '';
+  Future _getDataHome(String lat, String long)async{
+    List<Transaction> _transaction = [];
+
+    setState(() {
+      // isLoading = true;
+    });
+    SharedPreferences pref = await SharedPreferences.getInstance();
+    String token = pref.getString("token") ?? "";
+    var apiResult = await http.get(Uri.parse(Links.mainUrl + '/page/home?lat=$lat&long=$long'), headers: {
+      "Accept": "Application/json",
+      "Authorization": "Bearer $token"
+    });
+    print('all data'+apiResult.body.toString());
+    var data = json.decode(apiResult.body);
+    // print('all data'+data['tipename'].toString().split(',').length.toString());
+    // print('all data'+data['tipe'][0].toString());
+    print('all data'+data['tipe'][0].toString());
+    print('all data1'+data['trans'].toString());
+    print('all data'+lat.toString());
+    print('all data'+long.toString());
+    // print(data['resto']);
+
+    // print('ini banner '+data['banner'].toString());
+    // for(var v in data['banner']){
+    //   imgBanner t = imgBanner(
+    //       id: int.parse(v['resto_id'].toString()),
+    //       urlImg: v['img']
+    //   );
+    //   _images.add(t);
+    // }
+
+    if (data.toString().contains('trans')) {
+      for(var v in data['trans']){
+        Transaction t = Transaction.all2(
+          id: v['id'],
+          idResto: v['restaurants_id'].toString(),
+          date: v['date'],
+          img: v['img'],
+          nameResto: v['resto_name'],
+          status: v['status'],
+          total: int.parse((v['total']??0).toString()) + int.parse((v['ongkir']??0).toString()),
+          type: v['type_text'],
+          note: v['note'].toString(),
+          chat_user: v['chat_resto'].toString(),
+          // address: v['address'].toString(),
+        );
+        if (v['type_text'].startsWith('Reservasi') == true) {
+          _transaction.add(t);
+        } else {
+
+        }
+      }
+    }
+    setState(() {
+      transaction = _transaction;
+      pref.setString("jmlhMeja", transaction[0].type.toString().replaceAll('Reservasi untuk ', '').replaceAll(' orang', ''));
+      pref.setString("tglReser", transaction[0].date.toString().split(',')[0]);
+      pref.setString("jamReser", transaction[0].date.toString().split(', ')[1]);
+      pref.setString("hargaReser", (int.parse(transaction[0].total.toString())/int.parse(transaction[0].type.toString().replaceAll('Reservasi untuk ', '').replaceAll(' orang', '').toString())).toString());
+      print('HARGA');
+      print(int.parse(transaction[0].total.toString())/int.parse(transaction[0].type.toString().replaceAll('Reservasi untuk ', '').replaceAll(' orang', '').toString()));
+      pref.setString("totalReser", transaction[0].total.toString());
+      pref.setString("idnyatransRes", transaction[0].idResto.toString());
+      pref.setString("chatUserCount", transaction[0].chat_user);
+      pref.setString("idnyatrans", transaction[0].id.toString());
+      pref.setString("restoNameTrans99", transaction[0].nameResto.toString());
+      pref.setString("alamateResto99", transaction[0].address.toString());
+      isLoading = false;
+    });
+  }
+
   @override
   void initState() {
     Location.instance.getLocation().then((value) {
       setState(() {
+        _getDataHome(value.latitude.toString(), value.longitude.toString());
         latitude = value.latitude;
         longitude = value.longitude;
       });
@@ -722,17 +801,17 @@ class _FinalTransReserState extends State<FinalTransReser> {
                 SizedBox(height: CustomSize.sizeHeight(context) / 88,),
                 (_transCode == 1 || _transCode == 2 || _transCode == 3)?Divider(thickness: 6, color: CustomColor.secondary,):SizedBox(),
                 // SizedBox(height: CustomSize.sizeHeight(context) / 88,),
-                Padding(
-                  padding: EdgeInsets.only(
-                    left: CustomSize.sizeWidth(context) / 32,
-                    right: CustomSize.sizeWidth(context) / 32,
-                  ),
-                  child: MediaQuery(
-                      child: CustomText.bodyRegular18(text: "*Semua proses pembayaran dan transaksi di luar tanggung jawab IRG!", color: CustomColor.redBtn, sizeNew: double.parse(((MediaQuery.of(context).size.width*0.038).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.038).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.038).toString()), maxLines: 3),
-                      data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0)
-                  ),
-                ),
-                (_transCode == 1 || _transCode == 2 || _transCode == 3)?Divider(thickness: 6, color: Colors.transparent):SizedBox(),
+                // Padding(
+                //   padding: EdgeInsets.only(
+                //     left: CustomSize.sizeWidth(context) / 32,
+                //     right: CustomSize.sizeWidth(context) / 32,
+                //   ),
+                //   child: MediaQuery(
+                //       child: CustomText.bodyRegular18(text: "*Semua proses pembayaran dan transaksi di luar tanggung jawab IRG!", color: CustomColor.redBtn, sizeNew: double.parse(((MediaQuery.of(context).size.width*0.038).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.038).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.038).toString()), maxLines: 3),
+                //       data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0)
+                //   ),
+                // ),
+                // (_transCode == 1 || _transCode == 2 || _transCode == 3)?Divider(thickness: 6, color: Colors.transparent):SizedBox(),
                 (jmlhMeja.toString() == '')?Padding(
                   padding: EdgeInsets.only(
                     left: CustomSize.sizeWidth(context) / 32,
@@ -1415,253 +1494,253 @@ class _FinalTransReserState extends State<FinalTransReser> {
                 // ),
                 SizedBox(height: CustomSize.sizeHeight(context) * 0.0075),
                 Divider(thickness: 6, color: CustomColor.secondary,),
-                Padding(
-                  padding: EdgeInsets.symmetric(
-                      horizontal: CustomSize.sizeWidth(context) / 32,
-                      // vertical: CustomSize.sizeHeight(context) / 55
-                  ),
-                  child: Container(
-                    width: CustomSize.sizeWidth(context),
-                    decoration: BoxDecoration(
-                        color: Colors.white
-                    ),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        MediaQuery(
-                            child: CustomText.textHeading4(text: "Data Usaha", sizeNew: double.parse(((MediaQuery.of(context).size.width*0.045).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.045)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.045)).toString())),
-                            data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0)
-                        ),
-                        SizedBox(height: CustomSize.sizeHeight(context) * 0.01,),
-                        Container(
-                          padding: EdgeInsets.only(
-                            left: CustomSize.sizeWidth(context) / 18,
-                            right: CustomSize.sizeWidth(context) / 18,
-                          ),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              (nameRestoTrans != '' && nameRestoTrans != 'null')?
-                              MediaQuery(
-                                  child: CustomText.bodyRegular17(text: "Nama Usaha: "+nameRestoTrans, maxLines: 4, sizeNew: double.parse(((MediaQuery.of(context).size.width*0.038).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.038).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.038).toString())),
-                                  data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0)
-                              ):
-                              Row(
-                                children: [
-                                  MediaQuery(
-                                      child: CustomText.bodyRegular17(text: "Nama Usaha: ", maxLines: 2, sizeNew: double.parse(((MediaQuery.of(context).size.width*0.038).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.038).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.038).toString())),
-                                      data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0)
-                                      ),
-                                  MediaQuery(
-                                      child: CustomText.bodyRegular17(text: "kosong", maxLines: 2, color: CustomColor.redBtn, sizeNew: double.parse(((MediaQuery.of(context).size.width*0.038).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.038).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.038).toString())),
-                                      data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0)
-                                  ),
-                                ],
-                              ),
-                              SizedBox(height: CustomSize.sizeHeight(context) * 0.005,),
-
-                              (restoAddress != '' && restoAddress != 'null')?
-                              Row(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  MediaQuery(
-                                      child: CustomText.bodyRegular17(text: "Alamat Usaha: ", maxLines: 4, sizeNew: double.parse(((MediaQuery.of(context).size.width*0.038).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.038).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.038).toString())),
-                                      data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0)
-                                  ),
-                                  GestureDetector(
-                                      onTap: (){
-                                        _launchURL();
-                                      },
-                                      child: Container(
-                                          width: CustomSize.sizeWidth(context) / 2.1,
-                                          child: MediaQuery(
-                                              child: CustomText.bodyRegular17(text: restoAddress, maxLines: 14, sizeNew: double.parse(((MediaQuery.of(context).size.width*0.038).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.038).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.038).toString())),
-                                              data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0)
-                                          )
-                                      )
-                                  ),
-                                ],
-                              ):
-                              Row(
-                                children: [
-                                  MediaQuery(
-                                      child: CustomText.bodyRegular17(text: "Alamat Usaha: ", maxLines: 2, sizeNew: double.parse(((MediaQuery.of(context).size.width*0.038).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.038).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.038).toString())),
-                                      data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0)
-                                  ),
-                                  MediaQuery(
-                                      child: CustomText.bodyRegular17(text: "kosong", maxLines: 2, color: CustomColor.redBtn, sizeNew: double.parse(((MediaQuery.of(context).size.width*0.038).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.038).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.038).toString())),
-                                      data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0)
-                                  ),
-                                ],
-                              ),
-                              SizedBox(height: CustomSize.sizeHeight(context) * 0.005,),
-
-                              (emailTokoTrans != '' && emailTokoTrans != 'null')?
-                              Row(
-                                children: [
-                                  MediaQuery(
-                                      child: CustomText.bodyRegular17(text: "Email Usaha: ", maxLines: 2, sizeNew: double.parse(((MediaQuery.of(context).size.width*0.038).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.038).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.038).toString())),
-                                      data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0)
-                                  ),
-                                  GestureDetector(
-                                      onTap: (){
-                                        launch('mailto:$emailTokoTrans');
-                                      },
-                                      child: MediaQuery(
-                                          child: CustomText.bodyRegular17(text: emailTokoTrans, maxLines: 2, sizeNew: double.parse(((MediaQuery.of(context).size.width*0.038).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.038).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.038).toString())),
-                                          data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0)
-                                      )
-                                  ),
-                                ],
-                              ):
-                              Row(
-                                children: [
-                                  MediaQuery(
-                                      child: CustomText.bodyRegular17(text: "Email Usaha: ", maxLines: 2, sizeNew: double.parse(((MediaQuery.of(context).size.width*0.038).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.038).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.038).toString())),
-                                      data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0)
-                                  ),
-                                  MediaQuery(
-                                      child: CustomText.bodyRegular17(text: "kosong", maxLines: 2, color: CustomColor.redBtn, sizeNew: double.parse(((MediaQuery.of(context).size.width*0.038).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.038).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.038).toString())),
-                                      data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0)
-                                  ),
-                                ],
-                              ),
-                              SizedBox(height: CustomSize.sizeHeight(context) * 0.005,),
-
-                              (phoneRestoTrans != '' && phoneRestoTrans != 'null')?
-                              Row(
-                                children: [
-                                  MediaQuery(
-                                      child: CustomText.bodyRegular17(text: "Telepon Usaha: ", maxLines: 2, sizeNew: double.parse(((MediaQuery.of(context).size.width*0.038).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.038).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.038).toString())),
-                                      data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0)
-                                  ),
-                                  GestureDetector(
-                                      onTap: (){
-                                        launch('tel:$phoneRestoTrans');
-                                      },
-                                      child: MediaQuery(
-                                          child: CustomText.bodyRegular17(text: phoneRestoTrans, maxLines: 2, sizeNew: double.parse(((MediaQuery.of(context).size.width*0.038).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.038).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.038).toString())),
-                                          data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0)
-                                      )
-                                  ),
-                                ],
-                              ):
-                              Row(
-                                children: [
-                                  MediaQuery(
-                                      child: CustomText.bodyRegular17(text: "Telepon Usaha: ", maxLines: 2, sizeNew: double.parse(((MediaQuery.of(context).size.width*0.038).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.038).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.038).toString())),
-                                      data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0)
-                                  ),
-                                  MediaQuery(
-                                      child: CustomText.bodyRegular17(text: "kosong", maxLines: 2, color: CustomColor.redBtn, sizeNew: double.parse(((MediaQuery.of(context).size.width*0.038).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.038).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.038).toString())),
-                                      data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0)
-                                  ),
-                                ],
-                              ),
-                              SizedBox(height: CustomSize.sizeHeight(context) * 0.005,),
-
-                              (ownerTokoTrans != '' && ownerTokoTrans != 'null')?
-                              MediaQuery(
-                                  child: CustomText.bodyRegular17(text: "Nama Pemilik: "+ownerTokoTrans, maxLines: 2, sizeNew: double.parse(((MediaQuery.of(context).size.width*0.038).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.038).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.038).toString())),
-                                  data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0)
-                              ):
-                              Row(
-                                children: [
-                                  MediaQuery(
-                                      child: CustomText.bodyRegular17(text: "Nama Pemilik: ", maxLines: 2, sizeNew: double.parse(((MediaQuery.of(context).size.width*0.038).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.038).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.038).toString())),
-                                      data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0)
-),
-                                  MediaQuery(
-                                      child: CustomText.bodyRegular17(text: "kosong", maxLines: 2, color: CustomColor.redBtn, sizeNew: double.parse(((MediaQuery.of(context).size.width*0.038).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.038).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.038).toString())),
-                                      data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0)
-                                  ),
-                                ],
-                              ),
-                              SizedBox(height: CustomSize.sizeHeight(context) * 0.005,),
-
-                              (pjTokoTrans != '' && pjTokoTrans != 'null')?
-                              MediaQuery(
-                                  child: CustomText.bodyRegular17(text: "Nama Penanggung Jawab: "+pjTokoTrans, maxLines: 2, sizeNew: double.parse(((MediaQuery.of(context).size.width*0.038).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.038).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.038).toString())),
-                                  data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0)
-                              ):
-                              Row(
-                                children: [
-                                  MediaQuery(
-                                      child: CustomText.bodyRegular17(text: "Nama Penanggung Jawab: ", maxLines: 2, sizeNew: double.parse(((MediaQuery.of(context).size.width*0.038).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.038).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.038).toString())),
-                                      data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0)
-                                  ),
-                                  MediaQuery(
-                                      child: CustomText.bodyRegular17(text: "kosong", maxLines: 2, color: CustomColor.redBtn, sizeNew: double.parse(((MediaQuery.of(context).size.width*0.038).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.038).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.038).toString())),
-                                      data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0)
-                                  ),
-                                ],
-                              ),
-                              SizedBox(height: CustomSize.sizeHeight(context) * 0.005,),
-
-                              (nameRekening != '' && nameRekening != 'null')?
-                              MediaQuery(
-                                  child: CustomText.bodyRegular17(text: "Nomor Rekening atas Nama: "+nameRekening, maxLines: 2, sizeNew: double.parse(((MediaQuery.of(context).size.width*0.038).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.038).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.038).toString())),
-                                  data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0)
-                              ):
-                              Row(
-                                children: [
-                                  MediaQuery(
-                                      child: CustomText.bodyRegular17(text: "Nomor Rekening atas Nama: ", maxLines: 2, sizeNew: double.parse(((MediaQuery.of(context).size.width*0.038).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.038).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.038).toString())),
-                                      data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0)
-                                  ),
-                                  MediaQuery(
-                                      child: CustomText.bodyRegular17(text: "kosong", maxLines: 2, color: CustomColor.redBtn, sizeNew: double.parse(((MediaQuery.of(context).size.width*0.038).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.038).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.038).toString())),
-                                      data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0)
-                                  ),
-                                ],
-                              ),
-                              SizedBox(height: CustomSize.sizeHeight(context) * 0.005,),
-
-                              (nameBank != '' && nameBank != 'null')?
-                              MediaQuery(
-                                  child: CustomText.bodyRegular17(text: "Rekening Bank: "+nameBank, maxLines: 2, sizeNew: double.parse(((MediaQuery.of(context).size.width*0.038).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.038).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.038).toString())),
-                                  data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0)
-                              ):
-                              Row(
-                                children: [
-                                  MediaQuery(
-                                      child: CustomText.bodyRegular17(text: "Rekening Bank: ", maxLines: 2, sizeNew: double.parse(((MediaQuery.of(context).size.width*0.038).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.038).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.038).toString())),
-                                      data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0)
-                                  ),
-                                  MediaQuery(
-                                      child: CustomText.bodyRegular17(text: "kosong", maxLines: 2, color: CustomColor.redBtn, sizeNew: double.parse(((MediaQuery.of(context).size.width*0.038).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.038).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.038).toString())),
-                                      data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0)
-                                  ),
-                                ],
-                              ),
-                              SizedBox(height: CustomSize.sizeHeight(context) * 0.005,),
-
-                              (norekTokoTrans != '' && norekTokoTrans != 'null')?
-                              MediaQuery(
-                                  child: CustomText.bodyRegular17(text: "Nomor Rekening: "+norekTokoTrans, maxLines: 2, sizeNew: double.parse(((MediaQuery.of(context).size.width*0.038).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.038).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.038).toString())),
-                                  data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0)
-                              ):
-                              Row(
-                                children: [
-                                  MediaQuery(
-                                      child: CustomText.bodyRegular17(text: "Nomor Rekening: ", maxLines: 2, sizeNew: double.parse(((MediaQuery.of(context).size.width*0.038).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.038).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.038).toString())),
-                                      data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0)
-                                  ),
-                                  MediaQuery(
-                                      child: CustomText.bodyRegular17(text: "kosong", maxLines: 2, color: CustomColor.redBtn, sizeNew: double.parse(((MediaQuery.of(context).size.width*0.038).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.038).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.038).toString())),
-                                      data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0)
-                                  ),
-                                ],
-                              ),
-                            ],
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-                SizedBox(height: CustomSize.sizeHeight(context) * 0.0075),
-                Divider(thickness: 6, color: CustomColor.secondary,),
+//                 Padding(
+//                   padding: EdgeInsets.symmetric(
+//                       horizontal: CustomSize.sizeWidth(context) / 32,
+//                       // vertical: CustomSize.sizeHeight(context) / 55
+//                   ),
+//                   child: Container(
+//                     width: CustomSize.sizeWidth(context),
+//                     decoration: BoxDecoration(
+//                         color: Colors.white
+//                     ),
+//                     child: Column(
+//                       crossAxisAlignment: CrossAxisAlignment.start,
+//                       children: [
+//                         MediaQuery(
+//                             child: CustomText.textHeading4(text: "Data Usaha", sizeNew: double.parse(((MediaQuery.of(context).size.width*0.045).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.045)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.045)).toString())),
+//                             data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0)
+//                         ),
+//                         SizedBox(height: CustomSize.sizeHeight(context) * 0.01,),
+//                         Container(
+//                           padding: EdgeInsets.only(
+//                             left: CustomSize.sizeWidth(context) / 18,
+//                             right: CustomSize.sizeWidth(context) / 18,
+//                           ),
+//                           child: Column(
+//                             crossAxisAlignment: CrossAxisAlignment.start,
+//                             children: [
+//                               (nameRestoTrans != '' && nameRestoTrans != 'null')?
+//                               MediaQuery(
+//                                   child: CustomText.bodyRegular17(text: "Nama Usaha: "+nameRestoTrans, maxLines: 4, sizeNew: double.parse(((MediaQuery.of(context).size.width*0.038).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.038).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.038).toString())),
+//                                   data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0)
+//                               ):
+//                               Row(
+//                                 children: [
+//                                   MediaQuery(
+//                                       child: CustomText.bodyRegular17(text: "Nama Usaha: ", maxLines: 2, sizeNew: double.parse(((MediaQuery.of(context).size.width*0.038).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.038).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.038).toString())),
+//                                       data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0)
+//                                       ),
+//                                   MediaQuery(
+//                                       child: CustomText.bodyRegular17(text: "kosong", maxLines: 2, color: CustomColor.redBtn, sizeNew: double.parse(((MediaQuery.of(context).size.width*0.038).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.038).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.038).toString())),
+//                                       data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0)
+//                                   ),
+//                                 ],
+//                               ),
+//                               SizedBox(height: CustomSize.sizeHeight(context) * 0.005,),
+//
+//                               (restoAddress != '' && restoAddress != 'null')?
+//                               Row(
+//                                 crossAxisAlignment: CrossAxisAlignment.start,
+//                                 children: [
+//                                   MediaQuery(
+//                                       child: CustomText.bodyRegular17(text: "Alamat Usaha: ", maxLines: 4, sizeNew: double.parse(((MediaQuery.of(context).size.width*0.038).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.038).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.038).toString())),
+//                                       data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0)
+//                                   ),
+//                                   GestureDetector(
+//                                       onTap: (){
+//                                         _launchURL();
+//                                       },
+//                                       child: Container(
+//                                           width: CustomSize.sizeWidth(context) / 2.1,
+//                                           child: MediaQuery(
+//                                               child: CustomText.bodyRegular17(text: restoAddress, maxLines: 14, sizeNew: double.parse(((MediaQuery.of(context).size.width*0.038).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.038).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.038).toString())),
+//                                               data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0)
+//                                           )
+//                                       )
+//                                   ),
+//                                 ],
+//                               ):
+//                               Row(
+//                                 children: [
+//                                   MediaQuery(
+//                                       child: CustomText.bodyRegular17(text: "Alamat Usaha: ", maxLines: 2, sizeNew: double.parse(((MediaQuery.of(context).size.width*0.038).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.038).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.038).toString())),
+//                                       data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0)
+//                                   ),
+//                                   MediaQuery(
+//                                       child: CustomText.bodyRegular17(text: "kosong", maxLines: 2, color: CustomColor.redBtn, sizeNew: double.parse(((MediaQuery.of(context).size.width*0.038).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.038).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.038).toString())),
+//                                       data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0)
+//                                   ),
+//                                 ],
+//                               ),
+//                               SizedBox(height: CustomSize.sizeHeight(context) * 0.005,),
+//
+//                               (emailTokoTrans != '' && emailTokoTrans != 'null')?
+//                               Row(
+//                                 children: [
+//                                   MediaQuery(
+//                                       child: CustomText.bodyRegular17(text: "Email Usaha: ", maxLines: 2, sizeNew: double.parse(((MediaQuery.of(context).size.width*0.038).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.038).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.038).toString())),
+//                                       data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0)
+//                                   ),
+//                                   GestureDetector(
+//                                       onTap: (){
+//                                         launch('mailto:$emailTokoTrans');
+//                                       },
+//                                       child: MediaQuery(
+//                                           child: CustomText.bodyRegular17(text: emailTokoTrans, maxLines: 2, sizeNew: double.parse(((MediaQuery.of(context).size.width*0.038).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.038).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.038).toString())),
+//                                           data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0)
+//                                       )
+//                                   ),
+//                                 ],
+//                               ):
+//                               Row(
+//                                 children: [
+//                                   MediaQuery(
+//                                       child: CustomText.bodyRegular17(text: "Email Usaha: ", maxLines: 2, sizeNew: double.parse(((MediaQuery.of(context).size.width*0.038).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.038).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.038).toString())),
+//                                       data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0)
+//                                   ),
+//                                   MediaQuery(
+//                                       child: CustomText.bodyRegular17(text: "kosong", maxLines: 2, color: CustomColor.redBtn, sizeNew: double.parse(((MediaQuery.of(context).size.width*0.038).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.038).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.038).toString())),
+//                                       data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0)
+//                                   ),
+//                                 ],
+//                               ),
+//                               SizedBox(height: CustomSize.sizeHeight(context) * 0.005,),
+//
+//                               (phoneRestoTrans != '' && phoneRestoTrans != 'null')?
+//                               Row(
+//                                 children: [
+//                                   MediaQuery(
+//                                       child: CustomText.bodyRegular17(text: "Telepon Usaha: ", maxLines: 2, sizeNew: double.parse(((MediaQuery.of(context).size.width*0.038).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.038).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.038).toString())),
+//                                       data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0)
+//                                   ),
+//                                   GestureDetector(
+//                                       onTap: (){
+//                                         launch('tel:$phoneRestoTrans');
+//                                       },
+//                                       child: MediaQuery(
+//                                           child: CustomText.bodyRegular17(text: phoneRestoTrans, maxLines: 2, sizeNew: double.parse(((MediaQuery.of(context).size.width*0.038).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.038).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.038).toString())),
+//                                           data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0)
+//                                       )
+//                                   ),
+//                                 ],
+//                               ):
+//                               Row(
+//                                 children: [
+//                                   MediaQuery(
+//                                       child: CustomText.bodyRegular17(text: "Telepon Usaha: ", maxLines: 2, sizeNew: double.parse(((MediaQuery.of(context).size.width*0.038).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.038).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.038).toString())),
+//                                       data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0)
+//                                   ),
+//                                   MediaQuery(
+//                                       child: CustomText.bodyRegular17(text: "kosong", maxLines: 2, color: CustomColor.redBtn, sizeNew: double.parse(((MediaQuery.of(context).size.width*0.038).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.038).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.038).toString())),
+//                                       data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0)
+//                                   ),
+//                                 ],
+//                               ),
+//                               SizedBox(height: CustomSize.sizeHeight(context) * 0.005,),
+//
+// //                               (ownerTokoTrans != '' && ownerTokoTrans != 'null')?
+// //                               MediaQuery(
+// //                                   child: CustomText.bodyRegular17(text: "Nama Pemilik: "+ownerTokoTrans, maxLines: 2, sizeNew: double.parse(((MediaQuery.of(context).size.width*0.038).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.038).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.038).toString())),
+// //                                   data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0)
+// //                               ):
+// //                               Row(
+// //                                 children: [
+// //                                   MediaQuery(
+// //                                       child: CustomText.bodyRegular17(text: "Nama Pemilik: ", maxLines: 2, sizeNew: double.parse(((MediaQuery.of(context).size.width*0.038).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.038).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.038).toString())),
+// //                                       data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0)
+// // ),
+// //                                   MediaQuery(
+// //                                       child: CustomText.bodyRegular17(text: "kosong", maxLines: 2, color: CustomColor.redBtn, sizeNew: double.parse(((MediaQuery.of(context).size.width*0.038).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.038).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.038).toString())),
+// //                                       data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0)
+// //                                   ),
+// //                                 ],
+// //                               ),
+// //                               SizedBox(height: CustomSize.sizeHeight(context) * 0.005,),
+// //
+// //                               (pjTokoTrans != '' && pjTokoTrans != 'null')?
+// //                               MediaQuery(
+// //                                   child: CustomText.bodyRegular17(text: "Nama Penanggung Jawab: "+pjTokoTrans, maxLines: 2, sizeNew: double.parse(((MediaQuery.of(context).size.width*0.038).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.038).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.038).toString())),
+// //                                   data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0)
+// //                               ):
+// //                               Row(
+// //                                 children: [
+// //                                   MediaQuery(
+// //                                       child: CustomText.bodyRegular17(text: "Nama Penanggung Jawab: ", maxLines: 2, sizeNew: double.parse(((MediaQuery.of(context).size.width*0.038).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.038).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.038).toString())),
+// //                                       data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0)
+// //                                   ),
+// //                                   MediaQuery(
+// //                                       child: CustomText.bodyRegular17(text: "kosong", maxLines: 2, color: CustomColor.redBtn, sizeNew: double.parse(((MediaQuery.of(context).size.width*0.038).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.038).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.038).toString())),
+// //                                       data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0)
+// //                                   ),
+// //                                 ],
+// //                               ),
+// //                               SizedBox(height: CustomSize.sizeHeight(context) * 0.005,),
+//
+//                               (nameRekening != '' && nameRekening != 'null')?
+//                               MediaQuery(
+//                                   child: CustomText.bodyRegular17(text: "Nomor Rekening atas Nama: "+nameRekening, maxLines: 2, sizeNew: double.parse(((MediaQuery.of(context).size.width*0.038).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.038).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.038).toString())),
+//                                   data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0)
+//                               ):
+//                               Row(
+//                                 children: [
+//                                   MediaQuery(
+//                                       child: CustomText.bodyRegular17(text: "Nomor Rekening atas Nama: ", maxLines: 2, sizeNew: double.parse(((MediaQuery.of(context).size.width*0.038).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.038).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.038).toString())),
+//                                       data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0)
+//                                   ),
+//                                   MediaQuery(
+//                                       child: CustomText.bodyRegular17(text: "kosong", maxLines: 2, color: CustomColor.redBtn, sizeNew: double.parse(((MediaQuery.of(context).size.width*0.038).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.038).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.038).toString())),
+//                                       data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0)
+//                                   ),
+//                                 ],
+//                               ),
+//                               SizedBox(height: CustomSize.sizeHeight(context) * 0.005,),
+//
+//                               (nameBank != '' && nameBank != 'null')?
+//                               MediaQuery(
+//                                   child: CustomText.bodyRegular17(text: "Rekening Bank: "+nameBank, maxLines: 2, sizeNew: double.parse(((MediaQuery.of(context).size.width*0.038).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.038).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.038).toString())),
+//                                   data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0)
+//                               ):
+//                               Row(
+//                                 children: [
+//                                   MediaQuery(
+//                                       child: CustomText.bodyRegular17(text: "Rekening Bank: ", maxLines: 2, sizeNew: double.parse(((MediaQuery.of(context).size.width*0.038).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.038).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.038).toString())),
+//                                       data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0)
+//                                   ),
+//                                   MediaQuery(
+//                                       child: CustomText.bodyRegular17(text: "kosong", maxLines: 2, color: CustomColor.redBtn, sizeNew: double.parse(((MediaQuery.of(context).size.width*0.038).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.038).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.038).toString())),
+//                                       data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0)
+//                                   ),
+//                                 ],
+//                               ),
+//                               SizedBox(height: CustomSize.sizeHeight(context) * 0.005,),
+//
+//                               (norekTokoTrans != '' && norekTokoTrans != 'null')?
+//                               MediaQuery(
+//                                   child: CustomText.bodyRegular17(text: "Nomor Rekening: "+norekTokoTrans, maxLines: 2, sizeNew: double.parse(((MediaQuery.of(context).size.width*0.038).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.038).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.038).toString())),
+//                                   data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0)
+//                               ):
+//                               Row(
+//                                 children: [
+//                                   MediaQuery(
+//                                       child: CustomText.bodyRegular17(text: "Nomor Rekening: ", maxLines: 2, sizeNew: double.parse(((MediaQuery.of(context).size.width*0.038).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.038).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.038).toString())),
+//                                       data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0)
+//                                   ),
+//                                   MediaQuery(
+//                                       child: CustomText.bodyRegular17(text: "kosong", maxLines: 2, color: CustomColor.redBtn, sizeNew: double.parse(((MediaQuery.of(context).size.width*0.038).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.038).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.038).toString())),
+//                                       data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0)
+//                                   ),
+//                                 ],
+//                               ),
+//                             ],
+//                           ),
+//                         ),
+//                       ],
+//                     ),
+//                   ),
+//                 ),
+//                 SizedBox(height: CustomSize.sizeHeight(context) * 0.0075),
+//                 Divider(thickness: 6, color: CustomColor.secondary,),
                 Padding(
                   padding: EdgeInsets.only(
                     left: CustomSize.sizeWidth(context) / 32,
@@ -1675,26 +1754,26 @@ class _FinalTransReserState extends State<FinalTransReser> {
                 SizedBox(height: CustomSize.sizeHeight(context) * 0.0048,),
                 Column(
                   children: [
-                    Padding(
-                      padding: EdgeInsets.only(
-                        left: CustomSize.sizeWidth(context) / 18,
-                        right: CustomSize.sizeWidth(context) / 18,
-                      ),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          MediaQuery(
-                              child: CustomText.bodyLight16(text: (jmlhMeja.toString() == '')?"Harga":'Harga per meja', sizeNew: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.04).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.04).toString())),
-                              data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0)
-                          ),
-                          MediaQuery(
-                              child: CustomText.bodyLight16(text: NumberFormat.currency(locale: 'id', symbol: '', decimalDigits: 0).format((jmlhMeja.toString() == '')?int.parse(harga2):int.parse(hargaReser.toString())), sizeNew: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.04).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.04).toString())),
-                              data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0)
-                          ),
-                        ],
-                      ),
-                    ),
-                    SizedBox(height: CustomSize.sizeHeight(context) / 100,),
+                    // Padding(
+                    //   padding: EdgeInsets.only(
+                    //     left: CustomSize.sizeWidth(context) / 18,
+                    //     right: CustomSize.sizeWidth(context) / 18,
+                    //   ),
+                    //   child: Row(
+                    //     mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    //     children: [
+                    //       MediaQuery(
+                    //           child: CustomText.bodyLight16(text: (jmlhMeja.toString() == '')?"Harga":'Harga per meja', sizeNew: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.04).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.04).toString())),
+                    //           data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0)
+                    //       ),
+                    //       MediaQuery(
+                    //           child: CustomText.bodyLight16(text: NumberFormat.currency(locale: 'id', symbol: '', decimalDigits: 0).format((jmlhMeja.toString() == '')?int.parse(harga2):int.parse(hargaReser.toString())), sizeNew: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.04).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.04).toString())),
+                    //           data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0)
+                    //       ),
+                    //     ],
+                    //   ),
+                    // ),
+                    // SizedBox(height: CustomSize.sizeHeight(context) / 100,),
                     Padding(
                       padding: EdgeInsets.only(
                         left: CustomSize.sizeWidth(context) / 18,
@@ -1702,8 +1781,8 @@ class _FinalTransReserState extends State<FinalTransReser> {
                       ),
                       child: Row(mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          CustomText.bodyLight16(text: "Platform Fee", minSize: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.04)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.04)).toString())),
-                          CustomText.bodyLight16(text: NumberFormat.currency(locale: 'id', symbol: '', decimalDigits: 0).format(1000), minSize: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.04)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.04)).toString())),
+                          CustomText.bodyLight16(text: "Harga per meja (10.000 x "+jmlhMeja.toString()+')', minSize: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.04)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.04)).toString())),
+                          CustomText.bodyLight16(text: NumberFormat.currency(locale: 'id', symbol: '', decimalDigits: 0).format(total), minSize: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.04)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.04)).toString())),
                         ],
                       ),
                     ),
@@ -1747,7 +1826,8 @@ class _FinalTransReserState extends State<FinalTransReser> {
                               data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0)
                           ),
                           MediaQuery(
-                              child: CustomText.textTitle3(text: NumberFormat.currency(locale: 'id', symbol: '', decimalDigits: 0).format(int.parse((jmlhMeja.toString() == '')?totalHargaTrans:totalReser)), sizeNew: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.04).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.04).toString())),
+                              // child: CustomText.textTitle3(text: NumberFormat.currency(locale: 'id', symbol: '', decimalDigits: 0).format(int.parse((jmlhMeja.toString() == '')?totalHargaTrans:totalReser)), sizeNew: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.04).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.04).toString())),
+                              child: CustomText.textTitle3(text: NumberFormat.currency(locale: 'id', symbol: '', decimalDigits: 0).format(total), sizeNew: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.04).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.04).toString())),
                               data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0)
                           ),
                         ],
@@ -1774,12 +1854,12 @@ class _FinalTransReserState extends State<FinalTransReser> {
                   onTap: ()async{
                     // _getData();
                     setState((){});
-                    SharedPreferences preferences = await SharedPreferences.getInstance();
-                    await preferences.remove('jmlhMeja');
-                    await preferences.remove('tglReser');
-                    await preferences.remove('jamReser');
-                    await preferences.remove('hargaReser');
-                    await preferences.remove('totalReser');
+                    // SharedPreferences preferences = await SharedPreferences.getInstance();
+                    // await preferences.remove('jmlhMeja');
+                    // await preferences.remove('tglReser');
+                    // await preferences.remove('jamReser');
+                    // await preferences.remove('hargaReser');
+                    // await preferences.remove('totalReser');
                     // Navigator.push(context, PageTransition(
                     //     type: PageTransitionType.fade,
                     //     child: FinalTrans()));
@@ -1830,11 +1910,23 @@ class _FinalTransReserState extends State<FinalTransReser> {
                     // }
 
 
+                    // Navigator.pushReplacement(
+                    //     context,
+                    //     PageTransition(
+                    //         type: PageTransitionType.fade,
+                    //         child: HomeActivity()));
+
+                    print('OL');
+                    print(transaction[0].id!);
+                    print(transaction[0].status!);
+                    print(transaction[0].note!);
+                    print(transaction[0].idResto!);
+
                     Navigator.pushReplacement(
                         context,
                         PageTransition(
-                            type: PageTransitionType.fade,
-                            child: HomeActivity()));
+                            type: PageTransitionType.rightToLeft,
+                            child: DetailTransactionReser(transaction[0].id!, transaction[0].status!, transaction[0].note!, transaction[0].idResto!)));
                   },
                   child: Center(
                     child: Container(

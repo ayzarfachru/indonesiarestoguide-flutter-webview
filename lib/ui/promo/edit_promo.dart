@@ -10,6 +10,7 @@ import 'package:flutter_datetime_picker/flutter_datetime_picker.dart';
 import 'package:flutter_icons/flutter_icons.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:intl/intl.dart';
 import 'package:kam5ia/model/Promo.dart';
 import 'package:kam5ia/ui/promo/promo_activity.dart';
 import 'package:kam5ia/ui/ui_resto/add_resto/add_detail_resto.dart';
@@ -104,7 +105,7 @@ class _EditPromoState extends State<EditPromo> {
                 child: Text("Simpan", style: TextStyle(color: CustomColor.accent),),
                 onPressed: () async{
                   SharedPreferences pref = await SharedPreferences.getInstance();
-                  pref.setString("tipeMenu", tipe);
+                  pref.setString("tipeMenu", tipe.toString());
                   setState(() {
                     print(tipe);
                     getTipeMenu();
@@ -125,7 +126,7 @@ class _EditPromoState extends State<EditPromo> {
   getInitial() async {
     SharedPreferences pref = await SharedPreferences.getInstance();
     setState(() {
-      initial = (pref.getString('name').substring(0, 1).toUpperCase());
+      initial = (pref.getString('name')!.substring(0, 1).toUpperCase());
       print(initial);
     });
   }
@@ -165,7 +166,7 @@ class _EditPromoState extends State<EditPromo> {
     final pickedFile = await picker.getImage(source: ImageSource.gallery);
 
     setState(() {
-      image = File(pickedFile.path);
+      image = File(pickedFile!.path);
       extension = pickedFile.path.split('.').last;
     });
   }
@@ -236,7 +237,7 @@ class _EditPromoState extends State<EditPromo> {
     });
     SharedPreferences pref = await SharedPreferences.getInstance();
     String token = pref.getString("token") ?? "";
-    var apiResult = await http.post(Links.mainUrl + '/promo/$id',
+    var apiResult = await http.post(Uri.parse(Links.mainUrl + '/promo/$id'),
         body: {
           'menu_id': idMenu,
           'desc': descPromo.text,
@@ -485,7 +486,7 @@ class _EditPromoState extends State<EditPromo> {
                                       blurredBackground: true,
                                       accentColor: Colors.blue[400],
                                       context: context,
-                                      value: (jam != null)?jam:null,
+                                      value: (jam != null)?jam:TimeOfDay.now(),
                                       onChange: onTimeOpenChanged,
                                       minuteInterval: MinuteInterval.ONE,
                                       disableHour: false,

@@ -3,7 +3,8 @@ import 'dart:convert';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_icons/flutter_icons.dart';
-import 'package:full_screen_image/full_screen_image.dart';
+import 'package:full_screen_image_null_safe/full_screen_image_null_safe.dart';
+// import 'package:full_screen_image/full_screen_image.dart';
 import 'package:kam5ia/model/CategoryMenu.dart';
 import 'package:kam5ia/model/Menu.dart';
 import 'package:kam5ia/model/MenuJson.dart';
@@ -49,7 +50,7 @@ class _MenuActivityState extends State<MenuActivity> {
     SharedPreferences pref = await SharedPreferences.getInstance();
     String token = pref.getString("token") ?? "";
     var apiResult = await http.get(
-        Links.mainUrl + '/resto/detail/$id', headers: {
+        Uri.parse(Links.mainUrl + '/resto/detail/$id'), headers: {
       "Accept": "Application/json",
       "Authorization": "Bearer $token"
     });
@@ -94,7 +95,7 @@ class _MenuActivityState extends State<MenuActivity> {
     });
     SharedPreferences pref = await SharedPreferences.getInstance();
     String token = pref.getString("token") ?? "";
-    var apiResult = await http.get(Links.mainUrl + '/resto/menu', headers: {
+    var apiResult = await http.get(Uri.parse(Links.mainUrl + '/resto/menu'), headers: {
       "Accept": "Application/json",
       "Authorization": "Bearer $token"
     });
@@ -167,14 +168,14 @@ class _MenuActivityState extends State<MenuActivity> {
     });
     SharedPreferences pref = await SharedPreferences.getInstance();
     String token = pref.getString("token") ?? "";
-    var apiResult = await http.get(Links.mainUrl + '/resto/menu/delete/$id', headers: {
+    var apiResult = await http.get(Uri.parse(Links.mainUrl + '/resto/menu/delete/$id'), headers: {
       "Accept": "Application/json",
       "Authorization": "Bearer $token"
     });
     print(apiResult.body);
     var data = json.decode(apiResult.body);
 
-    if (data['message'].toString() == 'Success') {
+    if (apiResult.statusCode == 200) {
       Navigator.pop(context);
       Navigator.pushReplacement(context,
           PageTransition(

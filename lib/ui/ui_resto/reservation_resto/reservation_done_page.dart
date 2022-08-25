@@ -1,9 +1,10 @@
 import 'dart:convert';
 
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_icons/flutter_icons.dart';
-import 'package:kam5ia/model/Transaction.dart';
+import 'package:kam5ia/model/Transaction.dart' as trans;
 import 'package:kam5ia/model/User.dart';
 import 'package:kam5ia/ui/ui_resto/reservation_resto/reservation_activity.dart';
 import 'package:kam5ia/utils/chat_activity.dart';
@@ -25,13 +26,14 @@ class _ReservationDoneState extends State<ReservationDone> {
 
   bool ksg = false;
 
-  List<Transaction> transaction = [];
+  List<trans.Transaction> transaction = [];
+  String deposit = '';
   Future _getTrans()async{
-    List<Transaction> _transaction = [];
+    List<trans.Transaction> _transaction = [];
 
     SharedPreferences pref = await SharedPreferences.getInstance();
     String token = pref.getString("token") ?? "";
-    var apiResult = await http.get(Links.mainUrl + '/resto/reservation', headers: {
+    var apiResult = await http.get(Uri.parse(Links.mainUrl + '/resto/reservation'), headers: {
       "Accept": "Application/json",
       "Authorization": "Bearer $token"
     });
@@ -41,7 +43,7 @@ class _ReservationDoneState extends State<ReservationDone> {
 
     if (data['trx'].toString().contains('process')) {
       for(var v in data['trx']['process']){
-        Transaction r = Transaction.reservation(
+        trans.Transaction r = trans.Transaction.reservation(
           id: v['id'],
           status: v['status'],
           username: v['user_name'],
@@ -59,8 +61,17 @@ class _ReservationDoneState extends State<ReservationDone> {
       ksg = true;
     }
 
+    String id = pref.getString("idHomeResto") ?? "";
+    var apiResult2 = await http
+        .get(Uri.parse(Links.mainUrl + "/deposit/$id"), headers: {
+      "Accept": "Application/json",
+      "Authorization": "Bearer $token"
+    });
+    var data2 = json.decode(apiResult2.body);
+
     setState(() {
       transaction = _transaction;
+      deposit = data2['balance'].toString();
     });
   }
 
@@ -83,7 +94,7 @@ class _ReservationDoneState extends State<ReservationDone> {
 
     SharedPreferences pref = await SharedPreferences.getInstance();
     String token = pref.getString("token") ?? "";
-    var apiResult = await http.get(Links.mainUrl + '/resto/reservation/$Id', headers: {
+    var apiResult = await http.get(Uri.parse(Links.mainUrl + '/resto/reservation/$Id'), headers: {
       "Accept": "Application/json",
       "Authorization": "Bearer $token"
     });
@@ -185,8 +196,8 @@ class _ReservationDoneState extends State<ReservationDone> {
                                 SizedBox(height: CustomSize.sizeHeight(context) / 100,),
                                 Row(mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                   children: [
-                                    CustomText.bodyLight16(text: "Platform fee", sizeNew: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.04).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.04).toString())),
-                                    CustomText.bodyLight16(text: '1000',
+                                    CustomText.bodyLight16(text: "Harga per meja", sizeNew: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.04).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.04).toString())),
+                                    CustomText.bodyLight16(text: NumberFormat.currency(locale: 'id', symbol: '', decimalDigits: 0).format(10000),
                                         sizeNew: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.04).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.04).toString())
                                       // totalOngkir
                                     ),
@@ -197,7 +208,7 @@ class _ReservationDoneState extends State<ReservationDone> {
                                 Row(mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                   children: [
                                     CustomText.textTitle3(text: "Total Pembayaran", sizeNew: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.04).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.04).toString())),
-                                    CustomText.textTitle3(text: NumberFormat.currency(locale: 'id', symbol: '', decimalDigits: 0).format(int.parse(total)+1000),
+                                    CustomText.textTitle3(text: NumberFormat.currency(locale: 'id', symbol: '', decimalDigits: 0).format(int.parse(total)),
                                         sizeNew: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.04).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.04).toString())
                                       // NumberFormat.currency(locale: 'id', symbol: '', decimalDigits: 0).format(int.parse(totalHarga))
                                     ),
@@ -319,15 +330,20 @@ class _ReservationDoneState extends State<ReservationDone> {
                             SizedBox(height: CustomSize.sizeHeight(context) / 86,),
                             GestureDetector(
                               onTap: (){
-                                _Operation(operation = "done", id!);
-                                setStateModal(() {});
-                                Future.delayed(Duration(seconds: 0)).then((_) {
-                                  Navigator.pushReplacement(
-                                      context,
-                                      PageTransition(
-                                          type: PageTransitionType.fade,
-                                          child: ReservationRestoActivity()));
-                                });
+                                if (int.parse(deposit) >= (1000)) {
+                                  _Operation(operation = "done", id!);
+                                  setStateModal(() {});
+                                  Future.delayed(Duration(seconds: 0)).then((_) {
+                                    Navigator.pushReplacement(
+                                        context,
+                                        PageTransition(
+                                            type: PageTransitionType.fade,
+                                            child: ReservationRestoActivity()));
+                                  });
+                                } else {
+                                  Fluttertoast.showToast(
+                                    msg: 'Saldo deposit anda tidak mencukupi untuk melanjutkan transaksi ini!',);
+                                }
                               },
                               child: Center(
                                 child: Container(
@@ -390,7 +406,7 @@ class _ReservationDoneState extends State<ReservationDone> {
 
     SharedPreferences pref = await SharedPreferences.getInstance();
     String token = pref.getString("token") ?? "";
-    var apiResult = await http.get(Links.mainUrl + '/reservation/op/open/$id', headers: {
+    var apiResult = await http.get(Uri.parse(Links.mainUrl + '/reservation/op/open/$id'), headers: {
       "Accept": "Application/json",
       "Authorization": "Bearer $token"
     });
@@ -421,7 +437,7 @@ class _ReservationDoneState extends State<ReservationDone> {
 
     SharedPreferences pref = await SharedPreferences.getInstance();
     String token = pref.getString("token") ?? "";
-    var apiResult = await http.get(Links.mainUrl + '/reservation/op/$operation/$id', headers: {
+    var apiResult = await http.get(Uri.parse(Links.mainUrl + '/reservation/op/$operation/$id'), headers: {
       "Accept": "Application/json",
       "Authorization": "Bearer $token"
     });
@@ -429,6 +445,11 @@ class _ReservationDoneState extends State<ReservationDone> {
     var data = json.decode(apiResult.body);
     print(data);
 
+    FirebaseFirestore.instance.collection('room').doc(chatroom).collection('messages').get().then((snapshot) {
+      for (DocumentSnapshot ds in snapshot.docs){
+        ds.reference.delete();
+      }
+    });
     // for(var v in data['trx']['process']){
     //   Transaction r = Transaction.resto(
     //       id: v['id'],
@@ -449,7 +470,7 @@ class _ReservationDoneState extends State<ReservationDone> {
   Future getUser()async{
     SharedPreferences pref = await SharedPreferences.getInstance();
     setState(() {
-      userName = (pref.getString('name'));
+      userName = (pref.getString('name')??'');
     });
   }
 
@@ -576,7 +597,7 @@ class _ReservationDoneState extends State<ReservationDone> {
                                             SizedBox(height: CustomSize.sizeHeight(context) * 0.00468,),
                                             CustomText.bodyMedium12(
                                               // text: transaction[index].type.toString(),
-                                                text: (transaction[index].total! + 1000).toString(),
+                                                text: (transaction[index].total).toString(),
                                                 maxLines: 1,
                                                 sizeNew: double.parse(((MediaQuery.of(context).size.width*0.033).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.033).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.033).toString())
                                             ),

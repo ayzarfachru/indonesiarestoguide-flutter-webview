@@ -12,6 +12,7 @@ import 'package:page_transition/page_transition.dart';
 import 'package:qr_flutter/qr_flutter.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:http/http.dart' as http;
+import 'package:url_launcher/url_launcher.dart';
 
 class PaymentResto extends StatefulWidget {
   String name, phone, address;
@@ -41,8 +42,8 @@ class _PaymentRestoState extends State<PaymentResto> {
     SharedPreferences pref = await SharedPreferences.getInstance();
     setState(() {
       tipe = (pref.getString("jUsaha")) ?? "";
-      homepg = (pref.getString('homepg'));
-      owner = (pref.getString('owner'));
+      homepg = (pref.getString('homepg')??'');
+      owner = (pref.getString('owner')??'');
     });
 
     print(tipe);
@@ -52,7 +53,7 @@ class _PaymentRestoState extends State<PaymentResto> {
     SharedPreferences pref = await SharedPreferences.getInstance();
     String token = pref.getString("token") ?? "";
 
-    var apiResult = await http.post(Links.mainUrl + '/payment/checkout', body: {
+    var apiResult = await http.post(Uri.parse(Links.mainUrl + '/payment/checkout'), body: {
       'amount': '550000'
     }, headers: {
       "Accept": "Application/json",
@@ -88,7 +89,7 @@ class _PaymentRestoState extends State<PaymentResto> {
     SharedPreferences pref = await SharedPreferences.getInstance();
     String token = pref.getString("token") ?? "";
 
-    var apiResult = await http.post(Links.mainUrl + '/payment/checkout', body: {
+    var apiResult = await http.post(Uri.parse(Links.mainUrl + '/payment/checkout'), body: {
       'amount': '330000'
     }, headers: {
       "Accept": "Application/json",
@@ -128,7 +129,7 @@ class _PaymentRestoState extends State<PaymentResto> {
     String token = pref.getString("token") ?? "";
 
     var apiResult = await http
-        .post(Links.mainUrl + '/payment/inquiry', headers: {
+        .post(Uri.parse(Links.mainUrl + '/payment/inquiry'), headers: {
       "Accept": "Application/json",
       "Authorization": "Bearer $token"
     });
@@ -168,7 +169,7 @@ class _PaymentRestoState extends State<PaymentResto> {
     String token = pref.getString("token") ?? "";
 
     var apiResult = await http
-        .post(Links.mainUrl + '/payment/inquiry', headers: {
+        .post(Uri.parse(Links.mainUrl + '/payment/inquiry'), headers: {
       "Accept": "Application/json",
       "Authorization": "Bearer $token"
     });
@@ -497,7 +498,7 @@ class _PaymentRestoState extends State<PaymentResto> {
     String token = pref.getString("token") ?? "";
 
     var apiResult = await http
-        .post(Links.mainUrl + '/payment/inquiry', headers: {
+        .post(Uri.parse(Links.mainUrl + '/payment/inquiry'), headers: {
       "Accept": "Application/json",
       "Authorization": "Bearer $token"
     });
@@ -817,7 +818,7 @@ class _PaymentRestoState extends State<PaymentResto> {
     SharedPreferences pref = await SharedPreferences.getInstance();
     String token = pref.getString("token") ?? "";
 
-    var apiResult = await http.post(Links.mainUrl + '/payment/checkout', body: {
+    var apiResult = await http.post(Uri.parse(Links.mainUrl + '/payment/checkout'), body: {
       'amount': priceReferral.toString(),
       // 'amount': '5000',
       'ref': codeProgram.text
@@ -861,7 +862,7 @@ class _PaymentRestoState extends State<PaymentResto> {
     SharedPreferences pref = await SharedPreferences.getInstance();
     String token = pref.getString("token") ?? "";
 
-    var apiResult = await http.post(Links.mainUrl + '/payment/activate', body: {
+    var apiResult = await http.post(Uri.parse(Links.mainUrl + '/payment/activate'), body: {
       // 'amount': '200000',
       // 'amount': '5000',
       'ref': codeProgram.text
@@ -877,9 +878,9 @@ class _PaymentRestoState extends State<PaymentResto> {
     if (apiResult.statusCode == 200) {
       loading = false;
       print(data);
-      if (status == 'done' && homepg != "1") {
+      if (homepg != "1") {
         Navigator.pushReplacement(context, PageTransition(type: PageTransitionType.fade, child: HomeActivity()));
-      } else if (status == 'done' && homepg == "1"){
+      } else if (homepg == "1"){
         Navigator.pushReplacement(context, PageTransition(type: PageTransitionType.fade, child: HomeActivityResto()));
       }
     }
@@ -891,7 +892,7 @@ class _PaymentRestoState extends State<PaymentResto> {
     String token = pref.getString("token") ?? "";
 
     var apiResult = await http
-        .post(Links.mainUrl + '/payment/inquiry', headers: {
+        .post(Uri.parse(Links.mainUrl + '/payment/inquiry'), headers: {
       "Accept": "Application/json",
       "Authorization": "Bearer $token"
     });
@@ -931,7 +932,7 @@ class _PaymentRestoState extends State<PaymentResto> {
     String token = pref.getString("token") ?? "";
 
     var apiResult = await http
-        .post(Links.mainUrl + '/payment/inquiry', headers: {
+        .post(Uri.parse(Links.mainUrl + '/payment/inquiry'), headers: {
       "Accept": "Application/json",
       "Authorization": "Bearer $token"
     });
@@ -1271,7 +1272,7 @@ class _PaymentRestoState extends State<PaymentResto> {
                 borderRadius: BorderRadius.all(Radius.circular(10))
             ),
             title: Center(child: Text('Perhatian!', style: TextStyle(color: CustomColor.redBtn))),
-            content: Text('Apakah yakin ingin meninggalkan halaman aktivasi pembayaran?', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500), textAlign: TextAlign.center),
+            content: Text('Apakah yakin ingin meninggalkan halaman aktivasi resto?', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500), textAlign: TextAlign.center),
             actions: <Widget>[
               Center(
                 child: Row(
@@ -1350,7 +1351,7 @@ class _PaymentRestoState extends State<PaymentResto> {
     });
     SharedPreferences pref = await SharedPreferences.getInstance();
     String token = pref.getString("token") ?? "";
-    var apiResult = await http.get('https://erp.devastic.com/api/ref?ref='+codeProgram.text, headers: {
+    var apiResult = await http.get(Uri.parse('https://erp.devastic.com/api/ref?ref='+codeProgram.text), headers: {
       "Accept": "Application/json",
       "Authorization": "Bearer $token"
     });
@@ -1416,6 +1417,10 @@ class _PaymentRestoState extends State<PaymentResto> {
                               // SizedBox(
                               //   width: CustomSize.sizeWidth(context) / 18,
                               // ),
+                              Icon(Icons.chevron_left, color: Colors.white, size: double.parse(((MediaQuery.of(context).size.width*0.075).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.075)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.075)).toString())),
+                              SizedBox(
+                                width: CustomSize.sizeWidth(context) / 88,
+                              ),
                               Expanded(
                                 child: CustomText.textHeading4(
                                   color: Colors.white,
@@ -1939,7 +1944,57 @@ class _PaymentRestoState extends State<PaymentResto> {
                       ),
                       GestureDetector(
                         onTap: (){
-                          Navigator.pop(context);
+                          showDialog(
+                              context: context,
+                              builder: (context) {
+                                return AlertDialog(
+                                  contentPadding: EdgeInsets.only(left: 25, right: 25, top: 15, bottom: 5),
+                                  shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.all(Radius.circular(10))
+                                  ),
+                                  title: Center(child: Text('Perhatian!', style: TextStyle(color: CustomColor.redBtn))),
+                                  content: Text('Apakah yakin ingin meninggalkan halaman aktivasi resto?', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500), textAlign: TextAlign.center),
+                                  actions: <Widget>[
+                                    Center(
+                                      child: Row(
+                                        mainAxisAlignment: MainAxisAlignment.spaceAround,
+                                        children: [
+                                          FlatButton(
+                                            // minWidth: CustomSize.sizeWidth(context),
+                                            color: CustomColor.redBtn,
+                                            textColor: Colors.white,
+                                            shape: RoundedRectangleBorder(
+                                                borderRadius: BorderRadius.all(Radius.circular(10))
+                                            ),
+                                            child: Text('Batal'),
+                                            onPressed: () async{
+                                              setState(() {
+                                                // codeDialog = valueText;
+                                                Navigator.pop(context);
+                                              });
+                                            },
+                                          ),
+                                          FlatButton(
+                                            color: CustomColor.primaryLight,
+                                            textColor: Colors.white,
+                                            shape: RoundedRectangleBorder(
+                                                borderRadius: BorderRadius.all(Radius.circular(10))
+                                            ),
+                                            child: Text('Iya'),
+                                            onPressed: () async{
+                                              if (homepg != "1") {
+                                                Navigator.pushReplacement(context, PageTransition(type: PageTransitionType.fade, child: HomeActivity()));
+                                              } else if (homepg == "1") {
+                                                Navigator.pushReplacement(context, PageTransition(type: PageTransitionType.fade, child: HomeActivityResto()));
+                                              }
+                                            },
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                  ],
+                                );
+                              });
                         },
                         child: Padding(
                           padding: EdgeInsets.symmetric(
@@ -1953,6 +2008,10 @@ class _PaymentRestoState extends State<PaymentResto> {
                               // SizedBox(
                               //   width: CustomSize.sizeWidth(context) / 18,
                               // ),
+                              Icon(Icons.chevron_left, color: Colors.white, size: double.parse(((MediaQuery.of(context).size.width*0.075).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.075)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.075)).toString())),
+                              SizedBox(
+                                width: CustomSize.sizeWidth(context) / 88,
+                              ),
                               Expanded(
                                 child: CustomText.textHeading4(
                                   color: Colors.white,
@@ -2055,7 +2114,7 @@ class _PaymentRestoState extends State<PaymentResto> {
                                                             ),
                                                             child: Text('Cek', style: TextStyle(fontSize: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.04)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.04)).toString()),),),
                                                             onPressed: () async{
-                                                              if (checking = true) {
+                                                              if (checking == true) {
                                                                 Fluttertoast.showToast(msg: "Tunggu . . .");
                                                               } else {
                                                                 _cekReferral();
@@ -2078,6 +2137,73 @@ class _PaymentRestoState extends State<PaymentResto> {
                                             child: Center(
                                               child: CustomText.text(
                                                   text: "Masukkan kode referral",
+                                                  size: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.04)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.04)).toString()),
+                                                  weight: FontWeight.w600,
+                                                  color: Colors.white,
+                                                  maxLines: 1
+                                              ),
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                    SizedBox(height: CustomSize.sizeHeight(context) / 96,),
+                                    Container(
+                                      width: CustomSize.sizeWidth(context),
+                                      height: CustomSize.sizeHeight(context) / 16,
+                                      decoration: BoxDecoration(
+                                        borderRadius: BorderRadius.circular(10),
+                                        color: CustomColor.redBtn,
+                                      ),
+                                      child: Material(
+                                        borderRadius: BorderRadius.circular(10),
+                                        color: Colors.transparent,
+                                        child: InkWell(
+                                          borderRadius: BorderRadius.circular(10),
+                                          splashColor: Colors.white.withOpacity(.2),
+                                          highlightColor: CustomColor.accent,
+                                          onTap: (){
+                                            showDialog(
+                                                context: context,
+                                                builder: (context) {
+                                                  return AlertDialog(
+                                                    shape: RoundedRectangleBorder(
+                                                        borderRadius: BorderRadius.all(Radius.circular(10))
+                                                    ),
+                                                    title: Text('Informasi lebih lanjut'),
+                                                    content: Text('Silahkan hubungi +6285852270555'),
+                                                    actions: <Widget>[
+                                                      Center(
+                                                        child: Padding(
+                                                          padding: const EdgeInsets.only(left: 10.0, right: 10.0, bottom: 8.0),
+                                                          child: FlatButton(
+                                                            minWidth: CustomSize.sizeWidth(context),
+                                                            color: CustomColor.primaryLight,
+                                                            textColor: Colors.white,
+                                                            shape: RoundedRectangleBorder(
+                                                                borderRadius: BorderRadius.all(Radius.circular(10))
+                                                            ),
+                                                            child: Text('Hubungi sekarang', style: TextStyle(fontSize: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.04)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.04)).toString()),),),
+                                                            onPressed: () async{
+                                                              launch("https://wa.me/6285852270555");
+                                                            },
+                                                          ),
+                                                        ),
+                                                      ),
+                                                    ],
+                                                  );
+                                                });
+                                            setState(() {});
+                                          },
+                                          child: Container(
+                                            width: CustomSize.sizeWidth(context),
+                                            height: CustomSize.sizeHeight(context) / 16,
+                                            decoration: BoxDecoration(
+                                              borderRadius: BorderRadius.circular(10),
+                                            ),
+                                            child: Center(
+                                              child: CustomText.text(
+                                                  text: "Saya tidak punya kode referral",
                                                   size: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.04)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.04)).toString()),
                                                   weight: FontWeight.w600,
                                                   color: Colors.white,
@@ -2171,6 +2297,10 @@ class _PaymentRestoState extends State<PaymentResto> {
                               // SizedBox(
                               //   width: CustomSize.sizeWidth(context) / 18,
                               // ),
+                              Icon(Icons.chevron_left, color: Colors.white, size: double.parse(((MediaQuery.of(context).size.width*0.075).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.075)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.075)).toString())),
+                              SizedBox(
+                                width: CustomSize.sizeWidth(context) / 88,
+                              ),
                               Expanded(
                                 child: Row(
                                   children: [

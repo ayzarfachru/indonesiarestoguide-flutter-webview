@@ -88,8 +88,8 @@ class _EditDataUsahaState extends State<EditDataUsaha> {
   getInitial() async {
     SharedPreferences pref = await SharedPreferences.getInstance();
     setState(() {
-      karyawan = (pref.getString("karyawan"));
-      initial = (pref.getString('name').substring(0, 1).toUpperCase());
+      karyawan = (pref.getString("karyawan")??'');
+      initial = (pref.getString('name')!.substring(0, 1).toUpperCase());
       print(initial);
     });
   }
@@ -103,7 +103,7 @@ class _EditDataUsahaState extends State<EditDataUsaha> {
     final pickedFile = await picker2.getImage(source: ImageSource.gallery);
 
     setState(() {
-      image2 = File(pickedFile.path);
+      image2 = File(pickedFile!.path);
       extension = pickedFile.path.split('.').last;
     });
   }
@@ -116,7 +116,7 @@ class _EditDataUsahaState extends State<EditDataUsaha> {
     final pickedFile = await picker3.getImage(source: ImageSource.gallery);
 
     setState(() {
-      image3 = File(pickedFile.path);
+      image3 = File(pickedFile!.path);
       extension = pickedFile.path.split('.').last;
     });
   }
@@ -206,10 +206,10 @@ class _EditDataUsahaState extends State<EditDataUsaha> {
                       ),
                       TextField(
                         // readOnly: (btnAddress == true)?true:false,
-                        onTap: (){
-                          Fluttertoast.showToast(msg: 'Anda tidak dapat merubah apapun di halaman ini.',);
-                        },
-                        readOnly: true,
+                        // onTap: (){
+                        //   Fluttertoast.showToast(msg: 'Anda tidak dapat merubah apapun di halaman ini.',);
+                        // },
+                        // readOnly: true,
                         controller: _NameBadanUsaha,
                         keyboardType: TextInputType.text,
                         cursorColor: Colors.black,
@@ -239,10 +239,10 @@ class _EditDataUsahaState extends State<EditDataUsaha> {
                         height: CustomSize.sizeHeight(context) * 0.005,
                       ),
                       TextField(
-                        onTap: (){
-                          Fluttertoast.showToast(msg: 'Anda tidak dapat merubah apapun di halaman ini.',);
-                        },
-                        readOnly: true,
+                        // onTap: (){
+                        //   Fluttertoast.showToast(msg: 'Anda tidak dapat merubah apapun di halaman ini.',);
+                        // },
+                        // readOnly: true,
                         controller: _NamePemilik,
                         keyboardType: TextInputType.text,
                         cursorColor: Colors.black,
@@ -272,10 +272,10 @@ class _EditDataUsahaState extends State<EditDataUsaha> {
                         height: CustomSize.sizeHeight(context) * 0.005,
                       ),
                       TextField(
-                        onTap: (){
-                          Fluttertoast.showToast(msg: 'Anda tidak dapat merubah apapun di halaman ini.',);
-                        },
-                        readOnly: true,
+                        // onTap: (){
+                        //   Fluttertoast.showToast(msg: 'Anda tidak dapat merubah apapun di halaman ini.',);
+                        // },
+                        // readOnly: true,
                         // readOnly: (btnAddress == true)?true:false,
                         controller: _NamePenanggungJawab,
                         keyboardType: TextInputType.text,
@@ -307,8 +307,8 @@ class _EditDataUsahaState extends State<EditDataUsaha> {
                       ),
                       GestureDetector(
                         onTap: () async{
-                          Fluttertoast.showToast(msg: 'Anda tidak dapat merubah apapun di halaman ini.',);
-                          // getImage2();
+                          // Fluttertoast.showToast(msg: 'Anda tidak dapat merubah apapun di halaman ini.',);
+                          getImage2();
                         },
                         child: Row(
                           children: [
@@ -381,8 +381,8 @@ class _EditDataUsahaState extends State<EditDataUsaha> {
                       ),
                       GestureDetector(
                         onTap: () async{
-                          // getImage3();
-                          Fluttertoast.showToast(msg: 'Anda tidak dapat merubah apapun di halaman ini.',);
+                          getImage3();
+                          // Fluttertoast.showToast(msg: 'Anda tidak dapat merubah apapun di halaman ini.',);
                         },
                         child: Row(
                           children: [
@@ -454,10 +454,10 @@ class _EditDataUsahaState extends State<EditDataUsaha> {
                         height: CustomSize.sizeHeight(context) * 0.005,
                       ),
                       TextField(
-                        onTap: (){
-                          Fluttertoast.showToast(msg: 'Anda tidak dapat merubah apapun di halaman ini.',);
-                        },
-                        readOnly: true,
+                        // onTap: (){
+                        //   Fluttertoast.showToast(msg: 'Anda tidak dapat merubah apapun di halaman ini.',);
+                        // },
+                        // readOnly: true,
                         // readOnly: (btnAddress == true)?true:false,
                         controller: _NameRekening,
                         keyboardType: TextInputType.text,
@@ -488,10 +488,10 @@ class _EditDataUsahaState extends State<EditDataUsaha> {
                         height: CustomSize.sizeHeight(context) * 0.005,
                       ),
                       TextField(
-                        onTap: (){
-                          Fluttertoast.showToast(msg: 'Anda tidak dapat merubah apapun di halaman ini.',);
-                        },
-                        readOnly: true,
+                        // onTap: (){
+                        //   Fluttertoast.showToast(msg: 'Anda tidak dapat merubah apapun di halaman ini.',);
+                        // },
+                        // readOnly: true,
                         // readOnly: (btnAddress == true)?true:false,
                         controller: _NameBank,
                         keyboardType: TextInputType.text,
@@ -522,10 +522,10 @@ class _EditDataUsahaState extends State<EditDataUsaha> {
                         height: CustomSize.sizeHeight(context) * 0.005,
                       ),
                       TextField(
-                        onTap: (){
-                          Fluttertoast.showToast(msg: 'Anda tidak dapat merubah apapun di halaman ini.',);
-                        },
-                        readOnly: true,
+                        // onTap: (){
+                        //   Fluttertoast.showToast(msg: 'Anda tidak dapat merubah apapun di halaman ini.',);
+                        // },
+                        // readOnly: true,
                         // readOnly: (btnAddress == true)?true:false,
                         controller: _NoRekeningBank,
                         keyboardType: TextInputType.number,
@@ -575,7 +575,7 @@ class _EditDataUsahaState extends State<EditDataUsaha> {
                             pref.setString("nameBank", _NameBank.text.toString());
                             pref.setString("noRekeningBank", _NoRekeningBank.text.toString());
                             print(pref.getString("imgSelfie"));
-                            print(pref.getString("imgKTP")+'ini ktp');
+                            print(pref.getString("imgKTP").toString()+'ini ktp');
                             print(pref.getString("nameBadanUsaha"));
                             print(pref.getString("namePemilik"));
                             print(pref.getString("namePenanggungJawab"));
@@ -664,7 +664,7 @@ class _EditDataUsahaState extends State<EditDataUsaha> {
                               // onTap: (){
                               //   Fluttertoast.showToast(msg: 'Anda tidak dapat merubah apapun di halaman ini.',);
                               // },
-                              readOnly: true,
+                              // readOnly: true,
                               controller: _NamePemilik,
                               keyboardType: TextInputType.text,
                               cursorColor: Colors.black,
@@ -1124,7 +1124,7 @@ class _EditDataUsahaState extends State<EditDataUsaha> {
             pref.setString("nameBank", _NameBank.text.toString());
             pref.setString("noRekeningBank", _NoRekeningBank.text.toString());
             print(pref.getString("imgSelfie"));
-            print(pref.getString("imgKTP")+'ini ktp');
+            print(pref.getString("imgKTP").toString()+'ini ktp');
             print(pref.getString("nameBadanUsaha"));
             print(pref.getString("namePemilik"));
             print(pref.getString("namePenanggungJawab"));

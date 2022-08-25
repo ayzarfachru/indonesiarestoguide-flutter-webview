@@ -1,10 +1,13 @@
 import 'dart:convert';
 
-import 'package:barcode_scan/barcode_scan.dart';
+// import 'package:barcode_scan/barcode_scan.dart';
+import 'package:barcode_scan2/gen/protos/protos.pb.dart';
+import 'package:barcode_scan2/platform_wrapper.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_icons/flutter_icons.dart';
-import 'package:full_screen_image/full_screen_image.dart';
+import 'package:full_screen_image_null_safe/full_screen_image_null_safe.dart';
+// import 'package:full_screen_image/full_screen_image.dart';
 import 'package:kam5ia/ui/cart/final_trans.dart';
 import 'package:kam5ia/ui/profile/edit_profile.dart';
 import 'package:kam5ia/ui/profile/profile_activity.dart';
@@ -161,10 +164,10 @@ class _CartActivityState extends State<CartActivity> {
       isLoading = true;
     });
     SharedPreferences pref2 = await SharedPreferences.getInstance();
-    latRes = pref2.getString('latResto1');
-    longRes = pref2.getString('longResto1');
+    latRes = pref2.getString('latResto1')??'';
+    longRes = pref2.getString('longResto1')??'';
     _transCode = int.parse(pref2.getString("metodeBeli")??'1');
-    delivAddress = pref2.getString('addressDelivTrans');
+    delivAddress = pref2.getString('addressDelivTrans')??'';
     dist = pref2.getString('distan')??'0';
     _distan = pref2.getString('distan')??'0';
     print('diss '+_distan.toString());
@@ -174,8 +177,8 @@ class _CartActivityState extends State<CartActivity> {
     restoAddress = (pref2.getString('alamateResto')??"");
     print('ini name '+name.toString());
     restoId.addAll(pref2.getStringList('restoId')??[]);
-    nameRestoTrans = pref2.getString("restoNameTrans");
-    phoneRestoTrans = pref2.getString("restoPhoneTrans");
+    nameRestoTrans = pref2.getString("restoNameTrans")??'';
+    phoneRestoTrans = pref2.getString("restoPhoneTrans")??'';
     print('nama Rest '+nameRestoTrans);
     qty.addAll(pref2.getStringList('qty')??[]);
     print('qty '+qty.toString());
@@ -210,12 +213,12 @@ class _CartActivityState extends State<CartActivity> {
 
     SharedPreferences pref = await SharedPreferences.getInstance();
     String token = pref.getString("token") ?? "";
-    can_delivery = pref.getString('can_deliveryUser');
-    can_takeaway = pref.getString('can_take_awayUser');
+    can_delivery = pref.getString('can_deliveryUser')??'';
+    can_takeaway = pref.getString('can_take_awayUser')??'';
     checkId = pref.getString('restoIdUsr')??'';
     print('ini '+checkId);
     print('tempek '+ checkId);
-    var apiResult = await http.post(Links.mainUrl + '/trans/check',
+    var apiResult = await http.post(Uri.parse(Links.mainUrl + '/trans/check'),
         body: {'menu': _menuId.toString().split('[')[1].split(']')[0].replaceAll(' ', '')},
         headers: {
           "Accept": "Application/json",
@@ -253,7 +256,7 @@ class _CartActivityState extends State<CartActivity> {
     });
 
     // SharedPreferences pref2 = await SharedPreferences.getInstance();
-    delivAddress = (message == 'resto tutup')?'Toko tutup!':pref2.getString('addressDelivTrans');
+    delivAddress = (message == 'resto tutup')?'Toko tutup!':pref2.getString('addressDelivTrans')??'';
     print(delivAddress);
     if (delivAddress.toString() != 'null') {
       print('oi 1');
@@ -343,11 +346,11 @@ class _CartActivityState extends State<CartActivity> {
 
     SharedPreferences pref = await SharedPreferences.getInstance();
     String token = pref.getString("token") ?? "";
-    can_delivery = pref.getString('can_deliveryUser');
-    can_takeaway = pref.getString('can_take_awayUser');
+    can_delivery = pref.getString('can_deliveryUser')??'';
+    can_takeaway = pref.getString('can_take_awayUser')??'';
     checkId = pref.getString('restoIdUsr')??'';
     print('ini '+checkId);
-    var apiResult = await http.post(Links.mainUrl + '/trans/check',
+    var apiResult = await http.post(Uri.parse(Links.mainUrl + '/trans/check'),
         body: {'menu': _menuId.toString().split('[')[1].split(']')[0].replaceAll(' ', '')},
         headers: {
           "Accept": "Application/json",
@@ -403,7 +406,7 @@ class _CartActivityState extends State<CartActivity> {
     });
     SharedPreferences pref = await SharedPreferences.getInstance();
     String token = pref.getString("token") ?? "";
-    var apiResult = await http.get(Links.mainUrl + '/resto/userdata/'+checkId, headers: {
+    var apiResult = await http.get(Uri.parse(Links.mainUrl + '/resto/userdata/'+checkId), headers: {
       "Accept": "Application/json",
       "Authorization": "Bearer $token"
     });
@@ -441,12 +444,21 @@ class _CartActivityState extends State<CartActivity> {
     // }
   }
 
+  getHomePg() async {
+    SharedPreferences pref = await SharedPreferences.getInstance();
+    setState(() {
+      homepg = (pref.getString('homepg')??'');
+      print(homepg);
+    });
+  }
+
+  String homepg = "";
   Future<String?>? makeTransaction(String qrscan)async{
     print(qrscan);
     SharedPreferences pref = await SharedPreferences.getInstance();
     var token = pref.getString("token") ?? "";
 
-    var apiResult = await http.post(Links.mainUrl + '/trans',
+    var apiResult = await http.post(Uri.parse(Links.mainUrl + '/trans'),
         body: {
           'address': (_transCode == 1)?delivAddress.toString():'',
           'type': (_transCode == 1)?'delivery':(_transCode == 2)?'takeaway':'dinein',
@@ -461,8 +473,12 @@ class _CartActivityState extends State<CartActivity> {
           "Accept": "Application/json",
           "Authorization": "Bearer $token"
         });
-    print('OYd '+apiResult.body.toString());
     var data = json.decode(apiResult.body);
+    print('OYd2 '+data.toString());
+    print('OYd2 '+apiResult.body.toString());
+    if (data['msg'].toString() == 'meja tidak tersedia') {
+      Fluttertoast.showToast(msg: 'Gunakan hp sebelumnya yang sama untuk memesan');
+    }
 
     for(var v in data['device_id']){
       // User p = User.resto(
@@ -474,9 +490,11 @@ class _CartActivityState extends State<CartActivity> {
       print(id);
       OneSignal.shared.postNotification(OSCreateNotification(
         playerIds: id,
-        heading: "$nameUser telah memesan produk di toko Anda",
+        heading: "$nameUser telah memesan menu di resto Anda",
         content: "Cek sekarang !",
-        androidChannelId: "2482eb14-bcdf-4045-b69e-422011d9e6ef",
+        androidChannelId: "9af3771b-b272-4757-9902-b23ee8da77f2",
+        collapseId: "forAdmin_$checkId",
+        androidSound: 'irg_order.wav',
       ));
       // await OneSignal.shared.postNotificationWithJson();
       // user3.add(v['device_id']);
@@ -484,16 +502,12 @@ class _CartActivityState extends State<CartActivity> {
     }
 
     if(data['status_code'] == 200){
-      if (data['msg'] == 'meja tidak tersedia') {
-        Fluttertoast.showToast(msg: 'Gunakan hp sebelumnya yang sama untuk memesan');
-      } else {
-        Navigator.pop(context);
-        Navigator.push(
-            context,
-            PageTransition(
-                type: PageTransitionType.fade,
-                child: FinalTrans()));
-      }
+      Navigator.pop(context);
+      Navigator.push(
+          context,
+          PageTransition(
+              type: PageTransitionType.fade,
+              child: FinalTrans()));
       // SharedPreferences preferences = await SharedPreferences.getInstance();
       // await preferences.remove('menuJson');
       // await preferences.remove('restoId');
@@ -529,7 +543,7 @@ class _CartActivityState extends State<CartActivity> {
     print(latUser);
     print(longUser);
 
-    var apiResult = await http.post('https://qurir.devastic.com/api/borzo/init',
+    var apiResult = await http.post(Uri.parse('https://qurir.devastic.com/api/borzo/init'),
         body: {
           'address_pick_up': restoAddress,
           'name_pick_up': pjTokoTrans,
@@ -691,10 +705,10 @@ class _CartActivityState extends State<CartActivity> {
   getPref() async {
     SharedPreferences pref = await SharedPreferences.getInstance();
     setState(() {
-      userName = (pref.getString('name') == '')?'null':pref.getString('name');
-      notelp = (pref.getString('notelp') == '')?'null':pref.getString('notelp');
-      latUser = (pref.getString('latUser') == '')?'null':pref.getString('latUser');
-      longUser = (pref.getString('longUser') == '')?'null':pref.getString('longUser');
+      userName = (pref.getString('name') == '')?'null':pref.getString('name')??'';
+      notelp = pref.getString('notelp')??'null';
+      latUser = (pref.getString('latUser') == '')?'null':pref.getString('latUser')??'';
+      longUser = (pref.getString('longUser') == '')?'null':pref.getString('longUser')??'';
       print(notelp+' telp');
       if (notelp.toString() == '' && notelp.toString() == 'null') {
         Fluttertoast.showToast(
@@ -706,6 +720,7 @@ class _CartActivityState extends State<CartActivity> {
 
   @override
   void initState() {
+    getHomePg();
     getPref().whenComplete((){
       if (notelp.toString() == '' && notelp.toString() == 'null') {
         Fluttertoast.showToast(
@@ -994,7 +1009,7 @@ class _CartActivityState extends State<CartActivity> {
                         CustomText.bodyLight12(text: "Alamat Pengiriman", minSize: double.parse(((MediaQuery.of(context).size.width*0.03).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.03)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.03)).toString())),
                         SizedBox(height: CustomSize.sizeHeight(context) * 0.005,),
                         CustomText.textHeading4(
-                            text: (delivAddress.toString() == "null")?"Masukkan alamat anda.":delivAddress.toString(),
+                            text: (delivAddress.toString() == "null" || delivAddress.toString() == "")?"Masukkan alamat anda.":delivAddress.toString(),
                             minSize: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.04)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.04)).toString()),
                             maxLines: 10
                         ),
@@ -1057,14 +1072,14 @@ class _CartActivityState extends State<CartActivity> {
                                 if(result != ""){
                                   SharedPreferences pref = await SharedPreferences.getInstance();
                                   _srchAddress = TextEditingController(text: pref.getString('address'));
-                                  delivAddress = pref.getString('addressDelivTrans');
+                                  delivAddress = pref.getString('addressDelivTrans')??'';
                                   print('kene bos');
                                   if (delivAddress != '') {
-                                    latUser = (pref.getString('latUser') == '')?'null':pref.getString('latUser');
-                                    longUser = (pref.getString('longUser') == '')?'null':pref.getString('longUser');
+                                    latUser = (pref.getString('latUser') == '')?'null':pref.getString('latUser')??'';
+                                    longUser = (pref.getString('longUser') == '')?'null':pref.getString('longUser')??'';
                                     cekHarga()!.whenComplete((){
                                       _ongkir = int.parse(ongkir!.toString());
-                                      dist = NumberFormat.currency(locale: 'id', symbol: '', decimalDigits: 0).format(double.parse(pref.getString('distan')));
+                                      dist = NumberFormat.currency(locale: 'id', symbol: '', decimalDigits: 0).format(double.parse(pref.getString('distan')??'0'));
                                       _distan = pref.getString('distan')??'0';
                                       _distan5 = (_distan.contains('.'))?(int.parse(_distan.split('.')[1]) >= 5)?(int.parse(_distan.split('.')[0])+1).toString():_distan.split('.')[0]:_distan;
                                       _distance = int.parse((_distan.contains('.'))?(_distan.split('.')[0] == '0')?'1':(int.parse(_distan.split('.')[1]) >= 5)?_distan5:_distan.split('.')[0]:_distan);
@@ -1237,14 +1252,13 @@ class _CartActivityState extends State<CartActivity> {
                                                         shape: RoundedRectangleBorder(
                                                             borderRadius: BorderRadius.all(Radius.circular(10))
                                                         ),
-                                                        title: CustomText.bodyMedium14(text: 'Catatan', minSize: double.parse(((MediaQuery.of(context).size.width*0.045).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.045)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.045)).toString())),
+                                                        title: Text('Catatan'),
                                                         content: TextField(
                                                           autofocus: true,
                                                           keyboardType: TextInputType.text,
                                                           controller: note,
                                                           decoration: InputDecoration(
                                                             hintText: "Untuk pesananmu",
-                                                            hintStyle: TextStyle(fontSize: double.parse(((MediaQuery.of(context).size.width*0.035).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.035)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.035)).toString())),
                                                             border: OutlineInputBorder(
                                                               borderRadius: BorderRadius.circular(10.0),
                                                             ),
@@ -1267,7 +1281,7 @@ class _CartActivityState extends State<CartActivity> {
                                                                 shape: RoundedRectangleBorder(
                                                                     borderRadius: BorderRadius.all(Radius.circular(10))
                                                                 ),
-                                                                child: CustomText.bodyMedium14(text: 'Simpan', color: Colors.white, minSize: double.parse(((MediaQuery.of(context).size.width*0.035).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.035)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.035)).toString())),
+                                                                child: Text('Simpan'),
                                                                 onPressed: () async{
                                                                   String s = noted[restoId.indexOf(menuJson[index].id.toString())];
                                                                   String i = s.replaceAll(noted[restoId.indexOf(menuJson[index].id.toString())].split(': ')[1], (note.text != '')?note.text+'}':'kam5ia_null'+'}') ;
@@ -1575,13 +1589,12 @@ class _CartActivityState extends State<CartActivity> {
                                               child: Row(
                                                 mainAxisAlignment: MainAxisAlignment.spaceAround,
                                                 children: [
-                                                  OutlineButton(
+                                                  FlatButton(
                                                     // minWidth: CustomSize.sizeWidth(context),
-                                                    shape: StadiumBorder(),
-                                                    highlightedBorderColor: CustomColor.secondary,
-                                                    borderSide: BorderSide(
-                                                        width: 2,
-                                                        color: CustomColor.redBtn
+                                                    color: CustomColor.redBtn,
+                                                    textColor: Colors.white,
+                                                    shape: RoundedRectangleBorder(
+                                                        borderRadius: BorderRadius.all(Radius.circular(10))
                                                     ),
                                                     child: Text('Hapus'),
                                                     onPressed: () async{
@@ -1606,13 +1619,12 @@ class _CartActivityState extends State<CartActivity> {
                                                       });
                                                     },
                                                   ),
-                                                  OutlineButton(
+                                                  FlatButton(
                                                     // minWidth: CustomSize.sizeWidth(context),
-                                                    shape: StadiumBorder(),
-                                                    highlightedBorderColor: CustomColor.secondary,
-                                                    borderSide: BorderSide(
-                                                        width: 2,
-                                                        color: CustomColor.primaryLight
+                                                    color: CustomColor.primaryLight,
+                                                    textColor: Colors.white,
+                                                    shape: RoundedRectangleBorder(
+                                                        borderRadius: BorderRadius.all(Radius.circular(10))
                                                     ),
                                                     child: Text('Simpan'),
                                                     onPressed: () async{
@@ -1713,162 +1725,162 @@ class _CartActivityState extends State<CartActivity> {
                       ],
                     ),
                   ),
-                  Divider(thickness: 6, color: CustomColor.secondary,),
-                  Padding(
-                    padding: EdgeInsets.symmetric(
-                        horizontal: CustomSize.sizeWidth(context) / 32,
-                        vertical: CustomSize.sizeHeight(context) / 55
-                    ),
-                    child: Container(
-                      width: CustomSize.sizeWidth(context),
-                      decoration: BoxDecoration(
-                          color: Colors.white
-                      ),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          CustomText.textHeading7(text: "Data Usaha", minSize: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.04)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.04)).toString())),
-                          SizedBox(height: CustomSize.sizeHeight(context) * 0.01,),
-                          Container(
-                            padding: EdgeInsets.only(
-                              left: CustomSize.sizeWidth(context) / 25,
-                              right: CustomSize.sizeWidth(context) / 25,
-                            ),
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                (nameRestoTrans != '' && nameRestoTrans != 'null')?
-                                CustomText.bodyRegular17(text: "Nama Usaha: "+nameRestoTrans, maxLines: 4, minSize: double.parse(((MediaQuery.of(context).size.width*0.037).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.037)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.037)).toString())):
-                                Row(
-                                  children: [
-                                    CustomText.bodyRegular17(text: "Nama Usaha: ", maxLines: 2, minSize: double.parse(((MediaQuery.of(context).size.width*0.037).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.037)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.037)).toString())),
-                                    CustomText.bodyRegular17(text: "kosong", maxLines: 2, color: CustomColor.redBtn, minSize: double.parse(((MediaQuery.of(context).size.width*0.037).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.037)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.037)).toString())),
-                                  ],
-                                ),
-                                SizedBox(height: CustomSize.sizeHeight(context) * 0.005,),
-
-                                (restoAddress != '' && restoAddress != 'null')?
-                                Row(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    CustomText.bodyRegular17(text: "Alamat Usaha: ", maxLines: 4, minSize: double.parse(((MediaQuery.of(context).size.width*0.037).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.037)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.037)).toString())),
-                                    GestureDetector(
-                                        onTap: (){
-                                          _launchURL();
-                                        },
-                                        child: Container(
-                                            width: CustomSize.sizeWidth(context) / 1.8,
-                                            child: CustomText.bodyRegular17(text: restoAddress, maxLines: 14, minSize: double.parse(((MediaQuery.of(context).size.width*0.037).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.037)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.037)).toString()))
-                                        )
-                                    ),
-                                  ],
-                                ):
-                                Row(
-                                  children: [
-                                    CustomText.bodyRegular17(text: "Alamat Usaha: ", maxLines: 2, minSize: double.parse(((MediaQuery.of(context).size.width*0.037).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.037)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.037)).toString())),
-                                    CustomText.bodyRegular17(text: "kosong", maxLines: 2, color: CustomColor.redBtn, minSize: double.parse(((MediaQuery.of(context).size.width*0.037).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.037)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.037)).toString())),
-                                  ],
-                                ),
-                                SizedBox(height: CustomSize.sizeHeight(context) * 0.005,),
-
-                                (emailTokoTrans != '' && emailTokoTrans != 'null')?
-                                Row(
-                                  children: [
-                                    CustomText.bodyRegular17(text: "Email Usaha: ", maxLines: 2, minSize: double.parse(((MediaQuery.of(context).size.width*0.037).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.037)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.037)).toString())),
-                                    GestureDetector(
-                                        onTap: (){
-                                          launch('mailto:$emailTokoTrans');
-                                        },
-                                        child: Container(
-                                            width: CustomSize.sizeWidth(context) / 1.8,
-                                            child: CustomText.bodyRegular17(text: emailTokoTrans, maxLines: 1, minSize: double.parse(((MediaQuery.of(context).size.width*0.037).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.037)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.037)).toString()))
-                                        )
-                                    ),
-                                  ],
-                                ):
-                                Row(
-                                  children: [
-                                    CustomText.bodyRegular17(text: "Email Usaha: ", maxLines: 2, minSize: double.parse(((MediaQuery.of(context).size.width*0.037).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.037)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.037)).toString())),
-                                    CustomText.bodyRegular17(text: "kosong", maxLines: 2, color: CustomColor.redBtn, minSize: double.parse(((MediaQuery.of(context).size.width*0.037).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.037)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.037)).toString())),
-                                  ],
-                                ),
-                                SizedBox(height: CustomSize.sizeHeight(context) * 0.005,),
-
-                                (phoneRestoTrans != '' && phoneRestoTrans != 'null')?
-                                Row(
-                                  children: [
-                                    CustomText.bodyRegular17(text: "Telepon Usaha: ", maxLines: 2, minSize: double.parse(((MediaQuery.of(context).size.width*0.037).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.037)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.037)).toString())),
-                                    GestureDetector(
-                                        onTap: (){
-                                          launch('tel:$phoneRestoTrans');
-                                        },
-                                        child: CustomText.bodyRegular17(text: phoneRestoTrans, maxLines: 2, minSize: double.parse(((MediaQuery.of(context).size.width*0.037).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.037)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.037)).toString()))
-                                    ),
-                                  ],
-                                ):
-                                Row(
-                                  children: [
-                                    CustomText.bodyRegular17(text: "Telepon Usaha: ", maxLines: 2, minSize: double.parse(((MediaQuery.of(context).size.width*0.037).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.037)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.037)).toString())),
-                                    CustomText.bodyRegular17(text: "kosong", maxLines: 2, color: CustomColor.redBtn, minSize: double.parse(((MediaQuery.of(context).size.width*0.037).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.037)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.037)).toString())),
-                                  ],
-                                ),
-                                SizedBox(height: CustomSize.sizeHeight(context) * 0.005,),
-
-                                (ownerTokoTrans != '' && ownerTokoTrans != 'null')?
-                                CustomText.bodyRegular17(text: "Nama Pemilik: "+ownerTokoTrans, maxLines: 2, minSize: double.parse(((MediaQuery.of(context).size.width*0.037).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.037)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.037)).toString())):
-                                Row(
-                                  children: [
-                                    CustomText.bodyRegular17(text: "Nama Pemilik: ", maxLines: 2, minSize: double.parse(((MediaQuery.of(context).size.width*0.037).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.037)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.037)).toString())),
-                                    CustomText.bodyRegular17(text: "kosong", maxLines: 2, color: CustomColor.redBtn, minSize: double.parse(((MediaQuery.of(context).size.width*0.037).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.037)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.037)).toString())),
-                                  ],
-                                ),
-                                SizedBox(height: CustomSize.sizeHeight(context) * 0.005,),
-
-                                (pjTokoTrans != '' && pjTokoTrans != 'null')?
-                                CustomText.bodyRegular17(text: "Nama Penanggung Jawab: "+pjTokoTrans, maxLines: 2, minSize: double.parse(((MediaQuery.of(context).size.width*0.037).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.037)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.037)).toString())):
-                                Row(
-                                  children: [
-                                    CustomText.bodyRegular17(text: "Nama Penanggung Jawab: ", maxLines: 2, minSize: double.parse(((MediaQuery.of(context).size.width*0.037).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.037)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.037)).toString())),
-                                    CustomText.bodyRegular17(text: "kosong", maxLines: 2, color: CustomColor.redBtn, minSize: double.parse(((MediaQuery.of(context).size.width*0.037).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.037)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.037)).toString())),
-                                  ],
-                                ),
-                                SizedBox(height: CustomSize.sizeHeight(context) * 0.005,),
-
-                                (nameRekening != '' && nameRekening != 'null')?
-                                CustomText.bodyRegular17(text: "Nomor Rekening atas Nama: "+nameRekening, maxLines: 2, minSize: double.parse(((MediaQuery.of(context).size.width*0.037).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.037)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.037)).toString())):
-                                Row(
-                                  children: [
-                                    CustomText.bodyRegular17(text: "Nomor Rekening atas Nama: ", maxLines: 2, minSize: double.parse(((MediaQuery.of(context).size.width*0.037).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.037)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.037)).toString())),
-                                    CustomText.bodyRegular17(text: "kosong", maxLines: 2, color: CustomColor.redBtn, minSize: double.parse(((MediaQuery.of(context).size.width*0.037).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.037)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.037)).toString())),
-                                  ],
-                                ),
-                                SizedBox(height: CustomSize.sizeHeight(context) * 0.005,),
-
-                                (nameBank != '' && nameBank != 'null')?
-                                CustomText.bodyRegular17(text: "Rekening Bank: "+nameBank, maxLines: 2, minSize: double.parse(((MediaQuery.of(context).size.width*0.037).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.037)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.037)).toString())):
-                                Row(
-                                  children: [
-                                    CustomText.bodyRegular17(text: "Rekening Bank: ", maxLines: 2, minSize: double.parse(((MediaQuery.of(context).size.width*0.037).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.037)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.037)).toString())),
-                                    CustomText.bodyRegular17(text: "kosong", maxLines: 2, color: CustomColor.redBtn, minSize: double.parse(((MediaQuery.of(context).size.width*0.037).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.037)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.037)).toString())),
-                                  ],
-                                ),
-                                SizedBox(height: CustomSize.sizeHeight(context) * 0.005,),
-
-                                (norekTokoTrans != '' && norekTokoTrans != 'null')?
-                                CustomText.bodyRegular17(text: "Nomor Rekening: "+norekTokoTrans, maxLines: 2, minSize: double.parse(((MediaQuery.of(context).size.width*0.037).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.037)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.037)).toString())):
-                                Row(
-                                  children: [
-                                    CustomText.bodyRegular17(text: "Nomor Rekening: ", maxLines: 2, minSize: double.parse(((MediaQuery.of(context).size.width*0.037).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.037)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.037)).toString())),
-                                    CustomText.bodyRegular17(text: "kosong", maxLines: 2, color: CustomColor.redBtn, minSize: double.parse(((MediaQuery.of(context).size.width*0.037).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.037)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.037)).toString())),
-                                  ],
-                                ),
-                              ],
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
+                  // Divider(thickness: 6, color: CustomColor.secondary,),
+                  // Padding(
+                  //   padding: EdgeInsets.symmetric(
+                  //       horizontal: CustomSize.sizeWidth(context) / 32,
+                  //       vertical: CustomSize.sizeHeight(context) / 55
+                  //   ),
+                  //   child: Container(
+                  //     width: CustomSize.sizeWidth(context),
+                  //     decoration: BoxDecoration(
+                  //         color: Colors.white
+                  //     ),
+                  //     child: Column(
+                  //       crossAxisAlignment: CrossAxisAlignment.start,
+                  //       children: [
+                  //         CustomText.textHeading7(text: "Data Usaha", minSize: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.04)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.04)).toString())),
+                  //         SizedBox(height: CustomSize.sizeHeight(context) * 0.01,),
+                  //         Container(
+                  //           padding: EdgeInsets.only(
+                  //             left: CustomSize.sizeWidth(context) / 25,
+                  //             right: CustomSize.sizeWidth(context) / 25,
+                  //           ),
+                  //           child: Column(
+                  //             crossAxisAlignment: CrossAxisAlignment.start,
+                  //             children: [
+                  //               (nameRestoTrans != '' && nameRestoTrans != 'null')?
+                  //               CustomText.bodyRegular17(text: "Nama Usaha: "+nameRestoTrans, maxLines: 4, minSize: double.parse(((MediaQuery.of(context).size.width*0.037).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.037)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.037)).toString())):
+                  //               Row(
+                  //                 children: [
+                  //                   CustomText.bodyRegular17(text: "Nama Usaha: ", maxLines: 2, minSize: double.parse(((MediaQuery.of(context).size.width*0.037).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.037)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.037)).toString())),
+                  //                   CustomText.bodyRegular17(text: "kosong", maxLines: 2, color: CustomColor.redBtn, minSize: double.parse(((MediaQuery.of(context).size.width*0.037).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.037)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.037)).toString())),
+                  //                 ],
+                  //               ),
+                  //               SizedBox(height: CustomSize.sizeHeight(context) * 0.005,),
+                  //
+                  //               (restoAddress != '' && restoAddress != 'null')?
+                  //               Row(
+                  //                 crossAxisAlignment: CrossAxisAlignment.start,
+                  //                 children: [
+                  //                   CustomText.bodyRegular17(text: "Alamat Usaha: ", maxLines: 4, minSize: double.parse(((MediaQuery.of(context).size.width*0.037).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.037)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.037)).toString())),
+                  //                   GestureDetector(
+                  //                       onTap: (){
+                  //                         _launchURL();
+                  //                       },
+                  //                       child: Container(
+                  //                           width: CustomSize.sizeWidth(context) / 1.8,
+                  //                           child: CustomText.bodyRegular17(text: restoAddress, maxLines: 14, minSize: double.parse(((MediaQuery.of(context).size.width*0.037).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.037)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.037)).toString()))
+                  //                       )
+                  //                   ),
+                  //                 ],
+                  //               ):
+                  //               Row(
+                  //                 children: [
+                  //                   CustomText.bodyRegular17(text: "Alamat Usaha: ", maxLines: 2, minSize: double.parse(((MediaQuery.of(context).size.width*0.037).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.037)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.037)).toString())),
+                  //                   CustomText.bodyRegular17(text: "kosong", maxLines: 2, color: CustomColor.redBtn, minSize: double.parse(((MediaQuery.of(context).size.width*0.037).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.037)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.037)).toString())),
+                  //                 ],
+                  //               ),
+                  //               SizedBox(height: CustomSize.sizeHeight(context) * 0.005,),
+                  //
+                  //               (emailTokoTrans != '' && emailTokoTrans != 'null')?
+                  //               Row(
+                  //                 children: [
+                  //                   CustomText.bodyRegular17(text: "Email Usaha: ", maxLines: 2, minSize: double.parse(((MediaQuery.of(context).size.width*0.037).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.037)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.037)).toString())),
+                  //                   GestureDetector(
+                  //                       onTap: (){
+                  //                         launch('mailto:$emailTokoTrans');
+                  //                       },
+                  //                       child: Container(
+                  //                           width: CustomSize.sizeWidth(context) / 1.8,
+                  //                           child: CustomText.bodyRegular17(text: emailTokoTrans, maxLines: 1, minSize: double.parse(((MediaQuery.of(context).size.width*0.037).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.037)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.037)).toString()))
+                  //                       )
+                  //                   ),
+                  //                 ],
+                  //               ):
+                  //               Row(
+                  //                 children: [
+                  //                   CustomText.bodyRegular17(text: "Email Usaha: ", maxLines: 2, minSize: double.parse(((MediaQuery.of(context).size.width*0.037).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.037)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.037)).toString())),
+                  //                   CustomText.bodyRegular17(text: "kosong", maxLines: 2, color: CustomColor.redBtn, minSize: double.parse(((MediaQuery.of(context).size.width*0.037).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.037)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.037)).toString())),
+                  //                 ],
+                  //               ),
+                  //               SizedBox(height: CustomSize.sizeHeight(context) * 0.005,),
+                  //
+                  //               (phoneRestoTrans != '' && phoneRestoTrans != 'null')?
+                  //               Row(
+                  //                 children: [
+                  //                   CustomText.bodyRegular17(text: "Telepon Usaha: ", maxLines: 2, minSize: double.parse(((MediaQuery.of(context).size.width*0.037).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.037)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.037)).toString())),
+                  //                   GestureDetector(
+                  //                       onTap: (){
+                  //                         launch('tel:$phoneRestoTrans');
+                  //                       },
+                  //                       child: CustomText.bodyRegular17(text: phoneRestoTrans, maxLines: 2, minSize: double.parse(((MediaQuery.of(context).size.width*0.037).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.037)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.037)).toString()))
+                  //                   ),
+                  //                 ],
+                  //               ):
+                  //               Row(
+                  //                 children: [
+                  //                   CustomText.bodyRegular17(text: "Telepon Usaha: ", maxLines: 2, minSize: double.parse(((MediaQuery.of(context).size.width*0.037).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.037)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.037)).toString())),
+                  //                   CustomText.bodyRegular17(text: "kosong", maxLines: 2, color: CustomColor.redBtn, minSize: double.parse(((MediaQuery.of(context).size.width*0.037).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.037)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.037)).toString())),
+                  //                 ],
+                  //               ),
+                  //               SizedBox(height: CustomSize.sizeHeight(context) * 0.005,),
+                  //
+                  //               // (ownerTokoTrans != '' && ownerTokoTrans != 'null')?
+                  //               // CustomText.bodyRegular17(text: "Nama Pemilik: "+ownerTokoTrans, maxLines: 2, minSize: double.parse(((MediaQuery.of(context).size.width*0.037).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.037)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.037)).toString())):
+                  //               // Row(
+                  //               //   children: [
+                  //               //     CustomText.bodyRegular17(text: "Nama Pemilik: ", maxLines: 2, minSize: double.parse(((MediaQuery.of(context).size.width*0.037).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.037)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.037)).toString())),
+                  //               //     CustomText.bodyRegular17(text: "kosong", maxLines: 2, color: CustomColor.redBtn, minSize: double.parse(((MediaQuery.of(context).size.width*0.037).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.037)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.037)).toString())),
+                  //               //   ],
+                  //               // ),
+                  //               // SizedBox(height: CustomSize.sizeHeight(context) * 0.005,),
+                  //               //
+                  //               // (pjTokoTrans != '' && pjTokoTrans != 'null')?
+                  //               // CustomText.bodyRegular17(text: "Nama Penanggung Jawab: "+pjTokoTrans, maxLines: 2, minSize: double.parse(((MediaQuery.of(context).size.width*0.037).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.037)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.037)).toString())):
+                  //               // Row(
+                  //               //   children: [
+                  //               //     CustomText.bodyRegular17(text: "Nama Penanggung Jawab: ", maxLines: 2, minSize: double.parse(((MediaQuery.of(context).size.width*0.037).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.037)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.037)).toString())),
+                  //               //     CustomText.bodyRegular17(text: "kosong", maxLines: 2, color: CustomColor.redBtn, minSize: double.parse(((MediaQuery.of(context).size.width*0.037).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.037)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.037)).toString())),
+                  //               //   ],
+                  //               // ),
+                  //               // SizedBox(height: CustomSize.sizeHeight(context) * 0.005,),
+                  //
+                  //               (nameRekening != '' && nameRekening != 'null')?
+                  //               CustomText.bodyRegular17(text: "Nomor Rekening atas Nama: "+nameRekening, maxLines: 2, minSize: double.parse(((MediaQuery.of(context).size.width*0.037).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.037)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.037)).toString())):
+                  //               Row(
+                  //                 children: [
+                  //                   CustomText.bodyRegular17(text: "Nomor Rekening atas Nama: ", maxLines: 2, minSize: double.parse(((MediaQuery.of(context).size.width*0.037).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.037)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.037)).toString())),
+                  //                   CustomText.bodyRegular17(text: "kosong", maxLines: 2, color: CustomColor.redBtn, minSize: double.parse(((MediaQuery.of(context).size.width*0.037).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.037)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.037)).toString())),
+                  //                 ],
+                  //               ),
+                  //               SizedBox(height: CustomSize.sizeHeight(context) * 0.005,),
+                  //
+                  //               (nameBank != '' && nameBank != 'null')?
+                  //               CustomText.bodyRegular17(text: "Rekening Bank: "+nameBank, maxLines: 2, minSize: double.parse(((MediaQuery.of(context).size.width*0.037).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.037)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.037)).toString())):
+                  //               Row(
+                  //                 children: [
+                  //                   CustomText.bodyRegular17(text: "Rekening Bank: ", maxLines: 2, minSize: double.parse(((MediaQuery.of(context).size.width*0.037).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.037)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.037)).toString())),
+                  //                   CustomText.bodyRegular17(text: "kosong", maxLines: 2, color: CustomColor.redBtn, minSize: double.parse(((MediaQuery.of(context).size.width*0.037).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.037)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.037)).toString())),
+                  //                 ],
+                  //               ),
+                  //               SizedBox(height: CustomSize.sizeHeight(context) * 0.005,),
+                  //
+                  //               (norekTokoTrans != '' && norekTokoTrans != 'null')?
+                  //               CustomText.bodyRegular17(text: "Nomor Rekening: "+norekTokoTrans, maxLines: 2, minSize: double.parse(((MediaQuery.of(context).size.width*0.037).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.037)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.037)).toString())):
+                  //               Row(
+                  //                 children: [
+                  //                   CustomText.bodyRegular17(text: "Nomor Rekening: ", maxLines: 2, minSize: double.parse(((MediaQuery.of(context).size.width*0.037).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.037)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.037)).toString())),
+                  //                   CustomText.bodyRegular17(text: "kosong", maxLines: 2, color: CustomColor.redBtn, minSize: double.parse(((MediaQuery.of(context).size.width*0.037).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.037)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.037)).toString())),
+                  //                 ],
+                  //               ),
+                  //             ],
+                  //           ),
+                  //         ),
+                  //       ],
+                  //     ),
+                  //   ),
+                  // ),
                   Container(
                     width: CustomSize.sizeWidth(context),
                     decoration: BoxDecoration(
@@ -1933,13 +1945,13 @@ class _CartActivityState extends State<CartActivity> {
                         GestureDetector(
                           onTap: ()async{
                             // _getData();
-                            if (loadingBorzo == true) {
+                            if (loadingBorzo == true && int.parse(ongkir.toString()) == 0) {
                               print('loadingBorzo');
                               print(loadingBorzo);
                               Fluttertoast.showToast(msg: 'Sedang menghitung ongkir');
                             } else {
                               SharedPreferences pref2 = await SharedPreferences.getInstance();
-                              pref2.setString('delivAddress', pref2.getString('addressDelivTrans'));
+                              pref2.setString('delivAddress', pref2.getString('addressDelivTrans')??'');
                               // delivAddress = pref2.getString('addressDelivTrans');
                               pref2.setString('delivTotalOngkir', totalOngkirBorzo.toString());
                               pref2.setString('totalHargaTrans', totalHarga.toString());
@@ -1997,126 +2009,126 @@ class _CartActivityState extends State<CartActivity> {
 
                               print('qr_available');
                               print(qr_available);
-                              if (qr_available == 'true') {
-                                showModalBottomSheet(
-                                    isScrollControlled: true,
-                                    shape: RoundedRectangleBorder(
-                                        borderRadius: BorderRadius.only(topLeft: Radius.circular(20), topRight: Radius.circular(20))
-                                    ),
-                                    context: context,
-                                    builder: (_){
-                                      return Column(
-                                        crossAxisAlignment: CrossAxisAlignment.start,
-                                        mainAxisSize: MainAxisSize.min,
-                                        children: [
-                                          SizedBox(height: CustomSize.sizeHeight(context) / 86,),
-                                          Padding(
-                                            padding: EdgeInsets.symmetric(horizontal: CustomSize.sizeWidth(context) / 2.4),
-                                            child: Divider(thickness: 4,),
-                                          ),
-                                          SizedBox(height: CustomSize.sizeHeight(context) / 106,),
-                                          Center(
-                                            child: CustomText.textHeading2(
-                                                text: "Qris",
-                                                minSize: double.parse(((MediaQuery.of(context).size.width*0.05).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.05)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.05)).toString()),
-                                                maxLines: 1
-                                            ),
-                                          ),
-                                          SizedBox(height: CustomSize.sizeHeight(context) * 0.003,),
-                                          Center(
-                                            child: FullScreenWidget(
-                                              child: Image.asset("assets/imajilogo.png",
-                                                width: CustomSize.sizeWidth(context) / 1.2,
-                                                height: CustomSize.sizeWidth(context) / 1.2,
-                                              ),
-                                              backgroundColor: Colors.white,
-                                            ),
-                                          ),
-                                          SizedBox(height: CustomSize.sizeHeight(context) / 106,),
-                                          Center(
-                                            child: Container(
-                                              alignment: Alignment.center,
-                                              width: CustomSize.sizeWidth(context) / 1.2,
-                                              child: Row(
-                                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                                children: [
-                                                  CustomText.textTitle2(
-                                                      text: 'Total harga:',
-                                                      minSize: double.parse(((MediaQuery.of(context).size.width*0.045).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.045)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.045)).toString()),
-                                                      maxLines: 1
-                                                  ),
-                                                  CustomText.textTitle2(
-                                                      text: 'Rp '+NumberFormat.currency(locale: 'id', symbol: '', decimalDigits: 0).format(int.parse(totalHarga)),
-                                                      minSize: double.parse(((MediaQuery.of(context).size.width*0.045).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.045)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.045)).toString()),
-                                                      maxLines: 1
-                                                  ),
-                                                ],
-                                              ),
-                                            ),
-                                          ),
-                                          SizedBox(height: CustomSize.sizeHeight(context) * 0.005,),
-                                          Center(
-                                            child: Container(
-                                              alignment: Alignment.center,
-                                              width: CustomSize.sizeWidth(context) / 1.2,
-                                              child: CustomText.textTitle1(
-                                                  text: 'Scan disini untuk melakukan pembayaran',
-                                                  minSize: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.04)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.04)).toString()),
-                                                  maxLines: 1
-                                              ),
-                                            ),
-                                          ),
-                                          Center(
-                                            child: Container(
-                                              alignment: Alignment.center,
-                                              width: CustomSize.sizeWidth(context) / 1.2,
-                                              child: CustomText.textTitle1(
-                                                  text: 'ke $nameRestoTrans!',
-                                                  minSize: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.04)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.04)).toString()),
-                                                  maxLines: 3
-                                              ),
-                                            ),
-                                          ),
-                                          SizedBox(height: CustomSize.sizeHeight(context) / 48,),
-                                          GestureDetector(
-                                            onTap: ()async{
-                                              Fluttertoast.showToast(
-                                                msg: "Anda belum membayar!",);
-                                            },
-                                            child: Center(
-                                              child: Container(
-                                                width: CustomSize.sizeWidth(context) / 1.1,
-                                                height: CustomSize.sizeHeight(context) / 14,
-                                                decoration: BoxDecoration(
-                                                    color: (menuReady.contains(false))?CustomColor.textBody:CustomColor.primaryLight,
-                                                    borderRadius: BorderRadius.circular(50)
-                                                ),
-                                                child: Center(
-                                                  child: Padding(
-                                                    padding: const EdgeInsets.symmetric(horizontal: 20.0),
-                                                    child: CustomText.textTitle3(text: "Sudah Membayar", color: Colors.white, minSize: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.04)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.04)).toString())),
-                                                  ),
-                                                ),
-                                              ),
-                                            ),
-                                          ),
-                                          SizedBox(height: CustomSize.sizeHeight(context) / 54,),
-                                          // SizedBox(height: CustomSize.sizeHeight(context) / 106,),
-                                        ],
-                                      );
-                                    }
-                                );
+                              print('ini loh telp '+notelp);
+                              print('ini loh  '+message);
+                              if (notelp == '' || notelp == 'null') {
+                                Fluttertoast.showToast(
+                                  msg: "Isi nomor telepon anda terlebih dahulu!",);
+                                Navigator.push(context, PageTransition(type: PageTransitionType.fade, child: new ProfileActivity()));
                               } else {
-                                print('ini loh telp '+notelp);
-                                print('ini loh  '+message);
-                                if (notelp == '' || notelp == 'null') {
+                                if (message != 'resto buka') {
                                   Fluttertoast.showToast(
-                                    msg: "Isi nomor telepon anda terlebih dahulu!",);
-                                  Navigator.push(context, PageTransition(type: PageTransitionType.fade, child: new ProfileActivity()));
+                                    msg: "Toko sedang tutup!",);
                                 } else {
-                                  if (message != 'resto buka') {
-                                    Fluttertoast.showToast(
-                                      msg: "Toko sedang tutup!",);
+                                  if (qr_available == 'true') {
+                                    showModalBottomSheet(
+                                        isScrollControlled: true,
+                                        shape: RoundedRectangleBorder(
+                                            borderRadius: BorderRadius.only(topLeft: Radius.circular(20), topRight: Radius.circular(20))
+                                        ),
+                                        context: context,
+                                        builder: (_){
+                                          return Column(
+                                            crossAxisAlignment: CrossAxisAlignment.start,
+                                            mainAxisSize: MainAxisSize.min,
+                                            children: [
+                                              SizedBox(height: CustomSize.sizeHeight(context) / 86,),
+                                              Padding(
+                                                padding: EdgeInsets.symmetric(horizontal: CustomSize.sizeWidth(context) / 2.4),
+                                                child: Divider(thickness: 4,),
+                                              ),
+                                              SizedBox(height: CustomSize.sizeHeight(context) / 106,),
+                                              Center(
+                                                child: CustomText.textHeading2(
+                                                    text: "Qris",
+                                                    minSize: double.parse(((MediaQuery.of(context).size.width*0.05).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.05)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.05)).toString()),
+                                                    maxLines: 1
+                                                ),
+                                              ),
+                                              SizedBox(height: CustomSize.sizeHeight(context) * 0.003,),
+                                              Center(
+                                                child: FullScreenWidget(
+                                                  child: Image.asset("assets/imajilogo.png",
+                                                    width: CustomSize.sizeWidth(context) / 1.2,
+                                                    height: CustomSize.sizeWidth(context) / 1.2,
+                                                  ),
+                                                  backgroundColor: Colors.white,
+                                                ),
+                                              ),
+                                              SizedBox(height: CustomSize.sizeHeight(context) / 106,),
+                                              Center(
+                                                child: Container(
+                                                  alignment: Alignment.center,
+                                                  width: CustomSize.sizeWidth(context) / 1.2,
+                                                  child: Row(
+                                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                                    children: [
+                                                      CustomText.textTitle2(
+                                                          text: 'Total harga:',
+                                                          minSize: double.parse(((MediaQuery.of(context).size.width*0.045).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.045)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.045)).toString()),
+                                                          maxLines: 1
+                                                      ),
+                                                      CustomText.textTitle2(
+                                                          text: 'Rp '+NumberFormat.currency(locale: 'id', symbol: '', decimalDigits: 0).format(int.parse(totalHarga)),
+                                                          minSize: double.parse(((MediaQuery.of(context).size.width*0.045).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.045)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.045)).toString()),
+                                                          maxLines: 1
+                                                      ),
+                                                    ],
+                                                  ),
+                                                ),
+                                              ),
+                                              SizedBox(height: CustomSize.sizeHeight(context) * 0.005,),
+                                              Center(
+                                                child: Container(
+                                                  alignment: Alignment.center,
+                                                  width: CustomSize.sizeWidth(context) / 1.2,
+                                                  child: CustomText.textTitle1(
+                                                      text: 'Scan disini untuk melakukan pembayaran',
+                                                      minSize: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.04)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.04)).toString()),
+                                                      maxLines: 1
+                                                  ),
+                                                ),
+                                              ),
+                                              Center(
+                                                child: Container(
+                                                  alignment: Alignment.center,
+                                                  width: CustomSize.sizeWidth(context) / 1.2,
+                                                  child: CustomText.textTitle1(
+                                                      text: 'ke $nameRestoTrans!',
+                                                      minSize: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.04)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.04)).toString()),
+                                                      maxLines: 3
+                                                  ),
+                                                ),
+                                              ),
+                                              SizedBox(height: CustomSize.sizeHeight(context) / 48,),
+                                              GestureDetector(
+                                                onTap: ()async{
+                                                  Fluttertoast.showToast(
+                                                    msg: "Anda belum membayar!",);
+                                                },
+                                                child: Center(
+                                                  child: Container(
+                                                    width: CustomSize.sizeWidth(context) / 1.1,
+                                                    height: CustomSize.sizeHeight(context) / 14,
+                                                    decoration: BoxDecoration(
+                                                        color: (menuReady.contains(false))?CustomColor.textBody:CustomColor.primaryLight,
+                                                        borderRadius: BorderRadius.circular(50)
+                                                    ),
+                                                    child: Center(
+                                                      child: Padding(
+                                                        padding: const EdgeInsets.symmetric(horizontal: 20.0),
+                                                        child: CustomText.textTitle3(text: "Sudah Membayar", color: Colors.white, minSize: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.04)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.04)).toString())),
+                                                      ),
+                                                    ),
+                                                  ),
+                                                ),
+                                              ),
+                                              SizedBox(height: CustomSize.sizeHeight(context) / 54,),
+                                              // SizedBox(height: CustomSize.sizeHeight(context) / 106,),
+                                            ],
+                                          );
+                                        }
+                                    );
                                   } else {
                                     if(_transCode == 1){
                                       if(delivAddress.toString() != '' && delivAddress.toString() != 'null'){
@@ -2131,19 +2143,19 @@ class _CartActivityState extends State<CartActivity> {
                                                     borderRadius: BorderRadius.all(Radius.circular(10))
                                                 ),
                                                 title: Center(child: Text('Peringatan!', style: TextStyle(color: CustomColor.redBtn))),
-                                                content: Text('Silahkan hubungi penjual melalui fitur chat pada aplikasi kami untuk menyelesaikan proses pembayaran. \n \nSemua proses pembayaran dan transaksi di luar tanggung jawab IRG!', style: TextStyle(fontSize: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.04)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.04)).toString()), fontWeight: FontWeight.w500), textAlign: TextAlign.center),
+                                                content: Text('Apakah anda sudah yakin dengan pesanan anda? ', style: TextStyle(fontSize: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.04)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.04)).toString()), fontWeight: FontWeight.w500), textAlign: TextAlign.center),
+                                                    // '\n \nSemua proses pembayaran dan transaksi di luar tanggung jawab IRG!', style: TextStyle(fontSize: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.04)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.04)).toString()), fontWeight: FontWeight.w500), textAlign: TextAlign.center),
                                                 actions: <Widget>[
                                                   Center(
                                                     child: Row(
                                                       mainAxisAlignment: MainAxisAlignment.spaceAround,
                                                       children: [
-                                                        OutlineButton(
+                                                        FlatButton(
                                                           // minWidth: CustomSize.sizeWidth(context),
-                                                          shape: StadiumBorder(),
-                                                          highlightedBorderColor: CustomColor.secondary,
-                                                          borderSide: BorderSide(
-                                                              width: 2,
-                                                              color: CustomColor.redBtn
+                                                          color: CustomColor.redBtn,
+                                                          textColor: Colors.white,
+                                                          shape: RoundedRectangleBorder(
+                                                              borderRadius: BorderRadius.all(Radius.circular(10))
                                                           ),
                                                           child: Text('Batal'),
                                                           onPressed: () async{
@@ -2153,13 +2165,11 @@ class _CartActivityState extends State<CartActivity> {
                                                             });
                                                           },
                                                         ),
-                                                        OutlineButton(
-                                                          // minWidth: CustomSize.sizeWidth(context),
-                                                          shape: StadiumBorder(),
-                                                          highlightedBorderColor: CustomColor.secondary,
-                                                          borderSide: BorderSide(
-                                                              width: 2,
-                                                              color: CustomColor.accent
+                                                        FlatButton(
+                                                          color: CustomColor.primaryLight,
+                                                          textColor: Colors.white,
+                                                          shape: RoundedRectangleBorder(
+                                                              borderRadius: BorderRadius.all(Radius.circular(10))
                                                           ),
                                                           child: Text('Setuju'),
                                                           onPressed: () async{
@@ -2239,19 +2249,17 @@ class _CartActivityState extends State<CartActivity> {
                                                     borderRadius: BorderRadius.all(Radius.circular(10))
                                                 ),
                                                 title: Center(child: Text('Peringatan!', style: TextStyle(color: CustomColor.redBtn))),
-                                                content: Text('Semua proses pembayaran dan transaksi di luar tanggung jawab IRG! \n \nHarga sudah termasuk PB1 dan Service Charge sesuai masing-masing Resto. \n \nMau menambah makanan atau minuman lagi?', style: TextStyle(fontSize: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.04)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.04)).toString()), fontWeight: FontWeight.w500), textAlign: TextAlign.center),
+                                                content: Text('Harga sudah termasuk PB1 dan Service Charge sesuai masing-masing Resto. \n \nMau menambah makanan atau minuman lagi?', style: TextStyle(fontSize: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.04)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.04)).toString()), fontWeight: FontWeight.w500), textAlign: TextAlign.center),
                                                 actions: <Widget>[
                                                   Center(
                                                     child: Row(
                                                       mainAxisAlignment: MainAxisAlignment.spaceAround,
                                                       children: [
-                                                        OutlineButton(
-                                                          // minWidth: CustomSize.sizeWidth(context),
-                                                          shape: StadiumBorder(),
-                                                          highlightedBorderColor: CustomColor.secondary,
-                                                          borderSide: BorderSide(
-                                                              width: 2,
-                                                              color: Colors.blue
+                                                        FlatButton(
+                                                          color: Colors.blue,
+                                                          textColor: Colors.white,
+                                                          shape: RoundedRectangleBorder(
+                                                              borderRadius: BorderRadius.all(Radius.circular(10))
                                                           ),
                                                           child: Text('Tambah'),
                                                           onPressed: () async{
@@ -2266,13 +2274,11 @@ class _CartActivityState extends State<CartActivity> {
                                                             });
                                                           },
                                                         ),
-                                                        OutlineButton(
-                                                          // minWidth: CustomSize.sizeWidth(context),
-                                                          shape: StadiumBorder(),
-                                                          highlightedBorderColor: CustomColor.secondary,
-                                                          borderSide: BorderSide(
-                                                              width: 2,
-                                                              color: CustomColor.accent
+                                                        FlatButton(
+                                                          color: CustomColor.accent,
+                                                          textColor: Colors.white,
+                                                          shape: RoundedRectangleBorder(
+                                                              borderRadius: BorderRadius.all(Radius.circular(10))
                                                           ),
                                                           child: Text('Tidak'),
                                                           onPressed: () async{
@@ -2280,12 +2286,16 @@ class _CartActivityState extends State<CartActivity> {
                                                             String qrcode = '';
                                                             if(_transCode == 3){
                                                               try {
-                                                                qrcode = await BarcodeScanner.scan();
+                                                                var qrScanResult = await BarcodeScanner.scan();
+                                                                String qrcode = qrScanResult.rawContent;
+                                                                print('SCAN');
+                                                                print('KIW');
+                                                                print(qrcode);
                                                                 makeTransaction(qrcode);
                                                                 setState(() {});
                                                                 // makeTransaction(qrcode);
                                                               } on PlatformException catch (error) {
-                                                                if (error.code == BarcodeScanner.CameraAccessDenied) {
+                                                                if (error.code == BarcodeScanner.cameraAccessDenied) {
                                                                   print('Izin kamera tidak diizinkan oleh si pengguna');
                                                                 } else {
                                                                   print('Error: $error');
@@ -2342,19 +2352,19 @@ class _CartActivityState extends State<CartActivity> {
                                                     borderRadius: BorderRadius.all(Radius.circular(10))
                                                 ),
                                                 title: Center(child: Text('Peringatan!', style: TextStyle(color: CustomColor.redBtn))),
-                                                content: Text('Silahkan hubungi penjual melalui fitur chat pada aplikasi kami untuk menyelesaikan proses pembayaran. \n \nSemua proses pembayaran dan transaksi di luar tanggung jawab IRG!', style: TextStyle(fontSize: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.04)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.04)).toString()), fontWeight: FontWeight.w500), textAlign: TextAlign.center),
+                                                content: Text('Apakah anda sudah yakin dengan pesanan anda? ', style: TextStyle(fontSize: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.04)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.04)).toString()), fontWeight: FontWeight.w500), textAlign: TextAlign.center),
+                                                    // '\n \nSemua proses pembayaran dan transaksi di luar tanggung jawab IRG!', style: TextStyle(fontSize: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.04)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.04)).toString()), fontWeight: FontWeight.w500), textAlign: TextAlign.center),
                                                 actions: <Widget>[
                                                   Center(
                                                     child: Row(
                                                       mainAxisAlignment: MainAxisAlignment.spaceAround,
                                                       children: [
-                                                        OutlineButton(
+                                                        FlatButton(
                                                           // minWidth: CustomSize.sizeWidth(context),
-                                                          shape: StadiumBorder(),
-                                                          highlightedBorderColor: CustomColor.secondary,
-                                                          borderSide: BorderSide(
-                                                              width: 2,
-                                                              color: CustomColor.redBtn
+                                                          color: CustomColor.redBtn,
+                                                          textColor: Colors.white,
+                                                          shape: RoundedRectangleBorder(
+                                                              borderRadius: BorderRadius.all(Radius.circular(10))
                                                           ),
                                                           child: Text('Batal'),
                                                           onPressed: () async{
@@ -2364,13 +2374,11 @@ class _CartActivityState extends State<CartActivity> {
                                                             });
                                                           },
                                                         ),
-                                                        OutlineButton(
-                                                          // minWidth: CustomSize.sizeWidth(context),
-                                                          shape: StadiumBorder(),
-                                                          highlightedBorderColor: CustomColor.secondary,
-                                                          borderSide: BorderSide(
-                                                              width: 2,
-                                                              color: CustomColor.accent
+                                                        FlatButton(
+                                                          color: CustomColor.primaryLight,
+                                                          textColor: Colors.white,
+                                                          shape: RoundedRectangleBorder(
+                                                              borderRadius: BorderRadius.all(Radius.circular(10))
                                                           ),
                                                           child: Text('Setuju'),
                                                           onPressed: () async{
@@ -2378,13 +2386,14 @@ class _CartActivityState extends State<CartActivity> {
                                                             String qrcode = '';
                                                             if(_transCode == 3){
                                                               try {
-                                                                qrcode = await BarcodeScanner.scan().whenComplete((){
+                                                                qrcode = (await BarcodeScanner.scan().whenComplete((){
                                                                   makeTransaction(qrcode);
-                                                                }) ;
+                                                                  print('SCAN');
+                                                                })).toString() ;
                                                                 setState(() {});
                                                                 // makeTransaction(qrcode);
                                                               } on PlatformException catch (error) {
-                                                                if (error.code == BarcodeScanner.CameraAccessDenied) {
+                                                                if (error.code == BarcodeScanner.cameraAccessDenied) {
                                                                   print('Izin kamera tidak diizinkan oleh si pengguna');
                                                                 } else {
                                                                   print('Error: $error');

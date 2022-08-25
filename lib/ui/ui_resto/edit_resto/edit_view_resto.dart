@@ -96,8 +96,8 @@ class _EditViewRestoState extends State<EditViewResto> {
   getInitial() async {
     SharedPreferences pref = await SharedPreferences.getInstance();
     setState(() {
-      karyawan = (pref.getString("karyawan"));
-      initial = (pref.getString('name').substring(0, 1).toUpperCase());
+      karyawan = (pref.getString("karyawan")??'');
+      initial = (pref.getString('name')!.substring(0, 1).toUpperCase());
       print(initial);
     });
   }
@@ -120,7 +120,7 @@ class _EditViewRestoState extends State<EditViewResto> {
     final pickedFile = await picker.getImage(source: ImageSource.gallery);
 
     setState(() {
-      image = File(pickedFile.path);
+      image = File(pickedFile!.path);
       extension = pickedFile.path.split('.').last;
     });
   }
@@ -197,7 +197,7 @@ class _EditViewRestoState extends State<EditViewResto> {
                           GestureDetector(
                             onTap: () async{
                               // getImage();
-                              Fluttertoast.showToast(msg: 'Anda hanya bisa merubah email, nomor telepon, dan deskripsi resto di halaman ini.',);
+                              Fluttertoast.showToast(msg: 'Anda hanya bisa merubah email dan deskripsi resto di halaman ini.',);
                             },
                             child: Container(
                               width: CustomSize.sizeWidth(context) / 6,
@@ -241,7 +241,7 @@ class _EditViewRestoState extends State<EditViewResto> {
                       TextField(
                         readOnly: true,
                         onTap: (){
-                          Fluttertoast.showToast(msg: 'Anda hanya bisa merubah email, nomor telepon, dan deskripsi resto di halaman ini.',);
+                          Fluttertoast.showToast(msg: 'Anda hanya bisa merubah email dan deskripsi resto di halaman ini.',);
                         },
                         controller: _Name,
                         keyboardType: TextInputType.text,
@@ -385,7 +385,10 @@ class _EditViewRestoState extends State<EditViewResto> {
                         height: CustomSize.sizeHeight(context) * 0.005,
                       ),
                       TextField(
-                        // readOnly: (btnAddress == true)?true:false,
+                        readOnly: true,
+                        onTap: (){
+                          Fluttertoast.showToast(msg: 'Anda hanya bisa merubah email dan deskripsi resto di halaman ini.',);
+                        },
                         controller: _NoTelp,
                         keyboardType: TextInputType.number,
                         cursorColor: Colors.black,

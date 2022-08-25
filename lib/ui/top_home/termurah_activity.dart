@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter_icons/flutter_icons.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:kam5ia/model/Resto.dart';
 import 'package:kam5ia/ui/detail/detail_resto.dart';
 import 'package:kam5ia/ui/promo/add_promo.dart';
@@ -106,12 +107,12 @@ class _TermurahActivityState extends State<TermurahActivity> {
   }
   ScrollController _scrollController = ScrollController();
   String homepg = "";
-  bool isLoading = false;
+  bool isLoading = true;
 
   getHomePg() async {
     SharedPreferences pref = await SharedPreferences.getInstance();
     setState(() {
-      homepg = (pref.getString('homepg'));
+      homepg = (pref.getString('homepg')??'');
       print(homepg);
     });
   }
@@ -123,11 +124,12 @@ class _TermurahActivityState extends State<TermurahActivity> {
     List<String> _promo2 = [];
 
     setState(() {
+      page = 1;
       isLoading = true;
     });
     SharedPreferences pref = await SharedPreferences.getInstance();
     String token = pref.getString("token") ?? "";
-    var apiResult = await http.get(Links.mainUrl + '/page/special/terbaru?lat=$lat&long=$long', headers: {
+    var apiResult = await http.get(Uri.parse(Links.mainUrl + '/page/special/terbaru?lat=$lat&long=$long'), headers: {
       "Accept": "Application/json",
       "Authorization": "Bearer $token"
     });
@@ -139,7 +141,8 @@ class _TermurahActivityState extends State<TermurahActivity> {
           id: v['id'],
           name: v['name'],
           distance: double.parse(v['distance'].toString()),
-          img: v['img']??null
+          img: v['img']??null,
+          isOpen: v['isOpen'].toString()
       );
       _promo.add(r);
     }
@@ -167,6 +170,7 @@ class _TermurahActivityState extends State<TermurahActivity> {
       // _promo2 = _promo.toList();
       // _promo = _promo.map((item) => jsonEncode(item));
       // _promo = _promo.toSet().toList();
+      last_page = data['resto']['last_page'];
       promo = _promo;
       // print('ini '+_promo..toString());
       // promo.retainWhere((element) => promo.remove(element.id));
@@ -307,7 +311,7 @@ class _TermurahActivityState extends State<TermurahActivity> {
     });
     SharedPreferences pref = await SharedPreferences.getInstance();
     String token = pref.getString("token") ?? "";
-    var apiResult = await http.get(Links.mainUrl + '/promo/delete/$id', headers: {
+    var apiResult = await http.get(Uri.parse(Links.mainUrl + '/promo/delete/$id'), headers: {
       "Accept": "Application/json",
       "Authorization": "Bearer $token"
     });
@@ -327,9 +331,66 @@ class _TermurahActivityState extends State<TermurahActivity> {
     });
   }
 
+  bool isLoading2 = false;
+  int page = 1;
+  int last_page = 0;
+  ScrollController _controller = ScrollController();
+
+  Future<void> _getPromo2(String lat, String long)async{
+    List<Resto> _promo = [];
+    List<String> _promo2 = [];
+
+    setState(() {
+      isLoading2 = true;
+    });
+    SharedPreferences pref = await SharedPreferences.getInstance();
+    String token = pref.getString("token") ?? "";
+    var apiResult = await http.get(Uri.parse(Links.mainUrl + '/page/special/terbaru?page=$page&lat=$lat&long=$long'), headers: {
+      "Accept": "Application/json",
+      "Authorization": "Bearer $token"
+    });
+    var data = json.decode(apiResult.body);
+    print(data);
+    print(data['resto']['from']);
+    print(data['resto']['last_page']);
+
+    for(var v in data['resto']['data']){
+      Resto r = Resto.all(
+          id: v['id'],
+          name: v['name'],
+          distance: double.parse(v['distance'].toString()),
+          img: v['img']??null,
+          isOpen: v['isOpen'].toString()
+      );
+      promo.add(r);
+    }
+
+    setState(() {
+      // _promo2 = _promo.toList();
+      // _promo = _promo.map((item) => jsonEncode(item));
+      // _promo = _promo.toSet().toList();
+      promo = promo;
+      if (page == int.parse(data['resto']['last_page'].toString())) {
+        Fluttertoast.showToast(msg: "Semua data telah ditampilkan");
+      }
+      // print('ini '+_promo..toString());
+      // promo.retainWhere((element) => promo.remove(element.id));
+      isLoading2 = false;
+    });
+
+    if (apiResult.statusCode == 200) {
+      if (promo.toString() == '[]') {
+        ksg = true;
+      } else {
+        ksg = false;
+      }
+    }
+  }
+
   @override
   void dispose() {
     _scrollController.dispose();
+    _controller.dispose();
     super.dispose();
   }
 
@@ -353,6 +414,25 @@ class _TermurahActivityState extends State<TermurahActivity> {
         // print(promoResto);
       }
     });
+    _scrollController.addListener(() {
+      if (_scrollController.position.atEdge) {
+        if (_scrollController.position.pixels != 0 && isLoading2 == true && page != last_page) {
+          // print(startCuisine.toString().split(',').length.toString());
+          // print(totalCuisine.toString());
+          // _page(lat,long);
+          page = page + 1;
+          Location.instance.getLocation().then((value) {
+            _getPromo2(value.latitude.toString(), value.longitude.toString());
+          });
+        } else {
+          isLoading2 = false;
+          print(isLoading2.toString());
+          print(_scrollController.position.pixels.toString());
+          print("You're at the top.");
+          setState(() {});
+        }
+      }
+    });
     super.initState();
     getHomePg();
     print(homepg);
@@ -370,7 +450,7 @@ class _TermurahActivityState extends State<TermurahActivity> {
                   color: CustomColor.primaryLight,
                 ))):(ksg != true)?SmartRefresher(
               enablePullDown: true,
-              enablePullUp: false,
+              enablePullUp: true,
               header: WaterDropMaterialHeader(
                 distance: 30,
                 backgroundColor: Colors.white,
@@ -379,8 +459,35 @@ class _TermurahActivityState extends State<TermurahActivity> {
               controller: _refreshController,
               onRefresh: _onRefresh,
               onLoading: _onLoading,
+              scrollController: _scrollController,
+              physics: BouncingScrollPhysics(),
+              footer: CustomFooter(builder: (BuildContext context, LoadStatus? mode) {
+                Widget body;
+                if(mode==LoadStatus.idle){
+                  body =  MediaQuery(child: Text(""), data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0),);
+                }
+                else if(mode==LoadStatus.loading){
+                  body = Text("");
+                  isLoading2 = true;
+                }
+                else if(mode == LoadStatus.failed){
+                  body = MediaQuery(child: Text(""), data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0),);
+                }
+                else if(mode == LoadStatus.canLoading){
+                  body = MediaQuery(child: Text(""), data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0),);
+                }
+                else{
+                  body = MediaQuery(child: Text(""), data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0),);
+                }
+                return Container(
+                  height: CustomSize.sizeHeight(context) / 48,
+                  alignment: Alignment.topCenter,
+                  child: Center(child: body),
+                );
+              },
+              ),
               child: SingleChildScrollView(
-                controller: _scrollController,
+                controller: _controller,
                 child: (kosong.toString() != 'true')?Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
@@ -449,8 +556,8 @@ class _TermurahActivityState extends State<TermurahActivity> {
                         return StaggeredTile.count(1, 1.2);
                       },
                       crossAxisCount: 2,
-                      controller: _scrollController,
-                      physics: NeverScrollableScrollPhysics(),
+                      controller: _controller,
+                      // physics: NeverScrollableScrollPhysics(),
                       shrinkWrap: true,
                       itemCount: promo.length,
                       itemBuilder: (_, index){
@@ -464,6 +571,7 @@ class _TermurahActivityState extends State<TermurahActivity> {
                                       type: PageTransitionType.rightToLeft,
                                       child: new DetailResto(promo[index].id.toString())));
                             },
+                            // child: (promo[index].isOpen.toString() == 'true')?Container(
                             child: Container(
                               width: CustomSize.sizeWidth(context) / 2.3,
                               height: CustomSize.sizeHeight(context) / 3,
@@ -482,7 +590,8 @@ class _TermurahActivityState extends State<TermurahActivity> {
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  Container(
+                                  // (promo[index].isOpen != 'false')?Container(
+                                  (promo[index].isOpen != 'x')?Container(
                                     width: CustomSize.sizeWidth(context),
                                     height: CustomSize.sizeHeight(context) / 5.8,
                                     decoration: (promo[index].img != null)?BoxDecoration(
@@ -494,6 +603,27 @@ class _TermurahActivityState extends State<TermurahActivity> {
                                     ):BoxDecoration(
                                         color: CustomColor.primaryLight
                                     ),
+                                  ):ClipRRect(
+                                    borderRadius: BorderRadius.circular(20),
+                                    child: ColorFiltered(
+                                      colorFilter: ColorFilter.mode(
+                                        Colors.grey,
+                                        BlendMode.saturation,
+                                      ),
+                                      child: Container(
+                                        width: CustomSize.sizeWidth(context),
+                                        height: CustomSize.sizeHeight(context) / 5.8,
+                                        decoration: (promo[index].img != null)?BoxDecoration(
+                                          image: DecorationImage(
+                                              image: NetworkImage(Links.subUrl + promo[index].img!),
+                                              fit: BoxFit.cover
+                                          ),
+                                          borderRadius: BorderRadius.circular(20),
+                                        ):BoxDecoration(
+                                            color: CustomColor.primaryLight
+                                        ),
+                                      ),
+                                    ),
                                   ),
                                   SizedBox(height: CustomSize.sizeHeight(context) / 86,),
                                   Padding(
@@ -501,17 +631,87 @@ class _TermurahActivityState extends State<TermurahActivity> {
                                     child: CustomText.bodyRegular14(text: promo[index].distance.toString() + " Km", sizeNew: double.parse(((MediaQuery.of(context).size.width*0.03).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.03).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.03).toString())),
                                   ),
                                   Padding(
-                                    padding: EdgeInsets.only(left: CustomSize.sizeWidth(context) / 24),
-                                    child: CustomText.bodyMedium16(text: promo[index].name, sizeNew: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.04).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.04).toString())),
+                                    padding: EdgeInsets.only(left: CustomSize.sizeWidth(context) / 24, right: CustomSize.sizeWidth(context) / 34),
+                                    child: Container(
+                                        height: CustomSize.sizeWidth(context) / 12,
+                                        child: CustomText.bodyMedium16(maxLines: 2, text: promo[index].name, sizeNew: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.04).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.04).toString()))),
                                   ),
                                 ],
                               ),
                             ),
+                            //       :Container(
+                            //   width: CustomSize.sizeWidth(context) / 2.3,
+                            //   height: CustomSize.sizeHeight(context) / 3,
+                            //   decoration: BoxDecoration(
+                            //     color: Colors.white,
+                            //     borderRadius: BorderRadius.circular(20),
+                            //     boxShadow: [
+                            //       BoxShadow(
+                            //         color: Colors.grey.withOpacity(0.5),
+                            //         spreadRadius: 0,
+                            //         blurRadius: 4,
+                            //         offset: Offset(0, 3), // changes position of shadow
+                            //       ),
+                            //     ],
+                            //   ),
+                            //   child: Column(
+                            //     crossAxisAlignment: CrossAxisAlignment.start,
+                            //     children: [
+                            //       ClipRRect(
+                            //         borderRadius: BorderRadius.circular(20),
+                            //         child: ColorFiltered(
+                            //           colorFilter: ColorFilter.mode(
+                            //             Colors.grey,
+                            //             BlendMode.saturation,
+                            //           ),
+                            //           child: Container(
+                            //             width: CustomSize.sizeWidth(context),
+                            //             height: CustomSize.sizeHeight(context) / 5.8,
+                            //             decoration: (promo[index].img != null)?BoxDecoration(
+                            //               image: DecorationImage(
+                            //                   image: NetworkImage(Links.subUrl + promo[index].img!),
+                            //                   fit: BoxFit.cover
+                            //               ),
+                            //               borderRadius: BorderRadius.circular(20),
+                            //             ):BoxDecoration(
+                            //                 color: CustomColor.primaryLight
+                            //             ),
+                            //           ),
+                            //         ),
+                            //       ),
+                            //       SizedBox(height: CustomSize.sizeHeight(context) / 86,),
+                            //       Padding(
+                            //         padding: EdgeInsets.only(left: CustomSize.sizeWidth(context) / 24),
+                            //         child: CustomText.bodyRegular14(text: promo[index].distance.toString() + " Km", sizeNew: double.parse(((MediaQuery.of(context).size.width*0.03).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.03).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.03).toString())),
+                            //       ),
+                            //       Padding(
+                            //         padding: EdgeInsets.only(left: CustomSize.sizeWidth(context) / 24),
+                            //         child: CustomText.bodyMedium16(text: promo[index].name, sizeNew: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.04).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.04).toString())),
+                            //       ),
+                            //     ],
+                            //   ),
+                            // ),
                           ),
                         );
                       },
                     ),
-                    SizedBox(height: CustomSize.sizeHeight(context) / 8,)
+                    // SizedBox(height: CustomSize.sizeHeight(context) / 8,)
+                    (isLoading2 == true)?Center(
+                      child: Container(
+                        alignment: Alignment.center,
+                        width: CustomSize.sizeWidth(context) / 1.1,
+                        height: CustomSize.sizeHeight(context) / 14,
+                        // decoration: BoxDecoration(
+                        //     borderRadius: BorderRadius.circular(30),
+                        //     color: CustomColor.accent
+                        // ),
+                        child: Center(
+                          child: CircularProgressIndicator(
+                            valueColor: AlwaysStoppedAnimation<Color>(CustomColor.primary),
+                          ),
+                        ),
+                      ),
+                    ):Container(),
                   ],
                 ):Stack(
                   children: [

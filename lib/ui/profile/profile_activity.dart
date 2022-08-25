@@ -4,7 +4,9 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_icons/flutter_icons.dart';
 import 'package:fluttertoast/fluttertoast.dart';
-import 'package:full_screen_image/full_screen_image.dart';
+import 'package:full_screen_image_null_safe/full_screen_image_null_safe.dart';
+// import 'package:full_screen_image/full_screen_image.dart';
+import 'package:google_sign_in/google_sign_in.dart';
 import 'package:kam5ia/model/User.dart';
 import 'package:kam5ia/ui/auth/login_activity.dart';
 import 'package:kam5ia/ui/home/home_activity.dart';
@@ -39,15 +41,26 @@ class _ProfileActivityState extends State<ProfileActivity> {
   getName() async {
     SharedPreferences pref = await SharedPreferences.getInstance();
     setState(() {
-      name = (pref.getString('name'));
+      name = (pref.getString('name')??'');
       print(name);
     });
   }
 
+  GoogleSignIn _googleSignIn = GoogleSignIn(
+    clientId: "887058389150-nesf8jr9jdk5n2dtt1t30to2el1v3bbi.apps.googleusercontent.com",
+    scopes: [
+      'email',
+      'https://www.googleapis.com/auth/userinfo.profile',
+      // 'https://www.googleapis.com/auth/user.birthday.read',
+      // 'https://www.googleapis.com/auth/user.gender.read',
+      // 'https://www.googleapis.com/auth/user.phonenumbers.read'
+    ],
+  );
+
   getInitial() async {
     SharedPreferences pref = await SharedPreferences.getInstance();
     setState(() {
-      initial = (pref.getString('name').substring(0, 1).toUpperCase());
+      initial = (pref.getString('name')!.substring(0, 1).toUpperCase());
       print(initial);
     });
   }
@@ -55,7 +68,7 @@ class _ProfileActivityState extends State<ProfileActivity> {
   getEmail() async {
     SharedPreferences pref = await SharedPreferences.getInstance();
     setState(() {
-      email = (pref.getString('email'));
+      email = (pref.getString('email')??'');
       print(email);
     });
   }
@@ -63,7 +76,7 @@ class _ProfileActivityState extends State<ProfileActivity> {
   getImg() async {
     SharedPreferences pref = await SharedPreferences.getInstance();
     setState(() {
-      img = (pref.getString('img'));
+      img = (pref.getString('img')??'');
       print(img);
     });
   }
@@ -71,7 +84,7 @@ class _ProfileActivityState extends State<ProfileActivity> {
   getNotelp() async {
     SharedPreferences pref = await SharedPreferences.getInstance();
     setState(() {
-      notelp = (pref.getString('notelp'));
+      notelp = (pref.getString('notelp')??'');
       print(notelp+' telp');
     });
   }
@@ -79,7 +92,7 @@ class _ProfileActivityState extends State<ProfileActivity> {
   getHomePg() async {
     SharedPreferences pref = await SharedPreferences.getInstance();
     setState(() {
-      homepg = (pref.getString('homepg'));
+      homepg = (pref.getString('homepg')??'');
       print(homepg);
     });
   }
@@ -111,7 +124,7 @@ class _ProfileActivityState extends State<ProfileActivity> {
     });
     SharedPreferences pref = await SharedPreferences.getInstance();
     String token = pref.getString("token") ?? "";
-    var apiResult = await http.get(Links.mainUrl + '/resto', headers: {
+    var apiResult = await http.get(Uri.parse(Links.mainUrl + '/resto'), headers: {
       "Accept": "Application/json",
       "Authorization": "Bearer $token"
     });
@@ -163,7 +176,7 @@ class _ProfileActivityState extends State<ProfileActivity> {
     });
     SharedPreferences pref = await SharedPreferences.getInstance();
     String token = pref.getString("token") ?? "";
-    var apiResult = await http.post(Links.mainUrl + '/auth/logout', headers: {
+    var apiResult = await http.post(Uri.parse(Links.mainUrl + '/auth/logout'), headers: {
       "Accept": "Application/json",
       "Authorization": "Bearer $token"
     });
@@ -208,13 +221,13 @@ class _ProfileActivityState extends State<ProfileActivity> {
   getPref() async {
     SharedPreferences pref = await SharedPreferences.getInstance();
     setState(() {
-      name = (pref.getString('name'));
+      name = (pref.getString('name')??'');
       print(name);
-      email = (pref.getString('email'));
+      email = (pref.getString('email')??'');
       print(email);
-      img = (pref.getString('img'));
+      img = (pref.getString('img')??'');
       print(img);
-      notelp = (pref.getString('notelp'));
+      notelp = (pref.getString('notelp')??"");
       print(notelp);
       // gender = (pref.getString('gender'));
       // print(gender);
@@ -234,7 +247,7 @@ class _ProfileActivityState extends State<ProfileActivity> {
     List<User> _user = [];
     SharedPreferences pref = await SharedPreferences.getInstance();
     String token = pref.getString("token") ?? "";
-    var apiResult = await http.get(Links.mainUrl + '/owner', headers: {
+    var apiResult = await http.get(Uri.parse(Links.mainUrl + '/owner'), headers: {
       "Accept": "Application/json",
       "Authorization": "Bearer $token"
     });
@@ -336,7 +349,7 @@ class _ProfileActivityState extends State<ProfileActivity> {
     });
     SharedPreferences pref = await SharedPreferences.getInstance();
     String token = pref.getString("token") ?? "";
-    var apiResult = await http.get(Links.mainUrl + '/owner/delete/$id', headers: {
+    var apiResult = await http.get(Uri.parse(Links.mainUrl + '/owner/delete/$id'), headers: {
       "Accept": "Application/json",
       "Authorization": "Bearer $token"
     });
@@ -366,7 +379,7 @@ class _ProfileActivityState extends State<ProfileActivity> {
     SharedPreferences pref = await SharedPreferences.getInstance();
     String token = pref.getString("token") ?? "";
     int idRes = pref.getInt("ownerId") ?? 0;
-    var apiResult = await http.get(Links.mainUrl + '/owner/activate/'+idRes.toString(), headers: {
+    var apiResult = await http.get(Uri.parse(Links.mainUrl + '/owner/activate/'+idRes.toString()), headers: {
       "Accept": "Application/json",
       "Authorization": "Bearer $token"
     });
@@ -457,7 +470,7 @@ class _ProfileActivityState extends State<ProfileActivity> {
     SharedPreferences pref = await SharedPreferences.getInstance();
     String token = pref.getString("token") ?? "";
     int idRes = pref.getInt("ownerId") ?? 0;
-    var apiResult = await http.get(Links.mainUrl + '/owner/deactivate', headers: {
+    var apiResult = await http.get(Uri.parse(Links.mainUrl + '/owner/deactivate'), headers: {
       "Accept": "Application/json",
       "Authorization": "Bearer $token"
     });
@@ -502,11 +515,6 @@ class _ProfileActivityState extends State<ProfileActivity> {
     if (apiResult.statusCode == 200) {
       if (data['msg'].toString() == "success") {
         logOut();
-        SharedPreferences pref = await SharedPreferences.getInstance();
-        pref.clear();
-        setState(() {
-          Navigator.pushReplacement(context, PageTransition(type: PageTransitionType.fade, child: new LoginActivity()));
-        });
         // Navigator.pushReplacement(context, MaterialPageRoute(builder: (context)=> HomeActivity()));
         // kosong = '1';
       }
@@ -642,7 +650,7 @@ class _ProfileActivityState extends State<ProfileActivity> {
                                   height: CustomSize.sizeWidth(context) / 6,
                                   child: ClipRRect(
                                     borderRadius: BorderRadius.circular(50),
-                                    child: (img == "" || img == null)?Image.network(Links.subUrl + "$img", fit: BoxFit.fitWidth):Container(decoration: BoxDecoration(
+                                    child: (img == "" || img == 'null')?Image.network(Links.subUrl + "$img", fit: BoxFit.fitWidth):Container(decoration: BoxDecoration(
                                       shape: BoxShape.circle,
                                       image: ("$img".substring(0, 8) == '/storage')?DecorationImage(
                                           image: NetworkImage(Links.subUrl +
@@ -739,7 +747,7 @@ class _ProfileActivityState extends State<ProfileActivity> {
                         child: GestureDetector(
                           onTap: (){
                             // _launchURL();
-                            launch('mailto:info@irg.com');
+                            launch('mailto:info@indonesiarestoguide.id');
                           },
                           child: Row(
                             children: [
@@ -785,7 +793,7 @@ class _ProfileActivityState extends State<ProfileActivity> {
                                                 onTap: () async{
                                                   // Navigator.push(context, PageTransition(type: PageTransitionType.rightToLeft, child: new DetailHistory(history[index].id)));
                                                   SharedPreferences pref = await SharedPreferences.getInstance();
-                                                  pref.setInt("ownerId", user[index].id) ?? 0;
+                                                  pref.setInt("ownerId", user[index].id!);
                                                   pref.setString("owner", 'true') ?? '';
                                                   pref.setString("nameOwner", name);
                                                   pref.setString("emailOwner", email);
@@ -1001,8 +1009,15 @@ class _ProfileActivityState extends State<ProfileActivity> {
                   GestureDetector(
                     onTap: () async{
                       if (owner == 'true' && homepg == "1") {
+                        _googleSignIn.signOut();
                         _getOwnerOut();
+                        SharedPreferences pref = await SharedPreferences.getInstance();
+                        pref.clear();
+                        setState(() {
+                          Navigator.pushReplacement(context, PageTransition(type: PageTransitionType.fade, child: new LoginActivity()));
+                        });
                       } else {
+                        _googleSignIn.signOut();
                         logOut();
                         SharedPreferences pref = await SharedPreferences.getInstance();
                         pref.clear();

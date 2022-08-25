@@ -144,7 +144,7 @@ class _EditScheduleState extends State<EditSchedule> {
                 child: Text("Simpan", style: TextStyle(color: CustomColor.accent),),
                 onPressed: () async{
                   SharedPreferences pref = await SharedPreferences.getInstance();
-                  pref.setString("openDay", openDay);
+                  pref.setString("openDay", openDay.toString());
                   setState(() {
                     print(openDay);
                     getHariBuka();
@@ -196,7 +196,7 @@ class _EditScheduleState extends State<EditSchedule> {
                 child: Text("Simpan", style: TextStyle(color: CustomColor.accent),),
                 onPressed: () async{
                   SharedPreferences pref = await SharedPreferences.getInstance();
-                  pref.setString("closeDay", closeDay);
+                  pref.setString("closeDay", closeDay.toString());
                   setState(() {
                     print(closeDay);
                     getHariTutup();
@@ -217,7 +217,7 @@ class _EditScheduleState extends State<EditSchedule> {
   getHomePg() async {
     SharedPreferences pref = await SharedPreferences.getInstance();
     setState(() {
-      homepg = (pref.getString('homepg'));
+      homepg = (pref.getString('homepg')??'');
       print(homepg);
     });
   }
@@ -339,7 +339,7 @@ class _EditScheduleState extends State<EditSchedule> {
     });
     SharedPreferences pref = await SharedPreferences.getInstance();
     String token = pref.getString("token") ?? "";
-    var apiResult = await http.post(Links.mainUrl + '/resto/day',
+    var apiResult = await http.post(Uri.parse(Links.mainUrl + '/resto/day'),
         body: {
           'day': dayId,
           'hours': _JamOperasionalBuka.text+'-'+_JamOperasionalTutup.text,
@@ -383,7 +383,7 @@ class _EditScheduleState extends State<EditSchedule> {
     });
     SharedPreferences pref = await SharedPreferences.getInstance();
     String token = pref.getString("token") ?? "";
-    var apiResult = await http.post(Links.mainUrl + '/resto/day',
+    var apiResult = await http.post(Uri.parse(Links.mainUrl + '/resto/day'),
         body: {
           'day': dayId,
           'hours': '00:00-00:00',
@@ -427,7 +427,7 @@ class _EditScheduleState extends State<EditSchedule> {
     });
     SharedPreferences pref = await SharedPreferences.getInstance();
     String token = pref.getString("token") ?? "";
-    var apiResult = await http.post(Links.mainUrl + '/resto/day',
+    var apiResult = await http.post(Uri.parse(Links.mainUrl + '/resto/day'),
         body: {
           'day': dayId,
           'hours': '08:30-21:30',
@@ -609,7 +609,7 @@ class _EditScheduleState extends State<EditSchedule> {
                                           blurredBackground: true,
                                           accentColor: Colors.blue[400],
                                           context: context,
-                                          value: (jamBuka != null)?jamBuka:null,
+                                          value: (jamBuka != null)?jamBuka:TimeOfDay.now(),
                                           onChange: onTimeOpenChanged,
                                           minuteInterval: MinuteInterval.ONE,
                                           disableHour: false,
@@ -749,7 +749,7 @@ class _EditScheduleState extends State<EditSchedule> {
         floatingActionButton: Column(
           mainAxisAlignment: MainAxisAlignment.end,
           children: [
-            (detailSchedule.closed_at.split(':')[0]+':'+detailSchedule.closed_at.split(':')[1] != '00:00' && detailSchedule.open_at.split(':')[0]+':'+detailSchedule.open_at.split(':')[1] != '00:00')?GestureDetector(
+            (detailSchedule.closed_at.split(':')[0]+':'+detailSchedule.closed_at.split(':')[1] != '00:00' && detailSchedule.closed_at.split(':')[0]+':'+detailSchedule.closed_at.split(':')[1] != '00:00')?GestureDetector(
               onTap: () async{
                 setState(() {
                   isLoading = false;

@@ -1,5 +1,7 @@
 import 'dart:convert';
 import 'dart:io';
+import 'package:geocoding/geocoding.dart';
+import 'package:intl/intl.dart';
 
 import 'package:day_night_time_picker/lib/constants.dart';
 import 'package:day_night_time_picker/lib/daynight_timepicker.dart';
@@ -213,7 +215,7 @@ class _AddDetailRestoState extends State<AddDetailResto> {
                 child: Text("Simpan"),
                 onPressed: () async{
                   SharedPreferences pref = await SharedPreferences.getInstance();
-                  pref.setString("cuisine", cuisine);
+                  pref.setString("cuisine", cuisine.toString());
                   setState(() {
                     print(cuisine);
                     FieldCuisine();
@@ -306,7 +308,7 @@ class _AddDetailRestoState extends State<AddDetailResto> {
   Future<void> getCuisine() async {
     SharedPreferences pref = await SharedPreferences.getInstance();
     var token = pref.getString("token") ?? "";
-    var data = await http.get(Links.mainUrl +'/util/data?q=cuisine',
+    var data = await http.get(Uri.parse(Links.mainUrl +'/util/data?q=cuisine'),
         headers: {
           "Accept": "application/json",
           "Authorization": "Bearer $token"
@@ -328,7 +330,7 @@ class _AddDetailRestoState extends State<AddDetailResto> {
   Future<void> getFacility() async {
     SharedPreferences pref = await SharedPreferences.getInstance();
     var token = pref.getString("token") ?? "";
-    var data = await http.get(Links.mainUrl +'/util/data?q=facility',
+    var data = await http.get(Uri.parse(Links.mainUrl +'/util/data?q=facility'),
         headers: {
           "Accept": "application/json",
           "Authorization": "Bearer $token"
@@ -348,23 +350,44 @@ class _AddDetailRestoState extends State<AddDetailResto> {
   }
 
   void onTimeOpenChanged(TimeOfDay newTime) {
+    DateTime now = DateTime.now();
     setState(() {
       jamBuka = newTime;
+      print('jamBuka');
+      print(jamBuka);
+      now = DateTime(now.year, now.month, now.day, jamBuka.hour, jamBuka.minute);
+      print('now');
+      print(now);
+      OpenTime = DateFormat.Hm().format(now);
+      print('OpenTime');
+      print(OpenTime);
     });
   }
 
   void onTimeClosedChanged(TimeOfDay newTime) {
+    DateTime now = DateTime.now();
     setState(() {
       jamTutup = newTime;
+      print('jamTutup');
+      print(jamTutup);
+      now = DateTime(now.year, now.month, now.day, jamTutup.hour, jamTutup.minute);
+      print('now');
+      print(now);
+      CloseTime = DateFormat.Hm().format(now);
+      print('CloseTime');
+      print(CloseTime);
     });
   }
 
   getBuka() async {
-    _JamOperasionalBuka = (jamBuka.hour != null)?TextEditingController(text: jamBuka.hour.toString() + ':' + jamBuka.minute.toString()):TextEditingController(text: "");
+    _JamOperasionalBuka = (jamBuka.hour != null)?TextEditingController(text: OpenTime.toString()):TextEditingController(text: "");
   }
 
+  String OpenTime = '';
+  String CloseTime = '';
+
   getTutup() async {
-    _JamOperasionalTutup = (jamTutup.hour != null)?TextEditingController(text: jamTutup.hour.toString() + ':' + jamTutup.minute.toString()):TextEditingController(text: "");
+    _JamOperasionalTutup = (jamTutup.hour != null)?TextEditingController(text: CloseTime.toString()):TextEditingController(text: "");
   }
 
   String name = '';
@@ -388,20 +411,20 @@ class _AddDetailRestoState extends State<AddDetailResto> {
     SharedPreferences pref = await SharedPreferences.getInstance();
     // var token = pref.getString("token") ?? "";
     name = pref.getString("nameResto") ?? "";
-    email = pref.getString("emailResto");
+    email = pref.getString("emailResto")??'';
     desc = pref.getString("descResto") ?? "";
     latitude = pref.getString("latitudeResto") ?? "";
     longitude = pref.getString("longitudeResto") ?? "";
     address = pref.getString("addressResto") ?? "";
     phone = pref.getString("notelpResto") ?? "";
     img = pref.getString("imgResto") ?? "";
-    badanUsaha = pref.getString("nameBadanUsaha");
+    badanUsaha = pref.getString("nameBadanUsaha")??'';
     namaPemilik = pref.getString("namePemilik") ?? "";
     namaPenanggungJwb = pref.getString("namePenanggungJawab") ?? "";
     imgSelfie = pref.getString("imgSelfie") ?? "";
     imgKtp = pref.getString("imgKTP") ?? "";
-    nameRekening = pref.getString("nameRekening");
-    nameBank = pref.getString("nameBank");
+    nameRekening = pref.getString("nameRekening")??'';
+    nameBank = pref.getString("nameBank")??'';
     norek = pref.getString("noRekeningBank") ?? "";
     print('1'+email);
     print('2'+badanUsaha);
@@ -433,7 +456,7 @@ class _AddDetailRestoState extends State<AddDetailResto> {
       isLoading = true;
     });
 
-    var apiResult = await http.post(Links.mainUrl + '/resto',
+    var apiResult = await http.post(Uri.parse(Links.mainUrl + '/resto'),
         body: {
           'name': name,
           'data_email': email,
@@ -443,8 +466,9 @@ class _AddDetailRestoState extends State<AddDetailResto> {
           'address': address,
           'phone': phone,
           'hours': buka! + '-' + tutup!,
-          'ongkir': (_Ongkir.text.toString() != null)?_Ongkir.text.toString():'',
-          're_price': (_HargaPerMeja.text.toString() != '')?_HargaPerMeja.text.toString():'',
+          'ongkir': '1000',
+          // 're_price': (_HargaPerMeja.text.toString() != '')?_HargaPerMeja.text.toString():'',
+          're_price': '1000',
           'takeaway': (takeaway == true)?'1':'0',
           'img': img,
           'type': _Tipe.text.toString(),
@@ -540,7 +564,7 @@ class _AddDetailRestoState extends State<AddDetailResto> {
       isLoading = true;
     });
 
-    var apiResult = await http.post(Links.mainUrl + '/resto',
+    var apiResult = await http.post(Uri.parse(Links.mainUrl + '/resto'),
         body: {
           'name': name,
           'data_email': email,
@@ -550,7 +574,8 @@ class _AddDetailRestoState extends State<AddDetailResto> {
           'address': address,
           'phone': phone,
           'hours': buka! + '-' + tutup!,
-          're_price': (_HargaPerMeja.text.toString() != '')?_HargaPerMeja.text.toString():'',
+          // 're_price': (_HargaPerMeja.text.toString() != '')?_HargaPerMeja.text.toString():'',
+          're_price': '1000',
           'takeaway': (takeaway == true)?'1':'0',
           'img': img,
           'type': _Tipe.text.toString(),
@@ -914,7 +939,7 @@ class _AddDetailRestoState extends State<AddDetailResto> {
                                       blurredBackground: true,
                                       accentColor: Colors.blue[400],
                                       context: context,
-                                      value: (jamBuka != null)?jamBuka:null,
+                                      value: (jamBuka != null)?jamBuka:TimeOfDay.now(),
                                       onChange: onTimeOpenChanged,
                                       minuteInterval: MinuteInterval.ONE,
                                       disableHour: false,
@@ -1108,48 +1133,48 @@ class _AddDetailRestoState extends State<AddDetailResto> {
                         ],
                       ),
                       //------------------------------------- harga pesan ----------------------------------------
-                      (reservation)?CustomText.bodyLight12(text: "Harga pesan per meja (1 meja 4 kursi)", sizeNew: double.parse(((MediaQuery.of(context).size.width*0.03).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.03).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.03).toString())):Container(),
-                      (reservation)?TextField(
-                        controller: _HargaPerMeja,
-                        keyboardType: TextInputType.number,
-                        cursorColor: Colors.black,
-                        style: GoogleFonts.poppins(
-                            textStyle:
-                            TextStyle(fontSize: 18, color: Colors.black, fontWeight: FontWeight.w600)),
-                        decoration: InputDecoration(
-                          isDense: true,
-                          contentPadding: EdgeInsets.only(bottom: CustomSize.sizeHeight(context) / 86),
-                          hintStyle: GoogleFonts.poppins(
-                              textStyle:
-                              TextStyle(fontSize: 14, color: Colors.grey)),
-                          helperStyle: GoogleFonts.poppins(
-                              textStyle: TextStyle(fontSize: 14)),
-                          enabledBorder: UnderlineInputBorder(),
-                          focusedBorder: UnderlineInputBorder(),
-                        ),
-                      ):Container(),
-                      (reservation)?SizedBox(height: CustomSize.sizeHeight(context) / 48,):Container(),
+                      // (reservation)?CustomText.bodyLight12(text: "Harga pesan per meja (1 meja 4 kursi)", sizeNew: double.parse(((MediaQuery.of(context).size.width*0.03).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.03).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.03).toString())):Container(),
+                      // (reservation)?TextField(
+                      //   controller: _HargaPerMeja,
+                      //   keyboardType: TextInputType.number,
+                      //   cursorColor: Colors.black,
+                      //   style: GoogleFonts.poppins(
+                      //       textStyle:
+                      //       TextStyle(fontSize: 18, color: Colors.black, fontWeight: FontWeight.w600)),
+                      //   decoration: InputDecoration(
+                      //     isDense: true,
+                      //     contentPadding: EdgeInsets.only(bottom: CustomSize.sizeHeight(context) / 86),
+                      //     hintStyle: GoogleFonts.poppins(
+                      //         textStyle:
+                      //         TextStyle(fontSize: 14, color: Colors.grey)),
+                      //     helperStyle: GoogleFonts.poppins(
+                      //         textStyle: TextStyle(fontSize: 14)),
+                      //     enabledBorder: UnderlineInputBorder(),
+                      //     focusedBorder: UnderlineInputBorder(),
+                      //   ),
+                      // ):Container(),
+                      // (reservation)?SizedBox(height: CustomSize.sizeHeight(context) / 48,):Container(),
                       //------------------------------------- meja yang disediakan ----------------------------------------
-                      (reservation)?CustomText.bodyLight12(text: "Meja yang disediakan restomu untuk reservasi", sizeNew: double.parse(((MediaQuery.of(context).size.width*0.03).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.03).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.03).toString())):Container(),
-                      (reservation)?TextField(
-                        controller: _JumlahMeja,
-                        keyboardType: TextInputType.number,
-                        cursorColor: Colors.black,
-                        style: GoogleFonts.poppins(
-                            textStyle:
-                            TextStyle(fontSize: 18, color: Colors.black, fontWeight: FontWeight.w600)),
-                        decoration: InputDecoration(
-                          isDense: true,
-                          contentPadding: EdgeInsets.only(bottom: CustomSize.sizeHeight(context) / 86),
-                          hintStyle: GoogleFonts.poppins(
-                              textStyle:
-                              TextStyle(fontSize: 14, color: Colors.grey)),
-                          helperStyle: GoogleFonts.poppins(
-                              textStyle: TextStyle(fontSize: 14)),
-                          enabledBorder: UnderlineInputBorder(),
-                          focusedBorder: UnderlineInputBorder(),
-                        ),
-                      ):Container(),
+                      // (reservation)?CustomText.bodyLight12(text: "Meja yang disediakan restomu untuk reservasi", sizeNew: double.parse(((MediaQuery.of(context).size.width*0.03).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.03).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.03).toString())):Container(),
+                      // (reservation)?TextField(
+                      //   controller: _JumlahMeja,
+                      //   keyboardType: TextInputType.number,
+                      //   cursorColor: Colors.black,
+                      //   style: GoogleFonts.poppins(
+                      //       textStyle:
+                      //       TextStyle(fontSize: 18, color: Colors.black, fontWeight: FontWeight.w600)),
+                      //   decoration: InputDecoration(
+                      //     isDense: true,
+                      //     contentPadding: EdgeInsets.only(bottom: CustomSize.sizeHeight(context) / 86),
+                      //     hintStyle: GoogleFonts.poppins(
+                      //         textStyle:
+                      //         TextStyle(fontSize: 14, color: Colors.grey)),
+                      //     helperStyle: GoogleFonts.poppins(
+                      //         textStyle: TextStyle(fontSize: 14)),
+                      //     enabledBorder: UnderlineInputBorder(),
+                      //     focusedBorder: UnderlineInputBorder(),
+                      //   ),
+                      // ):Container(),
                       // ------------------------------------ checkbox takeaway -------------------------------------
                       Row(
                         mainAxisSize: MainAxisSize.max,
@@ -1230,7 +1255,91 @@ class _AddDetailRestoState extends State<AddDetailResto> {
                                                       onPressed: () async{
                                                         Navigator.pop(context);
                                                         String qrcode = '';
-                                                        addResto();
+                                                        if (int.parse(_JamOperasionalBuka.text.replaceAll(':', ''))>int.parse(_JamOperasionalTutup.text.replaceAll(':', ''))) {
+                                                          showDialog(
+                                                              context: context,
+                                                              builder: (context) {
+                                                                return AlertDialog(
+                                                                  contentPadding: EdgeInsets.only(left: 25, right: 25, top: 15, bottom: 5),
+                                                                  shape: RoundedRectangleBorder(
+                                                                      borderRadius: BorderRadius.all(Radius.circular(10))
+                                                                  ),
+                                                                  title: Center(child: Text('Perhatian!', style: TextStyle(color: CustomColor.redBtn))),
+                                                                  content: Text('Untuk saat pendaftaran pertama, jam buka harus lebih awal dari pada jam tutup!\n\nJika tidak sesuai dengan jam operasional anda yang sesungguhnya\n\n Silahkan atur jadwal anda kembali pada halaman resto saat resto anda telah terdaftar, terimakasih.', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500), textAlign: TextAlign.center),
+                                                                  actions: <Widget>[
+                                                                    Center(
+                                                                      child: Row(
+                                                                        mainAxisAlignment: MainAxisAlignment.center,
+                                                                        children: [
+                                                                          FlatButton(
+                                                                            color: CustomColor.primaryLight,
+                                                                            textColor: Colors.white,
+                                                                            shape: RoundedRectangleBorder(
+                                                                                borderRadius: BorderRadius.all(Radius.circular(10))
+                                                                            ),
+                                                                            child: Text('Atur Kembali'),
+                                                                            onPressed: () async{
+                                                                              Navigator.pop(context);
+                                                                              // String qrcode = '';
+                                                                              // if (int.parse(buka.toString().replaceAll(':', ''))>int.parse(tutup.toString().replaceAll(':', ''))) {
+                                                                              //
+                                                                              // }
+                                                                              // print('Jam buka '+buka.toString()+'P');
+                                                                              // print('Jam tutup '+tutup.toString()+'P');
+                                                                              // addResto2();
+                                                                            },
+                                                                          ),
+                                                                        ],
+                                                                      ),
+                                                                    ),
+
+                                                                  ],
+                                                                );
+                                                              });
+                                                        } else {
+                                                          if (latitude == 'null' || longitude == 'null') {
+                                                            var addresses = await locationFromAddress(address.toString(),
+                                                                localeIdentifier: 'id_ID')
+                                                                .then((placemarks) async {
+                                                              setState(() {
+                                                                latitude = placemarks[0].latitude.toString();
+                                                                longitude = placemarks[0].longitude.toString();
+                                                                print('latRes');
+                                                                print(latitude);
+                                                                print(longitude);
+                                                                addResto();
+                                                                // address = placemarks[0].street +
+                                                                //     ', ' +
+                                                                //     placemarks[0].subLocality! +
+                                                                //     ', ' +
+                                                                //     placemarks[0].locality! +
+                                                                //     ', ' +
+                                                                //     placemarks[0].subAdministrativeArea! +
+                                                                //     ', ' +
+                                                                //     placemarks[0].administrativeArea! +
+                                                                //     ' ' +
+                                                                //     placemarks[0].postalCode! +
+                                                                //     ', ' +
+                                                                //     placemarks[0].country!;
+                                                              });
+                                                            });
+                                                            // Geocoder2.getDataFromAddress(address: restoAddress.toString(), googleMapApiKey: 'AIzaSyDZH54AvqWFepAGB7wh2VQPAhASjFzI-lE');
+                                                            // geoCode.forwardGeocoding(address: restoAddress.toString());
+                                                            // print(addresses.toString());
+                                                            // var first = addresses.first;
+                                                            // setState(() {
+                                                            // latRes = first.coordinates.latitude.toString();
+                                                            // latRes = addresses.latitude.toString();
+                                                            // longRes = first.coordinates.longitude.toString();
+                                                            // longRes = addresses.longitude.toString();
+                                                            // print('latt');
+                                                            // print(latUser);
+                                                            // print(longUser);
+                                                            // });
+                                                          } else {
+                                                            addResto();
+                                                          }
+                                                        }
                                                       },
                                                     ),
                                                   ],
@@ -1295,7 +1404,91 @@ class _AddDetailRestoState extends State<AddDetailResto> {
                                                       onPressed: () async{
                                                         Navigator.pop(context);
                                                         String qrcode = '';
-                                                        addResto2();
+                                                        if (int.parse(_JamOperasionalBuka.text.replaceAll(':', ''))>int.parse(_JamOperasionalTutup.text.replaceAll(':', ''))) {
+                                                          showDialog(
+                                                              context: context,
+                                                              builder: (context) {
+                                                                return AlertDialog(
+                                                                  contentPadding: EdgeInsets.only(left: 25, right: 25, top: 15, bottom: 5),
+                                                                  shape: RoundedRectangleBorder(
+                                                                      borderRadius: BorderRadius.all(Radius.circular(10))
+                                                                  ),
+                                                                  title: Center(child: Text('Perhatian!', style: TextStyle(color: CustomColor.redBtn))),
+                                                                  content: Text('Untuk saat pendaftaran pertama, jam buka harus lebih awal dari pada jam tutup!\n\nJika tidak sesuai dengan jam operasional anda yang sesungguhnya\n\n Silahkan atur jadwal anda kembali pada halaman resto saat resto anda telah terdaftar, terimakasih.', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500), textAlign: TextAlign.center),
+                                                                  actions: <Widget>[
+                                                                    Center(
+                                                                      child: Row(
+                                                                        mainAxisAlignment: MainAxisAlignment.center,
+                                                                        children: [
+                                                                          FlatButton(
+                                                                            color: CustomColor.primaryLight,
+                                                                            textColor: Colors.white,
+                                                                            shape: RoundedRectangleBorder(
+                                                                                borderRadius: BorderRadius.all(Radius.circular(10))
+                                                                            ),
+                                                                            child: Text('Atur Kembali'),
+                                                                            onPressed: () async{
+                                                                              Navigator.pop(context);
+                                                                              // String qrcode = '';
+                                                                              // if (int.parse(buka.toString().replaceAll(':', ''))>int.parse(tutup.toString().replaceAll(':', ''))) {
+                                                                              //
+                                                                              // }
+                                                                              // print('Jam buka '+buka.toString()+'P');
+                                                                              // print('Jam tutup '+tutup.toString()+'P');
+                                                                              // addResto2();
+                                                                            },
+                                                                          ),
+                                                                        ],
+                                                                      ),
+                                                                    ),
+
+                                                                  ],
+                                                                );
+                                                              });
+                                                        } else {
+                                                          if (latitude == 'null' || longitude == 'null') {
+                                                            var addresses = await locationFromAddress(address.toString(),
+                                                                localeIdentifier: 'id_ID')
+                                                                .then((placemarks) async {
+                                                              setState(() {
+                                                                latitude = placemarks[0].latitude.toString();
+                                                                longitude = placemarks[0].longitude.toString();
+                                                                print('latRes');
+                                                                print(latitude);
+                                                                print(longitude);
+                                                                addResto2();
+                                                                // address = placemarks[0].street +
+                                                                //     ', ' +
+                                                                //     placemarks[0].subLocality! +
+                                                                //     ', ' +
+                                                                //     placemarks[0].locality! +
+                                                                //     ', ' +
+                                                                //     placemarks[0].subAdministrativeArea! +
+                                                                //     ', ' +
+                                                                //     placemarks[0].administrativeArea! +
+                                                                //     ' ' +
+                                                                //     placemarks[0].postalCode! +
+                                                                //     ', ' +
+                                                                //     placemarks[0].country!;
+                                                              });
+                                                            });
+                                                            // Geocoder2.getDataFromAddress(address: restoAddress.toString(), googleMapApiKey: 'AIzaSyDZH54AvqWFepAGB7wh2VQPAhASjFzI-lE');
+                                                            // geoCode.forwardGeocoding(address: restoAddress.toString());
+                                                            // print(addresses.toString());
+                                                            // var first = addresses.first;
+                                                            // setState(() {
+                                                            // latRes = first.coordinates.latitude.toString();
+                                                            // latRes = addresses.latitude.toString();
+                                                            // longRes = first.coordinates.longitude.toString();
+                                                            // longRes = addresses.longitude.toString();
+                                                            // print('latt');
+                                                            // print(latUser);
+                                                            // print(longUser);
+                                                            // });
+                                                          } else {
+                                                            addResto2();
+                                                          }
+                                                        }
                                                       },
                                                     ),
                                                   ],

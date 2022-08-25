@@ -1,7 +1,9 @@
 import 'dart:convert';
 
 import 'package:flutter/cupertino.dart';
-import 'package:full_screen_image/full_screen_image.dart';
+import 'package:full_screen_image_null_safe/full_screen_image_null_safe.dart';
+import 'package:geocoding/geocoding.dart';
+// import 'package:full_screen_image/full_screen_image.dart';
 import 'package:kam5ia/model/Meja.dart';
 import 'package:kam5ia/model/Menu.dart';
 import 'package:kam5ia/model/Price.dart';
@@ -33,6 +35,157 @@ class _OrderProcessState extends State<OrderProcess> {
   ScrollController _scrollController = ScrollController();
 
 
+  String restoAddress = '';
+  String pjTokoTrans = '';
+  String phoneRestoTrans = "";
+  String latRes = "";
+  String longRes = "";
+  String delivAddress = "";
+  String userNamePembeli = "";
+  String notelp = "";
+  String latUser = "";
+  String longUser = "";
+  Future<String?>? cariKurir()async{
+    // print(qrscan);
+    SharedPreferences pref = await SharedPreferences.getInstance();
+    var token = pref.getString("token") ?? "";
+
+    var apiResult = await http.post(Uri.parse('https://qurir.devastic.com/api/borzo/checkout'),
+        body: {
+          'address_pick_up': restoAddress,
+          'name_pick_up': pjTokoTrans,
+          'phone_pick_up': phoneRestoTrans,
+          'latitude_pick_up': latRes,
+          'longitude_pick_up': longRes,
+          'address_sender': delivAddress,
+          'name_sender': userNamePembeli,
+          'phone_sender': notelp,
+          'latitude_sender': latUser,
+          'longitude_sender': longUser,
+          'transaction_id': 'KAM-$idTrans'
+        },
+        headers: {
+          "Accept": "Application/json",
+          "Authorization": "Bearer $token"
+        });
+    print('Cek Harga '+apiResult.body.toString());
+    var data = json.decode(apiResult.body);
+
+    // totalOngkirBorzo = data['price'];
+    setState((){});
+
+    // for(var v in data['device_id']){
+    //   // User p = User.resto(
+    //   //   name: v['device_id'],
+    //   // );
+    //   List<String> id = [];
+    //   id.add(v);
+    //   print('099');
+    //   print(id);
+    //   OneSignal.shared.postNotification(OSCreateNotification(
+    //     playerIds: id,
+    //     heading: "$nameUser telah memesan produk di toko Anda",
+    //     content: "Cek sekarang !",
+    //     androidChannelId: "2482eb14-bcdf-4045-b69e-422011d9e6ef",
+    //   ));
+    //   // await OneSignal.shared.postNotificationWithJson();
+    //   // user3.add(v['device_id']);
+    //   // _user.add(p);
+    // }
+
+    if(data['status_code'] == 200){
+      print('KAM-$idTrans');
+      print(restoAddress);
+      print(pjTokoTrans);
+      print(phoneRestoTrans);
+      print(latRes);
+      print(longRes);
+      print(delivAddress);
+      print(userNamePembeli);
+      print(notelp);
+      print(latUser);
+      print(longUser);
+      // totalOngkirBorzo = data['price'];
+      // SharedPreferences pref = await SharedPreferences.getInstance();
+      // pref.setString('totalOngkirBorzo', totalOngkirBorzo);
+      setState((){});
+      // SharedPreferences preferences = await SharedPreferences.getInstance();
+      // await preferences.remove('menuJson');
+      // await preferences.remove('restoId');
+      // await preferences.remove('qty');
+      // await preferences.remove('note');
+      // await preferences.remove('address');
+      // await preferences.remove('inCart');
+      // await pref.remove('restoIdUsr');
+      // pref.remove("addressDelivTrans");
+      // pref.remove("distan");
+      // notif(jsonEncode(data['device_id'].toString().split('[')[1].split(']')[0]));
+      // print('ini device nya '+json.encode(data['device_id'].toString().split('[')[1].split(']')[0]));
+    }
+  }
+
+  String checkId = "";
+  Future _getDetail()async{
+    SharedPreferences pref = await SharedPreferences.getInstance();
+    String token = pref.getString("token") ?? "";
+    // GeoCode geoCode = GeoCode();
+    checkId = pref.getString('idHomeResto')??'';
+    print('checkId');
+    print(checkId);
+    var apiResult = await http.get(Uri.parse(Links.mainUrl + '/resto/detail/$checkId'), headers: {
+      "Accept": "Application/json",
+      "Authorization": "Bearer $token"
+    });
+    var data = json.decode(apiResult.body);
+    print('resto data '+checkId);
+    print('resto data '+data.toString());
+
+    setState(() {
+      restoAddress = data['data']['address'];
+      phoneRestoTrans = data['data']['phone_number'].toString();
+      latRes = data['data']['lat'].toString();
+      longRes = data['data']['long'].toString();
+    });
+    if (latRes == 'null' || longRes == 'null') {
+      var addresses = await
+      locationFromAddress(restoAddress.toString(),
+          localeIdentifier: 'id_ID')
+          .then((placemarks) async {
+        setState(() {
+          latRes = placemarks[0].latitude.toString();
+          longRes = placemarks[0].longitude.toString();
+          print('latRes');
+          print(latRes);
+          print(longRes);
+          // address = placemarks[0].street +
+          //     ', ' +
+          //     placemarks[0].subLocality! +
+          //     ', ' +
+          //     placemarks[0].locality! +
+          //     ', ' +
+          //     placemarks[0].subAdministrativeArea! +
+          //     ', ' +
+          //     placemarks[0].administrativeArea! +
+          //     ' ' +
+          //     placemarks[0].postalCode! +
+          //     ', ' +
+          //     placemarks[0].country!;
+        });
+      });
+      // geoCode.forwardGeocoding(
+      //     address: restoAddress.toString());
+      // Geocoder2.getDataFromAddress(address: restoAddress.toString(), googleMapApiKey: 'AIzaSyDZH54AvqWFepAGB7wh2VQPAhASjFzI-lE');
+      var first = addresses;
+      setState(() {
+        // latRes = first.latitude.toString();
+        // longRes = first.longitude.toString();
+        // print('latt');
+        // print(latUser);
+        // print(longUser);
+      });
+    }
+  }
+
   String address = "";
   String type = "";
   int all = 0;
@@ -50,13 +203,15 @@ class _OrderProcessState extends State<OrderProcess> {
   String chatRestoCount = '';
   // String s = 'null';
   bool waiting = false;
+  String idTrans = '';
   Future _getDetailTrans(String Id, String name, String status)async{
     List<Transaction> _detTransaction = [];
     List<Menu> _menu = [];
+    idTrans = Id;
 
     SharedPreferences pref = await SharedPreferences.getInstance();
     String token = pref.getString("token") ?? "";
-    var apiResult = await http.get(Links.mainUrl + '/resto/trans/$Id', headers: {
+    var apiResult = await http.get(Uri.parse(Links.mainUrl + '/resto/trans/$Id'), headers: {
       "Accept": "Application/json",
       "Authorization": "Bearer $token"
     });
@@ -98,6 +253,45 @@ class _OrderProcessState extends State<OrderProcess> {
         price: Price(original: int.parse(v['price'].toString()),discounted: int.parse(v['discounted_price'].toString()), delivery: null), restoName: '', distance: null, delivery_price: null, restoId: '',
       );
       _menu.add(p);
+    }
+
+    if (data['trx']['type'].toString() == 'delivery') {
+      var addresses = await
+      locationFromAddress(data['trx']['address'].toString(),
+          localeIdentifier: 'id_ID')
+          .then((placemarks) async {
+        setState(() {
+          latUser = placemarks[0].latitude.toString();
+          longUser = placemarks[0].longitude.toString();
+          print('latUser');
+          print(latUser);
+          print(longUser);
+          // address = placemarks[0].street +
+          //     ', ' +
+          //     placemarks[0].subLocality! +
+          //     ', ' +
+          //     placemarks[0].locality! +
+          //     ', ' +
+          //     placemarks[0].subAdministrativeArea! +
+          //     ', ' +
+          //     placemarks[0].administrativeArea! +
+          //     ' ' +
+          //     placemarks[0].postalCode! +
+          //     ', ' +
+          //     placemarks[0].country!;
+        });
+      });
+      // geoCode.forwardGeocoding(
+      //     address: data['trx']['address'].toString());
+      // Geocoder2.getDataFromAddress(address: data['trx']['address'].toString(), googleMapApiKey: 'AIzaSyDZH54AvqWFepAGB7wh2VQPAhASjFzI-lE');
+      var first = addresses;
+      setState(() {
+        // latUser = first.latitude.toString();
+        // longUser = first.longitude.toString();
+        print('latt');
+        print(latUser);
+        print(longUser);
+      });
     }
 
     if (data['status_code'].toString() == "200") {
@@ -459,7 +653,7 @@ class _OrderProcessState extends State<OrderProcess> {
                                                       child: CustomText.textHeading7(text: address,
                                                         // (_transCode == 1)?
                                                         maxLines: 3,
-                                                        sizeNew: double.parse(((MediaQuery.of(context).size.width*0.033).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.033)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.033)).toString())
+                                                        sizeNew: double.parse(((MediaQuery.of(context).size.width*0.03).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.03)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.03)).toString())
                                                         // :(_transCode == 2)?"Ambil Langsung":"Makan Ditempat"
                                                         ,),
                                                     ):Container(),
@@ -794,15 +988,50 @@ class _OrderProcessState extends State<OrderProcess> {
                               SizedBox(height: CustomSize.sizeHeight(context) / 86,),
                               GestureDetector(
                                 onTap: (){
-                                  _getProcess(operation = "ready", id!);
-                                  setStateModal(() {});
-                                  Future.delayed(Duration(seconds: 0)).then((_) {
-                                    Navigator.pushReplacement(
-                                        context,
-                                        PageTransition(
-                                            type: PageTransitionType.fade,
-                                            child: OrderActivity()));
-                                  });
+                                  // cariKurir()!.whenComplete((){
+                                  //   _getProcess(operation = "ready", id!);
+                                  //   setStateModal(() {});
+                                  //   Future.delayed(Duration(seconds: 0)).then((_) {
+                                  //     Navigator.pushReplacement(
+                                  //         context,
+                                  //         PageTransition(
+                                  //             type: PageTransitionType.fade,
+                                  //             child: OrderActivity()));
+                                  //   });
+                                  //   setState(() { });
+                                  // });
+
+                                  if (type == 'delivery') {
+                                    Fluttertoast.showToast(msg: 'Memeriksa kurir');
+                                    _checkDriver();
+                                  } else {
+                                    _getProcess(operation = "ready", id!).whenComplete((){
+                                      setStateModal(() {});
+                                    });
+                                    // Future.delayed(Duration(seconds: 0)).then((_) {
+                                    //   Navigator.pushReplacement(
+                                    //       context,
+                                    //       PageTransition(
+                                    //           type: PageTransitionType.fade,
+                                    //           child: OrderActivity()));
+                                    // });
+                                    setState(() { });
+                                  }
+
+                                  // if (int.parse(deposit) >= (1000)) {
+                                  //   _getProcess(operation = "ready", id!);
+                                  //   setStateModal(() {});
+                                  //   Future.delayed(Duration(seconds: 0)).then((_) {
+                                  //     Navigator.pushReplacement(
+                                  //         context,
+                                  //         PageTransition(
+                                  //             type: PageTransitionType.fade,
+                                  //             child: OrderActivity()));
+                                  //   });
+                                  // } else {
+                                  //   Fluttertoast.showToast(
+                                  //     msg: 'Saldo deposit anda tidak mencukupi untuk melanjutkan transaksi ini!',);
+                                  // }
                                   setState(() { });
                                 },
                                 child: Center(
@@ -820,7 +1049,7 @@ class _OrderProcessState extends State<OrderProcess> {
                                           mainAxisAlignment: MainAxisAlignment.center,
                                           crossAxisAlignment: CrossAxisAlignment.center,
                                           children: [
-                                            CustomText.textHeading7(text: "Selesaikan Transaksi", color: Colors.white, sizeNew: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.04)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.04)).toString())),
+                                            CustomText.textHeading7(text: "Pesanan Selesai", color: Colors.white, sizeNew: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.04)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.04)).toString())),
                                           ],
                                         ),
                                       ),
@@ -847,14 +1076,28 @@ class _OrderProcessState extends State<OrderProcess> {
 
     setState(() {
       waiting = false;
+      notelp = data['trx']['user_phone'].toString();
       chatroom = (data['trx']['chatroom'] != null)?(data['trx']['chatroom']['id']??'null').toString():'null';
       Meja = (data['trx']['restaurant_tables_id'] != null)?(data['trx']['restaurant_tables_id']??'null').toString():'null';
       ongkir = int.parse(data['trx']['ongkir']);
       total = int.parse(data['trx']['total']);
       all = total+ongkir;
+      delivAddress = address.toString();
       type = data['trx']['type'].toString();
       address = data['trx']['address'].toString();
       phone = data['trx']['user_phone'].toString();
+      print('CUOK');
+      print('IRG-$idTrans');
+      print(restoAddress);
+      print(pjTokoTrans);
+      print(phoneRestoTrans);
+      print(latRes);
+      print(longRes);
+      print(delivAddress);
+      print(userNamePembeli);
+      print(notelp);
+      print(latUser);
+      print(longUser);
       // print(price);
       // detTransaction = _detTransaction;
       menu = _menu;
@@ -866,8 +1109,61 @@ class _OrderProcessState extends State<OrderProcess> {
   Future getUser()async{
     SharedPreferences pref = await SharedPreferences.getInstance();
     setState(() {
-      userName = (pref.getString('name'));
+      userName = (pref.getString('name')??'');
     });
+  }
+
+  Future<void> _getUserDataResto()async{
+    // List<Menu> _menu = [];
+
+    // setState(() {
+    //   isLoading = true;
+    // });
+    SharedPreferences pref = await SharedPreferences.getInstance();
+    String token = pref.getString("token") ?? "";
+    var apiResult = await http.get(Uri.parse(Links.mainUrl + '/resto/userdata/'+checkId), headers: {
+      "Accept": "Application/json",
+      "Authorization": "Bearer $token"
+    });
+    print(Links.mainUrl + '/resto/userdata/'+checkId);
+    var data = json.decode(apiResult.body);
+
+    print('id e '+data.toString());
+    print('id e '+checkId.toString());
+    // for(var v in data['menu']){
+    //   Menu p = Menu(
+    //       id: v['id'],
+    //       name: v['name'],
+    //       desc: v['desc'],
+    //       urlImg: v['img'],
+    //       type: v['type'],
+    //       is_recommended: v['is_recommended'],
+    //       price: Price(original: int.parse(v['price'].toString()), discounted: null, delivery: null),
+    //       delivery_price: Price(original: int.parse(v['price']), delivery: null, discounted: null), restoId: '', restoName: '', distance: null, qty: ''
+    //   );
+    //   _menu.add(p);
+    // }
+    setState(() {
+      pjTokoTrans = data['name_pj'].toString();
+      // restoAddress = '';
+      // phoneRestoTrans = '';
+      // latRes = '';
+      // longRes = '';
+
+      // emailTokoTrans = data['email'].toString();
+      // ownerTokoTrans = data['name_owner'].toString();
+      // pjTokoTrans = data['name_pj'].toString();
+      // bankTokoTrans = data['bank'].toString();
+      // nameNorekTokoTrans = data['namaNorek'].toString();
+      // nameRekening = data['nama_norek'].toString();
+      // nameBank = data['bank_norek'].toString();
+      // norekTokoTrans = data['norek'].toString();
+      // isLoading = false;
+    });
+
+    // if (apiResult.statusCode == 200 && menu.toString() == '[]') {
+    //   kosong = true;
+    // }
   }
 
   bool ksg = false;
@@ -878,7 +1174,7 @@ class _OrderProcessState extends State<OrderProcess> {
 
     SharedPreferences pref = await SharedPreferences.getInstance();
     String token = pref.getString("token") ?? "";
-    var apiResult = await http.get(Links.mainUrl + '/resto/trans', headers: {
+    var apiResult = await http.get(Uri.parse(Links.mainUrl + '/resto/trans'), headers: {
       "Accept": "Application/json",
       "Authorization": "Bearer $token"
     });
@@ -910,6 +1206,156 @@ class _OrderProcessState extends State<OrderProcess> {
     });
   }
 
+  Future<void> _checkDriver()async{
+    // List<Menu> _menu = [];
+
+    setState(() {
+      // isLoading = true;
+    });
+    SharedPreferences pref = await SharedPreferences.getInstance();
+    String token = pref.getString("token") ?? "";
+    var apiResult = await http.get(Uri.parse('https://qurir.devastic.com/api/borzo?transaction_id=KAM-$id'), headers: {
+      "Accept": "Application/json",
+      "Authorization": "Bearer $token"
+    });
+    var data = json.decode(apiResult.body);
+    print(data);
+
+    print('driver '+apiResult.body.toString());
+    // print('driver '+idResto.toString());
+    if (apiResult.body.toString() != '"not found"') {
+      if (data['courier'].toString().contains('name') == false) {
+        StatusDriver = (apiResult.body.toString() != '"not found"')?data['status'].toString():'Tidak Ditemukan';
+      } else {
+        NameDriver = (apiResult.body.toString() != '"not found"')?data['courier']['name'].toString():'Tidak Ditemukan';
+        PhoneDriver = (apiResult.body.toString() != '"not found"')?data['courier']['phone'].toString():'0';
+        PhotoDriver = (apiResult.body.toString() != '"not found"')?data['courier']['photo'].toString():'';
+        StatusDriver = (apiResult.body.toString() != '"not found"')?(data['status'].toString() != 'active')?'Sudah sampai':data['status'].toString():'Tidak Ditemukan';
+      }
+    } else {
+      NameDriver = 'Tidak Ditemukan';
+      PhoneDriver = '0';
+      PhotoDriver = '';
+      StatusDriver = 'Tidak Ditemukan';
+    }
+    if (NameDriver != 'Tidak Ditemukan' || NameDriver != 'Tunggu') {
+      Fluttertoast.showToast(msg: 'Berhasil menemukan kurir');
+      showDialog(
+          context: context,
+          builder: (context) {
+            return AlertDialog(
+              contentPadding: EdgeInsets.only(left: 25, right: 25, top: 15, bottom: 5),
+              shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.all(Radius.circular(10))
+              ),
+              title: Center(child: Text('Peringatan!', style: TextStyle(color: CustomColor.redBtn))),
+              content: Text('Apakah pesanan ini sudah diterima kurir?', style: TextStyle(fontSize: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.04)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.04)).toString()), fontWeight: FontWeight.w500), textAlign: TextAlign.center),
+              actions: <Widget>[
+                Center(
+                  child: Padding(
+                    padding: EdgeInsets.only(left: 25, right: 25),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        // OutlineButton(
+                        //   // minWidth: CustomSize.sizeWidth(context),
+                        //   shape: StadiumBorder(),
+                        //   highlightedBorderColor: CustomColor.secondary,
+                        //   borderSide: BorderSide(
+                        //       width: 2,
+                        //       color: CustomColor.redBtn
+                        //   ),
+                        //   child: Text('Batal'),
+                        //   onPressed: () async{
+                        //     setState(() {
+                        //       // codeDialog = valueText;
+                        //       Navigator.pop(context);
+                        //     });
+                        //   },
+                        // ),
+                        OutlinedButton(
+                          // minWidth: CustomSize.sizeWidth(context),
+                          // shape: StadiumBorder(),
+                          // highlightedBorderColor: CustomColor.secondary,
+                          // borderSide: BorderSide(
+                          //     width: 2,
+                          //     color: CustomColor.accent
+                          // ),
+                          style: OutlinedButton.styleFrom(shape: StadiumBorder(), surfaceTintColor: CustomColor.redBtn),
+                          child: Text('Belum'),
+                          onPressed: () async{
+                            Navigator.pop(context);
+                            // _getProcess(operation = "ready", id.toString());
+                            // setStateModal(() {});
+                            // String qrcode = '';
+                          },
+                        ),
+                        OutlinedButton(
+                          // minWidth: CustomSize.sizeWidth(context),
+                          // shape: StadiumBorder(),
+                          // highlightedBorderColor: CustomColor.secondary,
+                          // borderSide: BorderSide(
+                          //     width: 2,
+                          //     color: CustomColor.accent
+                          // ),
+                          style: OutlinedButton.styleFrom(shape: StadiumBorder(), surfaceTintColor: CustomColor.accent),
+                          child: Text('Sudah'),
+                          onPressed: () async{
+                            Navigator.pop(context);
+                            _getProcess(operation = "ready", id.toString());
+                            // setStateModal(() {});
+                            // String qrcode = '';
+                          },
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+
+              ],
+            );
+          });
+      setState(() { });
+      // _getProcess(operation = "ready", id.toString());
+      // setStateModal(() {});
+      setState(() { });
+    } else {
+      Fluttertoast.showToast(msg: 'Belum menemukan kurir');
+    }
+    // for(var v in data['menu']){
+    //   Menu p = Menu(
+    //       id: v['id'],
+    //       name: v['name'],
+    //       desc: v['desc'],
+    //       urlImg: v['img'],
+    //       type: v['type'],
+    //       is_recommended: v['is_recommended'],
+    //       price: Price(original: int.parse(v['price'].toString()), discounted: null, delivery: null),
+    //       delivery_price: Price(original: int.parse(v['price']), delivery: null, discounted: null), restoId: '', restoName: '', distance: null, qty: ''
+    //   );
+    //   _menu.add(p);
+    // }
+    setState(() {
+      // emailTokoTrans = data['email'].toString();
+      // ownerTokoTrans = data['name_owner'].toString();
+      // pjTokoTrans = data['name_pj'].toString();
+      // // bankTokoTrans = data['bank'].toString();
+      // // nameNorekTokoTrans = data['namaNorek'].toString();
+      // nameRekening = data['nama_norek'].toString();
+      // nameBank = data['bank_norek'].toString();
+      // norekTokoTrans = data['norek'].toString();
+      // phone = data['resto']['phone_number'].toString();
+      // addressRes = data['resto']['address'].toString();
+      // nameRestoTrans = data['resto']['name'];
+      // restoAddress = data['resto']['address'];
+      // isLoading = false;
+    });
+
+    // if (apiResult.statusCode == 200 && menu.toString() == '[]') {
+    //   kosong = true;
+    // }
+  }
+
   String NameDriver = 'Tunggu';
   String PhoneDriver = '0';
   String PhotoDriver = '';
@@ -922,7 +1368,7 @@ class _OrderProcessState extends State<OrderProcess> {
     });
     SharedPreferences pref = await SharedPreferences.getInstance();
     String token = pref.getString("token") ?? "";
-    var apiResult = await http.get('https://qurir.devastic.com/api/borzo?transaction_id=IRG-$id', headers: {
+    var apiResult = await http.get(Uri.parse('https://qurir.devastic.com/api/borzo?transaction_id=IRG-$id'), headers: {
       "Accept": "Application/json",
       "Authorization": "Bearer $token"
     });
@@ -931,15 +1377,15 @@ class _OrderProcessState extends State<OrderProcess> {
 
     print('driver '+apiResult.body.toString());
     // print('driver '+idResto.toString());
-    if (apiResult.body.toString() != 'not found') {
+    if (apiResult.body.toString() != '"not found"') {
       if (data['courier'].toString().contains('name') == false) {
         StatusDriver = (apiResult.body.toString() != '"not found"')?data['status'].toString():'Tidak Ditemukan';
         PhoneDriver = 'Tunggu';
       } else {
-        NameDriver = (apiResult.body.toString() != 'not found')?data['courier']['name'].toString():'Tidak Ditemukan';
-        PhoneDriver = (apiResult.body.toString() != 'not found')?data['courier']['phone'].toString():'0';
-        PhotoDriver = (apiResult.body.toString() != 'not found')?data['courier']['photo'].toString():'';
-        StatusDriver = (apiResult.body.toString() != 'not found')?(data['status'].toString() != 'active')?'Sudah sampai':data['status'].toString():'Tidak Ditemukan';
+        NameDriver = (apiResult.body.toString() != '"not found"')?data['courier']['name'].toString():'Tidak Ditemukan';
+        PhoneDriver = (apiResult.body.toString() != '"not found"')?data['courier']['phone'].toString():'0';
+        PhotoDriver = (apiResult.body.toString() != '"not found"')?data['courier']['photo'].toString():'';
+        StatusDriver = (apiResult.body.toString() != '"not found"')?(data['status'].toString() != 'active')?'Sudah sampai':data['status'].toString():'Tidak Ditemukan';
       }
     } else {
       NameDriver = 'Tidak Ditemukan';
@@ -987,13 +1433,21 @@ class _OrderProcessState extends State<OrderProcess> {
 
     SharedPreferences pref = await SharedPreferences.getInstance();
     String token = pref.getString("token") ?? "";
-    var apiResult = await http.get(Links.mainUrl + '/trans/op/$operation/$id', headers: {
+    var apiResult = await http.get(Uri.parse(Links.mainUrl + '/trans/op/$operation/$id'), headers: {
       "Accept": "Application/json",
       "Authorization": "Bearer $token"
     });
     print(apiResult.body);
     var data = json.decode(apiResult.body);
     print(data);
+
+    Future.delayed(Duration(seconds: 0)).then((_) {
+      Navigator.pushReplacement(
+          context,
+          PageTransition(
+              type: PageTransitionType.fade,
+              child: OrderActivity()));
+    });
 
     // for(var v in data['trx']['process']){
     //   Transaction r = Transaction.resto(
@@ -1013,6 +1467,7 @@ class _OrderProcessState extends State<OrderProcess> {
   }
 
   List<Meja2> meja = [];
+  String deposit = '';
   Future<void> _getQr()async{
     List<Meja2> _meja = [];
 
@@ -1021,7 +1476,7 @@ class _OrderProcessState extends State<OrderProcess> {
     // });
     SharedPreferences pref = await SharedPreferences.getInstance();
     String token = pref.getString("token") ?? "";
-    var apiResult = await http.get(Links.mainUrl + '/resto/table', headers: {
+    var apiResult = await http.get(Uri.parse(Links.mainUrl + '/resto/table'), headers: {
       "Accept": "Application/json",
       "Authorization": "Bearer $token"
     });
@@ -1039,8 +1494,17 @@ class _OrderProcessState extends State<OrderProcess> {
       _meja.add(p);
     }
 
+    String id = pref.getString("idHomeResto") ?? "";
+    var apiResult2 = await http
+        .get(Uri.parse(Links.mainUrl + "/deposit/$id"), headers: {
+      "Accept": "Application/json",
+      "Authorization": "Bearer $token"
+    });
+    var data2 = json.decode(apiResult2.body);
+
     setState(() {
       meja = _meja;
+      deposit = data2['balance'].toString();
       // isLoading = false;
     });
   }
@@ -1081,10 +1545,18 @@ class _OrderProcessState extends State<OrderProcess> {
                             onTap: ()async{
                               Fluttertoast.showToast(msg: "Tunggu sebentar");
                               if (waiting == false) {
+                                userNamePembeli = transaction[index].username.toString();
                                 waiting = true;
                                 _getDriver().whenComplete((){
-                                  _getDetailTrans(transaction[index].id.toString(), userName, transaction[index].status!);
+                                  _getUserDataResto().whenComplete((){
+                                    _getDetail().whenComplete((){
+                                      _getDetailTrans(transaction[index].id.toString(), userName, transaction[index].status!);
+                                    });
+                                  });
                                 });
+                                // _getDriver().whenComplete((){
+                                //   _getDetailTrans(transaction[index].id.toString(), userName, transaction[index].status!);
+                                // });
                               }
                               id = transaction[index].id.toString();
                               SharedPreferences pref = await SharedPreferences.getInstance();
@@ -1153,7 +1625,7 @@ class _OrderProcessState extends State<OrderProcess> {
                                               SizedBox(height: CustomSize.sizeHeight(context) / 26,),
                                               Row(
                                                 children: [
-                                                  CustomText.bodyRegular12(text: transaction[index].total.toString(), sizeNew: double.parse(((MediaQuery.of(context).size.width*0.035).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.035)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.035)).toString())),
+                                                  CustomText.bodyRegular12(text: (transaction[index].total!+1000).toString(), sizeNew: double.parse(((MediaQuery.of(context).size.width*0.035).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.035)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.035)).toString())),
                                                 ],
                                               )
                                             ],

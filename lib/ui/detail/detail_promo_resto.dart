@@ -298,13 +298,13 @@ class _DetailPromoResto extends State<DetailPromoResto> {
   showAlertDialog(String id) {
 
     // set up the buttons
-    Widget cancelButton = FlatButton(
+    Widget cancelButton = TextButton(
       child: Text("Batal", style: TextStyle(color: CustomColor.primaryLight)),
       onPressed:  () {
         Navigator.pop(context);
       },
     );
-    Widget continueButton = FlatButton(
+    Widget continueButton = TextButton(
       child: Text("Hapus", style: TextStyle(color: CustomColor.primaryLight)),
       onPressed:  () {
         _delPromo(id);
@@ -907,14 +907,16 @@ class _DetailPromoResto extends State<DetailPromoResto> {
                                                                           Center(
                                                                             child: Padding(
                                                                               padding: const EdgeInsets.only(left: 10.0, right: 10.0, bottom: 8.0),
-                                                                              child: FlatButton(
-                                                                                minWidth: CustomSize.sizeWidth(context),
-                                                                                color: CustomColor.primaryLight,
-                                                                                textColor: Colors.white,
-                                                                                shape: RoundedRectangleBorder(
-                                                                                    borderRadius: BorderRadius.all(Radius.circular(10))
+                                                                              child: TextButton(
+                                                                                // minWidth: CustomSize.sizeWidth(context),
+                                                                                style: TextButton.styleFrom(
+                                                                                  backgroundColor: CustomColor.primaryLight,
+                                                                                  padding: EdgeInsets.all(0),
+                                                                                  shape: const RoundedRectangleBorder(
+                                                                                      borderRadius: BorderRadius.all(Radius.circular(10))
+                                                                                  ),
                                                                                 ),
-                                                                                child: Text('Simpan'),
+                                                                                child: Text('Simpan', style: TextStyle(color: Colors.white)),
                                                                                 onPressed: () async{
                                                                                   String s = noted[restoId.indexOf(promo[index].menu!.id.toString())];
                                                                                   String i = s.replaceAll(noted[restoId.indexOf(promo[index].menu!.id.toString())].split(': ')[1], (note.text != '')?note.text+'}':'kam5ia_null'+'}') ;
@@ -1568,13 +1570,13 @@ class _DetailPromoResto extends State<DetailPromoResto> {
                                                                 title: new Text("Hapus cart"),
                                                                 content: new Text("Apakah anda ingin mengganti item di cart dengan item yang baru ?"),
                                                                 actions: <Widget>[
-                                                                  new FlatButton(
+                                                                  new TextButton(
                                                                     child: new Text("Batal", style: TextStyle(color: CustomColor.primaryLight)),
                                                                     onPressed: () {
                                                                       Navigator.of(context).pop();
                                                                     },
                                                                   ),
-                                                                  new FlatButton(
+                                                                  new TextButton(
                                                                     child: new Text("Oke", style: TextStyle(color: CustomColor.primaryLight)),
                                                                     onPressed: () async{
                                                                       SharedPreferences pref = await SharedPreferences.getInstance();
@@ -1582,13 +1584,16 @@ class _DetailPromoResto extends State<DetailPromoResto> {
                                                                       pref.setString("restoId", "");
                                                                       pref.setString("qty", "");
                                                                       pref.setString("note", "");
+                                                                      pref.remove('menuJson');
+                                                                      pref.remove('restoId');
+                                                                      pref.remove('qty');
+                                                                      pref.remove('note');
                                                                       pref.remove('address');
                                                                       pref.remove('inCart');
                                                                       pref.remove('restoIdUsr');
                                                                       pref.remove("addressDelivTrans");
                                                                       pref.remove("distan");
                                                                       _getData2();
-                                                                      _getData();
                                                                       await Future.delayed(Duration(seconds: 2));
                                                                       Navigator.of(context).pop();
                                                                       // Navigator.pushReplacement(
@@ -2766,7 +2771,42 @@ class _DetailPromoResto extends State<DetailPromoResto> {
                                                       ),
                                                     ),
                                                   )
-                                                      :SizedBox(),
+                                                      :GestureDetector(
+                                                    onTap: (){
+                                                      Navigator.pop(context);
+                                                    },
+                                                    child: Center(
+                                                      child: Container(
+                                                          alignment: Alignment.center,
+                                                          width: CustomSize.sizeWidth(context) / 1.1,
+                                                          height: CustomSize.sizeHeight(context) / 14,
+                                                          decoration: BoxDecoration(
+                                                              color: CustomColor.primary,
+                                                              borderRadius: BorderRadius.circular(20)
+                                                          ),
+                                                          child: Center(child: MediaQuery(
+                                                              child: CustomText.bodyRegular16(text: "Tutup", color: Colors.white, minSize: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.04)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.04)).toString())),
+                                                              data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0)
+                                                          ))
+                                                        // :GestureDetector(
+                                                        // onTap: ()async{
+                                                        //   Fluttertoast.showToast(msg: 'Maaf toko sedang tutup');
+                                                        // },
+                                                        // child: Center(child: MediaQuery(
+                                                        //     child: CustomText.bodyRegular16(text: "Add to cart", color: Colors.white, minSize: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.04)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.04)).toString())),
+                                                        //     data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0)
+                                                        // )))
+                                                        // :GestureDetector(
+                                                        // onTap: ()async{
+                                                        //   Fluttertoast.showToast(msg: 'Maaf produk sedang tidak tersedia');
+                                                        // },
+                                                        // child: Center(child: MediaQuery(
+                                                        //     child: CustomText.bodyRegular16(text: "Produk tidak tersedia", color: Colors.white, minSize: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.04)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.04)).toString())),
+                                                        //     data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0)
+                                                        // )))
+                                                      ),
+                                                    ),
+                                                  ),
                                                   SizedBox(height: CustomSize.sizeHeight(context) / 86,),
                                                 ],
                                               );

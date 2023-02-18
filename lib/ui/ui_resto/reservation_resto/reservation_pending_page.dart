@@ -33,6 +33,7 @@ class _ReservationPendingState extends State<ReservationPending> {
 
     SharedPreferences pref = await SharedPreferences.getInstance();
     String token = pref.getString("token") ?? "";
+    pref.setString('inDetail', '3');
     var apiResult = await http.get(Uri.parse(Links.mainUrl + '/resto/reservation'), headers: {
       "Accept": "Application/json",
       "Authorization": "Bearer $token"
@@ -50,10 +51,10 @@ class _ReservationPendingState extends State<ReservationPending> {
           datetime: v['datetime'],
           table: v['table'].toString(),
           img: v['user_img'],
-          total: int.parse(v['price']),
+          total: int.parse(v['price'].toString()),
             chatroom: '',
-            chat_user: v['chat_user']??'0',
-            is_opened: v['is_opened']??'1'
+            chat_user: (v['chat_user']??0).toString(),
+            is_opened: (v['is_opened']??1).toString()
         );
         _transaction.add(r);
       }
@@ -216,7 +217,7 @@ class _ReservationPendingState extends State<ReservationPending> {
                                 Row(mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                   children: [
                                     CustomText.textTitle3(text: "Total Pembayaran", sizeNew: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.04).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.04).toString())),
-                                    CustomText.textTitle3(text: NumberFormat.currency(locale: 'id', symbol: '', decimalDigits: 0).format(int.parse(total)),
+                                    CustomText.textTitle3(text: NumberFormat.currency(locale: 'id', symbol: '', decimalDigits: 0).format(int.parse(total.toString())),
                                         sizeNew: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.04).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.04).toString())
                                       // NumberFormat.currency(locale: 'id', symbol: '', decimalDigits: 0).format(int.parse(totalHarga))
                                     ),
@@ -479,8 +480,8 @@ class _ReservationPendingState extends State<ReservationPending> {
       status = data['trx']['status'];
       datetime = data['trx']['datetime'];
       table = data['trx']['table'].toString();
-      total = data['trx']['price'];
-      username = data['trx']['user_name'];
+      total = data['trx']['price'].toString();
+      username = data['trx']['user_name'].toString();
       phone = (data['trx']['no_telp_user']??'').toString();
       // print(price);
       // detTransaction = _detTransaction;

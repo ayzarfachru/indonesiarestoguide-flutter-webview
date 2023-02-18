@@ -432,13 +432,13 @@ class _PesananmuActivityState extends State<PesananmuActivity> {
   showAlertDialog(String id) {
 
     // set up the buttons
-    Widget cancelButton = FlatButton(
+    Widget cancelButton = TextButton(
       child: Text("Batal", style: TextStyle(color: CustomColor.primaryLight)),
       onPressed:  () {
         Navigator.pop(context);
       },
     );
-    Widget continueButton = FlatButton(
+    Widget continueButton = TextButton(
       child: Text("Hapus", style: TextStyle(color: CustomColor.primaryLight)),
       onPressed:  () {
         _delPromo(id);

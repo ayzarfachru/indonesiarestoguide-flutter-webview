@@ -6,9 +6,14 @@ import 'package:barcode_scan2/platform_wrapper.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_icons/flutter_icons.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:full_screen_image_null_safe/full_screen_image_null_safe.dart';
+import 'package:geocoding/geocoding.dart';
+import 'package:kam5ia/model/NguponYuk.dart';
+import 'package:kam5ia/model/Transaction.dart';
 // import 'package:full_screen_image/full_screen_image.dart';
 import 'package:kam5ia/ui/cart/final_trans.dart';
+import 'package:kam5ia/ui/detail/detail_transaction.dart';
 import 'package:kam5ia/ui/profile/edit_profile.dart';
 import 'package:kam5ia/ui/profile/profile_activity.dart';
 import 'package:kam5ia/utils/map_cart/map_address.dart';
@@ -110,6 +115,7 @@ class _CartActivityState extends State<CartActivity> {
   String nameUser = '';
   String playerId = '';
   int harga = 0;
+  int hargaReal = 0;
   List<String> restoId = [];
   List<String> qty = [];
   List<String> noted = [];
@@ -136,6 +142,7 @@ class _CartActivityState extends State<CartActivity> {
   String totalOngkir = "0";
   String totalOngkirBorzo = "0";
   String totalHarga = "0";
+  String totalHargaReal = "0";
   String checkId = "";
   String nameRestoTrans = "";
   String phoneRestoTrans = "";
@@ -156,6 +163,7 @@ class _CartActivityState extends State<CartActivity> {
   int _totalOngkir = 0;
   int _totalHarga = 0;
   int _distance = 0;
+  int _platformfee = 1000;
   Future _getData()async{
     List<MenuJson> _menuJson = [];
     List<String> _menuId = [];
@@ -184,6 +192,7 @@ class _CartActivityState extends State<CartActivity> {
     print('qty '+qty.toString());
     noted.addAll(pref2.getStringList('note')??[]);
     noted2.addAll(pref2.getStringList('note')??[]);
+    noteKurir = TextEditingController(text: pref2.getString("keterangan")??'');
     _tempRestoId.addAll(pref2.getStringList('restoId')??[]);
     _tempQty.addAll(pref2.getStringList('qty')??[]);
     var data = json.decode(name);
@@ -206,7 +215,7 @@ class _CartActivityState extends State<CartActivity> {
       print('hrg '+v.toString());
       harga = (v['discount'].toString() == '' || v['discount'].toString() == 'null' || v['discount'].toString() == v['price'].toString())?(harga + int.parse(v['price'].toString()) * int.parse(qty[restoId.indexOf(v['id'].toString())])):(harga + int.parse(v['discount']) * int.parse(qty[restoId.indexOf(v['id'].toString())]));
       if (_transCode != 3) {
-        totalHarga = (harga + 1000).toString();
+        totalHarga = (harga + _platformfee).toString();
       }
     }
     print(_menuId.toString().split('[')[1].split(']')[0].replaceAll(' ', ''));
@@ -263,7 +272,14 @@ class _CartActivityState extends State<CartActivity> {
       print(delivAddress);
       if (delivAddress.toString() != 'Toko tutup!') {
         print('oi 2');
-        totalOngkirBorzo = pref2.getString('totalOngkirBorzo')??'0';
+        if (delivAddress.toString() == "null" || delivAddress.toString() == "") {
+
+        } else {
+          totalOngkirBorzo = (pref2.getString('totalOngkirBorzo').toString() != 'null')?pref2.getString('totalOngkirBorzo')??'0':'0';
+          totalOngkirDisBorzo = (pref2.getString('totalOngkirDisBorzo') != 'null')?pref2.getString('totalOngkirDisBorzo')??'0':'0';
+          print('totalOngkirBorzo1');
+          print(totalOngkirBorzo);
+        }
       } else {
         totalOngkirBorzo = '0';
       }
@@ -280,19 +296,34 @@ class _CartActivityState extends State<CartActivity> {
     _distan5 = (_distan.contains('.'))?(int.parse(_distan.split('.')[1]) >= 5)?(int.parse(_distan.split('.')[0])+1).toString():_distan.split('.')[0]:_distan;
     _distance = int.parse((_distan.contains('.'))?(_distan.split('.')[0] == '0')?'1':(int.parse(_distan.split('.')[1]) >= 5)?_distan5:_distan.split('.')[0]:_distan);
     if (_transCode == 1) {
-      if (_distan != '0') {
-        print('ini _distan '+_distan);
-        _totalOngkir = _ongkir * _distance;
-        totalOngkir = _totalOngkir.toString();
-        _totalHarga = harga + int.parse(totalOngkirBorzo);
-        totalHarga = (_totalHarga + 1000).toString();
+      // if (_distan != '0') {
+      //   print('ini _distan '+_distan);
+      //   _totalOngkir = _ongkir * _distance;
+      //   totalOngkir = _totalOngkir.toString();
+      //   _totalHarga = harga + int.parse(totalOngkirBorzo.toString());
+      //   totalHarga = (_totalHarga + 1000).toString();
+      //   setState(() {});
+      // }
+      if (delivAddress.toString() == "null" || delivAddress.toString() == "") {
+
+      } else {
+        if (totalOngkirBorzo != totalOngkirDisBorzo){
+          totalHarga = (int.parse(totalHarga) + int.parse(totalOngkirDisBorzo)).toString();
+        } else if (totalOngkirBorzo == totalOngkirDisBorzo){
+          print('IKI COK');
+          print(totalOngkirBorzo);
+          print(double.parse(totalOngkirBorzo).toInt());
+          print(int.parse(totalOngkirBorzo).toString());
+          totalHarga = (int.parse(totalHarga) + int.parse(totalOngkirBorzo)).toString();
+        }
+        // totalHarga = (pref.getString('totalHarga')??0).toString();
         setState(() {});
       }
       setState(() {});
     } else {
       _distan = '0';
       _ongkir = 0;
-      totalHarga = (harga + 1000).toString();
+      totalHarga = (harga + _platformfee).toString();
     }
 
     if (apiResult.statusCode == 200) {
@@ -301,28 +332,93 @@ class _CartActivityState extends State<CartActivity> {
     }
   }
 
-  Future _getData2(String qrscan)async{
+  Future _getData2()async{
     List<MenuJson> _menuJson = [];
     List<String> _menuId = [];
 
     setState(() {
-      isLoading = true;
+      // isLoading = true;
     });
     SharedPreferences pref2 = await SharedPreferences.getInstance();
+    restoAddress = (pref2.getString('alamateResto')??"");
+    latRes = pref2.getString('latResto1')??'';
+    longRes = pref2.getString('longResto1')??'';
+    print('latRes');
+    print(latRes);
+    print(longRes);
+    print(restoAddress.toString());
+    if (latRes == 'null' || longRes == 'null') {
+      var addresses = await locationFromAddress(restoAddress.toString(),
+          localeIdentifier: 'id_ID')
+          .then((placemarks) async {
+        setState(() {
+          latitude = placemarks[0].latitude;
+          longitude = placemarks[0].longitude;
+          print('latRes');
+          print(latitude);
+          print(longitude);
+          // address = placemarks[0].street +
+          //     ', ' +
+          //     placemarks[0].subLocality! +
+          //     ', ' +
+          //     placemarks[0].locality! +
+          //     ', ' +
+          //     placemarks[0].subAdministrativeArea! +
+          //     ', ' +
+          //     placemarks[0].administrativeArea! +
+          //     ' ' +
+          //     placemarks[0].postalCode! +
+          //     ', ' +
+          //     placemarks[0].country!;
+        });
+      });
+      // Geocoder2.getDataFromAddress(address: restoAddress.toString(), googleMapApiKey: 'AIzaSyDZH54AvqWFepAGB7wh2VQPAhASjFzI-lE');
+      // geoCode.forwardGeocoding(address: restoAddress.toString());
+      // print(addresses.toString());
+      // var first = addresses.first;
+      // setState(() {
+      // latRes = first.coordinates.latitude.toString();
+      // latRes = addresses.latitude.toString();
+      // longRes = first.coordinates.longitude.toString();
+      // longRes = addresses.longitude.toString();
+      // print('latt');
+      // print(latUser);
+      // print(longUser);
+      // });
+    }
     _transCode = int.parse(pref2.getString("metodeBeli")??'1');
+    delivAddress = pref2.getString('addressDelivTrans')??'';
+    dist = pref2.getString('distan')??'0';
+    _distan = pref2.getString('distan')??'0';
+    print('diss '+_distan.toString());
     name = (pref2.getString('menuJson')??"");
     nameUser = (pref2.getString('name')??"");
     playerId = (pref2.getString('playerId')??"");
-    restoAddress = (pref2.getString('alamateResto')??"");
     print('ini name '+name.toString());
+    restoId = [];
     restoId.addAll(pref2.getStringList('restoId')??[]);
+    nameRestoTrans = pref2.getString("restoNameTrans")??'';
+    phoneRestoTrans = pref2.getString("restoPhoneTrans")??'';
+    print('nama Rest '+nameRestoTrans);
+    qty = [];
     qty.addAll(pref2.getStringList('qty')??[]);
+    print('qty '+qty.toString());
+    noted = [];
     noted.addAll(pref2.getStringList('note')??[]);
+    print('noted');
+    print(noted.toString());
+    noted2 = [];
     noted2.addAll(pref2.getStringList('note')??[]);
+    noted2.removeWhere((element) => element.contains('kam5ia_null}'));
+    print('noted2');
+    print(noted2.toString());
+    noteKurir = TextEditingController(text: pref2.getString("keterangan")??'');
+    _tempRestoId = [];
     _tempRestoId.addAll(pref2.getStringList('restoId')??[]);
+    _tempQty = [];
     _tempQty.addAll(pref2.getStringList('qty')??[]);
     var data = json.decode(name);
-    print('ini data bos '+noted.toString());
+    print('ini data bos '+data.toString());
 
     for(var v in data){
       _menuId.add(v['id'].toString());
@@ -332,15 +428,27 @@ class _CartActivityState extends State<CartActivity> {
           restoName: v['restoName'],
           desc: v['desc'],
           distance: v['distance'],
-          price: v['price'],
+          price: v['price'].toString(),
           pricePlus: v['pricePlus'],
           discount: v['discount'],
           urlImg: v['urlImg'], restoId: ''
       );
       _menuJson.add(j);
-      print('hrg '+v.toString());
-      harga = (v['discount'].toString() == '' || v['discount'].toString() == 'null' || v['discount'].toString() == v['price'].toString())?(harga + int.parse(v['price']) * int.parse(qty[restoId.indexOf(v['id'].toString())])):(harga + int.parse(v['discount']) * int.parse(qty[restoId.indexOf(v['id'].toString())]));
-      totalHarga = harga.toString();
+      print('hrg '+harga.toString());
+      print('hrg '+restoId.toString());
+      print('hrg '+qty[restoId.indexOf(v['id'].toString())].toString());
+      print('hrg '+v['price'].toString().toString());
+      harga = (v['discount'].toString() == '' || v['discount'].toString() == 'null' || v['discount'].toString() == v['price'].toString())?(harga + int.parse(v['price'].toString()) * int.parse(qty[restoId.indexOf(v['id'].toString())])):(harga + int.parse(v['discount']) * int.parse(qty[restoId.indexOf(v['id'].toString())]));
+      totalHarga = (harga + _platformfee).toString();
+      if (delivAddress.toString() != "null" || delivAddress.toString() != "") {
+        totalOngkirBorzo = pref2.getString('totalOngkirBorzo')??'0';
+        totalOngkirDisBorzo = pref2.getString('totalOngkirDisBorzo')??'0';
+        if (totalOngkirBorzo != totalOngkirDisBorzo){
+          totalHarga = (int.parse(totalHarga) + int.parse(totalOngkirDisBorzo)).toString();
+        } else if (totalOngkirBorzo == totalOngkirDisBorzo){
+          totalHarga = (int.parse(totalHarga) + int.parse(totalOngkirBorzo)).toString();
+        }
+      }
     }
     print(_menuId.toString().split('[')[1].split(']')[0].replaceAll(' ', ''));
 
@@ -350,6 +458,7 @@ class _CartActivityState extends State<CartActivity> {
     can_takeaway = pref.getString('can_take_awayUser')??'';
     checkId = pref.getString('restoIdUsr')??'';
     print('ini '+checkId);
+    print('tempek '+ checkId);
     var apiResult = await http.post(Uri.parse(Links.mainUrl + '/trans/check'),
         body: {'menu': _menuId.toString().split('[')[1].split(']')[0].replaceAll(' ', '')},
         headers: {
@@ -365,9 +474,19 @@ class _CartActivityState extends State<CartActivity> {
     //   // deleteAnimation.add(false);
     // }
 
+    _getUserDataResto();
+    if (apiResult.statusCode.toString() == '200') {
+      print('kawan');
+      print(apiResult.statusCode);
+    }
+
     // print(deleteAnimation);
     setState(() {
-      ongkir = data1['ongkir'].toString();
+      // _ongkir = (data1['ongkir'].toString() != 'null')?int.parse(data1['ongkir'].toString()):0;
+      message = data1['message'].toString();
+      print('buka tutup');
+      print(message);
+      // ongkir = data1['ongkir'].toString();
       // restoAddress = data1['address'];
       menuJson = _menuJson;
       print('OY '+restoAddress.toString());
@@ -377,16 +496,63 @@ class _CartActivityState extends State<CartActivity> {
       _qty = qty.toString().split('[')[1].split(']')[0].replaceAll(' ', '');
     });
 
-    if (apiResult.statusCode == 200) {
-      noted2.removeWhere((element) => element.contains('kam5ia_null}'));
-      isLoading = false;
-      Future.delayed(const Duration(seconds: 0), () {
-        makeTransaction(qrscan);
-        setState(() {
-          // Here you can write your code for open new view
-        });
+    // SharedPreferences pref2 = await SharedPreferences.getInstance();
+    delivAddress = (message == 'resto tutup')?'Toko tutup!':pref2.getString('addressDelivTrans')??'';
+    print(delivAddress);
+    if (delivAddress.toString() != 'null') {
+      print('oi 1');
+      print(delivAddress);
+      if (delivAddress.toString() != 'Toko tutup!') {
+        print('oi 2');
+        if (delivAddress.toString() == "null" || delivAddress.toString() == "") {
 
-      });
+        } else {
+
+          print('totalOngkirBorzo1');
+          print(totalOngkirBorzo);
+        }
+      } else {
+        totalOngkirBorzo = '0';
+      }
+      print(totalOngkirBorzo);
+      setState((){});
+    } else if (delivAddress.toString() == 'null') {
+      totalOngkirBorzo = '0';
+      setState((){});
+    }
+
+
+    SharedPreferences pref3 = await SharedPreferences.getInstance();
+    _distan = pref3.getString('distan')??'0';
+    _distan5 = (_distan.contains('.'))?(int.parse(_distan.split('.')[1]) >= 5)?(int.parse(_distan.split('.')[0])+1).toString():_distan.split('.')[0]:_distan;
+    _distance = int.parse((_distan.contains('.'))?(_distan.split('.')[0] == '0')?'1':(int.parse(_distan.split('.')[1]) >= 5)?_distan5:_distan.split('.')[0]:_distan);
+    if (_transCode == 1) {
+      // if (_distan != '0') {
+      //   print('ini _distan '+_distan);
+      //   _totalOngkir = _ongkir * _distance;
+      //   totalOngkir = _totalOngkir.toString();
+      //   _totalHarga = harga + int.parse(totalOngkirBorzo);
+      //   totalHarga = (_totalHarga + 1000).toString();
+      //   setState(() {});
+      // }
+      if (delivAddress.toString() == "null" || delivAddress.toString() == "") {
+
+      } else {
+
+        // totalHarga = (pref.getString('totalHarga')??0).toString();
+        setState(() {});
+      }
+      setState(() {});
+    } else {
+      _distan = '0';
+      _ongkir = 0;
+    }
+
+    print('totalHarga');
+    print(totalHarga);
+
+    if (apiResult.statusCode == 200) {
+      isLoading = false;
     }
   }
 
@@ -452,76 +618,459 @@ class _CartActivityState extends State<CartActivity> {
     });
   }
 
-  String homepg = "";
-  Future<String?>? makeTransaction(String qrscan)async{
-    print(qrscan);
+
+  List<Transaction> transaction = [];
+  // String note = '';
+  Future _getDataHome(String lat, String long)async{
+    List<Transaction> _transaction = [];
+
+    setState(() {
+      isLoading = true;
+    });
     SharedPreferences pref = await SharedPreferences.getInstance();
-    var token = pref.getString("token") ?? "";
-
-    var apiResult = await http.post(Uri.parse(Links.mainUrl + '/trans'),
-        body: {
-          'address': (_transCode == 1)?delivAddress.toString():'',
-          'type': (_transCode == 1)?'delivery':(_transCode == 2)?'takeaway':'dinein',
-          'ongkir': totalOngkirBorzo,
-          'discount': '0',
-          'menu': _restId,
-          'note': noted2.toString(),
-          'qty': _qty,
-          'barcode': qrscan
-        },
-        headers: {
-          "Accept": "Application/json",
-          "Authorization": "Bearer $token"
-        });
+    String token = pref.getString("token") ?? "";
+    var apiResult = await http.get(Uri.parse(Links.mainUrl + '/page/home?lat=$lat&long=$long'), headers: {
+      "Accept": "Application/json",
+      "Authorization": "Bearer $token"
+    });
+    print('all data'+apiResult.body.toString());
     var data = json.decode(apiResult.body);
-    print('OYd2 '+data.toString());
-    print('OYd2 '+apiResult.body.toString());
-    if (data['msg'].toString() == 'meja tidak tersedia') {
-      Fluttertoast.showToast(msg: 'Gunakan hp sebelumnya yang sama untuk memesan');
-    }
+    // print('all data'+data['tipename'].toString().split(',').length.toString());
+    // print('all data'+data['tipe'][0].toString());
+    print('all data'+data['tipe'][0].toString());
+    print('all data1'+data['trans'].toString());
+    print('all data'+lat.toString());
+    print('all data'+long.toString());
+    // print(data['resto']);
 
-    for(var v in data['device_id']){
-      // User p = User.resto(
-      //   name: v['device_id'],
-      // );
-      List<String> id = [];
-      id.add(v);
-      print('099');
-      print(id);
-      OneSignal.shared.postNotification(OSCreateNotification(
-        playerIds: id,
-        heading: "$nameUser telah memesan menu di resto Anda",
-        content: "Cek sekarang !",
-        androidChannelId: "9af3771b-b272-4757-9902-b23ee8da77f2",
-        collapseId: "forAdmin_$checkId",
-        androidSound: 'irg_order.wav',
-      ));
-      // await OneSignal.shared.postNotificationWithJson();
-      // user3.add(v['device_id']);
-      // _user.add(p);
-    }
+    // print('ini banner '+data['banner'].toString());
+    // for(var v in data['banner']){
+    //   imgBanner t = imgBanner(
+    //       id: int.parse(v['resto_id'].toString()),
+    //       urlImg: v['img']
+    //   );
+    //   _images.add(t);
+    // }
 
-    if(data['status_code'] == 200){
+    if (data.toString().contains('trans')) {
+      for(var v in data['trans']){
+        Transaction t = Transaction.all2(
+          id: v['id'],
+          idResto: v['restaurants_id'].toString(),
+          date: v['date'],
+          img: v['img'],
+          nameResto: v['resto_name'],
+          status: v['status'],
+          total: int.parse((v['total']??0).toString()) + int.parse((v['ongkir']??0).toString()),
+          type: v['type_text'],
+          note: v['note'].toString(),
+          chat_user: v['chat_resto'].toString(),
+          // address: v['address'].toString(),
+        );
+        if (v['type_text'].startsWith('Reservasi') != true) {
+          _transaction.add(t);
+        } else {
+
+        }
+      }
+    }
+    setState(() {
+      transaction = _transaction;
+      pref.setString("idnyatransRes", transaction[0].idResto.toString());
+      pref.setString("chatUserCount", transaction[0].chat_user);
       Navigator.pop(context);
       Navigator.push(
           context,
           PageTransition(
               type: PageTransitionType.fade,
-              child: FinalTrans()));
-      // SharedPreferences preferences = await SharedPreferences.getInstance();
-      // await preferences.remove('menuJson');
-      // await preferences.remove('restoId');
-      // await preferences.remove('qty');
-      // await preferences.remove('note');
-      // await preferences.remove('address');
-      // await preferences.remove('inCart');
-      // await pref.remove('restoIdUsr');
-      // pref.remove("addressDelivTrans");
-      // pref.remove("distan");
-      // notif(jsonEncode(data['device_id'].toString().split('[')[1].split(']')[0]));
-      print('ini device nya '+json.encode(data['device_id'].toString().split('[')[1].split(']')[0]));
+              duration: Duration(milliseconds: 700),
+              child: new DetailTransaction(transaction[0].id!, transaction[0].status!, transaction[0].note!, transaction[0].idResto!)));
+    });
+  }
+
+
+  String homepg = "";
+  TextEditingController noteKurir = TextEditingController(text: '');
+  Future<String?>? makeTransaction(String qrscan)async{
+    print(qrscan);
+    SharedPreferences pref = await SharedPreferences.getInstance();
+    var token = pref.getString("token") ?? "";
+
+    if (_transCode != 1) {
+      var apiResult = await http.post(Uri.parse(Links.mainUrl + '/trans'),
+          body: {
+            'address': (_transCode == 1)?delivAddress.toString():'',
+            'type': (_transCode == 1)?'delivery':(_transCode == 2)?'takeaway':'dinein',
+            'ongkir': totalOngkirBorzo,
+            'discount': '0',
+            'menu': _restId,
+            'note': noted2.toString(),
+            'qty': _qty,
+            'barcode': qrscan,
+            'coupon': (codeNguponYukJson.toString() != '[]')?jsonEncode(codeNguponYuk).toString():'[]'
+          },
+          headers: {
+            "Accept": "Application/json",
+            "Authorization": "Bearer $token"
+          });
+      var data = json.decode(apiResult.body);
+      print('OYd2 '+jsonEncode(codeNguponYuk).toString());
+      print('OYd2 '+data.toString());
+      print('OYd2 '+apiResult.body.toString());
+      if (data['msg'].toString() == 'meja tidak tersedia') {
+        Fluttertoast.showToast(msg: 'Gunakan hp sebelumnya yang sama untuk memesan');
+      }
+
+      for(var v in data['device_id']){
+        // User p = User.resto(
+        //   name: v['device_id'],
+        // );
+        List<String> id = [];
+        id.add(v);
+        print('099');
+        print(id);
+        OneSignal.shared.postNotification(OSCreateNotification(
+          playerIds: id,
+          heading: "$nameUser telah memesan menu di resto Anda",
+          content: "Cek sekarang !",
+          androidChannelId: "9af3771b-b272-4757-9902-b23ee8da77f2",
+          collapseId: "forAdmin_$checkId",
+          androidSound: 'irg_order.wav',
+        ));
+        // await OneSignal.shared.postNotificationWithJson();
+        // user3.add(v['device_id']);
+        // _user.add(p);
+      }
+
+      if (data.toString().contains('resto tutup') == true) {
+        showDialog(
+            context: context,
+            builder: (context) {
+              return AlertDialog(
+                contentPadding: EdgeInsets.only(left: 25, right: 25, top: 15, bottom: 5),
+                shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.all(Radius.circular(10))
+                ),
+                title: Center(child: Text('Pemberitahuan!', style: TextStyle(color: Colors.blue))),
+                content: Text('Mohon maaf toko ini sedang tutup.', style: TextStyle(fontSize: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.04)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.04)).toString()), fontWeight: FontWeight.w500), textAlign: TextAlign.center),
+                actions: <Widget>[
+                  Center(
+                    child: Padding(
+                      padding: EdgeInsets.only(left: 25, right: 25),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.end,
+                        children: [
+                          // OutlineButton(
+                          //   // minWidth: CustomSize.sizeWidth(context),
+                          //   shape: StadiumBorder(),
+                          //   highlightedBorderColor: CustomColor.secondary,
+                          //   borderSide: BorderSide(
+                          //       width: 2,
+                          //       color: CustomColor.redBtn
+                          //   ),
+                          //   child: Text('Batal'),
+                          //   onPressed: () async{
+                          //     setState(() {
+                          //       // codeDialog = valueText;
+                          //       Navigator.pop(context);
+                          //     });
+                          //   },
+                          // ),
+                          OutlinedButton(
+                            // minWidth: CustomSize.sizeWidth(context),
+                            // shape: StadiumBorder(),
+                            // highlightedBorderColor: CustomColor.secondary,
+                            // borderSide: BorderSide(
+                            //     width: 2,
+                            //     color: CustomColor.accent
+                            // ),
+                            style: OutlinedButton.styleFrom(shape: StadiumBorder(), surfaceTintColor: CustomColor.accent),
+                            child: Text('Oke'),
+                            onPressed: () async{
+                              Navigator.pop(context);
+                              // String qrcode = '';
+                            },
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+
+                ],
+              );
+            });
+      }
+
+      if(data['status_code'] == 200 && data['message'] != 'resto tutup'){
+        if (codeNguponYukJson != []) {
+          for (var x in codeNguponYukJson){
+            print('bukan delivery');
+            print('codeNguponYukJson x');
+            print(x);
+            _useNguponYuk(x.toString());
+          }
+        }
+
+        SharedPreferences preferences = await SharedPreferences.getInstance();
+        await preferences.remove('menuJson');
+        await preferences.remove('restoId');
+        await preferences.remove('qty');
+        await preferences.remove('note');
+        await preferences.remove('address');
+        await preferences.remove('inCart');
+        await preferences.remove('keterangan');
+        await pref.remove('restoIdUsr');
+        pref.remove("addressDelivTrans");
+        pref.remove("distan");
+        Location.instance.getLocation().then((value) {
+          setState(() {
+            _getDataHome(value.latitude.toString(), value.longitude.toString()).whenComplete(() {
+              _getData();
+            });
+            latitude = value.latitude;
+            longitude = value.longitude;
+          });
+        });
+        // Navigator.push(
+        //     context,
+        //     PageTransition(
+        //         type: PageTransitionType.fade,
+        //         child: FinalTrans()));
+        // notif(jsonEncode(data['device_id'].toString().split('[')[1].split(']')[0]));
+        print('ini device nya '+json.encode(data['device_id'].toString().split('[')[1].split(']')[0]));
+      }
+    } else if (_transCode == 1) {
+      pref.setString('addressDelivTrans', delivAddress.toString());
+      var latitudeUser = pref.getString("latitudeUser") ?? "";
+      var longitudeUser = pref.getString("longitudeUser") ?? "";
+      print('TRANS DELIV');
+      print((_transCode == 1)?delivAddress.toString():'');
+      print((_transCode == 1)?'delivery':(_transCode == 2)?'takeaway':'dinein');
+      print((totalOngkirBorzo != totalOngkirDisBorzo)?totalOngkirDisBorzo:totalOngkirBorzo);
+      print("0");
+      print(_restId);
+      print((_transCode == 1)?(noteKurir.text != '')?(noted2.toString() != '[]')?noted2.toString().replaceAll(']', ', '+'{keterangan: '+noteKurir.text+'}]'):noted2.toString().replaceAll(']', '{keterangan: '+noteKurir.text+'}]'):noted2.toString():noted2.toString());
+      print(_qty);
+      print(latitudeUser);
+      print(longitudeUser);
+      print(qrscan);
+      var apiResult = await http.post(Uri.parse(Links.mainUrl + '/trans'),
+          body: {
+            'address': (_transCode == 1)?delivAddress.toString():'',
+            'type': (_transCode == 1)?'delivery':(_transCode == 2)?'takeaway':'dinein',
+            'ongkir': (totalOngkirBorzo != totalOngkirDisBorzo)?totalOngkirDisBorzo:totalOngkirBorzo,
+            'discount': '0',
+            'menu': _restId,
+            'note': (_transCode == 1)?(noteKurir.text != '')?(noted2.toString() != '[]')?noted2.toString().replaceAll(']', ', '+'{keterangan: '+noteKurir.text+'}]'):noted2.toString().replaceAll(']', '{keterangan: '+noteKurir.text+'}]'):noted2.toString():noted2.toString(),
+            'qty': _qty,
+            'barcode': qrscan,
+            'lat': latitudeUser,
+            'long': longitudeUser,
+            'coupon': (codeNguponYukJson.toString() != '[]')?jsonEncode(codeNguponYuk).toString():'[]'
+          },
+          headers: {
+            "Accept": "Application/json",
+            "Authorization": "Bearer $token"
+          });
+      var data = json.decode(apiResult.body);
+      print('OYd3 '+jsonEncode(codeNguponYuk).toString());
+      print('OYd3 '+data.toString());
+      print('OYd3 '+apiResult.body.toString());
+      if (data['msg'].toString() == 'meja tidak tersedia') {
+        Fluttertoast.showToast(msg: 'Gunakan hp sebelumnya yang sama untuk memesan');
+      }
+
+      for(var v in data['device_id']){
+        // User p = User.resto(
+        //   name: v['device_id'],
+        // );
+        List<String> id = [];
+        id.add(v);
+        print('099');
+        print(id);
+        OneSignal.shared.postNotification(OSCreateNotification(
+          playerIds: id,
+          heading: "$nameUser telah memesan menu di resto Anda",
+          content: "Cek sekarang !",
+          androidChannelId: "9af3771b-b272-4757-9902-b23ee8da77f2",
+          collapseId: "forAdmin_$checkId",
+          androidSound: 'irg_order.wav',
+        ));
+        // await OneSignal.shared.postNotificationWithJson();
+        // user3.add(v['device_id']);
+        // _user.add(p);
+      }
+
+      if (data.toString().contains('resto tutup') == true) {
+        showDialog(
+            context: context,
+            builder: (context) {
+              return AlertDialog(
+                contentPadding: EdgeInsets.only(left: 25, right: 25, top: 15, bottom: 5),
+                shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.all(Radius.circular(10))
+                ),
+                title: Center(child: Text('Pemberitahuan!', style: TextStyle(color: Colors.blue))),
+                content: Text('Mohon maaf toko ini sedang tutup.', style: TextStyle(fontSize: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.04)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.04)).toString()), fontWeight: FontWeight.w500), textAlign: TextAlign.center),
+                actions: <Widget>[
+                  Center(
+                    child: Padding(
+                      padding: EdgeInsets.only(left: 25, right: 25),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.end,
+                        children: [
+                          // OutlineButton(
+                          //   // minWidth: CustomSize.sizeWidth(context),
+                          //   shape: StadiumBorder(),
+                          //   highlightedBorderColor: CustomColor.secondary,
+                          //   borderSide: BorderSide(
+                          //       width: 2,
+                          //       color: CustomColor.redBtn
+                          //   ),
+                          //   child: Text('Batal'),
+                          //   onPressed: () async{
+                          //     setState(() {
+                          //       // codeDialog = valueText;
+                          //       Navigator.pop(context);
+                          //     });
+                          //   },
+                          // ),
+                          OutlinedButton(
+                            // minWidth: CustomSize.sizeWidth(context),
+                            // shape: StadiumBorder(),
+                            // highlightedBorderColor: CustomColor.secondary,
+                            // borderSide: BorderSide(
+                            //     width: 2,
+                            //     color: CustomColor.accent
+                            // ),
+                            style: OutlinedButton.styleFrom(shape: StadiumBorder(), surfaceTintColor: CustomColor.accent),
+                            child: Text('Oke'),
+                            onPressed: () async{
+                              Navigator.pop(context);
+                              // String qrcode = '';
+                            },
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+
+                ],
+              );
+            });
+      }
+
+      if(data['status_code'] == 200 && data['message'] != 'resto tutup'){
+        if (codeNguponYukJson != []) {
+          for (var x in codeNguponYukJson){
+            print('bukan delivery');
+            print('codeNguponYukJson x');
+            print(x);
+            _useNguponYuk(x.toString());
+          }
+        }
+        SharedPreferences preferences = await SharedPreferences.getInstance();
+        await preferences.remove('menuJson');
+        await preferences.remove('restoId');
+        await preferences.remove('qty');
+        await preferences.remove('note');
+        await preferences.remove('address');
+        await preferences.remove('inCart');
+        await preferences.remove('keterangan');
+        await pref.remove('restoIdUsr');
+        pref.remove("addressDelivTrans");
+        pref.remove("distan");
+        Location.instance.getLocation().then((value) {
+          setState(() {
+            _getDataHome(value.latitude.toString(), value.longitude.toString()).whenComplete(() {
+              _getData();
+            });
+            latitude = value.latitude;
+            longitude = value.longitude;
+          });
+        });
+        // Navigator.push(
+        //     context,
+        //     PageTransition(
+        //         type: PageTransitionType.fade,
+        //         child: FinalTrans()));
+        // notif(jsonEncode(data['device_id'].toString().split('[')[1].split(']')[0]));
+        print('ini device nya '+json.encode(data['device_id'].toString().split('[')[1].split(']')[0]));
+      }
+    }
+
+
+    // if(data['status_code'] == 200){
+    //   Navigator.pop(context);
+    //   Navigator.push(
+    //       context,
+    //       PageTransition(
+    //           type: PageTransitionType.fade,
+    //           child: FinalTrans()));
+    //   // SharedPreferences preferences = await SharedPreferences.getInstance();
+    //   // await preferences.remove('menuJson');
+    //   // await preferences.remove('restoId');
+    //   // await preferences.remove('qty');
+    //   // await preferences.remove('note');
+    //   // await preferences.remove('address');
+    //   // await preferences.remove('inCart');
+    //   // await pref.remove('restoIdUsr');
+    //   // pref.remove("addressDelivTrans");
+    //   // pref.remove("distan");
+    //   // notif(jsonEncode(data['device_id'].toString().split('[')[1].split(']')[0]));
+    //   print('ini device nya '+json.encode(data['device_id'].toString().split('[')[1].split(']')[0]));
+    // }
+  }
+
+
+  Future _useNguponYuk(String qrcode)async{
+
+    // setState(() {
+    //   isLoading = true;
+    // });
+    SharedPreferences pref = await SharedPreferences.getInstance();
+    String token = pref.getString("token") ?? "";
+    print('qrcode');
+    print(qrcode.toString());
+    var apiResult = await http.delete(Uri.parse(Links.nguponUrl + '/kupon/${qrcode.replaceAll('#', '')}'), headers: {
+      "Accept": "Application/json",
+      "Authorization": "Bearer $token"
+    });
+    print('_useNguponYuk');
+    print(apiResult.body);
+    var data = json.decode(apiResult.body);
+
+    // if (data['data'].toString().contains('code') == true) {
+    //   refCode = data['data']['ref_code'].toString();
+    // }
+    // for(var v in data['trans']){
+    //   History h = History(
+    //     id: v['id'],
+    //     name: v['resto_name'],
+    //     time: v['time'],
+    //     price: v['price'],
+    //     img: v['resto_img'],
+    //     type: v['type'],
+    //     status: v['status'],
+    //   );
+    //   _history.add(h);
+    // }
+
+    setState(() {
+      // history = _history;
+      // isLoading = false;
+    });
+
+    if (apiResult.statusCode == 200) {
+      // Navigator.pop(context, 'v');
+      // if (history.toString() == '[]') {
+      //   ksg = true;
+      // } else {
+      //   ksg = false;
+      // }
     }
   }
+
 
   bool loadingBorzo = false;
   Future<String?>? cekHarga()async{
@@ -532,6 +1081,10 @@ class _CartActivityState extends State<CartActivity> {
     SharedPreferences pref = await SharedPreferences.getInstance();
     var token = pref.getString("token") ?? "";
 
+    print('restoAddress');
+    print((int.parse(totalHarga)-int.parse(totalOngkirBorzo)-_platformfee).toString());
+    print(totalOngkirBorzo);
+    print(totalHarga);
     print(restoAddress);
     print(pjTokoTrans);
     print(phoneRestoTrans);
@@ -543,8 +1096,11 @@ class _CartActivityState extends State<CartActivity> {
     print(latUser);
     print(longUser);
 
-    var apiResult = await http.post(Uri.parse('https://qurir.devastic.com/api/borzo/init'),
+    var apiResult = await http.post(Uri.parse('https://erp.devastic.com/api/borzo/init'),
         body: {
+          'app': 'IRG',
+          'resto': checkId,
+          'price': (int.parse(totalHarga)-int.parse(totalOngkirDisBorzo)-_platformfee).toString(),
           'address_pick_up': restoAddress,
           'name_pick_up': pjTokoTrans,
           'phone_pick_up': phoneRestoTrans,
@@ -564,9 +1120,13 @@ class _CartActivityState extends State<CartActivity> {
     print('Cek Harga '+apiResult.body.toString());
     var data = json.decode(apiResult.body);
 
-    totalOngkirBorzo = data['price'];
+    // totalOngkirBorzo = data['price'].toString().split('.')[0];
+    totalOngkirBorzo = data['price'].toString();
+    totalOngkirDisBorzo = data['discounted_price'].toString();
     pref.setString('totalOngkirBorzo', totalOngkirBorzo);
+    pref.setString('totalOngkirDisBorzo', totalOngkirDisBorzo);
     setState((){
+      loadingTrans = false;
       loadingBorzo = false;
     });
 
@@ -600,7 +1160,162 @@ class _CartActivityState extends State<CartActivity> {
       print(notelp);
       print(latUser);
       print(longUser);
-      totalOngkirBorzo = data['price'];
+      totalOngkirBorzo = data['price'].toString();
+      // SharedPreferences preferences = await SharedPreferences.getInstance();
+      // await preferences.remove('menuJson');
+      // await preferences.remove('restoId');
+      // await preferences.remove('qty');
+      // await preferences.remove('note');
+      // await preferences.remove('address');
+      // await preferences.remove('inCart');
+      // await pref.remove('restoIdUsr');
+      // pref.remove("addressDelivTrans");
+      // pref.remove("distan");
+      // notif(jsonEncode(data['device_id'].toString().split('[')[1].split(']')[0]));
+      // print('ini device nya '+json.encode(data['device_id'].toString().split('[')[1].split(']')[0]));
+    }
+  }
+
+  bool loadingTrans = false;
+  String totalOngkirDisBorzo = "0";
+  Future<String?>? cekHarga2()async{
+    // print(qrscan);
+    setState((){
+      // loadingBorzo = true;
+    });
+    SharedPreferences pref = await SharedPreferences.getInstance();
+    var token = pref.getString("token") ?? "";
+
+    print('restoAddress');
+    print((int.parse(totalHarga)-int.parse(totalOngkirBorzo)-_platformfee).toString());
+
+    if (latRes == 'null' || longRes == 'null') {
+      var addresses = await locationFromAddress(restoAddress.toString(),
+          localeIdentifier: 'id_ID')
+          .then((placemarks) async {
+        setState(() {
+          latRes = placemarks[0].latitude.toString();
+          longRes = placemarks[0].longitude.toString();
+          print('latRes');
+          print(latRes);
+          print(longRes);
+          // address = placemarks[0].street +
+          //     ', ' +
+          //     placemarks[0].subLocality! +
+          //     ', ' +
+          //     placemarks[0].locality! +
+          //     ', ' +
+          //     placemarks[0].subAdministrativeArea! +
+          //     ', ' +
+          //     placemarks[0].administrativeArea! +
+          //     ' ' +
+          //     placemarks[0].postalCode! +
+          //     ', ' +
+          //     placemarks[0].country!;
+        });
+      });
+      // Geocoder2.getDataFromAddress(address: restoAddress.toString(), googleMapApiKey: 'AIzaSyDZH54AvqWFepAGB7wh2VQPAhASjFzI-lE');
+      // geoCode.forwardGeocoding(address: restoAddress.toString());
+      // print(addresses.toString());
+      // var first = addresses.first;
+      // setState(() {
+      // latRes = first.coordinates.latitude.toString();
+      // latRes = addresses.latitude.toString();
+      // longRes = first.coordinates.longitude.toString();
+      // longRes = addresses.longitude.toString();
+      // print('latt');
+      // print(latUser);
+      // print(longUser);
+      // });
+    }
+    print('price ongkir');
+    print((int.parse(totalHarga)-int.parse(totalOngkirBorzo.toString())-_platformfee).toString());
+
+    var latitudeUser = pref.getString("latitudeUser") ?? "";
+    var longitudeUser = pref.getString("longitudeUser") ?? "";
+    var apiResult = await http.post(Uri.parse('https://erp.devastic.com/api/borzo/init'),
+        body: {
+          'app': 'IRG',
+          'resto': checkId,
+          'price': (int.parse(totalHarga)-int.parse(totalOngkirDisBorzo.toString())-_platformfee).toString(),
+          'address_pick_up': restoAddress,
+          'name_pick_up': pjTokoTrans,
+          'phone_pick_up': phoneRestoTrans,
+          'latitude_pick_up': latRes,
+          'longitude_pick_up': longRes,
+          'address_sender': delivAddress,
+          'name_sender': userName,
+          'phone_sender': notelp,
+          'latitude_sender': latitudeUser,
+          'longitude_sender': longitudeUser,
+          // 'transaction_id': 'KAM-00001'
+        },
+        headers: {
+          "Accept": "Application/json",
+          "Authorization": "Bearer $token"
+        });
+    print('Cek Harga2 '+apiResult.body.toString());
+    print(totalOngkirBorzo);
+    print(totalOngkirDisBorzo);
+    print(restoAddress);
+    print(pjTokoTrans);
+    print(phoneRestoTrans);
+    print(latRes);
+    print(longRes);
+    print(delivAddress);
+    print(userName);
+    print(notelp);
+    print(latUser);
+    print(longUser);
+    var data = json.decode(apiResult.body);
+
+    print(data['price']);
+    totalOngkirBorzo = data['price'].toString();
+    // data['discounted_price'].toString()
+    totalOngkirDisBorzo = data['discounted_price'].toString();
+    if (totalOngkirBorzo != totalOngkirDisBorzo){
+      totalHarga = (int.parse(totalHarga) + int.parse(totalOngkirDisBorzo)).toString();
+    } else if (totalOngkirBorzo == totalOngkirDisBorzo){
+      totalHarga = (int.parse(totalHarga) + int.parse(totalOngkirBorzo.toString())).toString();
+    }
+    pref.setString('totalOngkirBorzo', totalOngkirBorzo);
+    pref.setString('totalOngkirDisBorzo', totalOngkirDisBorzo);
+    setState((){
+      // loadingTrans = false;
+      // loadingBorzo = false;
+    });
+
+    // for(var v in data['device_id']){
+    //   // User p = User.resto(
+    //   //   name: v['device_id'],
+    //   // );
+    //   List<String> id = [];
+    //   id.add(v);
+    //   print('099');
+    //   print(id);
+    //   OneSignal.shared.postNotification(OSCreateNotification(
+    //     playerIds: id,
+    //     heading: "$nameUser telah memesan produk di toko Anda",
+    //     content: "Cek sekarang !",
+    //     androidChannelId: "2482eb14-bcdf-4045-b69e-422011d9e6ef",
+    //   ));
+    //   // await OneSignal.shared.postNotificationWithJson();
+    //   // user3.add(v['device_id']);
+    //   // _user.add(p);
+    // }
+
+    if(data['status_code'] == 200){
+      print(restoAddress);
+      print(pjTokoTrans);
+      print(phoneRestoTrans);
+      print(latRes);
+      print(longRes);
+      print(delivAddress);
+      print(userName);
+      print(notelp);
+      print(latUser);
+      print(longUser);
+      totalOngkirBorzo = data['price'].toString();
       // SharedPreferences preferences = await SharedPreferences.getInstance();
       // await preferences.remove('menuJson');
       // await preferences.remove('restoId');
@@ -629,6 +1344,121 @@ class _CartActivityState extends State<CartActivity> {
     ));
   }
 
+  String formattedDate = DateFormat('y-MM-dd').format(DateTime.now());
+  List<NguponYuk> nguponYuk = [];
+  List<String> codeNguponYuk = [];
+  List<String> codeNguponYukJson = [];
+  String priceNguponYuk = '';
+  Future _getNguponYuk()async{
+
+    setState(() {
+      // isLoading = true;
+    });
+    SharedPreferences pref = await SharedPreferences.getInstance();
+    String token = pref.getString("token") ?? "";
+    String email = (pref.getString('email')??'');
+    restoId.addAll(pref.getStringList('restoId')??[]);
+    String inDetailRes = pref.getString('restoIdUsr').toString();
+    var apiResult = await http.get(Uri.parse(Links.nguponUrl + '/kupon?action=use&user=$email'), headers: {
+      "Accept": "Application/json",
+      "Authorization": "Bearer $token"
+    });
+    print('_getNguponYuk');
+    print(apiResult.body);
+    var data = json.decode(apiResult.body);
+
+    for (var h in data['data']['paid']) {
+      NguponYuk c = NguponYuk.sub(
+        id: int.parse(h['id'].toString()),
+        code: h['code'].toString(),
+        price: h['value'].toString(),
+        status: h['status'],
+        date: DateFormat('y-MM-dd').format(DateTime.parse(h['updated_at'].toString())).toString(),
+        // expired: DateFormat('y-MM-dd').format(DateTime.parse(h['expired_at'].toString())).toString(),
+      );
+      nguponYuk.add(c);
+      // setState((){});
+    }
+
+    // for (var h in data['data']['paid']) {
+    //   var apiResultCek = await http.get(Uri.parse(Links.nguponUrl + '/kupon/'+h['id'].toString()+'?restaurant_id=$checkId'), headers: {
+    //     "Accept": "Application/json",
+    //     "Authorization": "Bearer $token"
+    //   });
+    //   print('apiResultCek');
+    //   print(apiResultCek.body);
+    //
+    //   var dataCek = json.decode(apiResultCek.body);
+    //
+    //   // if (dataCek['message'].toString().contains('Data saved successfully') && dataCek['data'].toString() != 'null') {
+    //   //   NguponYuk c = NguponYuk.sub(
+    //   //       id: int.parse(h['id'].toString()),
+    //   //       code: h['code'].toString(),
+    //   //       price: h['value'].toString(),
+    //   //       status: h['status'],
+    //   //       date: DateFormat('y-MM-dd').format(DateTime.parse(h['updated_at'].toString())).toString(),
+    //   //       // expired: DateFormat('y-MM-dd').format(DateTime.parse(h['expired_at'].toString())).toString(),
+    //   //   );
+    //   //   nguponYuk.add(c);
+    //   //   setState((){});
+    //   // }
+    // }
+
+    // for(var v in data['trans']){
+    //   History h = History(
+    //     id: v['id'],
+    //     name: v['resto_name'],
+    //     time: v['time'],
+    //     price: v['price'],
+    //     img: v['resto_img'],
+    //     type: v['type'],
+    //     status: v['status'],
+    //   );
+    //   _history.add(h);
+    // }
+
+    setState(() {
+      // isLoading = false;
+    });
+
+    // if (apiResult.statusCode == 200) {
+    //   if (nguponYuk.toString() == '[]') {
+    //     ksg = true;
+    //   } else {
+    //     ksg = false;
+    //   }
+    // }
+  }
+
+  Future _checkNguponYuk(String kupon_id)async{
+
+    setState(() {
+      // isLoading = true;
+    });
+    SharedPreferences pref = await SharedPreferences.getInstance();
+    String token = pref.getString("token") ?? "";
+    // String email = (pref.getString('email')??'');
+    // restoId.addAll(pref.getStringList('restoId')??[]);
+    // String inDetailRes = pref.getString('restoIdUsr').toString();
+    var apiResult = await http.get(Uri.parse(Links.nguponUrl + '/kupon/$kupon_id?restaurant_id=$checkId'), headers: {
+      "Accept": "Application/json",
+      "Authorization": "Bearer $token"
+    });
+    print('_checkNguponYuk');
+    print('kupon_id');
+    print(kupon_id);
+    print(apiResult.body);
+    var data = json.decode(apiResult.body);
+    
+    if (data['message'].toString() == 'Data saved successfully') {
+      return true;
+    } else {
+      return false;
+    }
+    // setState(() {
+    //   // isLoading = false;
+    // });
+  }
 
   DateTime? currentBackPressTime;
   Future<bool> onWillPop() async{
@@ -642,7 +1472,20 @@ class _CartActivityState extends State<CartActivity> {
       return Future.value(false);
     }
 //    SystemNavigator.pop();
-    Navigator.pushReplacement(context, MaterialPageRoute(builder: (context)=> HomeActivity()));
+
+    SharedPreferences pref = await SharedPreferences.getInstance();
+    String inDetailRes = '';
+    inDetailRes = pref.getString('inDetailRes')??'';
+    if (inDetailRes != '') {
+      pref.remove('inDetailRes');
+      Navigator.pushReplacement(
+          context,
+          PageTransition(
+              type: PageTransitionType.fade,
+              child: DetailResto(inDetailRes)));
+    } else {
+      Navigator.pushReplacement(context, MaterialPageRoute(builder: (context)=> HomeActivity()));
+    }
     return Future.value(true);
   }
 
@@ -664,17 +1507,6 @@ class _CartActivityState extends State<CartActivity> {
     // Navigator.pushReplacement(context, MaterialPageRoute(builder: (context)=> HomeActivity()));
     return Future.value(true);
   }
-
-  // Future notif(String device, String sender, String message)async{
-  //   List<String> id = [];
-  //   id.add(device);
-  //   await OneSignal.shared.postNotification(OSCreateNotification(
-  //     playerIds: id,
-  //     heading: sender,
-  //     content: message,
-  //     androidChannelId: "2482eb14-bcdf-4045-b69e-422011d9e6ef",
-  //   ));
-  // }
 
   _launchURL() async {
     var url = 'https://www.google.co.id/maps/place/' + restoAddress;
@@ -720,6 +1552,7 @@ class _CartActivityState extends State<CartActivity> {
 
   @override
   void initState() {
+    _getNguponYuk();
     getHomePg();
     getPref().whenComplete((){
       if (notelp.toString() == '' && notelp.toString() == 'null') {
@@ -744,6 +1577,7 @@ class _CartActivityState extends State<CartActivity> {
     _scrollController.dispose();
     super.dispose();
   }
+
   @override
   Widget build(BuildContext context) {
     return WillPopScope(
@@ -768,8 +1602,20 @@ class _CartActivityState extends State<CartActivity> {
                       children: [
                         SizedBox(height: CustomSize.sizeHeight(context) / 98,),
                         GestureDetector(
-                            onTap: (){
-                              Navigator.pushReplacement(context, MaterialPageRoute(builder: (context)=> HomeActivity()));
+                            onTap: ()async{
+                              SharedPreferences pref = await SharedPreferences.getInstance();
+                              String inDetailRes = '';
+                              inDetailRes = pref.getString('inDetailRes')??'';
+                              if (inDetailRes != '') {
+                                pref.remove('inDetailRes');
+                                Navigator.pushReplacement(
+                                    context,
+                                    PageTransition(
+                                        type: PageTransitionType.fade,
+                                        child: DetailResto(inDetailRes)));
+                              } else {
+                                Navigator.pushReplacement(context, MaterialPageRoute(builder: (context)=> HomeActivity()));
+                              }
                             },
                             child: Container(
                                 width: CustomSize.sizeWidth(context) / 7,
@@ -1016,52 +1862,6 @@ class _CartActivityState extends State<CartActivity> {
                         SizedBox(height: CustomSize.sizeHeight(context) * 0.008,),
                         Row(
                           children: [
-                            // (_srchAddress.text != '')?GestureDetector(
-                            //   onTap: () async{
-                            //     SharedPreferences pref2 = await SharedPreferences.getInstance();
-                            //     if (srchAddress == false) {
-                            //       srchAddress = true;
-                            //     } else {
-                            //       srchAddress = false;
-                            //       List<Placemark> placemark = await Geolocator().placemarkFromAddress(_srchAddress.text);
-                            //       double distan = await Geolocator().distanceBetween( double.parse(pref2.getString('latResto')), double.parse(pref2.getString('longResto')), placemark[0].position.latitude, placemark[0].position.longitude);
-                            //       int _ongkir = int.parse(ongkir!);
-                            //       String dist = NumberFormat.currency(locale: 'id', symbol: '', decimalDigits: 0).format(int.parse(distan.toString().split('.')[0]));
-                            //       int _distan = int.parse(dist.split('.')[0]);
-                            //       if (_distan != 0) {
-                            //         int _totalOngkir = _ongkir * _distan;
-                            //         totalOngkir = _totalOngkir.toString();
-                            //         int _totalHarga = harga + _totalOngkir;
-                            //         totalHarga = _totalHarga.toString();
-                            //       } else {
-                            //         totalOngkir = ongkir!;
-                            //         int _totalHarga = harga + int.parse(totalOngkir);
-                            //         totalHarga = _totalHarga.toString();
-                            //       }
-                            //     }
-                            //     setState(() {});
-                            //   },
-                            //   child: Container(
-                            //     width: CustomSize.sizeWidth(context) / 3,
-                            //     height: CustomSize.sizeHeight(context) / 22,
-                            //     decoration: BoxDecoration(
-                            //         borderRadius: BorderRadius.circular(20),
-                            //         border: Border.all(color: Colors.black, width: 0.5)
-                            //     ),
-                            //     child: Center(
-                            //       child: Row(
-                            //         mainAxisAlignment: MainAxisAlignment.center,
-                            //         crossAxisAlignment: CrossAxisAlignment.center,
-                            //         children: [
-                            //           (srchAddress != true)?Icon(Octicons.pencil, size: 14,):Container(),
-                            //           (srchAddress != true)?SizedBox(width: CustomSize.sizeWidth(context) / 86,):Container(),
-                            //           (srchAddress != true)?CustomText.bodyMedium12(text: "Ganti Alamat"):CustomText.bodyMedium12(text: "Simpan")
-                            //         ],
-                            //       ),
-                            //     ),
-                            //   ),
-                            // ):Container(),
-                            // (_srchAddress.text != '')?SizedBox(width: CustomSize.sizeWidth(context) / 45,):Container(),
                             (srchAddress != true)?GestureDetector(
                               onTap: () async{
                                 var result = await Navigator.push(
@@ -1078,25 +1878,108 @@ class _CartActivityState extends State<CartActivity> {
                                     latUser = (pref.getString('latUser') == '')?'null':pref.getString('latUser')??'';
                                     longUser = (pref.getString('longUser') == '')?'null':pref.getString('longUser')??'';
                                     cekHarga()!.whenComplete((){
-                                      _ongkir = int.parse(ongkir!.toString());
+                                      _ongkir = int.parse(ongkir.toString());
                                       dist = NumberFormat.currency(locale: 'id', symbol: '', decimalDigits: 0).format(double.parse(pref.getString('distan')??'0'));
                                       _distan = pref.getString('distan')??'0';
                                       _distan5 = (_distan.contains('.'))?(int.parse(_distan.split('.')[1]) >= 5)?(int.parse(_distan.split('.')[0])+1).toString():_distan.split('.')[0]:_distan;
                                       _distance = int.parse((_distan.contains('.'))?(_distan.split('.')[0] == '0')?'1':(int.parse(_distan.split('.')[1]) >= 5)?_distan5:_distan.split('.')[0]:_distan);
                                       print(_distance);
+                                      if (totalOngkirBorzo != totalOngkirDisBorzo) {
+                                        print('bagi');
+                                        // print((int.parse(totalOngkirBorzo.toString().split('.')[0])/int.parse(totalOngkirDisBorzo)));
+                                        showDialog(
+                                            context: context,
+                                            builder: (context) {
+                                              return AlertDialog(
+                                                contentPadding: EdgeInsets.only(left: 25, right: 25, top: 15, bottom: 5),
+                                                shape: RoundedRectangleBorder(
+                                                    borderRadius: BorderRadius.all(Radius.circular(10))
+                                                ),
+                                                title: Center(child: Text('Selamat!', style: TextStyle(color: CustomColor.primaryLight))),
+                                                content: ((int.parse(totalOngkirBorzo.toString())/int.parse(totalOngkirDisBorzo)) == 2)?
+                                                Text('Anda mendapatkan diskon ongkir sebesar 50%', style: TextStyle(fontSize: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.04)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.04)).toString()), fontWeight: FontWeight.w500), textAlign: TextAlign.center):
+                                                (delivAddress != '' && totalOngkirDisBorzo == '0' || delivAddress != 'null' && totalOngkirDisBorzo == '0')?
+                                                Text('Anda mendapatkan promo bebas ongkir!', style: TextStyle(fontSize: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.04)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.04)).toString()), fontWeight: FontWeight.w500), textAlign: TextAlign.center):
+                                                Text('Anda mendapatkan potongan ongkir senilai Rp' + NumberFormat.currency(locale: 'id', symbol: '', decimalDigits: 0).format((int.parse(totalOngkirBorzo.toString())-int.parse(totalOngkirDisBorzo))), style: TextStyle(fontSize: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.04)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.04)).toString()), fontWeight: FontWeight.w500), textAlign: TextAlign.center),
+                                                actions: <Widget>[
+                                                  Center(
+                                                    child: Padding(
+                                                      padding: EdgeInsets.only(left: 25, right: 25),
+                                                      child: Row(
+                                                        mainAxisAlignment: MainAxisAlignment.center,
+                                                        children: [
+                                                          // OutlineButton(
+                                                          //   // minWidth: CustomSize.sizeWidth(context),
+                                                          //   shape: StadiumBorder(),
+                                                          //   highlightedBorderColor: CustomColor.secondary,
+                                                          //   borderSide: BorderSide(
+                                                          //       width: 2,
+                                                          //       color: CustomColor.redBtn
+                                                          //   ),
+                                                          //   child: Text('Batal'),
+                                                          //   onPressed: () async{
+                                                          //     setState(() {
+                                                          //       // codeDialog = valueText;
+                                                          //       Navigator.pop(context);
+                                                          //     });
+                                                          //   },
+                                                          // ),
+                                                          OutlinedButton(
+                                                            // minWidth: CustomSize.sizeWidth(context),
+                                                            // shape: StadiumBorder(),
+                                                            // highlightedBorderColor: CustomColor.secondary,
+                                                            // borderSide: BorderSide(
+                                                            //     width: 2,
+                                                            //     color: CustomColor.accent
+                                                            // ),
+                                                            style: OutlinedButton.styleFrom(shape: StadiumBorder(), surfaceTintColor: CustomColor.accent),
+                                                            child: Text('Terimakasih', style: TextStyle(color: CustomColor.accent)),
+                                                            onPressed: () async{
+                                                              Navigator.pop(context);
+                                                              // setStateModal(() {});
+                                                              // String qrcode = '';
+                                                            },
+                                                          ),
+                                                        ],
+                                                      ),
+                                                    ),
+                                                  ),
+
+                                                ],
+                                              );
+                                            });
+                                      }
                                       if (_distan != '0') {
                                         _totalOngkir = _ongkir * _distance;
                                         totalOngkir = _totalOngkir.toString();
                                         print('totalOngkirBorzo');
                                         print(totalOngkirBorzo);
-                                        int _totalHarga = harga + int.parse(totalOngkirBorzo);
-                                        totalHarga = (_totalHarga + 1000).toString();
-                                        setState(() {});
+                                        if (totalOngkirBorzo.toString() == totalOngkirDisBorzo.toString()) {
+                                          int _totalHarga = harga + int.parse(totalOngkirBorzo.toString());
+                                          totalHarga = (_totalHarga + _platformfee).toString();
+                                          pref.setString('totalHarga', totalHarga);
+                                          setState(() {});
+                                        } else {
+                                          int _totalHarga = harga + int.parse(totalOngkirDisBorzo);
+                                          totalHarga = (_totalHarga + _platformfee).toString();
+                                          pref.setString('totalHarga', totalHarga);
+                                          setState(() {});
+                                        }
+                                        // int _totalHarga = harga + (totalOngkirBorzo.toString() == totalOngkirDisBorzo.toString())?int.parse(totalOngkirBorzo):int.parse(totalOngkirDisBorzo);
+
                                       } else {
                                         totalOngkir = ongkir!;
-                                        int _totalHarga = harga + int.parse(totalOngkirBorzo);
-                                        totalHarga = (_totalHarga + 1000).toString();
-                                        setState(() {});
+                                        if (totalOngkirBorzo.toString() == totalOngkirDisBorzo.toString()) {
+                                          int _totalHarga = harga + int.parse(totalOngkirBorzo.toString());
+                                          totalHarga = (_totalHarga + _platformfee).toString();
+                                          pref.setString('totalHarga', totalHarga);
+                                          setState(() {});
+                                        } else {
+                                          int _totalHarga = harga + int.parse(totalOngkirDisBorzo);
+                                          totalHarga = (_totalHarga + _platformfee).toString();
+                                          pref.setString('totalHarga', totalHarga);
+                                          setState(() {});
+                                        }
                                       }
                                     });
                                     print('kene bos2');
@@ -1147,7 +2030,146 @@ class _CartActivityState extends State<CartActivity> {
                       ],
                     ),
                   ):SizedBox(),
-                  (_transCode == 1 || _transCode == 2)?SizedBox(height: CustomSize.sizeHeight(context) / 48,):SizedBox(),
+                  (_transCode == 1)?SizedBox(height: CustomSize.sizeHeight(context) / 98,):(_transCode == 2)?SizedBox(height: CustomSize.sizeHeight(context) / 48,):SizedBox(),
+                  // SizedBox(height: CustomSize.sizeHeight(context) / 48,),
+                  (_transCode == 1)?Padding(
+                    padding: EdgeInsets.symmetric(
+                        horizontal: CustomSize.sizeWidth(context) / 32,
+                        vertical: CustomSize.sizeHeight(context) / 86
+                    ),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        Container(
+                          width: CustomSize.sizeWidth(context) / 1.6,
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              CustomText.textHeading4(text: "Ada catatan untuk kurir ?", minSize: double.parse(((MediaQuery.of(context).size.width*0.045).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.045)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.045)).toString())),
+                              CustomText.bodyRegular16(text: "Tambah keterangan untuk alamatmu", minSize: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.04)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.04)).toString()))
+                            ],
+                          ),
+                        ),
+                        Padding(
+                          padding: EdgeInsets.symmetric(horizontal: CustomSize.sizeWidth(context) / 86),
+                          child: GestureDetector(
+                            onTap: ()async{
+                              // Navigator.pop(context);
+                              showDialog(
+                                  context: context,
+                                  builder: (context) {
+                                    return AlertDialog(
+                                      shape: RoundedRectangleBorder(
+                                          borderRadius: BorderRadius.all(Radius.circular(10))
+                                      ),
+                                      title: Text('Catatan'),
+                                      content: TextField(
+                                        autofocus: true,
+                                        keyboardType: TextInputType.text,
+                                        controller: noteKurir,
+                                        decoration: InputDecoration(
+                                          hintText: "Untuk keterangan alamat",
+                                          border: OutlineInputBorder(
+                                            borderRadius: BorderRadius.circular(10.0),
+                                          ),
+                                          enabledBorder: OutlineInputBorder(
+                                            borderSide: const BorderSide(color: Colors.grey, width: 1.0),
+                                          ),
+                                          focusedBorder: OutlineInputBorder(
+                                            borderSide: const BorderSide(color: Colors.grey, width: 2.0),
+                                          ),
+                                        ),
+                                      ),
+                                      actions: <Widget>[
+                                        Center(
+                                          child: Padding(
+                                            padding: const EdgeInsets.only(left: 10.0, right: 10.0, bottom: 8.0),
+                                            child: TextButton(
+                                              // minWidth: CustomSize.sizeWidth(context),
+                                              style: TextButton.styleFrom(
+                                                backgroundColor: CustomColor.primaryLight,
+                                                padding: EdgeInsets.all(0),
+                                                shape: const RoundedRectangleBorder(
+                                                    borderRadius: BorderRadius.all(Radius.circular(10))
+                                                ),
+                                              ),
+                                              child: Text('Simpan', style: TextStyle(color: Colors.white)),
+                                              onPressed: () async{
+                                                // String s = noted[restoId.indexOf(menuJson[index].id.toString())];
+                                                // String i = s.replaceAll(noted[restoId.indexOf(menuJson[index].id.toString())].split(': ')[1], (note.text != '')?note.text+'}':'kam5ia_null'+'}') ;
+                                                // print(i);
+                                                // noted[restoId.indexOf(menuJson[index].id.toString())] = i.toString();
+                                                // int i = int.parse(s) + 1;
+                                                // print(i);
+                                                // noted.add(note.text);
+                                                SharedPreferences pref = await SharedPreferences.getInstance();
+                                                print('noted kurir');
+                                                print(noteKurir.text);
+                                                String plus = '';
+                                                plus = noted.toString().replaceAll(']', ', '+'{keterangan: '+noteKurir.text+'}]');
+                                                print('plus');
+                                                print(plus);
+                                                print('noted');
+                                                print(noted);
+                                                print('noted');
+                                                print(noted);
+                                                print(noteKurir.text);
+                                                pref.setString('keterangan', noteKurir.text);
+                                                // pref.setStringList("note", noted);
+                                                // noteProduct = '';
+                                                // _getData();
+                                                // getNote();
+                                                setState(() {
+                                                  // codeDialog = valueText;
+                                                  Navigator.pop(context);
+                                                  // Navigator.push(context, PageTransition(
+                                                  //     type: PageTransitionType.fade,
+                                                  //     child: CartActivity()));
+                                                });
+                                              },
+                                            ),
+                                          ),
+                                        ),
+
+                                      ],
+                                    );
+                                  });
+                            },
+                            child: Container(
+                              height: CustomSize.sizeHeight(context) / 24,
+                              decoration: BoxDecoration(
+                                  borderRadius: BorderRadius.circular(20),
+                                  border: Border.all(color: Colors.grey)
+                              ),
+                              child: Padding(
+                                padding: EdgeInsets.symmetric(horizontal: CustomSize.sizeWidth(context) / 32),
+                                child: Center(
+                                  child: CustomText.textTitle8(
+                                      text: (noteKurir.text != '')?"Ubah":"Tambah",
+                                      color: Colors.grey,
+                                      minSize: double.parse(((MediaQuery.of(context).size.width*0.035).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.035)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.035)).toString())
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ),
+                        )
+                      ],
+                    ),
+                  ):Container(),
+                  (noteKurir.text != '')?SizedBox(height: CustomSize.sizeHeight(context) * 0.0048,):Container(),
+                  (noteKurir.text != '')?Padding(
+                      padding: EdgeInsets.only(
+                        left: CustomSize.sizeWidth(context) / 32,
+                        right: CustomSize.sizeWidth(context) / 18,
+                        bottom: CustomSize.sizeHeight(context) * 0.0075,
+                      ),
+                      child: Container(
+                          width: CustomSize.sizeWidth(context) / 1.6,
+                          child: CustomText.textTitle3(text: 'keterangan: '+noteKurir.text,  maxLines: 10, minSize: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.04)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.04)).toString()))
+                      )
+                  ):Container(),
                   // SizedBox(height: CustomSize.sizeHeight(context) / 48,),
                   (_transCode != 3)?Divider(thickness: 6, color: CustomColor.secondary,):SizedBox(),
                   // (_transCode != 3)?SizedBox(height: CustomSize.sizeHeight(context) / 48,):SizedBox(),
@@ -1274,14 +2296,16 @@ class _CartActivityState extends State<CartActivity> {
                                                           Center(
                                                             child: Padding(
                                                               padding: const EdgeInsets.only(left: 10.0, right: 10.0, bottom: 8.0),
-                                                              child: FlatButton(
-                                                                minWidth: CustomSize.sizeWidth(context),
-                                                                color: CustomColor.primaryLight,
-                                                                textColor: Colors.white,
-                                                                shape: RoundedRectangleBorder(
-                                                                    borderRadius: BorderRadius.all(Radius.circular(10))
+                                                              child: TextButton(
+                                                                // minWidth: CustomSize.sizeWidth(context),
+                                                                style: TextButton.styleFrom(
+                                                                  backgroundColor: CustomColor.primaryLight,
+                                                                  padding: EdgeInsets.all(0),
+                                                                  shape: const RoundedRectangleBorder(
+                                                                      borderRadius: BorderRadius.all(Radius.circular(10))
+                                                                  ),
                                                                 ),
-                                                                child: Text('Simpan'),
+                                                                child: Text('Simpan', style: TextStyle(color: Colors.white)),
                                                                 onPressed: () async{
                                                                   String s = noted[restoId.indexOf(menuJson[index].id.toString())];
                                                                   String i = s.replaceAll(noted[restoId.indexOf(menuJson[index].id.toString())].split(': ')[1], (note.text != '')?note.text+'}':'kam5ia_null'+'}') ;
@@ -1374,7 +2398,7 @@ class _CartActivityState extends State<CartActivity> {
                                             ),
                                             Row(
                                               children: [
-                                                GestureDetector(
+                                                (codeNguponYuk.toString() == '[]')?GestureDetector(
                                                   onTap: ()async{
                                                     print(index);
                                                     String s = qty[restoId.indexOf(menuJson[index].id.toString())];
@@ -1391,7 +2415,12 @@ class _CartActivityState extends State<CartActivity> {
                                                     if (harga == 0) {
                                                       // Navigator.pop(context);
                                                       // Navigator.pop(context);
-                                                      onWillPop2();
+                                                      // onWillPop2();
+                                                      Navigator.pushReplacement(
+                                                          context,
+                                                          PageTransition(
+                                                              type: PageTransitionType.rightToLeft,
+                                                              child: DetailResto(checkId)));
                                                       // Navigator.pushReplacement(context, MaterialPageRoute(builder: (context)=> HomeActivity()));
                                                       print('ini name '+name.toString());
                                                       pref.remove('inCart');
@@ -1428,6 +2457,47 @@ class _CartActivityState extends State<CartActivity> {
                                                       }
                                                     }
                                                     print(harga);
+                                                    if(delivAddress.toString() != '' && delivAddress.toString() != 'null'){
+                                                      SharedPreferences pref = await SharedPreferences.getInstance();
+                                                      cekHarga2()?.whenComplete((){
+                                                        if (_distan != '0') {
+                                                          _totalOngkir = _ongkir * _distance;
+                                                          totalOngkir = _totalOngkir.toString();
+                                                          print('totalOngkirBorzo');
+                                                          print(totalOngkirBorzo);
+                                                          if (totalOngkirBorzo.toString() == totalOngkirDisBorzo.toString()) {
+                                                            int _totalHarga = harga + int.parse(totalOngkirBorzo);
+                                                            totalHarga = (_totalHarga + _platformfee).toString();
+                                                            pref.setString('totalHarga', totalHarga);
+                                                            setState(() {});
+                                                          } else {
+                                                            int _totalHarga = harga + int.parse(totalOngkirDisBorzo);
+                                                            totalHarga = (_totalHarga + _platformfee).toString();
+                                                            pref.setString('totalHarga', totalHarga);
+                                                            setState(() {});
+                                                          }
+                                                          // int _totalHarga = harga + (totalOngkirBorzo.toString() == totalOngkirDisBorzo.toString())?int.parse(totalOngkirBorzo):int.parse(totalOngkirDisBorzo);
+
+                                                        } else {
+                                                          totalOngkir = ongkir!;
+                                                          if (totalOngkirBorzo.toString() == totalOngkirDisBorzo.toString()) {
+                                                            int _totalHarga = harga + int.parse(totalOngkirBorzo.toString());
+                                                            totalHarga = (_totalHarga + _platformfee).toString();
+                                                            pref.setString('totalHarga', totalHarga);
+                                                            setState(() {});
+                                                          } else {
+                                                            int _totalHarga = harga + int.parse(totalOngkirDisBorzo);
+                                                            totalHarga = (_totalHarga + _platformfee).toString();
+                                                            pref.setString('totalHarga', totalHarga);
+                                                            setState(() {});
+                                                          }
+                                                        }
+                                                        harga = 0;
+                                                        _getData2();
+                                                      });
+                                                    }
+                                                    codeNguponYuk = [];
+                                                    priceNguponYuk = '';
                                                     setState(() {});
                                                     // if(deleteAnimation[index] != true){
                                                     // if(int.parse(qty[restoId.indexOf(menuJson[index].id.toString())]) > 1){
@@ -1465,6 +2535,9 @@ class _CartActivityState extends State<CartActivity> {
                                                         data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0)
                                                     )),
                                                   ),
+                                                ):Container(
+                                                  width: CustomSize.sizeWidth(context) / 12,
+                                                  height: CustomSize.sizeWidth(context) / 12,
                                                 ),
                                                 SizedBox(width: CustomSize.sizeWidth(context) / 24,),
                                                 MediaQuery(
@@ -1472,7 +2545,7 @@ class _CartActivityState extends State<CartActivity> {
                                                     data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0)
                                                 ),
                                                 SizedBox(width: CustomSize.sizeWidth(context) / 24,),
-                                                GestureDetector(
+                                                (codeNguponYuk.toString() == '[]')?GestureDetector(
                                                   onTap: ()async{
                                                     String s = qty[restoId.indexOf(menuJson[index].id.toString())];
                                                     print(s);
@@ -1486,6 +2559,47 @@ class _CartActivityState extends State<CartActivity> {
                                                     int _total = (menuJson[restoId.indexOf(menuJson[index].id.toString())].discount.toString() == null || menuJson[restoId.indexOf(menuJson[index].id.toString())].discount.toString() == 'null' || menuJson[restoId.indexOf(menuJson[index].id.toString())].discount.toString() == '')?int.parse(totalHarga) + int.parse(menuJson[restoId.indexOf(menuJson[index].id.toString())].price):int.parse(totalHarga) + int.parse(menuJson[restoId.indexOf(menuJson[index].id.toString())].discount!);
                                                     totalHarga = _total.toString();
                                                     print(harga);
+                                                    if(delivAddress.toString() != '' && delivAddress.toString() != 'null'){
+                                                      SharedPreferences pref = await SharedPreferences.getInstance();
+                                                      cekHarga2()?.whenComplete((){
+                                                        if (_distan != '0') {
+                                                          _totalOngkir = _ongkir * _distance;
+                                                          totalOngkir = _totalOngkir.toString();
+                                                          print('totalOngkirBorzo');
+                                                          print(totalOngkirBorzo);
+                                                          if (totalOngkirBorzo.toString() == totalOngkirDisBorzo.toString()) {
+                                                            int _totalHarga = harga + int.parse(totalOngkirBorzo.toString());
+                                                            totalHarga = (_totalHarga + _platformfee).toString();
+                                                            pref.setString('totalHarga', totalHarga);
+                                                            setState(() {});
+                                                          } else {
+                                                            int _totalHarga = harga + int.parse(totalOngkirDisBorzo);
+                                                            totalHarga = (_totalHarga + _platformfee).toString();
+                                                            pref.setString('totalHarga', totalHarga);
+                                                            setState(() {});
+                                                          }
+                                                          // int _totalHarga = harga + (totalOngkirBorzo.toString() == totalOngkirDisBorzo.toString())?int.parse(totalOngkirBorzo):int.parse(totalOngkirDisBorzo);
+
+                                                        } else {
+                                                          totalOngkir = ongkir!;
+                                                          if (totalOngkirBorzo.toString() == totalOngkirDisBorzo.toString()) {
+                                                            int _totalHarga = harga + int.parse(totalOngkirBorzo.toString());
+                                                            totalHarga = (_totalHarga + _platformfee).toString();
+                                                            pref.setString('totalHarga', totalHarga);
+                                                            setState(() {});
+                                                          } else {
+                                                            int _totalHarga = harga + int.parse(totalOngkirDisBorzo);
+                                                            totalHarga = (_totalHarga + _platformfee).toString();
+                                                            pref.setString('totalHarga', totalHarga);
+                                                            setState(() {});
+                                                          }
+                                                        }
+                                                        harga = 0;
+                                                        _getData2();
+                                                      });
+                                                    }
+                                                    codeNguponYuk = [];
+                                                    priceNguponYuk = '';
                                                     setState(() {});
                                                   },
                                                   child: Container(
@@ -1500,6 +2614,9 @@ class _CartActivityState extends State<CartActivity> {
                                                         data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0)
                                                     )),
                                                   ),
+                                                ):Container(
+                                                  width: CustomSize.sizeWidth(context) / 12,
+                                                  height: CustomSize.sizeWidth(context) / 12,
                                                 ),
                                               ],
                                             )
@@ -1589,14 +2706,16 @@ class _CartActivityState extends State<CartActivity> {
                                               child: Row(
                                                 mainAxisAlignment: MainAxisAlignment.spaceAround,
                                                 children: [
-                                                  FlatButton(
+                                                  TextButton(
                                                     // minWidth: CustomSize.sizeWidth(context),
-                                                    color: CustomColor.redBtn,
-                                                    textColor: Colors.white,
-                                                    shape: RoundedRectangleBorder(
-                                                        borderRadius: BorderRadius.all(Radius.circular(10))
+                                                    style: TextButton.styleFrom(
+                                                      backgroundColor: CustomColor.redBtn,
+                                                      padding: EdgeInsets.all(0),
+                                                      shape: const RoundedRectangleBorder(
+                                                          borderRadius: BorderRadius.all(Radius.circular(10))
+                                                      ),
                                                     ),
-                                                    child: Text('Hapus'),
+                                                    child: Text('Hapus', style: TextStyle(color: Colors.white)),
                                                     onPressed: () async{
                                                       String s = noted[noted.indexOf(noted2[index].toString())];
                                                       String i = s.replaceAll(noted[noted.indexOf(noted2[index].toString())].split(': ')[1], 'kam5ia_null'+'}') ;
@@ -1619,14 +2738,16 @@ class _CartActivityState extends State<CartActivity> {
                                                       });
                                                     },
                                                   ),
-                                                  FlatButton(
+                                                  TextButton(
                                                     // minWidth: CustomSize.sizeWidth(context),
-                                                    color: CustomColor.primaryLight,
-                                                    textColor: Colors.white,
-                                                    shape: RoundedRectangleBorder(
-                                                        borderRadius: BorderRadius.all(Radius.circular(10))
+                                                    style: TextButton.styleFrom(
+                                                      backgroundColor: CustomColor.primaryLight,
+                                                      padding: EdgeInsets.all(0),
+                                                      shape: const RoundedRectangleBorder(
+                                                          borderRadius: BorderRadius.all(Radius.circular(10))
+                                                      ),
                                                     ),
-                                                    child: Text('Simpan'),
+                                                    child: Text('Simpan', style: TextStyle(color: Colors.white)),
                                                     onPressed: () async{
                                                       String s = noted[noted.indexOf(noted2[index].toString())];
                                                       String i = s.replaceAll(noted[noted.indexOf(noted2[index].toString())].split(': ')[1], (note.text != '')?note.text+'}':'kam5ia_null'+'}') ;
@@ -1710,7 +2831,7 @@ class _CartActivityState extends State<CartActivity> {
                                   border: Border.all(color: Colors.grey)
                               ),
                               child: Padding(
-                                padding: EdgeInsets.symmetric(horizontal: CustomSize.sizeWidth(context) / 32),
+                                  padding: EdgeInsets.symmetric(horizontal: CustomSize.sizeWidth(context) / 32),
                                 child: Center(
                                   child: CustomText.textTitle8(
                                       text: "Tambah",
@@ -1725,162 +2846,1189 @@ class _CartActivityState extends State<CartActivity> {
                       ],
                     ),
                   ),
-                  // Divider(thickness: 6, color: CustomColor.secondary,),
-                  // Padding(
+
+                  (nguponYuk.toString() != '[]')?Padding(
+                    padding: EdgeInsets.symmetric(
+                        horizontal: CustomSize.sizeWidth(context) / 32,
+                        vertical: CustomSize.sizeHeight(context) * 0.01
+                    ),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        Container(
+                          width: CustomSize.sizeWidth(context) / 1.6,
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              CustomText.textHeading4(text: "Gunakan Ngupon Yuk !", minSize: double.parse(((MediaQuery.of(context).size.width*0.045).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.045)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.045)).toString())),
+                              CustomText.bodyRegular16(text: "Pembayaran pesanan anda bisa", minSize: double.parse(((MediaQuery.of(context).size.width*0.03).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.03)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.03)).toString()), maxLines: 5),
+                              Container(
+                                width: CustomSize.sizeWidth(context) / 1.6,
+                                child: Row(
+                                  mainAxisAlignment: MainAxisAlignment.start,
+                                  children: [
+                                    CustomText.bodyRegular16(text: "menggunakan Ngupon Yuk", minSize: double.parse(((MediaQuery.of(context).size.width*0.03).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.03)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.03)).toString()), maxLines: 5),
+                                    GestureDetector(
+                                      onTap: () async {
+                                        showDialog(
+                                            context: context,
+                                            builder: (context) {
+                                              return AlertDialog(
+                                                contentPadding: EdgeInsets.only(left: 25, right: 25, top: 15, bottom: 5),
+                                                shape: RoundedRectangleBorder(
+                                                    borderRadius: BorderRadius.all(Radius.circular(10))
+                                                ),
+                                                title: Center(child: Text('Peringatan!', style: TextStyle(color: CustomColor.primary))),
+                                                content: Text('Kupon anda hanya berlaku pada harga menu yang anda pesan.\n\nTidak termasuk biaya ongkir.', style: TextStyle(fontSize: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.04)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.04)).toString()), fontWeight: FontWeight.w500), textAlign: TextAlign.center),
+                                                // '\n \nSemua proses pembayaran dan transaksi di luar tanggung jawab IRG!', style: TextStyle(fontSize: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.04)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.04)).toString()), fontWeight: FontWeight.w500), textAlign: TextAlign.center),
+                                                actions: <Widget>[
+                                                  Center(
+                                                    child: TextButton(
+                                                      // minWidth: CustomSize.sizeWidth(context),
+                                                      style: TextButton.styleFrom(
+                                                        backgroundColor: CustomColor.accent,
+                                                        padding: EdgeInsets.all(0),
+                                                        shape: const RoundedRectangleBorder(
+                                                            borderRadius: BorderRadius.all(Radius.circular(10))
+                                                        ),
+                                                      ),
+                                                      child: Text('Mengerti', style: TextStyle(color: Colors.white)),
+                                                      onPressed: () async{
+                                                        Navigator.pop(context);
+                                                      },
+                                                    ),
+                                                  ),
+
+                                                ],
+                                              );
+                                            }
+                                        );
+                                      },
+                                      child: FaIcon(
+                                        Icons.info_outline,
+                                        color: Colors.grey,
+                                        size: double.parse(((MediaQuery.of(context).size.width*0.0425).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.0425)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.0425)).toString()),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              )
+                            ],
+                          ),
+                        ),
+                        Padding(
+                          padding: EdgeInsets.symmetric(horizontal: CustomSize.sizeWidth(context) / 86),
+                          child: GestureDetector(
+                            onTap: ()async{
+                              // Navigator.pop(context);
+                              if (codeNguponYuk.toString() == '[]') {
+                                showDialog(
+                                    context: context,
+                                    builder: (context) {
+                                      return AlertDialog(
+                                        contentPadding: EdgeInsets.only(left: 25, right: 25, top: 15, bottom: 5),
+                                        shape: RoundedRectangleBorder(
+                                            borderRadius: BorderRadius.all(Radius.circular(10))
+                                        ),
+                                        title: Center(child: Text('Peringatan!', style: TextStyle(color: CustomColor.primary))),
+                                        content: Text('Pastikan jumlah pesanan anda sudah benar sebelum menggunakan kupon, karena jumlah pesanan anda tidak dapat diubah setelah anda menggunakan kupon!', style: TextStyle(fontSize: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.04)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.04)).toString()), fontWeight: FontWeight.w500), textAlign: TextAlign.center),
+                                        // '\n \nSemua proses pembayaran dan transaksi di luar tanggung jawab IRG!', style: TextStyle(fontSize: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.04)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.04)).toString()), fontWeight: FontWeight.w500), textAlign: TextAlign.center),
+                                        actions: <Widget>[
+                                          Center(
+                                            child: TextButton(
+                                              // minWidth: CustomSize.sizeWidth(context),
+                                              style: TextButton.styleFrom(
+                                                backgroundColor: CustomColor.accent,
+                                                padding: EdgeInsets.all(0),
+                                                shape: const RoundedRectangleBorder(
+                                                    borderRadius: BorderRadius.all(Radius.circular(10))
+                                                ),
+                                              ),
+                                              child: Text('Mengerti', style: TextStyle(color: Colors.white)),
+                                              onPressed: () async{
+                                                // Navigator.pop(context);
+                                                var result = await showDialog(
+                                                    context: context,
+                                                    builder: (context) {
+                                                      return AlertDialog(
+                                                        contentPadding: EdgeInsets.only(left: 5, right: 5, top: 15, bottom: 5),
+                                                        shape: RoundedRectangleBorder(
+                                                            borderRadius: BorderRadius.all(Radius.circular(10))
+                                                        ),
+                                                        title: Text('Kuponmu', style: TextStyle(color: CustomColor.primary)),
+                                                        content: Container(
+                                                          height: CustomSize.sizeHeight(context) / 2.2,
+                                                          width: CustomSize.sizeWidth(context) / 1.1,
+                                                          child: ListView.builder(
+                                                              shrinkWrap: true,
+                                                              controller: _scrollController,
+                                                              physics: BouncingScrollPhysics(),
+                                                              itemCount: nguponYuk.length,
+                                                              itemBuilder: (_, index){
+                                                                return Padding(
+                                                                  padding: EdgeInsets.symmetric(horizontal: CustomSize.sizeWidth(context) / 22, vertical: CustomSize.sizeHeight(context) * 0.0075),
+                                                                  child: GestureDetector(
+                                                                    onTap: () async{
+                                                                      // codeNguponYuk = nguponYuk[index].code.toString();
+                                                                      // priceNguponYuk = nguponYuk[index].price.toString();
+                                                                    },
+                                                                    child: Container(
+                                                                      // width: CustomSize.sizeWidth(context),
+                                                                      // height: CustomSize.sizeHeight(context) / 7.5,
+                                                                      color: Colors.white,
+                                                                      child: Row(
+                                                                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                                                        crossAxisAlignment: CrossAxisAlignment.start,
+                                                                        children: [
+                                                                          Row(
+                                                                            crossAxisAlignment: CrossAxisAlignment.start,
+                                                                            children: [
+                                                                              Container(
+                                                                                width: CustomSize.sizeWidth(context) / 2.5,
+                                                                                // width: CustomSize.sizeWidth(context) / 1.6,
+                                                                                child: Column(
+                                                                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                                                                  mainAxisAlignment: MainAxisAlignment.center,
+                                                                                  children: [
+                                                                                    CustomText.textHeading4(
+                                                                                        text: nguponYuk[index].code,
+                                                                                        maxLines: 2,
+                                                                                        minSize: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.04)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.04)).toString())
+                                                                                    ),
+                                                                                    CustomText.textTitle1(
+                                                                                        text: 'Potongan: Rp.'+NumberFormat.currency(locale: 'id', symbol: '', decimalDigits: 0).format(int.parse(nguponYuk[index].price.toString())),
+                                                                                        maxLines: 12,
+                                                                                        minSize: double.parse(((MediaQuery.of(context).size.width*0.035).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.035)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.035)).toString())
+                                                                                    ),
+                                                                                    // CustomText.bodyLight16(text: user[index].email, maxLines: 1, minSize: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.04)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.04)).toString())),
+                                                                                    // (user[index].notelp != null)?CustomText.bodyLight16(text: user[index].notelp, maxLines: 1, minSize: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.04)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.04)).toString())):CustomText.bodyLight16(text: 'Belum diisi.', maxLines: 1, minSize: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.04)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.04)).toString()), color: CustomColor.redBtn),
+                                                                                  ],
+                                                                                ),
+                                                                              ),
+                                                                            ],
+                                                                          ),
+                                                                          GestureDetector(
+                                                                            onTap: (){
+                                                                              // showAlertDialog(user[index].id.toString());
+
+                                                                              print(int.parse(nguponYuk[index].date!.replaceAll('-', '').toString()));
+                                                                              if (int.parse(nguponYuk[index].date!.replaceAll('-', '').toString()) == int.parse(formattedDate!.replaceAll('-', '').toString())) {
+                                                                                // Fluttertoast.showToast(
+                                                                                //     msg: (DateFormat('yMd').format(DateTime.parse(nguponYuk[index].date.toString()).add(Duration(days: 1)))).toString() +'>'+ (DateFormat('yMd').format(DateTime.parse(formattedDate))).toString());
+                                                                                Fluttertoast.showToast(
+                                                                                    msg: 'Kupon baru dapat digunakan 1 hari setelah pembelian anda!');
+                                                                                print(int.parse(nguponYuk[index].date!.replaceAll('-', '').toString()).toString() +'>'+ int.parse(formattedDate!.replaceAll('-', '').toString()).toString());
+                                                                                print('kecil');
+                                                                              } else if (int.parse(nguponYuk[index].date!.replaceAll('-', '').toString()) < int.parse(formattedDate!.replaceAll('-', '').toString())) {
+                                                                                _checkNguponYuk(nguponYuk[index].id.toString()).then((value){
+                                                                                  if (value == true) {
+                                                                                    if (codeNguponYuk.toString().contains(nguponYuk[index].code.toString()) == true) {
+                                                                                      codeNguponYuk.remove(nguponYuk[index].code.toString());
+                                                                                      Navigator.pop(context, 'x');
+                                                                                    } else {
+                                                                                      if (harga > 0) {
+                                                                                        codeNguponYuk.add(nguponYuk[index].code.toString());
+                                                                                        Navigator.pop(context, 'v');
+                                                                                      } else if (harga == 0) {
+                                                                                        codeNguponYuk = [];
+                                                                                        codeNguponYuk.add(nguponYuk[index].code.toString());
+                                                                                        Navigator.pop(context, 'v');
+                                                                                      }
+                                                                                    }
+                                                                                    priceNguponYuk = nguponYuk[index].price.toString();
+                                                                                    setState(() {});
+                                                                                  } else {
+                                                                                    Fluttertoast.showToast(
+                                                                                      msg: "Kupon tidak berlaku pada resto ini!",);
+                                                                                  }
+                                                                                });
+                                                                                print(int.parse(nguponYuk[index].date!.replaceAll('-', '').toString()).toString() +'>'+ int.parse(formattedDate!.replaceAll('-', '').toString()).toString());
+                                                                                print('besar');
+                                                                              }
+                                                                            },
+                                                                            child: Container(
+                                                                              height: CustomSize.sizeHeight(context) / 32,
+                                                                              decoration: BoxDecoration(
+                                                                                  borderRadius: BorderRadius.circular(20),
+                                                                                  border: Border.all(color: (codeNguponYuk.toString().contains(nguponYuk[index].code.toString()) == true)?CustomColor.redBtn:CustomColor.accent)
+                                                                              ),
+                                                                              child: Padding(
+                                                                                padding: EdgeInsets.symmetric(horizontal: CustomSize.sizeWidth(context) / 48),
+                                                                                child: Center(
+                                                                                  child: CustomText.textTitle8(
+                                                                                      text: (codeNguponYuk.toString().contains(nguponYuk[index].code.toString()) == true)?"Batal":"Gunakan",
+                                                                                      color: (codeNguponYuk.toString().contains(nguponYuk[index].code.toString()) == true)?CustomColor.redBtn:CustomColor.accent,
+                                                                                      sizeNew: double.parse(((MediaQuery.of(context).size.width*0.035).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.035)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.035)).toString())
+                                                                                  ),
+                                                                                ),
+                                                                              ),
+                                                                            ),
+                                                                          ),
+                                                                        ],
+                                                                      ),
+                                                                    ),
+                                                                  ),
+                                                                );
+                                                              }
+                                                          ),
+                                                        ),
+                                                      );
+                                                    });
+
+                                                if (result == 'v') {
+                                                  if (harga < int.parse(priceNguponYuk)) {
+                                                    if (priceNguponYuk != '') {
+                                                      totalHargaReal = totalHarga;
+                                                      hargaReal = harga;
+                                                      setState((){});
+                                                      if (_transCode != 1) {
+                                                        _platformfee = 1000;
+                                                        totalHarga = (int.parse(totalHargaReal) - hargaReal - _platformfee).toString();
+                                                        _platformfee = 0;
+                                                        setState((){});
+                                                      } else {
+                                                        totalHarga = (int.parse(totalHargaReal) - hargaReal).toString();
+                                                        setState((){});
+                                                      }
+                                                      harga = 0;
+                                                      setState((){});
+                                                      showDialog(
+                                                          context: context,
+                                                          builder: (context) {
+                                                            return AlertDialog(
+                                                              contentPadding: EdgeInsets.only(left: 25, right: 25, top: 15, bottom: 5),
+                                                              shape: RoundedRectangleBorder(
+                                                                  borderRadius: BorderRadius.all(Radius.circular(10))
+                                                              ),
+                                                              title: Center(child: Text('Peringatan!', style: TextStyle(color: CustomColor.primary))),
+                                                              content: Text('Kupon tidak dapat memberikan pengembalian pembayaran anda dibawah nilai kupon.', style: TextStyle(fontSize: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.04)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.04)).toString()), fontWeight: FontWeight.w500), textAlign: TextAlign.center),
+                                                              // '\n \nSemua proses pembayaran dan transaksi di luar tanggung jawab IRG!', style: TextStyle(fontSize: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.04)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.04)).toString()), fontWeight: FontWeight.w500), textAlign: TextAlign.center),
+                                                              actions: <Widget>[
+                                                                Center(
+                                                                  child: TextButton(
+                                                                    // minWidth: CustomSize.sizeWidth(context),
+                                                                    style: TextButton.styleFrom(
+                                                                      backgroundColor: CustomColor.accent,
+                                                                      padding: EdgeInsets.all(0),
+                                                                      shape: const RoundedRectangleBorder(
+                                                                          borderRadius: BorderRadius.all(Radius.circular(10))
+                                                                      ),
+                                                                    ),
+                                                                    child: Text('Mengerti', style: TextStyle(color: Colors.white)),
+                                                                    onPressed: () async{
+                                                                      Navigator.pop(context);
+                                                                      Navigator.pop(context);
+                                                                    },
+                                                                  ),
+                                                                ),
+
+                                                              ],
+                                                            );
+                                                          }
+                                                      );
+                                                    }
+                                                  } else if (harga > int.parse(priceNguponYuk)) {
+                                                    if (priceNguponYuk != '') {
+                                                      totalHargaReal = totalHarga;
+                                                      hargaReal = harga;
+                                                      setState((){});
+                                                      if (_transCode != 1) {
+                                                        _platformfee = 1000;
+                                                        totalHarga = (int.parse(totalHargaReal) - (int.parse(priceNguponYuk) * codeNguponYuk.length)).toString();
+                                                        harga = (hargaReal - (int.parse(priceNguponYuk) * codeNguponYuk.length));
+                                                        // _platformfee = 0;
+                                                        setState((){});
+                                                      } else {
+                                                        totalHarga = (int.parse(totalHargaReal) - (int.parse(priceNguponYuk) * codeNguponYuk.length)).toString();
+                                                        harga = (hargaReal - (int.parse(priceNguponYuk) * codeNguponYuk.length));
+                                                        setState((){});
+                                                      }
+                                                      print('harga');
+                                                      print(harga);
+
+                                                      Navigator.pop(context);
+                                                    }
+                                                  } else if (harga == int.parse(priceNguponYuk)) {
+                                                    if (priceNguponYuk != '') {
+                                                      totalHargaReal = totalHarga;
+                                                      hargaReal = harga;
+                                                      setState((){});
+                                                      if (_transCode != 1) {
+                                                        _platformfee = 1000;
+                                                        totalHarga = (int.parse(totalHargaReal) - hargaReal - _platformfee).toString();
+                                                        _platformfee = 0;
+                                                        setState((){});
+                                                      } else {
+                                                        totalHarga = (int.parse(totalHargaReal) - hargaReal).toString();
+                                                        setState((){});
+                                                      }
+                                                      harga = 0;
+                                                      Navigator.pop(context);
+                                                    }
+                                                  }
+
+                                                  setState((){});
+                                                } else if (result == 'x') {
+                                                  if (_transCode != 1) {
+                                                    _platformfee = 1000;
+                                                    totalHarga = (int.parse(totalHargaReal) - (int.parse(priceNguponYuk) * codeNguponYuk.length) + _platformfee).toString();
+                                                    harga = (hargaReal - (int.parse(priceNguponYuk) * codeNguponYuk.length));
+                                                    setState((){});
+                                                  } else {
+                                                    totalHarga = (int.parse(totalHargaReal) - (int.parse(priceNguponYuk) * codeNguponYuk.length)).toString();
+                                                    harga = (hargaReal - (int.parse(priceNguponYuk) * codeNguponYuk.length));
+                                                    setState((){});
+                                                  }
+                                                  print('harga x');
+                                                  print(harga);
+                                                  setState((){});
+                                                }
+                                              },
+                                            ),
+                                          ),
+
+                                        ],
+                                      );
+                                    }
+                                );
+                              } else {
+                                var result = await showDialog(
+                                    context: context,
+                                    builder: (context) {
+                                      return AlertDialog(
+                                        contentPadding: EdgeInsets.only(left: 5, right: 5, top: 15, bottom: 5),
+                                        shape: RoundedRectangleBorder(
+                                            borderRadius: BorderRadius.all(Radius.circular(10))
+                                        ),
+                                        title: Text('Kuponmu', style: TextStyle(color: CustomColor.primary)),
+                                        content: Container(
+                                          height: CustomSize.sizeHeight(context) / 2.2,
+                                          width: CustomSize.sizeWidth(context) / 1.1,
+                                          child: ListView.builder(
+                                              shrinkWrap: true,
+                                              controller: _scrollController,
+                                              physics: BouncingScrollPhysics(),
+                                              itemCount: nguponYuk.length,
+                                              itemBuilder: (_, index){
+                                                return Padding(
+                                                  padding: EdgeInsets.symmetric(horizontal: CustomSize.sizeWidth(context) / 22, vertical: CustomSize.sizeHeight(context) * 0.0075),
+                                                  child: GestureDetector(
+                                                    onTap: () async{
+                                                      // codeNguponYuk = nguponYuk[index].code.toString();
+                                                      // priceNguponYuk = nguponYuk[index].price.toString();
+                                                    },
+                                                    child: Container(
+                                                      // width: CustomSize.sizeWidth(context),
+                                                      // height: CustomSize.sizeHeight(context) / 7.5,
+                                                      color: Colors.white,
+                                                      child: Row(
+                                                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                                        crossAxisAlignment: CrossAxisAlignment.start,
+                                                        children: [
+                                                          Row(
+                                                            crossAxisAlignment: CrossAxisAlignment.start,
+                                                            children: [
+                                                              Container(
+                                                                width: CustomSize.sizeWidth(context) / 2.5,
+                                                                // width: CustomSize.sizeWidth(context) / 1.6,
+                                                                child: Column(
+                                                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                                                  mainAxisAlignment: MainAxisAlignment.center,
+                                                                  children: [
+                                                                    CustomText.textHeading4(
+                                                                        text: nguponYuk[index].code,
+                                                                        maxLines: 2,
+                                                                        minSize: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.04)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.04)).toString())
+                                                                    ),
+                                                                    CustomText.textTitle1(
+                                                                        text: 'Potongan: Rp.'+NumberFormat.currency(locale: 'id', symbol: '', decimalDigits: 0).format(int.parse(nguponYuk[index].price.toString())),
+                                                                        maxLines: 12,
+                                                                        minSize: double.parse(((MediaQuery.of(context).size.width*0.035).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.035)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.035)).toString())
+                                                                    ),
+                                                                    // CustomText.bodyLight16(text: user[index].email, maxLines: 1, minSize: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.04)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.04)).toString())),
+                                                                    // (user[index].notelp != null)?CustomText.bodyLight16(text: user[index].notelp, maxLines: 1, minSize: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.04)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.04)).toString())):CustomText.bodyLight16(text: 'Belum diisi.', maxLines: 1, minSize: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.04)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.04)).toString()), color: CustomColor.redBtn),
+                                                                  ],
+                                                                ),
+                                                              ),
+                                                            ],
+                                                          ),
+                                                          GestureDetector(
+                                                            onTap: (){
+                                                              // showAlertDialog(user[index].id.toString());
+
+                                                              print(int.parse(nguponYuk[index].date!.replaceAll('-', '').toString()));
+                                                              if (int.parse(nguponYuk[index].date!.replaceAll('-', '').toString()) == int.parse(formattedDate!.replaceAll('-', '').toString())) {
+                                                                // Fluttertoast.showToast(
+                                                                //     msg: (DateFormat('yMd').format(DateTime.parse(nguponYuk[index].date.toString()).add(Duration(days: 1)))).toString() +'>'+ (DateFormat('yMd').format(DateTime.parse(formattedDate))).toString());
+                                                                Fluttertoast.showToast(
+                                                                    msg: 'Kupon baru dapat digunakan 1 hari setelah pembelian anda!');
+                                                                print(int.parse(nguponYuk[index].date!.replaceAll('-', '').toString()).toString() +'>'+ int.parse(formattedDate!.replaceAll('-', '').toString()).toString());
+                                                                print('kecil');
+                                                              } else if (int.parse(nguponYuk[index].date!.replaceAll('-', '').toString()) < int.parse(formattedDate!.replaceAll('-', '').toString())) {
+                                                                _checkNguponYuk(nguponYuk[index].id.toString()).then((value){
+                                                                  if (value == true) {
+                                                                    if (codeNguponYuk.toString().contains(nguponYuk[index].code.toString()) == true) {
+                                                                      codeNguponYuk.remove(nguponYuk[index].code.toString());
+                                                                      Navigator.pop(context, 'x');
+                                                                    } else {
+                                                                      if (harga > 0) {
+                                                                        codeNguponYuk.add(nguponYuk[index].code.toString());
+                                                                        Navigator.pop(context, 'v');
+                                                                      } else if (harga == 0) {
+                                                                        codeNguponYuk = [];
+                                                                        codeNguponYuk.add(nguponYuk[index].code.toString());
+                                                                        Navigator.pop(context, 'v');
+                                                                      }
+                                                                    }
+                                                                    priceNguponYuk = nguponYuk[index].price.toString();
+                                                                    setState(() {});
+                                                                  }
+                                                                });
+                                                                print(int.parse(nguponYuk[index].date!.replaceAll('-', '').toString()).toString() +'>'+ int.parse(formattedDate!.replaceAll('-', '').toString()).toString());
+                                                                print('besar');
+                                                              }
+
+
+                                                              //===============================
+
+
+                                                              // _checkNguponYuk(nguponYuk[index].id.toString()).whenComplete((){
+                                                              //   if (codeNguponYuk.toString().contains(nguponYuk[index].code.toString()) == true) {
+                                                              //     codeNguponYuk.remove(nguponYuk[index].code.toString());
+                                                              //     Navigator.pop(context, 'x');
+                                                              //   } else {
+                                                              //     if (harga > 0) {
+                                                              //       codeNguponYuk.add(nguponYuk[index].code.toString());
+                                                              //       Navigator.pop(context, 'v');
+                                                              //     } else if (harga == 0) {
+                                                              //       codeNguponYuk = [];
+                                                              //       codeNguponYuk.add(nguponYuk[index].code.toString());
+                                                              //       Navigator.pop(context, 'v');
+                                                              //     }
+                                                              //   }
+                                                              //   priceNguponYuk = nguponYuk[index].price.toString();
+                                                              // });
+
+                                                              // if (codeNguponYuk.toString().contains(nguponYuk[index].code.toString()) == true) {
+                                                              //   codeNguponYuk.remove(nguponYuk[index].code.toString());
+                                                              //   Navigator.pop(context, 'x');
+                                                              // } else {
+                                                              //   if (harga > 0) {
+                                                              //     codeNguponYuk.add(nguponYuk[index].code.toString());
+                                                              //     Navigator.pop(context, 'v');
+                                                              //   } else if (harga == 0) {
+                                                              //     codeNguponYuk = [];
+                                                              //     codeNguponYuk.add(nguponYuk[index].code.toString());
+                                                              //     Navigator.pop(context, 'v');
+                                                              //   }
+                                                              // }
+                                                              // priceNguponYuk = nguponYuk[index].price.toString();
+
+                                                            },
+                                                            child: Container(
+                                                              height: CustomSize.sizeHeight(context) / 32,
+                                                              decoration: BoxDecoration(
+                                                                  borderRadius: BorderRadius.circular(20),
+                                                                  border: Border.all(color: (codeNguponYuk.toString().contains(nguponYuk[index].code.toString()) == true)?CustomColor.redBtn:CustomColor.accent)
+                                                              ),
+                                                              child: Padding(
+                                                                padding: EdgeInsets.symmetric(horizontal: CustomSize.sizeWidth(context) / 48),
+                                                                child: Center(
+                                                                  child: CustomText.textTitle8(
+                                                                      text: (codeNguponYuk.toString().contains(nguponYuk[index].code.toString()) == true)?"Batal":"Gunakan",
+                                                                      color: (codeNguponYuk.toString().contains(nguponYuk[index].code.toString()) == true)?CustomColor.redBtn:CustomColor.accent,
+                                                                      sizeNew: double.parse(((MediaQuery.of(context).size.width*0.035).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.035)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.035)).toString())
+                                                                  ),
+                                                                ),
+                                                              ),
+                                                            ),
+                                                          ),
+                                                        ],
+                                                      ),
+                                                    ),
+                                                  ),
+                                                );
+                                              }
+                                          ),
+                                        ),
+                                      );
+                                    });
+
+                                if (result == 'v') {
+                                  if (harga < int.parse(priceNguponYuk)) {
+                                    if (priceNguponYuk != '') {
+                                      // totalHargaReal = totalHarga;
+                                      // hargaReal = harga;
+                                      if (_transCode != 1) {
+                                        _platformfee = 1000;
+                                        totalHarga = (int.parse(totalHargaReal) - hargaReal - _platformfee).toString();
+                                        _platformfee = 0;
+                                        setState((){});
+                                      } else {
+                                        totalHarga = (int.parse(totalHargaReal) - hargaReal).toString();
+                                        setState((){});
+                                      }
+                                      harga = 0;
+                                      setState((){});
+                                      showDialog(
+                                          context: context,
+                                          builder: (context) {
+                                            return AlertDialog(
+                                              contentPadding: EdgeInsets.only(left: 25, right: 25, top: 15, bottom: 5),
+                                              shape: RoundedRectangleBorder(
+                                                  borderRadius: BorderRadius.all(Radius.circular(10))
+                                              ),
+                                              title: Center(child: Text('Peringatan!', style: TextStyle(color: CustomColor.primary))),
+                                              content: Text('Kupon tidak dapat memberikan pengembalian pembayaran anda dibawah nilai kupon.', style: TextStyle(fontSize: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.04)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.04)).toString()), fontWeight: FontWeight.w500), textAlign: TextAlign.center),
+                                              // '\n \nSemua proses pembayaran dan transaksi di luar tanggung jawab IRG!', style: TextStyle(fontSize: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.04)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.04)).toString()), fontWeight: FontWeight.w500), textAlign: TextAlign.center),
+                                              actions: <Widget>[
+                                                Center(
+                                                  child: TextButton(
+                                                    // minWidth: CustomSize.sizeWidth(context),
+                                                    style: TextButton.styleFrom(
+                                                      backgroundColor: CustomColor.accent,
+                                                      padding: EdgeInsets.all(0),
+                                                      shape: const RoundedRectangleBorder(
+                                                          borderRadius: BorderRadius.all(Radius.circular(10))
+                                                      ),
+                                                    ),
+                                                    child: Text('Mengerti', style: TextStyle(color: Colors.white)),
+                                                    onPressed: () async{
+                                                      Navigator.pop(context);
+                                                    },
+                                                  ),
+                                                ),
+
+                                              ],
+                                            );
+                                          }
+                                      );
+                                    }
+                                  } else if (harga > int.parse(priceNguponYuk)) {
+                                    if (priceNguponYuk != '') {
+                                      // totalHargaReal = totalHarga;
+                                      // hargaReal = harga;
+                                      if (_transCode != 1) {
+                                        _platformfee = 1000;
+                                        totalHarga = (int.parse(totalHargaReal) - (int.parse(priceNguponYuk) * codeNguponYuk.length)).toString();
+                                        harga = (hargaReal - (int.parse(priceNguponYuk) * codeNguponYuk.length));
+                                        // _platformfee = 0;
+                                        setState((){});
+                                      } else {
+                                        totalHarga = (int.parse(totalHargaReal) - (int.parse(priceNguponYuk) * codeNguponYuk.length)).toString();
+                                        harga = (hargaReal - (int.parse(priceNguponYuk) * codeNguponYuk.length));
+                                        setState((){});
+                                      }
+                                      print('harga');
+                                      print(harga);
+                                    }
+                                  } else if (harga == int.parse(priceNguponYuk)) {
+                                    if (priceNguponYuk != '') {
+                                      // totalHargaReal = totalHarga;
+                                      // hargaReal = harga;
+                                      if (_transCode != 1) {
+                                        _platformfee = 1000;
+                                        totalHarga = (int.parse(totalHargaReal) - hargaReal - _platformfee).toString();
+                                        _platformfee = 0;
+                                        setState((){});
+                                      } else {
+                                        totalHarga = (int.parse(totalHargaReal) - hargaReal).toString();
+                                        setState((){});
+                                      }
+                                      harga = 0;
+                                    }
+                                  }
+
+                                  setState((){});
+                                } else if (result == 'x') {
+                                  if (_transCode != 1) {
+                                    String totalHargaNew = (int.parse(totalHargaReal) - (int.parse(priceNguponYuk) * codeNguponYuk.length)).toString();
+                                    if (totalHargaNew != totalHargaReal) {
+                                      totalHarga = ((int.parse(totalHargaReal) - 1000) - (int.parse(priceNguponYuk) * codeNguponYuk.length)).toString();
+                                      harga = (hargaReal - (int.parse(priceNguponYuk) * codeNguponYuk.length));
+                                      print('in x1');
+                                    } else {
+                                      _platformfee = 1000;
+                                      totalHarga = (int.parse(totalHargaReal) - (int.parse(priceNguponYuk) * codeNguponYuk.length)).toString();
+                                      harga = (hargaReal - (int.parse(priceNguponYuk) * codeNguponYuk.length));
+                                      print('in x2');
+                                    }
+                                    print('in x');
+                                    setState((){});
+                                  } else {
+                                    _platformfee = 1000;
+                                    totalHarga = (int.parse(totalHargaReal) - (int.parse(priceNguponYuk) * codeNguponYuk.length) + _platformfee).toString();
+                                    harga = (hargaReal - (int.parse(priceNguponYuk) * codeNguponYuk.length));
+                                    setState((){});
+                                  }
+                                  print('harga x');
+                                  print(harga);
+                                  print(hargaReal);
+                                  print(codeNguponYuk.length);
+                                  setState((){});
+                                }
+                              }
+
+                            },
+                            child: Container(
+                              height: CustomSize.sizeHeight(context) / 24,
+                              decoration: BoxDecoration(
+                                  borderRadius: BorderRadius.circular(20),
+                                  border: Border.all(color: Colors.grey)
+                              ),
+                              child: Padding(
+                                padding: EdgeInsets.symmetric(horizontal: CustomSize.sizeWidth(context) / 32),
+                                child: Center(
+                                  child: CustomText.textTitle8(
+                                      text: (codeNguponYuk.toString() == '[]')?"Gunakan":(harga != 0)?"Tambah":"Ganti",
+                                      color: Colors.grey,
+                                      minSize: double.parse(((MediaQuery.of(context).size.width*0.035).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.035)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.035)).toString())
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ),
+                        )
+                      ],
+                    ),
+                  ):Container(),
+                  (codeNguponYuk.toString() != '[]')?Padding(
+                    padding: EdgeInsets.symmetric(
+                      horizontal: CustomSize.sizeWidth(context) / 32,
+                      // vertical: CustomSize.sizeHeight(context) * 0.01
+                    ),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        Container(
+                          width: CustomSize.sizeWidth(context) / 1.6,
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              CustomText.textHeading4(text: 'Kupon yang digunakan:', minSize: double.parse(((MediaQuery.of(context).size.width*0.045).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.045)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.045)).toString())),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
+                  ):Container(),
+                  (codeNguponYuk.toString() != '[]')?Padding(
+                    padding: EdgeInsets.only(
+                        left: CustomSize.sizeWidth(context) / 32,
+                        right: CustomSize.sizeWidth(context) / 32,
+                        bottom: CustomSize.sizeHeight(context) * 0.01
+                      // vertical: CustomSize.sizeHeight(context) * 0.01
+                    ),
+                    child: Container(
+                      // width: CustomSize.sizeWidth(context) / 1.6,
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          ListView.builder(
+                              shrinkWrap: true,
+                              controller: _scrollController,
+                              physics: BouncingScrollPhysics(),
+                              itemCount: codeNguponYuk.length,
+                              itemBuilder: (_, index){
+                              return Row(
+                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                children: [
+                                  CustomText.textTitle2(text: codeNguponYuk[index], color: CustomColor.primaryLight, sizeNew: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.04)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.04)).toString()), maxLines: 1),
+                                  CustomText.textTitle2(text: 'Rp.'+NumberFormat.currency(locale: 'id', symbol: '', decimalDigits: 0).format(int.parse(priceNguponYuk)), sizeNew: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.04)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.04)).toString()), maxLines: 1),
+                                ],
+                              );
+                            }
+                          ),
+                        ],
+                      ),
+                    ),
+                  ):Container(),
+
+                  // (nguponYuk.toString() != '[]')?Padding(
                   //   padding: EdgeInsets.symmetric(
                   //       horizontal: CustomSize.sizeWidth(context) / 32,
-                  //       vertical: CustomSize.sizeHeight(context) / 55
+                  //       vertical: CustomSize.sizeHeight(context) * 0.01
+                  //   ),
+                  //   child: Row(
+                  //     mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  //     crossAxisAlignment: CrossAxisAlignment.center,
+                  //     children: [
+                  //       Container(
+                  //         width: CustomSize.sizeWidth(context) / 1.6,
+                  //         child: Column(
+                  //           crossAxisAlignment: CrossAxisAlignment.start,
+                  //           children: [
+                  //             CustomText.textHeading4(text: "Gunakan Ngupon Yuk !", minSize: double.parse(((MediaQuery.of(context).size.width*0.045).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.045)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.045)).toString())),
+                  //             CustomText.bodyRegular16(text: "Pembayaran pesanan anda bisa", minSize: double.parse(((MediaQuery.of(context).size.width*0.03).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.03)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.03)).toString()), maxLines: 5),
+                  //             Container(
+                  //               width: CustomSize.sizeWidth(context) / 1.6,
+                  //               child: Row(
+                  //                 mainAxisAlignment: MainAxisAlignment.start,
+                  //                 children: [
+                  //                   CustomText.bodyRegular16(text: "menggunakan Ngupon Yuk", minSize: double.parse(((MediaQuery.of(context).size.width*0.03).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.03)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.03)).toString()), maxLines: 5),
+                  //                   GestureDetector(
+                  //                     onTap: () async {
+                  //                       showDialog(
+                  //                           context: context,
+                  //                           builder: (context) {
+                  //                             return AlertDialog(
+                  //                               contentPadding: EdgeInsets.only(left: 25, right: 25, top: 15, bottom: 5),
+                  //                               shape: RoundedRectangleBorder(
+                  //                                   borderRadius: BorderRadius.all(Radius.circular(10))
+                  //                               ),
+                  //                               title: Center(child: Text('Peringatan!', style: TextStyle(color: CustomColor.primary))),
+                  //                               content: Text('Kupon anda hanya berlaku pada harga menu yang anda pesan.\n\nTidak termasuk biaya ongkir.', style: TextStyle(fontSize: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.04)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.04)).toString()), fontWeight: FontWeight.w500), textAlign: TextAlign.center),
+                  //                               // '\n \nSemua proses pembayaran dan transaksi di luar tanggung jawab IRG!', style: TextStyle(fontSize: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.04)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.04)).toString()), fontWeight: FontWeight.w500), textAlign: TextAlign.center),
+                  //                               actions: <Widget>[
+                  //                                 Center(
+                  //                                   child: FlatButton(
+                  //                                     // minWidth: CustomSize.sizeWidth(context),
+                  //                                     color: CustomColor.accent,
+                  //                                     textColor: Colors.white,
+                  //                                     shape: RoundedRectangleBorder(
+                  //                                         borderRadius: BorderRadius.all(Radius.circular(10))
+                  //                                     ),
+                  //                                     child: Text('Mengerti'),
+                  //                                     onPressed: () async{
+                  //                                       Navigator.pop(context);
+                  //                                     },
+                  //                                   ),
+                  //                                 ),
+                  //
+                  //                               ],
+                  //                             );
+                  //                           }
+                  //                       );
+                  //                     },
+                  //                     child: FaIcon(
+                  //                       Icons.info_outline,
+                  //                       color: Colors.grey,
+                  //                       size: double.parse(((MediaQuery.of(context).size.width*0.0425).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.0425)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.0425)).toString()),
+                  //                     ),
+                  //                   ),
+                  //                 ],
+                  //               ),
+                  //             )
+                  //           ],
+                  //         ),
+                  //       ),
+                  //       Padding(
+                  //         padding: EdgeInsets.symmetric(horizontal: CustomSize.sizeWidth(context) / 86),
+                  //         child: GestureDetector(
+                  //           onTap: ()async{
+                  //             // Navigator.pop(context);
+                  //             if (_platformfee != 0) {
+                  //               showDialog(
+                  //                   context: context,
+                  //                   builder: (context) {
+                  //                     return AlertDialog(
+                  //                       contentPadding: EdgeInsets.only(left: 25, right: 25, top: 15, bottom: 5),
+                  //                       shape: RoundedRectangleBorder(
+                  //                           borderRadius: BorderRadius.all(Radius.circular(10))
+                  //                       ),
+                  //                       title: Center(child: Text('Peringatan!', style: TextStyle(color: CustomColor.primary))),
+                  //                       content: Text('Pastikan jumlah pesanan anda sudah benar sebelum menggunakan kupon, karena jumlah pesanan anda tidak dapat diubah setelah anda menggunakan kupon!', style: TextStyle(fontSize: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.04)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.04)).toString()), fontWeight: FontWeight.w500), textAlign: TextAlign.center),
+                  //                       // '\n \nSemua proses pembayaran dan transaksi di luar tanggung jawab IRG!', style: TextStyle(fontSize: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.04)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.04)).toString()), fontWeight: FontWeight.w500), textAlign: TextAlign.center),
+                  //                       actions: <Widget>[
+                  //                         Center(
+                  //                           child: FlatButton(
+                  //                             // minWidth: CustomSize.sizeWidth(context),
+                  //                             color: CustomColor.accent,
+                  //                             textColor: Colors.white,
+                  //                             shape: RoundedRectangleBorder(
+                  //                                 borderRadius: BorderRadius.all(Radius.circular(10))
+                  //                             ),
+                  //                             child: Text('Mengerti'),
+                  //                             onPressed: () async{
+                  //                               // Navigator.pop(context);
+                  //                               var result = await showDialog(
+                  //                                   context: context,
+                  //                                   builder: (context) {
+                  //                                     return AlertDialog(
+                  //                                       contentPadding: EdgeInsets.only(left: 5, right: 5, top: 15, bottom: 5),
+                  //                                       shape: RoundedRectangleBorder(
+                  //                                           borderRadius: BorderRadius.all(Radius.circular(10))
+                  //                                       ),
+                  //                                       title: Text('Kuponmu', style: TextStyle(color: CustomColor.primary)),
+                  //                                       content: Container(
+                  //                                         height: CustomSize.sizeHeight(context) / 2.2,
+                  //                                         width: CustomSize.sizeWidth(context) / 1.1,
+                  //                                         child: ListView.builder(
+                  //                                             shrinkWrap: true,
+                  //                                             controller: _scrollController,
+                  //                                             physics: BouncingScrollPhysics(),
+                  //                                             itemCount: nguponYuk.length,
+                  //                                             itemBuilder: (_, index){
+                  //                                               return Padding(
+                  //                                                 padding: EdgeInsets.symmetric(horizontal: CustomSize.sizeWidth(context) / 22, vertical: CustomSize.sizeHeight(context) * 0.0075),
+                  //                                                 child: GestureDetector(
+                  //                                                   onTap: () async{
+                  //                                                     // codeNguponYuk = nguponYuk[index].code.toString();
+                  //                                                     // priceNguponYuk = nguponYuk[index].price.toString();
+                  //                                                   },
+                  //                                                   child: Container(
+                  //                                                     // width: CustomSize.sizeWidth(context),
+                  //                                                     // height: CustomSize.sizeHeight(context) / 7.5,
+                  //                                                     color: Colors.white,
+                  //                                                     child: Row(
+                  //                                                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  //                                                       crossAxisAlignment: CrossAxisAlignment.start,
+                  //                                                       children: [
+                  //                                                         Row(
+                  //                                                           crossAxisAlignment: CrossAxisAlignment.start,
+                  //                                                           children: [
+                  //                                                             Container(
+                  //                                                               width: CustomSize.sizeWidth(context) / 2.5,
+                  //                                                               // width: CustomSize.sizeWidth(context) / 1.6,
+                  //                                                               child: Column(
+                  //                                                                 crossAxisAlignment: CrossAxisAlignment.start,
+                  //                                                                 mainAxisAlignment: MainAxisAlignment.center,
+                  //                                                                 children: [
+                  //                                                                   CustomText.textHeading4(
+                  //                                                                       text: nguponYuk[index].code,
+                  //                                                                       maxLines: 2,
+                  //                                                                       minSize: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.04)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.04)).toString())
+                  //                                                                   ),
+                  //                                                                   CustomText.textTitle1(
+                  //                                                                       text: 'Potongan: Rp.'+NumberFormat.currency(locale: 'id', symbol: '', decimalDigits: 0).format(int.parse(nguponYuk[index].price.toString())),
+                  //                                                                       maxLines: 12,
+                  //                                                                       minSize: double.parse(((MediaQuery.of(context).size.width*0.035).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.035)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.035)).toString())
+                  //                                                                   ),
+                  //                                                                   // CustomText.bodyLight16(text: user[index].email, maxLines: 1, minSize: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.04)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.04)).toString())),
+                  //                                                                   // (user[index].notelp != null)?CustomText.bodyLight16(text: user[index].notelp, maxLines: 1, minSize: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.04)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.04)).toString())):CustomText.bodyLight16(text: 'Belum diisi.', maxLines: 1, minSize: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.04)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.04)).toString()), color: CustomColor.redBtn),
+                  //                                                                 ],
+                  //                                                               ),
+                  //                                                             ),
+                  //                                                           ],
+                  //                                                         ),
+                  //                                                         GestureDetector(
+                  //                                                           onTap: (){
+                  //                                                             // showAlertDialog(user[index].id.toString());
+                  //                                                             codeNguponYuk = nguponYuk[index].code.toString();
+                  //                                                             priceNguponYuk = nguponYuk[index].price.toString();
+                  //                                                             Navigator.pop(context, 'v');
+                  //                                                           },
+                  //                                                           child: Container(
+                  //                                                             height: CustomSize.sizeHeight(context) / 32,
+                  //                                                             decoration: BoxDecoration(
+                  //                                                                 borderRadius: BorderRadius.circular(20),
+                  //                                                                 border: Border.all(color: CustomColor.accent)
+                  //                                                             ),
+                  //                                                             child: Padding(
+                  //                                                               padding: EdgeInsets.symmetric(horizontal: CustomSize.sizeWidth(context) / 48),
+                  //                                                               child: Center(
+                  //                                                                 child: CustomText.textTitle8(
+                  //                                                                     text: "Gunakan",
+                  //                                                                     color: CustomColor.accent,
+                  //                                                                     sizeNew: double.parse(((MediaQuery.of(context).size.width*0.035).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.035)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.035)).toString())
+                  //                                                                 ),
+                  //                                                               ),
+                  //                                                             ),
+                  //                                                           ),
+                  //                                                         ),
+                  //                                                       ],
+                  //                                                     ),
+                  //                                                   ),
+                  //                                                 ),
+                  //                                               );
+                  //                                             }
+                  //                                         ),
+                  //                                       ),
+                  //                                     );
+                  //                                   });
+                  //
+                  //                               if (result != '') {
+                  //                                 if (harga < int.parse(priceNguponYuk)) {
+                  //                                   if (priceNguponYuk != '') {
+                  //                                     totalHarga = (int.parse(totalHarga) - harga - _platformfee).toString();
+                  //                                     _platformfee = 0;
+                  //                                     harga = 0;
+                  //                                     showDialog(
+                  //                                         context: context,
+                  //                                         builder: (context) {
+                  //                                           return AlertDialog(
+                  //                                             contentPadding: EdgeInsets.only(left: 25, right: 25, top: 15, bottom: 5),
+                  //                                             shape: RoundedRectangleBorder(
+                  //                                                 borderRadius: BorderRadius.all(Radius.circular(10))
+                  //                                             ),
+                  //                                             title: Center(child: Text('Peringatan!', style: TextStyle(color: CustomColor.primary))),
+                  //                                             content: Text('Disarankan harga pesanan anda senilai dengan nilai kupon anda atau bisa lebih, agar anda tidak mengalami kerugian.', style: TextStyle(fontSize: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.04)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.04)).toString()), fontWeight: FontWeight.w500), textAlign: TextAlign.center),
+                  //                                             // '\n \nSemua proses pembayaran dan transaksi di luar tanggung jawab IRG!', style: TextStyle(fontSize: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.04)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.04)).toString()), fontWeight: FontWeight.w500), textAlign: TextAlign.center),
+                  //                                             actions: <Widget>[
+                  //                                               Center(
+                  //                                                 child: FlatButton(
+                  //                                                   // minWidth: CustomSize.sizeWidth(context),
+                  //                                                   color: CustomColor.accent,
+                  //                                                   textColor: Colors.white,
+                  //                                                   shape: RoundedRectangleBorder(
+                  //                                                       borderRadius: BorderRadius.all(Radius.circular(10))
+                  //                                                   ),
+                  //                                                   child: Text('Mengerti'),
+                  //                                                   onPressed: () async{
+                  //                                                     Navigator.pop(context);
+                  //                                                     Navigator.pop(context);
+                  //                                                   },
+                  //                                                 ),
+                  //                                               ),
+                  //
+                  //                                             ],
+                  //                                           );
+                  //                                         }
+                  //                                     );
+                  //                                   }
+                  //                                 } else if (harga > int.parse(priceNguponYuk)) {
+                  //                                   if (priceNguponYuk != '') {
+                  //                                     totalHarga = (int.parse(totalHarga) - int.parse(priceNguponYuk) - _platformfee).toString();
+                  //                                     harga = (harga - int.parse(priceNguponYuk));
+                  //                                     print('harga');
+                  //                                     print(harga);
+                  //                                     _platformfee = 0;
+                  //                                     Navigator.pop(context);
+                  //                                   }
+                  //                                 } else if (harga == int.parse(priceNguponYuk)) {
+                  //                                   if (priceNguponYuk != '') {
+                  //                                     totalHarga = (int.parse(totalHarga) - harga - _platformfee).toString();
+                  //                                     _platformfee = 0;
+                  //                                     harga = 0;
+                  //                                     Navigator.pop(context);
+                  //                                   }
+                  //                                 }
+                  //
+                  //                                 setState((){});
+                  //                               }
+                  //                             },
+                  //                           ),
+                  //                         ),
+                  //
+                  //                       ],
+                  //                     );
+                  //                   }
+                  //               );
+                  //             } else {
+                  //               var result = await showDialog(
+                  //                   context: context,
+                  //                   builder: (context) {
+                  //                     return AlertDialog(
+                  //                       contentPadding: EdgeInsets.only(left: 5, right: 5, top: 15, bottom: 5),
+                  //                       shape: RoundedRectangleBorder(
+                  //                           borderRadius: BorderRadius.all(Radius.circular(10))
+                  //                       ),
+                  //                       title: Text('Kuponmu', style: TextStyle(color: CustomColor.primary)),
+                  //                       content: Container(
+                  //                         height: CustomSize.sizeHeight(context) / 2.2,
+                  //                         width: CustomSize.sizeWidth(context) / 1.1,
+                  //                         child: ListView.builder(
+                  //                             shrinkWrap: true,
+                  //                             controller: _scrollController,
+                  //                             physics: BouncingScrollPhysics(),
+                  //                             itemCount: nguponYuk.length,
+                  //                             itemBuilder: (_, index){
+                  //                               return Padding(
+                  //                                 padding: EdgeInsets.symmetric(horizontal: CustomSize.sizeWidth(context) / 22, vertical: CustomSize.sizeHeight(context) * 0.0075),
+                  //                                 child: GestureDetector(
+                  //                                   onTap: () async{
+                  //                                     // codeNguponYuk = nguponYuk[index].code.toString();
+                  //                                     // priceNguponYuk = nguponYuk[index].price.toString();
+                  //                                   },
+                  //                                   child: Container(
+                  //                                     // width: CustomSize.sizeWidth(context),
+                  //                                     // height: CustomSize.sizeHeight(context) / 7.5,
+                  //                                     color: Colors.white,
+                  //                                     child: Row(
+                  //                                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  //                                       crossAxisAlignment: CrossAxisAlignment.start,
+                  //                                       children: [
+                  //                                         Row(
+                  //                                           crossAxisAlignment: CrossAxisAlignment.start,
+                  //                                           children: [
+                  //                                             Container(
+                  //                                               width: CustomSize.sizeWidth(context) / 2.5,
+                  //                                               // width: CustomSize.sizeWidth(context) / 1.6,
+                  //                                               child: Column(
+                  //                                                 crossAxisAlignment: CrossAxisAlignment.start,
+                  //                                                 mainAxisAlignment: MainAxisAlignment.center,
+                  //                                                 children: [
+                  //                                                   CustomText.textHeading4(
+                  //                                                       text: nguponYuk[index].code,
+                  //                                                       maxLines: 2,
+                  //                                                       minSize: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.04)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.04)).toString())
+                  //                                                   ),
+                  //                                                   CustomText.textTitle1(
+                  //                                                       text: 'Potongan: Rp.'+NumberFormat.currency(locale: 'id', symbol: '', decimalDigits: 0).format(int.parse(nguponYuk[index].price.toString())),
+                  //                                                       maxLines: 12,
+                  //                                                       minSize: double.parse(((MediaQuery.of(context).size.width*0.035).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.035)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.035)).toString())
+                  //                                                   ),
+                  //                                                   // CustomText.bodyLight16(text: user[index].email, maxLines: 1, minSize: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.04)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.04)).toString())),
+                  //                                                   // (user[index].notelp != null)?CustomText.bodyLight16(text: user[index].notelp, maxLines: 1, minSize: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.04)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.04)).toString())):CustomText.bodyLight16(text: 'Belum diisi.', maxLines: 1, minSize: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.04)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.04)).toString()), color: CustomColor.redBtn),
+                  //                                                 ],
+                  //                                               ),
+                  //                                             ),
+                  //                                           ],
+                  //                                         ),
+                  //                                         GestureDetector(
+                  //                                           onTap: (){
+                  //                                             // showAlertDialog(user[index].id.toString());
+                  //                                             codeNguponYuk = nguponYuk[index].code.toString();
+                  //                                             priceNguponYuk = nguponYuk[index].price.toString();
+                  //                                             Navigator.pop(context, 'v');
+                  //                                           },
+                  //                                           child: Container(
+                  //                                             height: CustomSize.sizeHeight(context) / 32,
+                  //                                             decoration: BoxDecoration(
+                  //                                                 borderRadius: BorderRadius.circular(20),
+                  //                                                 border: Border.all(color: CustomColor.accent)
+                  //                                             ),
+                  //                                             child: Padding(
+                  //                                               padding: EdgeInsets.symmetric(horizontal: CustomSize.sizeWidth(context) / 48),
+                  //                                               child: Center(
+                  //                                                 child: CustomText.textTitle8(
+                  //                                                     text: "Gunakan",
+                  //                                                     color: CustomColor.accent,
+                  //                                                     sizeNew: double.parse(((MediaQuery.of(context).size.width*0.035).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.035)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.035)).toString())
+                  //                                                 ),
+                  //                                               ),
+                  //                                             ),
+                  //                                           ),
+                  //                                         ),
+                  //                                       ],
+                  //                                     ),
+                  //                                   ),
+                  //                                 ),
+                  //                               );
+                  //                             }
+                  //                         ),
+                  //                       ),
+                  //                     );
+                  //                   });
+                  //
+                  //               if (result != '') {
+                  //                 if (harga < int.parse(priceNguponYuk)) {
+                  //                   if (priceNguponYuk != '') {
+                  //                     totalHarga = (int.parse(totalHarga) - harga - _platformfee).toString();
+                  //                     _platformfee = 0;
+                  //                     harga = 0;
+                  //                     showDialog(
+                  //                         context: context,
+                  //                         builder: (context) {
+                  //                           return AlertDialog(
+                  //                             contentPadding: EdgeInsets.only(left: 25, right: 25, top: 15, bottom: 5),
+                  //                             shape: RoundedRectangleBorder(
+                  //                                 borderRadius: BorderRadius.all(Radius.circular(10))
+                  //                             ),
+                  //                             title: Center(child: Text('Peringatan!', style: TextStyle(color: CustomColor.primary))),
+                  //                             content: Text('Disarankan harga pesanan anda senilai dengan nilai kupon anda atau bisa lebih, agar anda tidak mengalami kerugian.', style: TextStyle(fontSize: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.04)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.04)).toString()), fontWeight: FontWeight.w500), textAlign: TextAlign.center),
+                  //                             // '\n \nSemua proses pembayaran dan transaksi di luar tanggung jawab IRG!', style: TextStyle(fontSize: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.04)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.04)).toString()), fontWeight: FontWeight.w500), textAlign: TextAlign.center),
+                  //                             actions: <Widget>[
+                  //                               Center(
+                  //                                 child: FlatButton(
+                  //                                   // minWidth: CustomSize.sizeWidth(context),
+                  //                                   color: CustomColor.accent,
+                  //                                   textColor: Colors.white,
+                  //                                   shape: RoundedRectangleBorder(
+                  //                                       borderRadius: BorderRadius.all(Radius.circular(10))
+                  //                                   ),
+                  //                                   child: Text('Mengerti'),
+                  //                                   onPressed: () async{
+                  //                                     Navigator.pop(context);
+                  //                                   },
+                  //                                 ),
+                  //                               ),
+                  //
+                  //                             ],
+                  //                           );
+                  //                         }
+                  //                     );
+                  //                   }
+                  //                 } else if (harga > int.parse(priceNguponYuk)) {
+                  //                   if (priceNguponYuk != '') {
+                  //                     totalHarga = (int.parse(totalHarga) - int.parse(priceNguponYuk) - _platformfee).toString();
+                  //                     harga = (harga - int.parse(priceNguponYuk));
+                  //                     print('harga');
+                  //                     print(harga);
+                  //                     _platformfee = 0;
+                  //                   }
+                  //                 } else if (harga == int.parse(priceNguponYuk)) {
+                  //                   if (priceNguponYuk != '') {
+                  //                     totalHarga = (int.parse(totalHarga) - harga - _platformfee).toString();
+                  //                     _platformfee = 0;
+                  //                     harga = 0;
+                  //                   }
+                  //                 }
+                  //
+                  //                 setState((){});
+                  //               }
+                  //             }
+                  //
+                  //           },
+                  //           child: Container(
+                  //             height: CustomSize.sizeHeight(context) / 24,
+                  //             decoration: BoxDecoration(
+                  //                 borderRadius: BorderRadius.circular(20),
+                  //                 border: Border.all(color: Colors.grey)
+                  //             ),
+                  //             child: Padding(
+                  //                 padding: EdgeInsets.symmetric(horizontal: CustomSize.sizeWidth(context) / 32),
+                  //               child: Center(
+                  //                 child: CustomText.textTitle8(
+                  //                     text: (codeNguponYuk == '')?"Gunakan":"Ganti",
+                  //                     color: Colors.grey,
+                  //                     minSize: double.parse(((MediaQuery.of(context).size.width*0.035).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.035)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.035)).toString())
+                  //                 ),
+                  //               ),
+                  //             ),
+                  //           ),
+                  //         ),
+                  //       )
+                  //     ],
+                  //   ),
+                  // ):Container(),
+                  // (codeNguponYuk != '')?Padding(
+                  //   padding: EdgeInsets.symmetric(
+                  //       horizontal: CustomSize.sizeWidth(context) / 32,
+                  //       // vertical: CustomSize.sizeHeight(context) * 0.01
+                  //   ),
+                  //   child: Row(
+                  //     mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  //     crossAxisAlignment: CrossAxisAlignment.center,
+                  //     children: [
+                  //       Container(
+                  //         width: CustomSize.sizeWidth(context) / 1.6,
+                  //         child: Column(
+                  //           crossAxisAlignment: CrossAxisAlignment.start,
+                  //           children: [
+                  //             CustomText.textHeading4(text: 'Kupon yang digunakan:', minSize: double.parse(((MediaQuery.of(context).size.width*0.045).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.045)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.045)).toString())),
+                  //           ],
+                  //         ),
+                  //       ),
+                  //     ],
+                  //   ),
+                  // ):Container(),
+                  // (codeNguponYuk != '')?Padding(
+                  //   padding: EdgeInsets.only(
+                  //       left: CustomSize.sizeWidth(context) / 32,
+                  //       right: CustomSize.sizeWidth(context) / 32,
+                  //       bottom: CustomSize.sizeHeight(context) * 0.01
+                  //       // vertical: CustomSize.sizeHeight(context) * 0.01
                   //   ),
                   //   child: Container(
-                  //     width: CustomSize.sizeWidth(context),
-                  //     decoration: BoxDecoration(
-                  //         color: Colors.white
-                  //     ),
+                  //     // width: CustomSize.sizeWidth(context) / 1.6,
                   //     child: Column(
                   //       crossAxisAlignment: CrossAxisAlignment.start,
                   //       children: [
-                  //         CustomText.textHeading7(text: "Data Usaha", minSize: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.04)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.04)).toString())),
-                  //         SizedBox(height: CustomSize.sizeHeight(context) * 0.01,),
-                  //         Container(
-                  //           padding: EdgeInsets.only(
-                  //             left: CustomSize.sizeWidth(context) / 25,
-                  //             right: CustomSize.sizeWidth(context) / 25,
-                  //           ),
-                  //           child: Column(
-                  //             crossAxisAlignment: CrossAxisAlignment.start,
-                  //             children: [
-                  //               (nameRestoTrans != '' && nameRestoTrans != 'null')?
-                  //               CustomText.bodyRegular17(text: "Nama Usaha: "+nameRestoTrans, maxLines: 4, minSize: double.parse(((MediaQuery.of(context).size.width*0.037).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.037)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.037)).toString())):
-                  //               Row(
-                  //                 children: [
-                  //                   CustomText.bodyRegular17(text: "Nama Usaha: ", maxLines: 2, minSize: double.parse(((MediaQuery.of(context).size.width*0.037).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.037)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.037)).toString())),
-                  //                   CustomText.bodyRegular17(text: "kosong", maxLines: 2, color: CustomColor.redBtn, minSize: double.parse(((MediaQuery.of(context).size.width*0.037).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.037)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.037)).toString())),
-                  //                 ],
-                  //               ),
-                  //               SizedBox(height: CustomSize.sizeHeight(context) * 0.005,),
-                  //
-                  //               (restoAddress != '' && restoAddress != 'null')?
-                  //               Row(
-                  //                 crossAxisAlignment: CrossAxisAlignment.start,
-                  //                 children: [
-                  //                   CustomText.bodyRegular17(text: "Alamat Usaha: ", maxLines: 4, minSize: double.parse(((MediaQuery.of(context).size.width*0.037).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.037)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.037)).toString())),
-                  //                   GestureDetector(
-                  //                       onTap: (){
-                  //                         _launchURL();
-                  //                       },
-                  //                       child: Container(
-                  //                           width: CustomSize.sizeWidth(context) / 1.8,
-                  //                           child: CustomText.bodyRegular17(text: restoAddress, maxLines: 14, minSize: double.parse(((MediaQuery.of(context).size.width*0.037).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.037)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.037)).toString()))
-                  //                       )
-                  //                   ),
-                  //                 ],
-                  //               ):
-                  //               Row(
-                  //                 children: [
-                  //                   CustomText.bodyRegular17(text: "Alamat Usaha: ", maxLines: 2, minSize: double.parse(((MediaQuery.of(context).size.width*0.037).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.037)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.037)).toString())),
-                  //                   CustomText.bodyRegular17(text: "kosong", maxLines: 2, color: CustomColor.redBtn, minSize: double.parse(((MediaQuery.of(context).size.width*0.037).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.037)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.037)).toString())),
-                  //                 ],
-                  //               ),
-                  //               SizedBox(height: CustomSize.sizeHeight(context) * 0.005,),
-                  //
-                  //               (emailTokoTrans != '' && emailTokoTrans != 'null')?
-                  //               Row(
-                  //                 children: [
-                  //                   CustomText.bodyRegular17(text: "Email Usaha: ", maxLines: 2, minSize: double.parse(((MediaQuery.of(context).size.width*0.037).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.037)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.037)).toString())),
-                  //                   GestureDetector(
-                  //                       onTap: (){
-                  //                         launch('mailto:$emailTokoTrans');
-                  //                       },
-                  //                       child: Container(
-                  //                           width: CustomSize.sizeWidth(context) / 1.8,
-                  //                           child: CustomText.bodyRegular17(text: emailTokoTrans, maxLines: 1, minSize: double.parse(((MediaQuery.of(context).size.width*0.037).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.037)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.037)).toString()))
-                  //                       )
-                  //                   ),
-                  //                 ],
-                  //               ):
-                  //               Row(
-                  //                 children: [
-                  //                   CustomText.bodyRegular17(text: "Email Usaha: ", maxLines: 2, minSize: double.parse(((MediaQuery.of(context).size.width*0.037).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.037)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.037)).toString())),
-                  //                   CustomText.bodyRegular17(text: "kosong", maxLines: 2, color: CustomColor.redBtn, minSize: double.parse(((MediaQuery.of(context).size.width*0.037).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.037)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.037)).toString())),
-                  //                 ],
-                  //               ),
-                  //               SizedBox(height: CustomSize.sizeHeight(context) * 0.005,),
-                  //
-                  //               (phoneRestoTrans != '' && phoneRestoTrans != 'null')?
-                  //               Row(
-                  //                 children: [
-                  //                   CustomText.bodyRegular17(text: "Telepon Usaha: ", maxLines: 2, minSize: double.parse(((MediaQuery.of(context).size.width*0.037).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.037)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.037)).toString())),
-                  //                   GestureDetector(
-                  //                       onTap: (){
-                  //                         launch('tel:$phoneRestoTrans');
-                  //                       },
-                  //                       child: CustomText.bodyRegular17(text: phoneRestoTrans, maxLines: 2, minSize: double.parse(((MediaQuery.of(context).size.width*0.037).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.037)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.037)).toString()))
-                  //                   ),
-                  //                 ],
-                  //               ):
-                  //               Row(
-                  //                 children: [
-                  //                   CustomText.bodyRegular17(text: "Telepon Usaha: ", maxLines: 2, minSize: double.parse(((MediaQuery.of(context).size.width*0.037).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.037)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.037)).toString())),
-                  //                   CustomText.bodyRegular17(text: "kosong", maxLines: 2, color: CustomColor.redBtn, minSize: double.parse(((MediaQuery.of(context).size.width*0.037).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.037)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.037)).toString())),
-                  //                 ],
-                  //               ),
-                  //               SizedBox(height: CustomSize.sizeHeight(context) * 0.005,),
-                  //
-                  //               // (ownerTokoTrans != '' && ownerTokoTrans != 'null')?
-                  //               // CustomText.bodyRegular17(text: "Nama Pemilik: "+ownerTokoTrans, maxLines: 2, minSize: double.parse(((MediaQuery.of(context).size.width*0.037).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.037)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.037)).toString())):
-                  //               // Row(
-                  //               //   children: [
-                  //               //     CustomText.bodyRegular17(text: "Nama Pemilik: ", maxLines: 2, minSize: double.parse(((MediaQuery.of(context).size.width*0.037).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.037)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.037)).toString())),
-                  //               //     CustomText.bodyRegular17(text: "kosong", maxLines: 2, color: CustomColor.redBtn, minSize: double.parse(((MediaQuery.of(context).size.width*0.037).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.037)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.037)).toString())),
-                  //               //   ],
-                  //               // ),
-                  //               // SizedBox(height: CustomSize.sizeHeight(context) * 0.005,),
-                  //               //
-                  //               // (pjTokoTrans != '' && pjTokoTrans != 'null')?
-                  //               // CustomText.bodyRegular17(text: "Nama Penanggung Jawab: "+pjTokoTrans, maxLines: 2, minSize: double.parse(((MediaQuery.of(context).size.width*0.037).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.037)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.037)).toString())):
-                  //               // Row(
-                  //               //   children: [
-                  //               //     CustomText.bodyRegular17(text: "Nama Penanggung Jawab: ", maxLines: 2, minSize: double.parse(((MediaQuery.of(context).size.width*0.037).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.037)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.037)).toString())),
-                  //               //     CustomText.bodyRegular17(text: "kosong", maxLines: 2, color: CustomColor.redBtn, minSize: double.parse(((MediaQuery.of(context).size.width*0.037).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.037)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.037)).toString())),
-                  //               //   ],
-                  //               // ),
-                  //               // SizedBox(height: CustomSize.sizeHeight(context) * 0.005,),
-                  //
-                  //               (nameRekening != '' && nameRekening != 'null')?
-                  //               CustomText.bodyRegular17(text: "Nomor Rekening atas Nama: "+nameRekening, maxLines: 2, minSize: double.parse(((MediaQuery.of(context).size.width*0.037).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.037)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.037)).toString())):
-                  //               Row(
-                  //                 children: [
-                  //                   CustomText.bodyRegular17(text: "Nomor Rekening atas Nama: ", maxLines: 2, minSize: double.parse(((MediaQuery.of(context).size.width*0.037).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.037)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.037)).toString())),
-                  //                   CustomText.bodyRegular17(text: "kosong", maxLines: 2, color: CustomColor.redBtn, minSize: double.parse(((MediaQuery.of(context).size.width*0.037).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.037)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.037)).toString())),
-                  //                 ],
-                  //               ),
-                  //               SizedBox(height: CustomSize.sizeHeight(context) * 0.005,),
-                  //
-                  //               (nameBank != '' && nameBank != 'null')?
-                  //               CustomText.bodyRegular17(text: "Rekening Bank: "+nameBank, maxLines: 2, minSize: double.parse(((MediaQuery.of(context).size.width*0.037).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.037)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.037)).toString())):
-                  //               Row(
-                  //                 children: [
-                  //                   CustomText.bodyRegular17(text: "Rekening Bank: ", maxLines: 2, minSize: double.parse(((MediaQuery.of(context).size.width*0.037).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.037)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.037)).toString())),
-                  //                   CustomText.bodyRegular17(text: "kosong", maxLines: 2, color: CustomColor.redBtn, minSize: double.parse(((MediaQuery.of(context).size.width*0.037).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.037)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.037)).toString())),
-                  //                 ],
-                  //               ),
-                  //               SizedBox(height: CustomSize.sizeHeight(context) * 0.005,),
-                  //
-                  //               (norekTokoTrans != '' && norekTokoTrans != 'null')?
-                  //               CustomText.bodyRegular17(text: "Nomor Rekening: "+norekTokoTrans, maxLines: 2, minSize: double.parse(((MediaQuery.of(context).size.width*0.037).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.037)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.037)).toString())):
-                  //               Row(
-                  //                 children: [
-                  //                   CustomText.bodyRegular17(text: "Nomor Rekening: ", maxLines: 2, minSize: double.parse(((MediaQuery.of(context).size.width*0.037).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.037)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.037)).toString())),
-                  //                   CustomText.bodyRegular17(text: "kosong", maxLines: 2, color: CustomColor.redBtn, minSize: double.parse(((MediaQuery.of(context).size.width*0.037).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.037)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.037)).toString())),
-                  //                 ],
-                  //               ),
-                  //             ],
-                  //           ),
+                  //         Row(
+                  //           mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  //           children: [
+                  //             CustomText.textTitle2(text: codeNguponYuk, color: CustomColor.primaryLight, sizeNew: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.04)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.04)).toString()), maxLines: 1),
+                  //             CustomText.textTitle2(text: 'Rp.'+NumberFormat.currency(locale: 'id', symbol: '', decimalDigits: 0).format(int.parse(priceNguponYuk)), sizeNew: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.04)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.04)).toString()), maxLines: 1),
+                  //           ],
                   //         ),
                   //       ],
                   //     ),
                   //   ),
-                  // ),
+                  // ):Container(),
+
                   Container(
                     width: CustomSize.sizeWidth(context),
                     decoration: BoxDecoration(
@@ -1910,21 +4058,32 @@ class _CartActivityState extends State<CartActivity> {
                                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                     children: [
                                       CustomText.bodyLight16(text: "Harga", minSize: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.04)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.04)).toString())),
-                                      CustomText.bodyLight16(text: NumberFormat.currency(locale: 'id', symbol: '', decimalDigits: 0).format(harga), minSize: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.04)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.04)).toString())),
+                                      CustomText.bodyLight16(text: (codeNguponYuk.toString() != '[]')?(harga == 0)?
+                                      'Free':
+                                      NumberFormat.currency(locale: 'id', symbol: '', decimalDigits: 0).format(harga):
+                                      NumberFormat.currency(locale: 'id', symbol: '', decimalDigits: 0).format(harga), minSize: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.04)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.04)).toString())),
                                     ],
                                   ),
                                   (_transCode == 1)?SizedBox(height: CustomSize.sizeHeight(context) / 100,):SizedBox(),
                                   (_transCode == 1)?Row(mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                     children: [
                                       CustomText.bodyLight16(text: "Ongkir", minSize: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.04)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.04)).toString())),
-                                      CustomText.bodyLight16(text: NumberFormat.currency(locale: 'id', symbol: '', decimalDigits: 0).format(int.parse(totalOngkirBorzo)), minSize: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.04)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.04)).toString())),
+                                      (totalOngkirBorzo != totalOngkirDisBorzo)?(delivAddress != '' && totalOngkirDisBorzo == '0' || delivAddress != 'null' && totalOngkirDisBorzo == '0')?
+                                      CustomText.bodyLight16(decoration: TextDecoration.none, text: 'Gratis Ongkir', minSize: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.04)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.04)).toString())):
+                                      Row(
+                                        children: [
+                                          CustomText.bodyLight16(decoration: TextDecoration.lineThrough, text: NumberFormat.currency(locale: 'id', symbol: '', decimalDigits: 0).format(int.parse(totalOngkirBorzo)), minSize: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.04)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.04)).toString())),
+                                          CustomText.bodyLight16(text: ' ', minSize: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.04)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.04)).toString())),
+                                          CustomText.bodyLight16(text: NumberFormat.currency(locale: 'id', symbol: '', decimalDigits: 0).format(int.parse(totalOngkirDisBorzo)), minSize: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.04)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.04)).toString())),
+                                        ],
+                                      ):CustomText.bodyLight16(decoration: TextDecoration.none, text: NumberFormat.currency(locale: 'id', symbol: '', decimalDigits: 0).format(int.parse(totalOngkirBorzo)), minSize: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.04)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.04)).toString())),
                                     ],
                                   ):SizedBox(),
                                   SizedBox(height: CustomSize.sizeHeight(context) / 100,),
                                   Row(mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                     children: [
                                       CustomText.bodyLight16(text: "Platform Fee", minSize: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.04)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.04)).toString())),
-                                      CustomText.bodyLight16(text: NumberFormat.currency(locale: 'id', symbol: '', decimalDigits: 0).format(1000), minSize: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.04)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.04)).toString())),
+                                      CustomText.bodyLight16(text: (codeNguponYuk.toString() != '[]')?(_transCode != 1 && harga == 0)?'Free':NumberFormat.currency(locale: 'id', symbol: '', decimalDigits: 0).format(_platformfee):NumberFormat.currency(locale: 'id', symbol: '', decimalDigits: 0).format(_platformfee), minSize: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.04)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.04)).toString())),
                                     ],
                                   ),
                                   SizedBox(height: CustomSize.sizeHeight(context) / 64,),
@@ -1933,7 +4092,7 @@ class _CartActivityState extends State<CartActivity> {
                                   Row(mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                     children: [
                                       CustomText.textTitle3(text: "Total Pembayaran", minSize: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.04)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.04)).toString())),
-                                      CustomText.textTitle3(text: NumberFormat.currency(locale: 'id', symbol: '', decimalDigits: 0).format(int.parse(totalHarga)), minSize: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.04)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.04)).toString())),
+                                      CustomText.textTitle3(text: (codeNguponYuk.toString() != '[]')?(totalHarga == '0')?'Free':NumberFormat.currency(locale: 'id', symbol: '', decimalDigits: 0).format(int.parse(totalHarga)):NumberFormat.currency(locale: 'id', symbol: '', decimalDigits: 0).format(int.parse(totalHarga)), minSize: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.04)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.04)).toString())),
                                     ],
                                   ),
                                 ],
@@ -1945,6 +4104,14 @@ class _CartActivityState extends State<CartActivity> {
                         GestureDetector(
                           onTap: ()async{
                             // _getData();
+                            print('codeNguponYuk');
+                            print(codeNguponYuk);
+                            codeNguponYukJson = [];
+                            for (var h in codeNguponYuk){
+                              codeNguponYukJson.add(h.replaceAll('#', ''));
+                            }
+                            print(codeNguponYukJson);
+                            print(jsonEncode(codeNguponYukJson));
                             if (loadingBorzo == true && int.parse(ongkir.toString()) == 0) {
                               print('loadingBorzo');
                               print(loadingBorzo);
@@ -1953,9 +4120,10 @@ class _CartActivityState extends State<CartActivity> {
                               SharedPreferences pref2 = await SharedPreferences.getInstance();
                               pref2.setString('delivAddress', pref2.getString('addressDelivTrans')??'');
                               // delivAddress = pref2.getString('addressDelivTrans');
-                              pref2.setString('delivTotalOngkir', totalOngkirBorzo.toString());
+                              pref2.setString('delivTotalOngkir', (totalOngkirBorzo != totalOngkirDisBorzo)?totalOngkirDisBorzo:totalOngkirBorzo);
                               pref2.setString('totalHargaTrans', totalHarga.toString());
-                              pref2.setString('totalHarga', harga.toString());
+                              pref2.setString('hargaTrans', harga.toString());
+                              pref2.setInt('_platformfee', int.parse(_platformfee.toString()));
                               // _srchAddress.text.toString()
 
                               // Navigator.push(context, PageTransition(
@@ -2134,106 +4302,299 @@ class _CartActivityState extends State<CartActivity> {
                                       if(delivAddress.toString() != '' && delivAddress.toString() != 'null'){
                                         // makeTransaction(qrcode);
                                         // makeTransaction(qrcode);
-                                        showDialog(
-                                            context: context,
-                                            builder: (context) {
-                                              return AlertDialog(
-                                                contentPadding: EdgeInsets.only(left: 25, right: 25, top: 15, bottom: 5),
-                                                shape: RoundedRectangleBorder(
-                                                    borderRadius: BorderRadius.all(Radius.circular(10))
-                                                ),
-                                                title: Center(child: Text('Peringatan!', style: TextStyle(color: CustomColor.redBtn))),
-                                                content: Text('Apakah anda sudah yakin dengan pesanan anda? ', style: TextStyle(fontSize: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.04)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.04)).toString()), fontWeight: FontWeight.w500), textAlign: TextAlign.center),
-                                                    // '\n \nSemua proses pembayaran dan transaksi di luar tanggung jawab IRG!', style: TextStyle(fontSize: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.04)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.04)).toString()), fontWeight: FontWeight.w500), textAlign: TextAlign.center),
-                                                actions: <Widget>[
-                                                  Center(
-                                                    child: Row(
-                                                      mainAxisAlignment: MainAxisAlignment.spaceAround,
-                                                      children: [
-                                                        FlatButton(
-                                                          // minWidth: CustomSize.sizeWidth(context),
-                                                          color: CustomColor.redBtn,
-                                                          textColor: Colors.white,
-                                                          shape: RoundedRectangleBorder(
-                                                              borderRadius: BorderRadius.all(Radius.circular(10))
-                                                          ),
-                                                          child: Text('Batal'),
-                                                          onPressed: () async{
-                                                            setState(() {
-                                                              // codeDialog = valueText;
-                                                              Navigator.pop(context);
-                                                            });
-                                                          },
-                                                        ),
-                                                        FlatButton(
-                                                          color: CustomColor.primaryLight,
-                                                          textColor: Colors.white,
-                                                          shape: RoundedRectangleBorder(
-                                                              borderRadius: BorderRadius.all(Radius.circular(10))
-                                                          ),
-                                                          child: Text('Setuju'),
-                                                          onPressed: () async{
-                                                            Navigator.pop(context);
-                                                            String qrcode = '';
-                                                            if(_transCode == 3){
-                                                              // try {
-                                                              //   qrcode = await BarcodeScanner.scan();
-                                                              //   setState(() {});
-                                                              //   makeTransaction(qrcode);
-                                                              //   // makeTransaction(qrcode);
-                                                              //   Navigator.push(
-                                                              //       context,
-                                                              //       PageTransition(
-                                                              //           type: PageTransitionType.fade,
-                                                              //           child: FinalTrans()));
-                                                              // } on PlatformException catch (error) {
-                                                              //   if (error.code == BarcodeScanner.CameraAccessDenied) {
-                                                              //     print('Izin kamera tidak diizinkan oleh si pengguna');
-                                                              //   } else {
-                                                              //     print('Error: $error');
-                                                              //   }
-                                                              // }
-                                                              setState(() {});
-                                                              makeTransaction(qrcode);
-                                                              // makeTransaction(qrcode);
-                                                              // Navigator.push(
-                                                              //     context,
-                                                              //     PageTransition(
-                                                              //         type: PageTransitionType.fade,
-                                                              //         child: FinalTrans()));
-                                                            }else{
-                                                              if(_transCode == 1){
-                                                                if(delivAddress != 'null' && delivAddress != ''){
-                                                                  makeTransaction(qrcode);
-                                                                  // makeTransaction(qrcode);
-                                                                  // Navigator.push(
-                                                                  //     context,
-                                                                  //     PageTransition(
-                                                                  //         type: PageTransitionType.fade,
-                                                                  //         child: FinalTrans()));
-                                                                }else{
-                                                                  Fluttertoast.showToast(
-                                                                    msg: "Alamat tujuan Anda dimana?",);
-                                                                }
-                                                              }else{
-                                                                makeTransaction(qrcode);
-                                                                // makeTransaction(qrcode);
-                                                                // Navigator.push(
-                                                                //     context,
-                                                                //     PageTransition(
-                                                                //         type: PageTransitionType.fade,
-                                                                //         child: FinalTrans()));
-                                                              }
-                                                            }
-                                                          },
-                                                        ),
-                                                      ],
-                                                    ),
-                                                  ),
+                                        if (loadingTrans == false) {
+                                          loadingTrans = true;
+                                          SharedPreferences pref = await SharedPreferences.getInstance();
+                                          cekHarga()?.whenComplete((){
+                                            if (_distan != '0') {
+                                              _totalOngkir = _ongkir * _distance;
+                                              totalOngkir = _totalOngkir.toString();
+                                              print('totalOngkirBorzo');
+                                              print(totalOngkirBorzo);
+                                              if (totalOngkirBorzo.toString() == totalOngkirDisBorzo.toString()) {
+                                                int _totalHarga = harga + int.parse(totalOngkirBorzo);
+                                                totalHarga = (_totalHarga + _platformfee).toString();
+                                                pref.setString('totalHarga', totalHarga);
+                                                setState(() {});
+                                              } else {
+                                                int _totalHarga = harga + int.parse(totalOngkirDisBorzo);
+                                                totalHarga = (_totalHarga + _platformfee).toString();
+                                                pref.setString('totalHarga', totalHarga);
+                                                setState(() {});
+                                              }
+                                              // int _totalHarga = harga + (totalOngkirBorzo.toString() == totalOngkirDisBorzo.toString())?int.parse(totalOngkirBorzo):int.parse(totalOngkirDisBorzo);
 
-                                                ],
-                                              );
-                                            });
+                                            } else {
+                                              totalOngkir = ongkir!;
+                                              if (totalOngkirBorzo.toString() == totalOngkirDisBorzo.toString()) {
+                                                int _totalHarga = harga + int.parse(totalOngkirBorzo);
+                                                totalHarga = (_totalHarga + _platformfee).toString();
+                                                pref.setString('totalHarga', totalHarga);
+                                                setState(() {});
+                                              } else {
+                                                int _totalHarga = harga + int.parse(totalOngkirDisBorzo);
+                                                totalHarga = (_totalHarga + _platformfee).toString();
+                                                pref.setString('totalHarga', totalHarga);
+                                                setState(() {});
+                                              }
+                                            }
+                                            if (loadingTrans == false) {
+                                              showDialog(
+                                                  context: context,
+                                                  builder: (context) {
+                                                    return AlertDialog(
+                                                      contentPadding: EdgeInsets.only(left: 25, right: 25, top: 15, bottom: 5),
+                                                      shape: RoundedRectangleBorder(
+                                                          borderRadius: BorderRadius.all(Radius.circular(10))
+                                                      ),
+                                                      title: Center(child: Text('Peringatan!', style: TextStyle(color: CustomColor.redBtn))),
+                                                      content: Text('Apakah anda sudah yakin dengan pesanan anda? ', style: TextStyle(fontSize: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.04)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.04)).toString()), fontWeight: FontWeight.w500), textAlign: TextAlign.center),
+                                                      // '\n \nSemua proses pembayaran dan transaksi di luar tanggung jawab IRG!', style: TextStyle(fontSize: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.04)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.04)).toString()), fontWeight: FontWeight.w500), textAlign: TextAlign.center),
+                                                      actions: <Widget>[
+                                                        Center(
+                                                          child: Row(
+                                                            mainAxisAlignment: MainAxisAlignment.spaceAround,
+                                                            children: [
+                                                              TextButton(
+                                                                // minWidth: CustomSize.sizeWidth(context),
+                                                                style: TextButton.styleFrom(
+                                                                  backgroundColor: CustomColor.redBtn,
+                                                                  padding: EdgeInsets.all(0),
+                                                                  shape: const RoundedRectangleBorder(
+                                                                      borderRadius: BorderRadius.all(Radius.circular(10))
+                                                                  ),
+                                                                ),
+                                                                child: Text('Batal', style: TextStyle(color: Colors.white)),
+                                                                onPressed: () async{
+                                                                  setState(() {
+                                                                    // codeDialog = valueText;
+                                                                    Navigator.pop(context);
+                                                                  });
+                                                                },
+                                                              ),
+                                                              TextButton(
+                                                                // minWidth: CustomSize.sizeWidth(context),
+                                                                style: TextButton.styleFrom(
+                                                                  backgroundColor: CustomColor.primaryLight,
+                                                                  padding: EdgeInsets.all(0),
+                                                                  shape: const RoundedRectangleBorder(
+                                                                      borderRadius: BorderRadius.all(Radius.circular(10))
+                                                                  ),
+                                                                ),
+                                                                child: Text('Setuju', style: TextStyle(color: Colors.white)),
+                                                                onPressed: () async{
+                                                                  Navigator.pop(context);
+                                                                  String qrcode = '';
+                                                                  if(_transCode == 3){
+                                                                    // try {
+                                                                    //   qrcode = await BarcodeScanner.scan();
+                                                                    //   setState(() {});
+                                                                    //   makeTransaction(qrcode);
+                                                                    //   // makeTransaction(qrcode);
+                                                                    //   Navigator.push(
+                                                                    //       context,
+                                                                    //       PageTransition(
+                                                                    //           type: PageTransitionType.fade,
+                                                                    //           child: FinalTrans()));
+                                                                    // } on PlatformException catch (error) {
+                                                                    //   if (error.code == BarcodeScanner.CameraAccessDenied) {
+                                                                    //     print('Izin kamera tidak diizinkan oleh si pengguna');
+                                                                    //   } else {
+                                                                    //     print('Error: $error');
+                                                                    //   }
+                                                                    // }
+                                                                    setState(() {});
+                                                                    makeTransaction(qrcode);
+                                                                    // makeTransaction(qrcode);
+                                                                    // Navigator.push(
+                                                                    //     context,
+                                                                    //     PageTransition(
+                                                                    //         type: PageTransitionType.fade,
+                                                                    //         child: FinalTrans()));
+                                                                  }else{
+                                                                    if(_transCode == 1){
+                                                                      if(delivAddress != 'null' && delivAddress != ''){
+                                                                        makeTransaction(qrcode);
+                                                                        // makeTransaction(qrcode);
+                                                                        // Navigator.push(
+                                                                        //     context,
+                                                                        //     PageTransition(
+                                                                        //         type: PageTransitionType.fade,
+                                                                        //         child: FinalTrans()));
+                                                                      }else{
+                                                                        Fluttertoast.showToast(
+                                                                          msg: "Alamat tujuan Anda dimana?",);
+                                                                      }
+                                                                    }else{
+                                                                      makeTransaction(qrcode);
+                                                                      // makeTransaction(qrcode);
+                                                                      // Navigator.push(
+                                                                      //     context,
+                                                                      //     PageTransition(
+                                                                      //         type: PageTransitionType.fade,
+                                                                      //         child: FinalTrans()));
+                                                                    }
+                                                                  }
+                                                                },
+                                                              ),
+                                                            ],
+                                                          ),
+                                                        ),
+
+                                                      ],
+                                                    );
+                                                  });
+                                            } else {
+                                              Fluttertoast.showToast(
+                                                msg: "Sedang menghitung ongkir!",);
+                                            }
+                                          });
+                                        }  else {
+                                          SharedPreferences pref = await SharedPreferences.getInstance();
+                                          cekHarga()?.whenComplete((){
+                                            if (_distan != '0') {
+                                              _totalOngkir = _ongkir * _distance;
+                                              totalOngkir = _totalOngkir.toString();
+                                              print('totalOngkirBorzo');
+                                              print(totalOngkirBorzo);
+                                              if (totalOngkirBorzo.toString() == totalOngkirDisBorzo.toString()) {
+                                                int _totalHarga = harga + int.parse(totalOngkirBorzo);
+                                                totalHarga = (_totalHarga + _platformfee).toString();
+                                                pref.setString('totalHarga', totalHarga);
+                                                setState(() {});
+                                              } else {
+                                                int _totalHarga = harga + int.parse(totalOngkirDisBorzo);
+                                                totalHarga = (_totalHarga + _platformfee).toString();
+                                                pref.setString('totalHarga', totalHarga);
+                                                setState(() {});
+                                              }
+                                              // int _totalHarga = harga + (totalOngkirBorzo.toString() == totalOngkirDisBorzo.toString())?int.parse(totalOngkirBorzo):int.parse(totalOngkirDisBorzo);
+
+                                            } else {
+                                              totalOngkir = ongkir!;
+                                              if (totalOngkirBorzo.toString() == totalOngkirDisBorzo.toString()) {
+                                                int _totalHarga = harga + int.parse(totalOngkirBorzo);
+                                                totalHarga = (_totalHarga + _platformfee).toString();
+                                                pref.setString('totalHarga', totalHarga);
+                                                setState(() {});
+                                              } else {
+                                                int _totalHarga = harga + int.parse(totalOngkirDisBorzo);
+                                                totalHarga = (_totalHarga + _platformfee).toString();
+                                                pref.setString('totalHarga', totalHarga);
+                                                setState(() {});
+                                              }
+                                            }
+                                            if (loadingTrans == false) {
+                                              showDialog(
+                                                  context: context,
+                                                  builder: (context) {
+                                                    return AlertDialog(
+                                                      contentPadding: EdgeInsets.only(left: 25, right: 25, top: 15, bottom: 5),
+                                                      shape: RoundedRectangleBorder(
+                                                          borderRadius: BorderRadius.all(Radius.circular(10))
+                                                      ),
+                                                      title: Center(child: Text('Peringatan!', style: TextStyle(color: CustomColor.redBtn))),
+                                                      content: Text('Apakah anda sudah yakin dengan pesanan anda? ', style: TextStyle(fontSize: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.04)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.04)).toString()), fontWeight: FontWeight.w500), textAlign: TextAlign.center),
+                                                      // '\n \nSemua proses pembayaran dan transaksi di luar tanggung jawab IRG!', style: TextStyle(fontSize: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.04)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.04)).toString()), fontWeight: FontWeight.w500), textAlign: TextAlign.center),
+                                                      actions: <Widget>[
+                                                        Center(
+                                                          child: Row(
+                                                            mainAxisAlignment: MainAxisAlignment.spaceAround,
+                                                            children: [
+                                                              TextButton(
+                                                                // minWidth: CustomSize.sizeWidth(context),
+                                                                style: TextButton.styleFrom(
+                                                                  backgroundColor: CustomColor.redBtn,
+                                                                  padding: EdgeInsets.all(0),
+                                                                  shape: const RoundedRectangleBorder(
+                                                                      borderRadius: BorderRadius.all(Radius.circular(10))
+                                                                  ),
+                                                                ),
+                                                                child: Text('Batal', style: TextStyle(color: Colors.white)),
+                                                                onPressed: () async{
+                                                                  setState(() {
+                                                                    // codeDialog = valueText;
+                                                                    Navigator.pop(context);
+                                                                  });
+                                                                },
+                                                              ),
+                                                              TextButton(
+                                                                // minWidth: CustomSize.sizeWidth(context),
+                                                                style: TextButton.styleFrom(
+                                                                  backgroundColor: CustomColor.primaryLight,
+                                                                  padding: EdgeInsets.all(0),
+                                                                  shape: const RoundedRectangleBorder(
+                                                                      borderRadius: BorderRadius.all(Radius.circular(10))
+                                                                  ),
+                                                                ),
+                                                                child: Text('Setuju', style: TextStyle(color: Colors.white)),
+                                                                onPressed: () async{
+                                                                  Navigator.pop(context);
+                                                                  String qrcode = '';
+                                                                  if(_transCode == 3){
+                                                                    // try {
+                                                                    //   qrcode = await BarcodeScanner.scan();
+                                                                    //   setState(() {});
+                                                                    //   makeTransaction(qrcode);
+                                                                    //   // makeTransaction(qrcode);
+                                                                    //   Navigator.push(
+                                                                    //       context,
+                                                                    //       PageTransition(
+                                                                    //           type: PageTransitionType.fade,
+                                                                    //           child: FinalTrans()));
+                                                                    // } on PlatformException catch (error) {
+                                                                    //   if (error.code == BarcodeScanner.CameraAccessDenied) {
+                                                                    //     print('Izin kamera tidak diizinkan oleh si pengguna');
+                                                                    //   } else {
+                                                                    //     print('Error: $error');
+                                                                    //   }
+                                                                    // }
+                                                                    setState(() {});
+                                                                    makeTransaction(qrcode);
+                                                                    // makeTransaction(qrcode);
+                                                                    // Navigator.push(
+                                                                    //     context,
+                                                                    //     PageTransition(
+                                                                    //         type: PageTransitionType.fade,
+                                                                    //         child: FinalTrans()));
+                                                                  }else{
+                                                                    if(_transCode == 1){
+                                                                      if(delivAddress != 'null' && delivAddress != ''){
+                                                                        makeTransaction(qrcode);
+                                                                        // makeTransaction(qrcode);
+                                                                        // Navigator.push(
+                                                                        //     context,
+                                                                        //     PageTransition(
+                                                                        //         type: PageTransitionType.fade,
+                                                                        //         child: FinalTrans()));
+                                                                      }else{
+                                                                        Fluttertoast.showToast(
+                                                                          msg: "Alamat tujuan Anda dimana?",);
+                                                                      }
+                                                                    }else{
+                                                                      makeTransaction(qrcode);
+                                                                      // makeTransaction(qrcode);
+                                                                      // Navigator.push(
+                                                                      //     context,
+                                                                      //     PageTransition(
+                                                                      //         type: PageTransitionType.fade,
+                                                                      //         child: FinalTrans()));
+                                                                    }
+                                                                  }
+                                                                },
+                                                              ),
+                                                            ],
+                                                          ),
+                                                        ),
+
+                                                      ],
+                                                    );
+                                                  });
+                                            }
+                                          });
+                                          Fluttertoast.showToast(
+                                            msg: "Sedang menghitung ongkir!",);
+                                        }
                                       }else{
                                         Fluttertoast.showToast(
                                           msg: "Alamat tujuan Anda dimana?",);
@@ -2255,13 +4616,16 @@ class _CartActivityState extends State<CartActivity> {
                                                     child: Row(
                                                       mainAxisAlignment: MainAxisAlignment.spaceAround,
                                                       children: [
-                                                        FlatButton(
-                                                          color: Colors.blue,
-                                                          textColor: Colors.white,
-                                                          shape: RoundedRectangleBorder(
-                                                              borderRadius: BorderRadius.all(Radius.circular(10))
+                                                        TextButton(
+                                                          // minWidth: CustomSize.sizeWidth(context),
+                                                          style: TextButton.styleFrom(
+                                                            backgroundColor: Colors.blue,
+                                                            padding: EdgeInsets.all(0),
+                                                            shape: const RoundedRectangleBorder(
+                                                                borderRadius: BorderRadius.all(Radius.circular(10))
+                                                            ),
                                                           ),
-                                                          child: Text('Tambah'),
+                                                          child: Text('Tambah', style: TextStyle(color: Colors.white)),
                                                           onPressed: () async{
                                                             setState(() {
                                                               // codeDialog = valueText;
@@ -2274,13 +4638,16 @@ class _CartActivityState extends State<CartActivity> {
                                                             });
                                                           },
                                                         ),
-                                                        FlatButton(
-                                                          color: CustomColor.accent,
-                                                          textColor: Colors.white,
-                                                          shape: RoundedRectangleBorder(
-                                                              borderRadius: BorderRadius.all(Radius.circular(10))
+                                                        TextButton(
+                                                          // minWidth: CustomSize.sizeWidth(context),
+                                                          style: TextButton.styleFrom(
+                                                            backgroundColor: CustomColor.accent,
+                                                            padding: EdgeInsets.all(0),
+                                                            shape: const RoundedRectangleBorder(
+                                                                borderRadius: BorderRadius.all(Radius.circular(10))
+                                                            ),
                                                           ),
-                                                          child: Text('Tidak'),
+                                                          child: Text('Tidak', style: TextStyle(color: Colors.white)),
                                                           onPressed: () async{
                                                             Navigator.pop(context);
                                                             String qrcode = '';
@@ -2359,14 +4726,16 @@ class _CartActivityState extends State<CartActivity> {
                                                     child: Row(
                                                       mainAxisAlignment: MainAxisAlignment.spaceAround,
                                                       children: [
-                                                        FlatButton(
+                                                        TextButton(
                                                           // minWidth: CustomSize.sizeWidth(context),
-                                                          color: CustomColor.redBtn,
-                                                          textColor: Colors.white,
-                                                          shape: RoundedRectangleBorder(
-                                                              borderRadius: BorderRadius.all(Radius.circular(10))
+                                                          style: TextButton.styleFrom(
+                                                            backgroundColor: CustomColor.redBtn,
+                                                            padding: EdgeInsets.all(0),
+                                                            shape: const RoundedRectangleBorder(
+                                                                borderRadius: BorderRadius.all(Radius.circular(10))
+                                                            ),
                                                           ),
-                                                          child: Text('Batal'),
+                                                          child: Text('Batal', style: TextStyle(color: Colors.white)),
                                                           onPressed: () async{
                                                             setState(() {
                                                               // codeDialog = valueText;
@@ -2374,13 +4743,16 @@ class _CartActivityState extends State<CartActivity> {
                                                             });
                                                           },
                                                         ),
-                                                        FlatButton(
-                                                          color: CustomColor.primaryLight,
-                                                          textColor: Colors.white,
-                                                          shape: RoundedRectangleBorder(
-                                                              borderRadius: BorderRadius.all(Radius.circular(10))
+                                                        TextButton(
+                                                          // minWidth: CustomSize.sizeWidth(context),
+                                                          style: TextButton.styleFrom(
+                                                            backgroundColor: CustomColor.primaryLight,
+                                                            padding: EdgeInsets.all(0),
+                                                            shape: const RoundedRectangleBorder(
+                                                                borderRadius: BorderRadius.all(Radius.circular(10))
+                                                            ),
                                                           ),
-                                                          child: Text('Setuju'),
+                                                          child: Text('Setuju', style: TextStyle(color: Colors.white)),
                                                           onPressed: () async{
                                                             Navigator.pop(context);
                                                             String qrcode = '';
@@ -2462,7 +4834,7 @@ class _CartActivityState extends State<CartActivity> {
                                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                     children: [
                                       CustomText.textTitle3(text: "Pesan Sekarang", color: Colors.white, minSize: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.04)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.04)).toString())),
-                                      CustomText.textTitle3(text: NumberFormat.currency(locale: 'id', symbol: '', decimalDigits: 0).format(int.parse(totalHarga)), color: Colors.white, minSize: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.04)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.04)).toString())),
+                                      CustomText.textTitle3(text: (codeNguponYuk.toString() != '[]')?(totalHarga == '0')?'Free':NumberFormat.currency(locale: 'id', symbol: '', decimalDigits: 0).format(int.parse(totalHarga)):NumberFormat.currency(locale: 'id', symbol: '', decimalDigits: 0).format(int.parse(totalHarga)), color: Colors.white, minSize: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.04)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.04)).toString())),
                                     ],
                                   ),
                                 ),

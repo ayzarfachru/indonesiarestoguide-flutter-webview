@@ -1,16 +1,11 @@
-import 'dart:convert';
-
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:kam5ia/model/Menu.dart';
-import 'package:kam5ia/model/Price.dart';
-import 'package:kam5ia/model/Promo.dart';
-import 'package:kam5ia/model/Resto.dart';
 import 'package:page_transition/page_transition.dart';
 
 class Links{
   static String mainUrl = "http://irg.devus-sby.com/api/v2";
+  static String nguponUrl = "http://nguponyuk.devastic.com/api";
   static String subUrl = "http://irg.devus-sby.com";
 
   // static String mainUrl = "http://irg.devastic.com/api/v2";
@@ -222,7 +217,7 @@ class CustomText{
   }
 
   static Widget textTitle1({String? text, Color? color,
-    double? minSize, int? maxLines,}){
+    double? minSize, int? maxLines, int align = 0,}){
     return AutoSizeText(
       text!,
       style: GoogleFonts.poppins(
@@ -230,6 +225,7 @@ class CustomText{
               fontSize: minSize,
               fontWeight:
               FontWeight.w400, color: color??=Colors.black)),
+      textAlign: (align == 1)?TextAlign.center:TextAlign.start,
       minFontSize: minSize??0,
       maxLines: maxLines??1,
     );
@@ -557,7 +553,7 @@ class CustomText{
   }
 
   static Widget bodyLight16({String? text, Color? color,
-    double? minSize, double? sizeNew, int? maxLines,}){
+    double? minSize, double? sizeNew, int? maxLines, TextDecoration? decoration}){
     return AutoSizeText(
       text!,
       style: GoogleFonts.poppins(
@@ -565,7 +561,8 @@ class CustomText{
               // fontSize: 16,
               fontSize: sizeNew,
               fontWeight:
-              FontWeight.w300, color: color??=Colors.black)),
+              FontWeight.w300, color: color??=Colors.black,
+              decoration: decoration??TextDecoration.none)),
       minFontSize: minSize??0,
       maxLines: maxLines??1,
     );
@@ -619,9 +616,10 @@ class CustomText{
 
 
 class CustomColor{
-  static Color primary = Color(0xffAF1E22);
+  static Color primary = Color(0xffaf1e22);
   static Color primaryLight = Color(0xffAF1E22);
   static Color primaryLight2 = Color(0xffAF1E22).withOpacity(.2);
+  static Color primaryLight3 = Color(0xffffe5dc);
   // static Color primaryLight = Color(0xffAF1E22).withOpacity(.2);
   static Color secondary = Color(0xffF5F5F5);
 

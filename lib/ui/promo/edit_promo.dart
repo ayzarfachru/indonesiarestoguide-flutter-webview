@@ -1,26 +1,18 @@
 import 'dart:convert';
 import 'dart:io';
 
-import 'package:date_time_picker/date_time_picker.dart';
 import 'package:day_night_time_picker/lib/constants.dart';
 import 'package:day_night_time_picker/lib/daynight_timepicker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_datetime_picker/flutter_datetime_picker.dart';
-import 'package:flutter_icons/flutter_icons.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
 import 'package:kam5ia/model/Promo.dart';
 import 'package:kam5ia/ui/promo/promo_activity.dart';
 import 'package:kam5ia/ui/ui_resto/add_resto/add_detail_resto.dart';
-import 'package:kam5ia/ui/ui_resto/add_resto/add_view_resto.dart';
-import 'package:kam5ia/ui/ui_resto/home/home_activity.dart';
-import 'package:kam5ia/ui/ui_resto/menu/menu_activity.dart';
 import 'package:kam5ia/utils/utils.dart';
-import 'package:kam5ia/ui/home/home_activity.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:fluttertoast/fluttertoast.dart';
 import 'package:page_transition/page_transition.dart';
 
 import 'package:http/http.dart' as http;
@@ -101,7 +93,7 @@ class _EditPromoState extends State<EditPromo> {
               },
             ),
             actions: <Widget>[
-              FlatButton(
+              TextButton(
                 child: Text("Simpan", style: TextStyle(color: CustomColor.accent),),
                 onPressed: () async{
                   SharedPreferences pref = await SharedPreferences.getInstance();

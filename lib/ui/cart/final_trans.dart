@@ -151,6 +151,7 @@ class _FinalTransState extends State<FinalTrans> {
   String can_delivery = "";
   String can_takeaway = "";
   String delivAddress = "";
+  int _platformfee = 1000;
   String delivTotalOngkir = "";
   String totalHargaTrans = "";
   Future _getData()async{
@@ -165,7 +166,10 @@ class _FinalTransState extends State<FinalTrans> {
     delivAddress = (pref2.getString('addressDelivTrans')??"");
     delivTotalOngkir = (pref2.getString('delivTotalOngkir')??"");
     totalHargaTrans = (pref2.getString('totalHargaTrans')??"");
-    harga2 = (pref2.getString('totalHarga')??"");
+    harga2 = (pref2.getString('hargaTrans')??"");
+    _platformfee = (pref2.getInt('_platformfee')??0);
+    print('harga2');
+    print(harga2);
     name = (pref2.getString('menuJson')??"");
     nameUser = (pref2.getString('name')??"");
     playerId = (pref2.getString('playerId')??"");
@@ -1430,7 +1434,7 @@ class _FinalTransState extends State<FinalTrans> {
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
                             CustomText.bodyLight16(text: "Harga", minSize: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.04)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.04)).toString())),
-                            CustomText.bodyLight16(text: NumberFormat.currency(locale: 'id', symbol: '', decimalDigits: 0).format(int.parse(harga2)), minSize: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.04)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.04)).toString())),
+                            CustomText.bodyLight16(text: (harga2 == '0')?'Free':NumberFormat.currency(locale: 'id', symbol: '', decimalDigits: 0).format(int.parse(harga2)), minSize: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.04)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.04)).toString())),
                           ],
                         ),
                       ),
@@ -1443,7 +1447,7 @@ class _FinalTransState extends State<FinalTrans> {
                         child: Row(mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
                             CustomText.bodyLight16(text: "Ongkir", minSize: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.04)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.04)).toString())),
-                            CustomText.bodyLight16(text: NumberFormat.currency(locale: 'id', symbol: '', decimalDigits: 0).format(int.parse(delivTotalOngkir)), minSize: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.04)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.04)).toString())),
+                            CustomText.bodyLight16(text: (delivTotalOngkir == '0')?'Gratis Ongkir':NumberFormat.currency(locale: 'id', symbol: '', decimalDigits: 0).format(int.parse(delivTotalOngkir)), minSize: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.04)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.04)).toString())),
                           ],
                         ),
                       ):SizedBox(),
@@ -1456,7 +1460,7 @@ class _FinalTransState extends State<FinalTrans> {
                         child: Row(mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
                             CustomText.bodyLight16(text: "Platform Fee", minSize: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.04)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.04)).toString())),
-                            CustomText.bodyLight16(text: NumberFormat.currency(locale: 'id', symbol: '', decimalDigits: 0).format(1000), minSize: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.04)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.04)).toString())),
+                            CustomText.bodyLight16(text: (_platformfee == 0)?'Free':NumberFormat.currency(locale: 'id', symbol: '', decimalDigits: 0).format(_platformfee), minSize: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.04)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.04)).toString())),
                           ],
                         ),
                       ),
@@ -1477,7 +1481,7 @@ class _FinalTransState extends State<FinalTrans> {
                         child: Row(mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
                             CustomText.textTitle3(text: "Total Pembayaran", minSize: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.04)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.04)).toString())),
-                            CustomText.textTitle3(text: NumberFormat.currency(locale: 'id', symbol: '', decimalDigits: 0).format(int.parse(totalHargaTrans)), minSize: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.04)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.04)).toString())),
+                            CustomText.textTitle3(text: (totalHargaTrans.toString() == '0')?'Free':NumberFormat.currency(locale: 'id', symbol: '', decimalDigits: 0).format(int.parse(totalHargaTrans)), minSize: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.04)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.04)).toString())),
                           ],
                         ),
                       ),

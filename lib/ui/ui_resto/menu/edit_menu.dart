@@ -136,7 +136,7 @@ class _EditMenuState extends State<EditMenu> {
               },
             ),
             actions: <Widget>[
-              FlatButton(
+              TextButton(
                 child: Text("Simpan", style: TextStyle(color: CustomColor.accent),),
                 onPressed: () async{
                   SharedPreferences pref = await SharedPreferences.getInstance();

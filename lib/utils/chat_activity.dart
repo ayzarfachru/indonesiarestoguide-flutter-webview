@@ -126,6 +126,8 @@ class _ChatActivityState extends State<ChatActivity> {
         });
     // print(apiResult.body);
     var data = json.decode(apiResult.body);
+    print('apiResult.body');
+    print(apiResult.body);
 
     if(data['status_code'] == 200){
       print("success");
@@ -163,6 +165,8 @@ class _ChatActivityState extends State<ChatActivity> {
         });
     // print(apiResult.body);
     var data = json.decode(apiResult.body);
+    print('apiResult.body2');
+    print(apiResult.body);
 
     if(data['status_code'] == 200){
       print("success");
@@ -463,11 +467,22 @@ class _ChatActivityState extends State<ChatActivity> {
 //     SharedPreferences pref = await SharedPreferences.getInstance();
 //     pref.setString("homepg", "");
 //     pref.setString("idresto", "");
-    (homepg != '1')?Navigator.pushReplacement(context, MaterialPageRoute(builder: (context)=> HomeActivity())):Navigator.pushReplacement(
-        context,
-        PageTransition(
-            type: PageTransitionType.rightToLeft,
-            child: HomeActivityResto()));
+    String inDetail = '';
+    SharedPreferences pref = await SharedPreferences.getInstance();
+    inDetail = pref.getString('inDetail')??'';
+    if (inDetail == '1') {
+      Navigator.pop(context);
+    } else if (inDetail == '2') {
+      Navigator.pop(context);
+    } else if (inDetail == '3') {
+      Navigator.pop(context);
+    } else {
+      (homepg != '1')?Navigator.pushReplacement(context, MaterialPageRoute(builder: (context)=> HomeActivity())):Navigator.pushReplacement(
+          context,
+          PageTransition(
+              type: PageTransitionType.rightToLeft,
+              child: HomeActivityResto()));
+    }
     return Future.value(true);
   }
 
@@ -543,7 +558,7 @@ class _ChatActivityState extends State<ChatActivity> {
     }
 
     return WillPopScope(
-      onWillPop: () => onWillPop(),
+      onWillPop: onWillPop,
       child: Scaffold(
         body: SafeArea(
           child: Column(
@@ -554,13 +569,24 @@ class _ChatActivityState extends State<ChatActivity> {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: <Widget>[
                   IconButton(
-                    onPressed: (){
+                    onPressed: () async{
                       print('homepg '+homepg);
-                      (homepg != '1')?Navigator.pushReplacement(context, MaterialPageRoute(builder: (context)=> HomeActivity())):Navigator.push(
-                          context,
-                          PageTransition(
-                              type: PageTransitionType.fade,
-                              child: HomeActivityResto()));
+                      String inDetail = '';
+                      SharedPreferences pref = await SharedPreferences.getInstance();
+                      inDetail = pref.getString('inDetail')??'';
+                      if (inDetail == '1') {
+                        Navigator.pop(context);
+                      } else if (inDetail == '2') {
+                        Navigator.pop(context);
+                      } else if (inDetail == '3') {
+                        Navigator.pop(context);
+                      } else {
+                        (homepg != '1')?Navigator.pushReplacement(context, MaterialPageRoute(builder: (context)=> HomeActivity())):Navigator.push(
+                            context,
+                            PageTransition(
+                                type: PageTransitionType.fade,
+                                child: HomeActivityResto()));
+                      }
                     },
                     icon: Icon(Icons.arrow_back),
                   ),

@@ -1,7 +1,9 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
-import 'package:flutter_icons/flutter_icons.dart';
+import 'package:fluttertoast/fluttertoast.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+// import 'package:flutter_icons/flutter_icons.dart';
 import 'package:kam5ia/ui/detail/detail_resto.dart';
 import 'package:kam5ia/ui/promo/add_promo.dart';
 import 'package:kam5ia/ui/promo/edit_promo.dart';
@@ -102,8 +104,9 @@ class _LagiDiskonActivityState extends State<LagiDiskonActivity> {
       super.setState(fn);
     }
   }
-
   ScrollController _scrollController = ScrollController();
+  ScrollController _controller = ScrollController();
+
   String homepg = "";
   bool isLoading = true;
 
@@ -128,7 +131,10 @@ class _LagiDiskonActivityState extends State<LagiDiskonActivity> {
       "Accept": "Application/json",
       "Authorization": "Bearer $token"
     });
+    print('WOT 1');
+    print(apiResult.body);
     var data = json.decode(apiResult.body);
+    print('WOT');
     print(data['promo']);
 
     for(var v in data['promo']){
@@ -140,16 +146,83 @@ class _LagiDiskonActivityState extends State<LagiDiskonActivity> {
           desc: v['desc']??'',
           urlImg: v['img'],
           is_available: v['is_available'],
-          // is_available: '0',
           price: Price.discounted(int.parse(v['price'].toString()), int.parse(v['discounted_price'].toString())),
           distance: double.parse(v['resto_distance'].toString()), is_recommended: '', qty: '', type: '', delivery_price: null
       );
       _promo.add(m);
     }
+
     setState(() {
       promo = _promo;
+      stop = '';
       isLoading = false;
     });
+
+    if (apiResult.statusCode == 200 && promo.toString() == '[]') {
+      kosong = true;
+    }
+  }
+
+
+  int pl = 15;
+  String stop = '';
+  bool wait = false;
+  Future<void> _getPromo2(String lat, String long)async{
+    List<Menu> _promo = [];
+    int pl_skip = promo.length;
+
+    setState(() {
+      pl_skip = promo.length;
+      isLoading2 = true;
+      wait = true;
+    });
+    SharedPreferences pref = await SharedPreferences.getInstance();
+    String token = pref.getString("token") ?? "";
+    var apiResult = await http.get(Uri.parse(Links.mainUrl + '/page/home?pl=15&pl_skip=$pl_skip&lat=$lat&long=$long&limit=0'), headers: {
+      "Accept": "Application/json",
+      "Authorization": "Bearer $token"
+    });
+    print('WOT 1');
+    print(apiResult.body);
+    var data = json.decode(apiResult.body);
+    print('WOT');
+    print(data['promo']);
+
+    for(var v in data['promo']){
+      Menu m = Menu(
+          id: v['id'],
+          name: v['name'],
+          restoId: v['resto_id'].toString(),
+          restoName: v['resto_name'],
+          desc: v['desc']??'',
+          urlImg: v['img'],
+          is_available: v['is_available'],
+          price: Price.discounted(int.parse(v['price'].toString()), int.parse(v['discounted_price'].toString())),
+          distance: double.parse(v['resto_distance'].toString()), is_recommended: '', qty: '', type: '', delivery_price: null
+      );
+      promo.add(m);
+    }
+
+    setState(() {
+      // promo = _promo;
+      isLoading2 = false;
+      wait = false;
+      print('pl_skip == promo.length');
+      print(pl_skip);
+      print(promo.length);
+      if (pl_skip == promo.length) {
+        if (stop == '') {
+          Fluttertoast.showToast(msg: "Semua data telah ditampilkan");
+        }
+        stop = '1';
+      } else if (pl_skip < promo.length) {
+
+      }
+    });
+
+    if (apiResult.statusCode == 200 && promo.toString() == '[]') {
+      kosong = true;
+    }
   }
 
   bool kosong = false;
@@ -185,7 +258,6 @@ class _LagiDiskonActivityState extends State<LagiDiskonActivity> {
             desc: a['menus']['desc']??null,
             urlImg: a['menus']['img'],
             is_available: a['menus']['is_available'],
-            // is_available: '0',
             price: Price.promo(
                 a['menus']['price'].toString(), a['menus']['delivery_price'].toString()), type: '', distance: null, delivery_price: null, restoId: '', restoName: '', is_recommended: '', qty: ''
         ),
@@ -239,13 +311,13 @@ class _LagiDiskonActivityState extends State<LagiDiskonActivity> {
   showAlertDialog(String id) {
 
     // set up the buttons
-    Widget cancelButton = FlatButton(
+    Widget cancelButton = TextButton(
       child: Text("Batal", style: TextStyle(color: CustomColor.primary)),
       onPressed:  () {
         Navigator.pop(context);
       },
     );
-    Widget continueButton = FlatButton(
+    Widget continueButton = TextButton(
       child: Text("Hapus", style: TextStyle(color: CustomColor.primary)),
       onPressed:  () {
         _delPromo(id);
@@ -300,12 +372,15 @@ class _LagiDiskonActivityState extends State<LagiDiskonActivity> {
   @override
   void dispose() {
     _scrollController.dispose();
+    _controller.dispose();
     super.dispose();
   }
 
   double hargaDiskon = 0;
   int hargaPotongan = 0;
   int hargaOngkir = 0;
+
+  bool isLoading2 = false;
 
   @override
   void initState() {
@@ -323,6 +398,40 @@ class _LagiDiskonActivityState extends State<LagiDiskonActivity> {
         // print(promoResto);
       }
     });
+    _scrollController.addListener(() {
+      if (_scrollController.position.atEdge) {
+        // if (_scrollController.position.pixels != 0 && isLoading2 == true && page != last_page) {
+        if (_scrollController.position.pixels != 0 && isLoading2 == true) {
+          // print(startCuisine.toString().split(',').length.toString());
+          // print(totalCuisine.toString());
+          // _page(lat,long);
+          // pl = pl + 1;
+          print('stop');
+          print(stop);
+          if (stop == '') {
+            if (isLoading2 == true) {
+              if (wait == false) {
+                print('uhuy');
+                Location.instance.getLocation().then((value) {
+                  _getPromo2(value.latitude.toString(), value.longitude.toString());
+                });
+              }
+              // isLoading2 = true;
+            }
+          } else if (stop == '1') {
+            // Fluttertoast.showToast(msg: "Semua data telah ditampilkan");
+          }
+        } else {
+          print(isLoading2.toString());
+          print(stop.toString());
+          isLoading2 = false;
+          setState((){});
+          print(_scrollController.position.pixels.toString());
+          print("You're at the top.");
+          setState(() {});
+        }
+      }
+    });
     super.initState();
     getHomePg();
     print(homepg);
@@ -332,396 +441,432 @@ class _LagiDiskonActivityState extends State<LagiDiskonActivity> {
   Widget build(BuildContext context) {
     return MediaQuery(
       child: Scaffold(
-          body: Stack(
-            children: [
-              SafeArea(
-                child: (isLoading)?Container(
-                    width: CustomSize.sizeWidth(context),
-                    height: CustomSize.sizeHeight(context),
-                    child: Center(child: CircularProgressIndicator(
-                      color: CustomColor.primaryLight,
-                    ))):SmartRefresher(
-                  enablePullDown: true,
-                  enablePullUp: false,
-                  header: WaterDropMaterialHeader(
-                    distance: 30,
-                    backgroundColor: Colors.white,
-                    color: CustomColor.primaryLight,
-                  ),
-                  controller: _refreshController,
-                  onRefresh: _onRefresh,
-                  onLoading: _onLoading,
-                  child: SingleChildScrollView(
-                    controller: _scrollController,
-                    child: Padding(
-                      padding: EdgeInsets.symmetric(horizontal: CustomSize.sizeWidth(context) / 24),
-                      child: (kosong.toString() != 'true')?Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          SizedBox(
-                            height: CustomSize.sizeHeight(context) / 32,
-                          ),
-                          (homepg != "1")?Row(
-                            children: [
-                              GestureDetector(
+          body: SafeArea(
+            child: (isLoading)?Container(
+                width: CustomSize.sizeWidth(context),
+                height: CustomSize.sizeHeight(context),
+                child: Center(child: CircularProgressIndicator(
+                  color: CustomColor.primaryLight,
+                ))):SmartRefresher(
+              enablePullDown: true,
+              enablePullUp: true,
+              header: WaterDropMaterialHeader(
+                distance: 30,
+                backgroundColor: Colors.white,
+                color: CustomColor.primaryLight,
+              ),
+              controller: _refreshController,
+              onRefresh: _onRefresh,
+              onLoading: _onLoading,
+              physics: BouncingScrollPhysics(),
+              footer: CustomFooter(builder: (BuildContext context, LoadStatus? mode) {
+                Widget body;
+                if(mode==LoadStatus.idle){
+                  body =  MediaQuery(child: Text(""), data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0),);
+                }
+                else if(mode==LoadStatus.loading){
+                  body = Text("");
+                  if (stop == '') {
+                    if (promo.length >= 15) {
+                      if (isLoading2 == false) {
+                        Fluttertoast.showToast(msg: "Data diperbarui");
+                      }
+                      isLoading2 = true;
+                      // Fluttertoast.showToast(msg: "Data diperbarui");
+                    }
+                  } else if (stop == '1') {
+                    isLoading2 = false;
+                    // Fluttertoast.showToast(msg: "Semua data telah ditampilkan");
+                  }
+                }
+                else if(mode == LoadStatus.failed){
+                  body = MediaQuery(child: Text(""), data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0),);
+                }
+                else if(mode == LoadStatus.canLoading){
+                  body = MediaQuery(child: Text(""), data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0),);
+                }
+                else{
+                  body = MediaQuery(child: Text(""), data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0),);
+                }
+                return Container(
+                  height: CustomSize.sizeHeight(context) / 48,
+                  alignment: Alignment.topCenter,
+                  child: Center(child: body),
+                );
+              },
+              ),
+              child: ListView(
+                controller: _scrollController,
+                physics: BouncingScrollPhysics(),
+                children: [
+                  Padding(
+                    padding: EdgeInsets.symmetric(horizontal: CustomSize.sizeWidth(context) / 24),
+                    child: (kosong.toString() != 'true')?Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        SizedBox(
+                          height: CustomSize.sizeHeight(context) / 32,
+                        ),
+                        (homepg != "1")?Row(
+                          children: [
+                            GestureDetector(
+                                onTap: (){
+                                  Navigator.pop(context);
+                                },
+                                child: Container(
+                                    width: CustomSize.sizeWidth(context) / 7,
+                                    height: CustomSize.sizeWidth(context) / 7,
+                                    decoration: BoxDecoration(
+                                      color: Colors.white,
+                                      shape: BoxShape.circle,
+                                      boxShadow: [
+                                        BoxShadow(
+                                          color: Colors.grey.withOpacity(0.5),
+                                          spreadRadius: 0,
+                                          blurRadius: 7,
+                                          offset: Offset(0, 0), // changes position of shadow
+                                        ),
+                                      ],
+                                    ),
+                                    child: Center(child: Icon(Icons.chevron_left, size: 38,)))
+                            ),
+                            SizedBox(
+                              width: CustomSize.sizeWidth(context) / 48,
+                            ),
+                            Container(
+                              width: CustomSize.sizeWidth(context) / 1.5,
+                              child: CustomText.textHeading3(
+                                  text: "Lagi Diskon",
+                                  color: CustomColor.primary,
+                                  minSize: double.parse(((MediaQuery.of(context).size.width*0.06).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.06)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.06)).toString()),
+                                  maxLines: 2
+                              ),
+                            ),
+                          ],
+                        ):CustomText.textHeading3(
+                            text: "Promo di Tokomu",
+                            color: CustomColor.primary,
+                            minSize: double.parse(((MediaQuery.of(context).size.width*0.045).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.045)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.045)).toString()),
+                            maxLines: 1
+                        ),
+                        // (homepg != "1")?CustomText.textHeading3(
+                        //     text: "di Sekitarmu",
+                        //     color: CustomColor.primary,
+                        //     minSize: 18,
+                        //     maxLines: 1
+                        // ):Container(),
+                        ListView.builder(
+                            shrinkWrap: true,
+                            // controller: _controller,
+                            physics: NeverScrollableScrollPhysics(),
+                            itemCount: (homepg != "1")?promo.length:promoResto.length,
+                            itemBuilder: (_, index){
+                              Future.delayed(Duration(seconds: 1)).then((_) {
+                                setState(() {
+                                  // int hargaAsli = int.parse(promoResto[index].menu.price.oriString);
+                                  // int hargaAsliDeliv = int.parse(promoResto[index].menu.price.deliString);
+                                  // hargaDiskon = hargaAsli-(hargaAsli*promoResto[index].discountedPrice/100);
+                                  // hargaPotongan = (promoResto[index].potongan != null)?hargaAsli-promoResto[index].potongan:hargaAsli;
+                                  // hargaOngkir = (promoResto[index].ongkir != null)?hargaAsliDeliv-promoResto[index].ongkir:hargaAsliDeliv;
+
+                                  // print(hargaDiskon.toString().split('.')[0]);
+                                  // print(hargaOngkir);
+                                });
+                              });
+                              return Padding(
+                                padding: EdgeInsets.only(top: CustomSize.sizeHeight(context) / 48),
+                                child: GestureDetector(
                                   onTap: (){
-                                    Navigator.pop(context);
+                                    Navigator.push(
+                                        context,
+                                        PageTransition(
+                                            type: PageTransitionType.rightToLeft,
+                                            child: new DetailResto(promo[index].restoId.toString())));
                                   },
                                   child: Container(
-                                      width: CustomSize.sizeWidth(context) / 7,
-                                      height: CustomSize.sizeWidth(context) / 7,
-                                      decoration: BoxDecoration(
-                                        color: Colors.white,
-                                        shape: BoxShape.circle,
-                                        boxShadow: [
-                                          BoxShadow(
-                                            color: Colors.grey.withOpacity(0.5),
-                                            spreadRadius: 0,
-                                            blurRadius: 7,
-                                            offset: Offset(0, 0), // changes position of shadow
-                                          ),
-                                        ],
-                                      ),
-                                      child: Center(child: Icon(Icons.chevron_left, size: 38,)))
-                              ),
-                              SizedBox(
-                                width: CustomSize.sizeWidth(context) / 48,
-                              ),
-                              Container(
-                                width: CustomSize.sizeWidth(context) / 1.5,
-                                child: CustomText.textHeading3(
-                                    text: "Lagi Diskon",
-                                    color: CustomColor.primary,
-                                    sizeNew: double.parse(((MediaQuery.of(context).size.width*0.06).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.06)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.06)).toString()),
-                                    maxLines: 2
-                                ),
-                              ),
-                            ],
-                          ):CustomText.textHeading3(
-                              text: "Promo di Tokomu",
-                              color: CustomColor.primary,
-                              sizeNew: double.parse(((MediaQuery.of(context).size.width*0.045).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.045)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.045)).toString()),
-                              maxLines: 1
-                          ),
-                          // (homepg != "1")?CustomText.textHeading3(
-                          //     text: "di Sekitarmu",
-                          //     color: CustomColor.primary,
-                          //     minSize: 18,
-                          //     maxLines: 1
-                          // ):Container(),
-                          ListView.builder(
-                              shrinkWrap: true,
-                              controller: _scrollController,
-                              physics: NeverScrollableScrollPhysics(),
-                              itemCount: (homepg != "1")?promo.length:promoResto.length,
-                              itemBuilder: (_, index){
-                                Future.delayed(Duration(seconds: 1)).then((_) {
-                                  setState(() {
-                                    // int hargaAsli = int.parse(promoResto[index].menu.price.oriString);
-                                    // int hargaAsliDeliv = int.parse(promoResto[index].menu.price.deliString);
-                                    // hargaDiskon = hargaAsli-(hargaAsli*promoResto[index].discountedPrice/100);
-                                    // hargaPotongan = (promoResto[index].potongan != null)?hargaAsli-promoResto[index].potongan:hargaAsli;
-                                    // hargaOngkir = (promoResto[index].ongkir != null)?hargaAsliDeliv-promoResto[index].ongkir:hargaAsliDeliv;
-
-                                    // print(hargaDiskon.toString().split('.')[0]);
-                                    // print(hargaOngkir);
-                                  });
-                                });
-                                return Padding(
-                                  padding: EdgeInsets.only(top: CustomSize.sizeHeight(context) / 48),
-                                  child: GestureDetector(
-                                    onTap: (){
-                                      Navigator.push(
-                                          context,
-                                          PageTransition(
-                                              type: PageTransitionType.rightToLeft,
-                                              child: new DetailResto(promo[index].restoId.toString())));
-                                    },
-                                    child: Container(
-                                      width: CustomSize.sizeWidth(context),
-                                      height: CustomSize.sizeWidth(context) / 2.6,
-                                      decoration: BoxDecoration(
-                                        color: Colors.white,
-                                        borderRadius: BorderRadius.circular(20),
-                                        boxShadow: [
-                                          BoxShadow(
-                                            color: Colors.grey.withOpacity(0.5),
-                                            spreadRadius: 0,
-                                            blurRadius: 7,
-                                            offset: Offset(0, 7), // changes position of shadow
-                                          ),
-                                        ],
-                                      ),
-                                      child: Row(
-                                        children: [
-                                          Container(
-                                            width: CustomSize.sizeWidth(context) / 2.6,
-                                            height: CustomSize.sizeWidth(context) / 2.6,
-                                            decoration: (homepg == "1")?(promoResto[index].menu != null)?(promoResto[index].menu!.is_available != '0')?BoxDecoration(
-                                              image: DecorationImage(
-                                                  image: NetworkImage(Links.subUrl + promoResto[index].menu!.urlImg),
-                                                  fit: BoxFit.cover
-                                              ),
-                                              borderRadius: BorderRadius.circular(20),
-                                            ):BoxDecoration(
-                                                image: DecorationImage(
-                                                    colorFilter: ColorFilter.mode(
-                                                      Colors.grey,
-                                                      BlendMode.saturation,
-                                                    ),
-                                                    image: NetworkImage(Links.subUrl + promoResto[index].menu!.urlImg),
-                                                    fit: BoxFit.fitWidth
-                                                ),
-                                                borderRadius: BorderRadius.circular(20)
-                                            ):BoxDecoration(
-                                              color: CustomColor.primaryLight,
-                                              borderRadius: BorderRadius.circular(20),
-                                            ):(promo[index].is_available != '0')?BoxDecoration(
-                                              image: DecorationImage(
-                                                  image: NetworkImage(Links.subUrl + promo[index].urlImg),
-                                                  fit: BoxFit.cover
-                                              ),
-                                              borderRadius: BorderRadius.circular(20),
-                                            ):BoxDecoration(
-                                                image: DecorationImage(
-                                                    colorFilter: ColorFilter.mode(
-                                                      Colors.grey,
-                                                      BlendMode.saturation,
-                                                    ),
-                                                    image: NetworkImage(Links.subUrl + promo[index].urlImg),
-                                                    fit: BoxFit.fitWidth
-                                                ),
-                                                borderRadius: BorderRadius.circular(20)
-                                            ),
-                                          ),
-                                          SizedBox(
-                                            width: CustomSize.sizeWidth(context) / 32,
-                                          ),
-                                          Container(
-                                            width: CustomSize.sizeWidth(context) / 2.1,
-                                            height: CustomSize.sizeWidth(context) / 2.85,
-                                            child: Column(
-                                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                              children: [
-                                                Column(
-                                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                                  children: [
-                                                    Row(
-                                                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                                      children: [
-                                                        (homepg != '1')?CustomText.bodyLight12(
-                                                          // text: promo[index].menu.distance.toString().split('.')[0]+' , '+promo[index].menu.distance.toString().split('')[0]+promo[index].menu.distance.toString().split('.')[1].split('')[1]+" km",
-                                                            text: promo[index].distance.toString().split('.')[0]+" km",
-                                                            maxLines: 1,
-                                                            sizeNew: double.parse(((MediaQuery.of(context).size.width*0.03).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.03)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.03)).toString())
-                                                        ):CustomText.bodyLight12(
-                                                            text: 'Sampai : '+promoResto[index].expired_at!.split(' ')[0],
-                                                            maxLines: 1,
-                                                            sizeNew: double.parse(((MediaQuery.of(context).size.width*0.03).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.03)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.03)).toString())
-                                                        ),
-                                                        (homepg != "1")?Container():Row(
-                                                          children: [
-                                                            GestureDetector(
-                                                                onTap: (){
-                                                                  Navigator.push(
-                                                                      context,
-                                                                      PageTransition(
-                                                                          type: PageTransitionType.rightToLeft,
-                                                                          child: EditPromo(promoResto[index])));
-                                                                },
-                                                                child: Icon(Icons.edit, color: Colors.grey,)
-                                                            ),
-                                                            SizedBox(width: CustomSize.sizeWidth(context) / 86,),
-                                                            GestureDetector(
-                                                                onTap: (){
-                                                                  showAlertDialog(promoResto[index].id.toString());
-                                                                },
-                                                                child: Icon(Icons.delete, color: CustomColor.redBtn,)
-                                                            ),
-                                                            SizedBox(width: CustomSize.sizeWidth(context) / 98,),
-                                                          ],
-                                                        )
-                                                      ],
-                                                    ),
-                                                    (homepg != '1')?Container():CustomText.bodyLight12(
-                                                        text: 'Jam : '+promoResto[index].expired_at!.split(' ')[1].split(':')[0]+':'+promoResto[index].expired_at!.split(' ')[1].split(':')[1],
-                                                        maxLines: 1,
-                                                        sizeNew: double.parse(((MediaQuery.of(context).size.width*0.03).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.03)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.03)).toString())
-                                                    ),
-                                                    (homepg != "1")?SizedBox(height: CustomSize.sizeHeight(context) * 0.00426,):Container(),
-                                                    (homepg != "1")?CustomText.textHeading4(
-                                                        text: promo[index].name,
-                                                        sizeNew: double.parse(((MediaQuery.of(context).size.width*0.045).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.045)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.045)).toString()),
-                                                        maxLines: 2
-                                                    ):(promoResto[index].menu != null)?CustomText.textHeading4(
-                                                        text: promoResto[index].menu!.name,
-                                                        sizeNew: double.parse(((MediaQuery.of(context).size.width*0.045).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.045)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.045)).toString()),
-                                                        maxLines: 1
-                                                    ):CustomText.textHeading6(
-                                                        text: 'Menu tidak tersedia',
-                                                        maxLines: 1,
-                                                        sizeNew: double.parse(((MediaQuery.of(context).size.width*0.035).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.035).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.035).toString())
-                                                    ),
-                                                    (homepg != "1")?CustomText.bodyMedium12(
-                                                        text: promo[index].restoName,
-                                                        sizeNew: double.parse(((MediaQuery.of(context).size.width*0.03).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.03).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.03).toString()),
-                                                        maxLines: 2,
-                                                        color: CustomColor.primary
-                                                    ):Container(),
-                                                    // CustomText.bodyMedium12(text: promo[index].restoName, minSize: 12),
-                                                    SizedBox(height: CustomSize.sizeHeight(context) * 0.005,),
-                                                    (homepg != "1")?CustomText.bodyMedium12(
-                                                        text: promo[index].desc,
-                                                        maxLines: 2,
-                                                        sizeNew: double.parse(((MediaQuery.of(context).size.width*0.03).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.03).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.03).toString())
-                                                    ):CustomText.bodyMedium12(
-                                                        text: promoResto[index].word,
-                                                        maxLines: 1,
-                                                        sizeNew: double.parse(((MediaQuery.of(context).size.width*0.03).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.03).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.03).toString())
-                                                    ),
-                                                    // (homepg != "1")?SizedBox(height: CustomSize.sizeHeight(context) / 22,):SizedBox(height: CustomSize.sizeHeight(context) / 56,),
-                                                  ],
-                                                ),
-                                                Row(
-                                                  children: [
-                                                    (homepg != "1")?CustomText.bodyRegular12(text: NumberFormat.currency(locale: 'id', symbol: '', decimalDigits: 0).format(promo[index].price!.original), sizeNew: double.parse(((MediaQuery.of(context).size.width*0.03).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.03).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.03).toString()),
-                                                        decoration: TextDecoration.lineThrough)
-                                                        :Column(
-                                                      crossAxisAlignment: CrossAxisAlignment.start,
-                                                      children: [
-                                                        (promoResto[index].menu != null)?Row(
-                                                          children: [
-                                                            CustomText.bodyRegular12(text: 'Harga :', sizeNew: double.parse(((MediaQuery.of(context).size.width*0.03).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.03).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.03).toString())),
-                                                            SizedBox(width: CustomSize.sizeWidth(context) / 48,),
-                                                            (promoResto[index].discountedPrice != null || promoResto[index].potongan != null)?CustomText.bodyRegular12(text: NumberFormat.currency(locale: 'id', symbol: '', decimalDigits: 0).format(int.parse(promoResto[index].menu!.price!.oriString!)), sizeNew: double.parse(((MediaQuery.of(context).size.width*0.03).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.03).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.03).toString()), color: CustomColor.redBtn,
-                                                                decoration: TextDecoration.lineThrough)
-                                                                :CustomText.bodyRegular12(text: NumberFormat.currency(locale: 'id', symbol: '', decimalDigits: 0).format(int.parse(promoResto[index].menu!.price!.oriString!)),sizeNew: double.parse(((MediaQuery.of(context).size.width*0.03).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.03).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.03).toString()),),
-                                                          ],
-                                                        ):Container(),
-                                                        (promoResto[index].ongkir != null)?Row(
-                                                          children: [
-                                                            CustomText.bodyRegular12(text: 'Potongan Ongkir :', sizeNew: double.parse(((MediaQuery.of(context).size.width*0.03).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.03).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.03).toString())),
-                                                            SizedBox(width: CustomSize.sizeWidth(context) / 48,),
-                                                            CustomText.bodyRegular12(text: NumberFormat.currency(locale: 'id', symbol: '', decimalDigits: 0).format(int.parse(promoResto[index].ongkir.toString())), sizeNew: double.parse(((MediaQuery.of(context).size.width*0.03).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.03).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.03).toString()),),
-                                                          ],
-                                                        ):Container(),
-                                                        // (promoResto[index].menu != null)?Row(
-                                                        //   children: [
-                                                        //     CustomText.bodyRegular12(text: 'Delivery : ', minSize: 12),
-                                                        //     SizedBox(width: CustomSize.sizeWidth(context) / 48,),
-                                                        //     (promoResto[index].ongkir != null)?CustomText.bodyRegular12(text: NumberFormat.currency(locale: 'id', symbol: '', decimalDigits: 0).format(int.parse(promoResto[index].menu.price.deliString)), minSize: 12, color: CustomColor.redBtn,
-                                                        //         decoration: TextDecoration.lineThrough)
-                                                        //         :CustomText.bodyRegular12(text: NumberFormat.currency(locale: 'id', symbol: '', decimalDigits: 0).format(int.parse(promoResto[index].menu.price.deliString)), minSize: 12,),
-                                                        //   ],
-                                                        // ):Container(),
-                                                      ],
-                                                    ),
-                                                    SizedBox(width: CustomSize.sizeWidth(context) / 48,),
-                                                    (homepg == "1")?(promoResto[index].menu != null)?Column(
-                                                      crossAxisAlignment: CrossAxisAlignment.start,
-                                                      children: [
-                                                        // (homepg != "1")?CustomText.bodyRegular12(text: NumberFormat.currency(locale: 'id', symbol: '', decimalDigits: 0).format(promo[index].menu.price.discounted), minSize: 12)
-                                                        //     :
-                                                        CustomText.bodyRegular12(text:
-                                                        (promoResto[index].discountedPrice != null)?
-                                                        NumberFormat.currency(locale: 'id', symbol: '', decimalDigits: 0).format((int.parse(promoResto[index].menu!.price!.oriString!)-(int.parse(promoResto[index].menu!.price!.oriString!)*promoResto[index].discountedPrice!/100)))
-                                                            :(promoResto[index].potongan != null)?NumberFormat.currency(locale: 'id', symbol: '', decimalDigits: 0).format(int.parse(promoResto[index].menu!.price!.oriString!)-promoResto[index].potongan!)
-                                                            :'', sizeNew: double.parse(((MediaQuery.of(context).size.width*0.03).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.03).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.03).toString())),
-
-                                                        // // (homepg != "1")?CustomText.bodyRegular12(text: NumberFormat.currency(locale: 'id', symbol: '', decimalDigits: 0).format(promo[index].menu.price.discounted), minSize: 12)
-                                                        // //     :
-                                                        // CustomText.bodyRegular12(text:
-                                                        // (promoResto[index].menu.price.deliString != null)?
-                                                        // (promoResto[index].ongkir != null)?
-                                                        //     NumberFormat.currency(locale: 'id', symbol: '', decimalDigits: 0).format((int.parse(promoResto[index].menu.price.deliString)-promoResto[index].ongkir))
-                                                        //     :'' :'', minSize: 12),
-                                                      ],
-                                                    ):Container():CustomText.bodyRegular12(text: NumberFormat.currency(locale: 'id', symbol: '', decimalDigits: 0).format(promo[index].price!.discounted), sizeNew: double.parse(((MediaQuery.of(context).size.width*0.03).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.03).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.03).toString())),
-                                                  ],
-                                                )
-                                              ],
-                                            ),
-                                          )
-                                        ],
-                                      ),
+                                    width: CustomSize.sizeWidth(context),
+                                    height: CustomSize.sizeWidth(context) / 2.6,
+                                    decoration: BoxDecoration(
+                                      color: Colors.white,
+                                      borderRadius: BorderRadius.circular(20),
+                                      boxShadow: [
+                                        BoxShadow(
+                                          color: Colors.grey.withOpacity(0.5),
+                                          spreadRadius: 0,
+                                          blurRadius: 7,
+                                          offset: Offset(0, 7), // changes position of shadow
+                                        ),
+                                      ],
                                     ),
-                                  ),
-                                );
-                              }
-                          ),
-                          SizedBox(height: CustomSize.sizeHeight(context) / 8,)
-                        ],
-                      ):Stack(
-                        children: [
-                          Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              SizedBox(
-                                height: CustomSize.sizeHeight(context) / 32,
-                              ),
-                              Row(
-                                children: [
-                                  GestureDetector(
-                                      onTap: (){
-                                        Navigator.pop(context);
-                                      },
-                                      child: Container(
-                                          width: CustomSize.sizeWidth(context) / 7,
-                                          height: CustomSize.sizeWidth(context) / 7,
-                                          decoration: BoxDecoration(
-                                            color: Colors.white,
-                                            shape: BoxShape.circle,
-                                            boxShadow: [
-                                              BoxShadow(
-                                                color: Colors.grey.withOpacity(0.5),
-                                                spreadRadius: 0,
-                                                blurRadius: 7,
-                                                offset: Offset(0, 0), // changes position of shadow
+                                    child: Row(
+                                      children: [
+                                        Container(
+                                          width: CustomSize.sizeWidth(context) / 2.6,
+                                          height: CustomSize.sizeWidth(context) / 2.6,
+                                          decoration: (homepg == "1")?(promoResto[index].menu != null)?BoxDecoration(
+                                            image: DecorationImage(
+                                                image: NetworkImage(Links.subUrl + promoResto[index].menu!.urlImg),
+                                                fit: BoxFit.cover
+                                            ),
+                                            borderRadius: BorderRadius.circular(20),
+                                          ):BoxDecoration(
+                                            color: CustomColor.primaryLight,
+                                            borderRadius: BorderRadius.circular(20),
+                                          ):BoxDecoration(
+                                            image: DecorationImage(
+                                                image: NetworkImage(Links.subUrl + promo[index].urlImg),
+                                                fit: BoxFit.cover
+                                            ),
+                                            borderRadius: BorderRadius.circular(20),
+                                          ),
+                                        ),
+                                        SizedBox(
+                                          width: CustomSize.sizeWidth(context) / 32,
+                                        ),
+                                        Container(
+                                          width: CustomSize.sizeWidth(context) / 2.1,
+                                          height: CustomSize.sizeWidth(context) / 2.85,
+                                          child: Column(
+                                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                            children: [
+                                              Column(
+                                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                                crossAxisAlignment: CrossAxisAlignment.start,
+                                                children: [
+                                                  Row(
+                                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                                    children: [
+                                                      // (homepg != '1')?CustomText.bodyLight12(
+                                                      //   // text: promo[index].menu.distance.toString().split('.')[0]+' , '+promo[index].menu.distance.toString().split('')[0]+promo[index].menu.distance.toString().split('.')[1].split('')[1]+" km",
+                                                      //     text: promo[index].distance.toString().split('.')[0]+" km",
+                                                      //     maxLines: 1,
+                                                      //     minSize: 12
+                                                      // ):CustomText.bodyLight12(
+                                                      //     text: 'Sampai : '+promoResto[index].expired_at!.split(' ')[0],
+                                                      //     maxLines: 1,
+                                                      //     minSize: 12
+                                                      // ),
+                                                      (homepg != "1")?Container():Row(
+                                                        children: [
+                                                          GestureDetector(
+                                                              onTap: (){
+                                                                Navigator.push(
+                                                                    context,
+                                                                    PageTransition(
+                                                                        type: PageTransitionType.rightToLeft,
+                                                                        child: EditPromo(promoResto[index])));
+                                                              },
+                                                              child: Icon(Icons.edit, color: Colors.grey,)
+                                                          ),
+                                                          SizedBox(width: CustomSize.sizeWidth(context) / 86,),
+                                                          GestureDetector(
+                                                              onTap: (){
+                                                                showAlertDialog(promoResto[index].id.toString());
+                                                              },
+                                                              child: Icon(Icons.delete, color: CustomColor.redBtn,)
+                                                          ),
+                                                          SizedBox(width: CustomSize.sizeWidth(context) / 98,),
+                                                        ],
+                                                      )
+                                                    ],
+                                                  ),
+                                                  (homepg != '1')?Container():CustomText.bodyLight12(
+                                                      text: 'Jam : '+promoResto[index].expired_at!.split(' ')[1].split(':')[0]+':'+promoResto[index].expired_at!.split(' ')[1].split(':')[1],
+                                                      maxLines: 1,
+                                                      minSize: double.parse(((MediaQuery.of(context).size.width*0.03).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.03)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.03)).toString())
+                                                  ),
+                                                  Column(
+                                                      mainAxisAlignment: MainAxisAlignment.start,
+                                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                                      children: [
+                                                        (homepg != "1")?SizedBox(height: CustomSize.sizeHeight(context) * 0.00426,):Container(),
+                                                        (homepg != "1")?CustomText.textHeading4(
+                                                            text: promo[index].name,
+                                                            minSize: double.parse(((MediaQuery.of(context).size.width*0.045).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.045)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.045)).toString()),
+                                                            maxLines: 2
+                                                        ):(promoResto[index].menu != null)?CustomText.textHeading4(
+                                                            text: promoResto[index].menu!.name,
+                                                            minSize: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.04)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.04)).toString()),
+                                                            maxLines: 1
+                                                        ):CustomText.textHeading6(
+                                                            text: 'Menu tidak tersedia',
+                                                            maxLines: 1,
+                                                            minSize: double.parse(((MediaQuery.of(context).size.width*0.035).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.035)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.035)).toString())
+                                                        ),
+                                                        (homepg != "1")?CustomText.textHeading2(
+                                                            text: promo[index].restoName,
+                                                            minSize: double.parse(((MediaQuery.of(context).size.width*0.03).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.03)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.03)).toString()),
+                                                            maxLines: 2,
+                                                            color: CustomColor.primary
+                                                        ):Container(),
+                                                        // CustomText.bodyMedium12(text: promo[index].restoName, minSize: 12),
+                                                        SizedBox(height: CustomSize.sizeHeight(context) * 0.005,),
+                                                        (homepg != "1")?CustomText.bodyMedium12(
+                                                            text: promo[index].desc,
+                                                            maxLines: 2,
+                                                            minSize: double.parse(((MediaQuery.of(context).size.width*0.03).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.03)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.03)).toString())
+                                                        ):CustomText.bodyMedium12(
+                                                            text: promoResto[index].word,
+                                                            maxLines: 1,
+                                                            minSize: double.parse(((MediaQuery.of(context).size.width*0.03).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.03)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.03)).toString())
+                                                        ),
+                                                      ]
+                                                  ),
+                                                  // (homepg != "1")?SizedBox(height: CustomSize.sizeHeight(context) / 22,):SizedBox(height: CustomSize.sizeHeight(context) / 56,),
+                                                ],
                                               ),
+                                              Row(
+                                                children: [
+                                                  (homepg != "1")?CustomText.bodyRegular12(text: NumberFormat.currency(locale: 'id', symbol: '', decimalDigits: 0).format(promo[index].price!.original), minSize: double.parse(((MediaQuery.of(context).size.width*0.03).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.03)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.03)).toString()),
+                                                      decoration: TextDecoration.lineThrough)
+                                                      :Column(
+                                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                                    children: [
+                                                      (promoResto[index].menu != null)?Row(
+                                                        children: [
+                                                          CustomText.bodyRegular12(text: 'Harga :', minSize: double.parse(((MediaQuery.of(context).size.width*0.03).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.03)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.03)).toString())),
+                                                          SizedBox(width: CustomSize.sizeWidth(context) / 48,),
+                                                          (promoResto[index].discountedPrice != null || promoResto[index].potongan != null)?CustomText.bodyRegular12(text: NumberFormat.currency(locale: 'id', symbol: '', decimalDigits: 0).format(int.parse(promoResto[index].menu!.price!.oriString!)), minSize: double.parse(((MediaQuery.of(context).size.width*0.03).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.03)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.03)).toString()), color: CustomColor.redBtn,
+                                                              decoration: TextDecoration.lineThrough)
+                                                              :CustomText.bodyRegular12(text: NumberFormat.currency(locale: 'id', symbol: '', decimalDigits: 0).format(int.parse(promoResto[index].menu!.price!.oriString!)), minSize: double.parse(((MediaQuery.of(context).size.width*0.03).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.03)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.03)).toString()),),
+                                                        ],
+                                                      ):Container(),
+                                                      (promoResto[index].ongkir != null)?Row(
+                                                        children: [
+                                                          CustomText.bodyRegular12(text: 'Potongan Ongkir :', minSize: double.parse(((MediaQuery.of(context).size.width*0.03).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.03)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.03)).toString())),
+                                                          SizedBox(width: CustomSize.sizeWidth(context) / 48,),
+                                                          CustomText.bodyRegular12(text: NumberFormat.currency(locale: 'id', symbol: '', decimalDigits: 0).format(int.parse(promoResto[index].ongkir.toString())), minSize: double.parse(((MediaQuery.of(context).size.width*0.03).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.03)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.03)).toString()),),
+                                                        ],
+                                                      ):Container(),
+                                                      // (promoResto[index].menu != null)?Row(
+                                                      //   children: [
+                                                      //     CustomText.bodyRegular12(text: 'Delivery : ', minSize: 12),
+                                                      //     SizedBox(width: CustomSize.sizeWidth(context) / 48,),
+                                                      //     (promoResto[index].ongkir != null)?CustomText.bodyRegular12(text: NumberFormat.currency(locale: 'id', symbol: '', decimalDigits: 0).format(int.parse(promoResto[index].menu.price.deliString)), minSize: 12, color: CustomColor.redBtn,
+                                                      //         decoration: TextDecoration.lineThrough)
+                                                      //         :CustomText.bodyRegular12(text: NumberFormat.currency(locale: 'id', symbol: '', decimalDigits: 0).format(int.parse(promoResto[index].menu.price.deliString)), minSize: 12,),
+                                                      //   ],
+                                                      // ):Container(),
+                                                    ],
+                                                  ),
+                                                  SizedBox(width: CustomSize.sizeWidth(context) / 48,),
+                                                  (homepg == "1")?(promoResto[index].menu != null)?Column(
+                                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                                    children: [
+                                                      // (homepg != "1")?CustomText.bodyRegular12(text: NumberFormat.currency(locale: 'id', symbol: '', decimalDigits: 0).format(promo[index].menu.price.discounted), minSize: 12)
+                                                      //     :
+                                                      CustomText.bodyRegular12(text:
+                                                      (promoResto[index].discountedPrice != null)?
+                                                      NumberFormat.currency(locale: 'id', symbol: '', decimalDigits: 0).format((int.parse(promoResto[index].menu!.price!.oriString!)-(int.parse(promoResto[index].menu!.price!.oriString!)*promoResto[index].discountedPrice!/100)))
+                                                          :(promoResto[index].potongan != null)?NumberFormat.currency(locale: 'id', symbol: '', decimalDigits: 0).format(int.parse(promoResto[index].menu!.price!.oriString!)-promoResto[index].potongan!)
+                                                          :'', minSize: double.parse(((MediaQuery.of(context).size.width*0.03).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.03)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.03)).toString())),
+
+                                                      // // (homepg != "1")?CustomText.bodyRegular12(text: NumberFormat.currency(locale: 'id', symbol: '', decimalDigits: 0).format(promo[index].menu.price.discounted), minSize: 12)
+                                                      // //     :
+                                                      // CustomText.bodyRegular12(text:
+                                                      // (promoResto[index].menu.price.deliString != null)?
+                                                      // (promoResto[index].ongkir != null)?
+                                                      //     NumberFormat.currency(locale: 'id', symbol: '', decimalDigits: 0).format((int.parse(promoResto[index].menu.price.deliString)-promoResto[index].ongkir))
+                                                      //     :'' :'', minSize: 12),
+                                                    ],
+                                                  ):Container():CustomText.bodyRegular12(text: NumberFormat.currency(locale: 'id', symbol: '', decimalDigits: 0).format(promo[index].price!.discounted), minSize: double.parse(((MediaQuery.of(context).size.width*0.03).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.03)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.03)).toString())),
+                                                ],
+                                              )
                                             ],
                                           ),
-                                          child: Center(child: Icon(Icons.chevron_left, size: 38,)))
-                                  ),
-                                  SizedBox(
-                                    width: CustomSize.sizeWidth(context) / 48,
-                                  ),
-                                  Container(
-                                    width: CustomSize.sizeWidth(context) / 1.5,
-                                    child: CustomText.textHeading3(
-                                        text: "Lagi Diskon",
-                                        color: CustomColor.primary,
-                                        sizeNew: double.parse(((MediaQuery.of(context).size.width*0.06).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.06)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.06)).toString()),
-                                        maxLines: 2
+                                        )
+                                      ],
                                     ),
                                   ),
-                                ],
+                                ),
+                              );
+                            }
+                        ),
+                        (isLoading2 == true)?Center(
+                          child: Container(
+                            alignment: Alignment.center,
+                            width: CustomSize.sizeWidth(context) / 1.1,
+                            height: CustomSize.sizeHeight(context) / 14,
+                            // decoration: BoxDecoration(
+                            //     borderRadius: BorderRadius.circular(30),
+                            //     color: CustomColor.accent
+                            // ),
+                            child: Center(
+                              child: CircularProgressIndicator(
+                                valueColor: AlwaysStoppedAnimation<Color>(CustomColor.primary),
                               ),
-                            ],
-                          ),
-                          Container(height: CustomSize.sizeHeight(context), child: Center(
-                            child: CustomText.bodyRegular14(
-                                text: 'kosong.',
-                                maxLines: 1,
-                                sizeNew: double.parse(((MediaQuery.of(context).size.width*0.03).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.03).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.03).toString()),
-                                color: Colors.grey
                             ),
-                          ),),
-                        ],
-                      ),
+                          ),
+                        ):Container(),
+                        // SizedBox(height: CustomSize.sizeHeight(context) / 8,)
+                      ],
+                    ):Stack(
+                      children: [
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            SizedBox(
+                              height: CustomSize.sizeHeight(context) / 32,
+                            ),
+                            (homepg != "1")?Row(
+                              children: [
+                                GestureDetector(
+                                    onTap: (){
+                                      Navigator.pop(context);
+                                    },
+                                    child: Container(
+                                        width: CustomSize.sizeWidth(context) / 7,
+                                        height: CustomSize.sizeWidth(context) / 7,
+                                        decoration: BoxDecoration(
+                                          color: Colors.white,
+                                          shape: BoxShape.circle,
+                                          boxShadow: [
+                                            BoxShadow(
+                                              color: Colors.grey.withOpacity(0.5),
+                                              spreadRadius: 0,
+                                              blurRadius: 7,
+                                              offset: Offset(0, 0), // changes position of shadow
+                                            ),
+                                          ],
+                                        ),
+                                        child: Center(child: Icon(Icons.chevron_left, size: 38,)))
+                                ),
+                                SizedBox(
+                                  width: CustomSize.sizeWidth(context) / 48,
+                                ),
+                                Container(
+                                  width: CustomSize.sizeWidth(context) / 1.5,
+                                  child: CustomText.textHeading3(
+                                      text: "Lagi Diskon",
+                                      color: CustomColor.primary,
+                                      minSize: double.parse(((MediaQuery.of(context).size.width*0.06).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.06)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.06)).toString()),
+                                      maxLines: 2
+                                  ),
+                                ),
+                              ],
+                            ):CustomText.textHeading3(
+                                text: "Promo di Tokomu",
+                                color: CustomColor.primary,
+                                minSize: double.parse(((MediaQuery.of(context).size.width*0.045).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.045)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.045)).toString()),
+                                maxLines: 1
+                            ),
+                          ],
+                        ),
+                        Container(height: CustomSize.sizeHeight(context), child: Center(
+                          child: CustomText.bodyRegular14(
+                              text: 'Kosong.',
+                              maxLines: 1,
+                              minSize: double.parse(((MediaQuery.of(context).size.width*0.03).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.03)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.03)).toString()),
+                              color: Colors.grey
+                          ),
+                        ),),
+                      ],
                     ),
                   ),
-                ),
+                ],
               ),
-              (promo.toString() == '[]' && isLoading != true)?Center(
-                child: CustomText.bodyRegular14(
-                    text: 'kosong.',
-                    maxLines: 1,
-                    sizeNew: double.parse(((MediaQuery.of(context).size.width*0.035).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.035)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.035)).toString()),
-                    color: Colors.grey
-                ),
-              ):Container(),
-            ],
+            ),
           ),
           floatingActionButton: (homepg != '1')?Container():GestureDetector(
             onTap: ()async{
@@ -743,7 +888,7 @@ class _LagiDiskonActivityState extends State<LagiDiskonActivity> {
                   color: CustomColor.primaryLight,
                   shape: BoxShape.circle
               ),
-              child: Center(child: Icon(FontAwesome.plus, color: Colors.white, size: 29,)),
+              child: Center(child: Icon(FontAwesomeIcons.plus, color: Colors.white, size: 29,)),
             ),
           )
       ),

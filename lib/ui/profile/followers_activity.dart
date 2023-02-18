@@ -1,17 +1,12 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
-import 'package:flutter_icons/flutter_icons.dart';
-import 'package:kam5ia/model/History.dart';
 import 'package:kam5ia/model/User.dart';
-import 'package:kam5ia/ui/ui_resto/employees/add_employees.dart';
 import 'package:kam5ia/utils/utils.dart';
-import 'package:intl/intl.dart';
 import 'package:page_transition/page_transition.dart';
 import 'package:pull_to_refresh/pull_to_refresh.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:http/http.dart' as http;
-import 'package:kam5ia/ui/detail/detail_history.dart';
 
 class FollowersActivity extends StatefulWidget {
   @override
@@ -125,13 +120,13 @@ class _FollowersActivityState extends State<FollowersActivity> {
   showAlertDialog(String id) {
 
     // set up the buttons
-    Widget cancelButton = FlatButton(
+    Widget cancelButton = TextButton(
       child: Text("Batal", style: TextStyle(color: CustomColor.primary)),
       onPressed:  () {
         Navigator.pop(context);
       },
     );
-    Widget continueButton = FlatButton(
+    Widget continueButton = TextButton(
       child: Text("Hapus", style: TextStyle(color: CustomColor.primary)),
       onPressed:  () {
         _delKaryawan(id);

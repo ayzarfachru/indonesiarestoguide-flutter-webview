@@ -4,18 +4,12 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_datetime_picker/flutter_datetime_picker.dart';
 import 'package:flutter_icons/flutter_icons.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:kam5ia/model/Menu.dart';
-import 'package:kam5ia/model/Price.dart';
-import 'package:kam5ia/ui/ui_resto/add_resto/add_detail_resto.dart';
-import 'package:kam5ia/ui/ui_resto/add_resto/add_view_resto.dart';
-import 'package:kam5ia/ui/ui_resto/home/home_activity.dart';
 import 'package:kam5ia/ui/ui_resto/menu/menu_activity.dart';
 import 'package:kam5ia/utils/utils.dart';
-import 'package:kam5ia/ui/home/home_activity.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:page_transition/page_transition.dart';
@@ -138,7 +132,7 @@ class _AddMenuState extends State<AddMenu> {
               }, tipeMenu: '',
             ),
             actions: <Widget>[
-              FlatButton(
+              TextButton(
                 child: Text("Simpan", style: TextStyle(color: CustomColor.accent),),
                 onPressed: () async{
                   SharedPreferences pref = await SharedPreferences.getInstance();
@@ -174,7 +168,7 @@ class _AddMenuState extends State<AddMenu> {
   final picker = ImagePicker();
 
   Future getImage() async {
-    final pickedFile = await picker.getImage(source: ImageSource.gallery);
+    final pickedFile = await picker.pickImage(source: ImageSource.gallery);
 
     setState(() {
       image = File(pickedFile!.path);
@@ -282,7 +276,7 @@ class _AddMenuState extends State<AddMenu> {
                 child: Padding(
                   padding: EdgeInsets.only(left: 25, right: 25),
                   child: Row(
-                    mainAxisAlignment: MainAxisAlignment.end,
+                    mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       // OutlineButton(
                       //   // minWidth: CustomSize.sizeWidth(context),
@@ -300,13 +294,16 @@ class _AddMenuState extends State<AddMenu> {
                       //     });
                       //   },
                       // ),
-                      FlatButton(
-                        color: CustomColor.accent,
-                        textColor: Colors.white,
-                        shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.all(Radius.circular(10))
+                      TextButton(
+                        // minWidth: CustomSize.sizeWidth(context),
+                        style: TextButton.styleFrom(
+                          backgroundColor: CustomColor.accent,
+                          padding: EdgeInsets.all(0),
+                          shape: const RoundedRectangleBorder(
+                              borderRadius: BorderRadius.all(Radius.circular(10))
+                          ),
                         ),
-                        child: Text('Oke'),
+                        child: Text('Oke', style: TextStyle(color: Colors.white)),
                         onPressed: () async{
                           Navigator.pop(context);
                           // String qrcode = '';
@@ -698,14 +695,16 @@ class _AddMenuState extends State<AddMenu> {
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.spaceAround,
                           children: [
-                            FlatButton(
+                            TextButton(
                               // minWidth: CustomSize.sizeWidth(context),
-                              color: CustomColor.redBtn,
-                              textColor: Colors.white,
-                              shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.all(Radius.circular(10))
+                              style: TextButton.styleFrom(
+                                backgroundColor: CustomColor.redBtn,
+                                padding: EdgeInsets.all(0),
+                                shape: const RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.all(Radius.circular(10))
+                                ),
                               ),
-                              child: Text('Tidak'),
+                              child: Text('Tidak', style: TextStyle(color: Colors.white)),
                               onPressed: () async{
                                 setState(() {
                                   // codeDialog = valueText;
@@ -726,13 +725,16 @@ class _AddMenuState extends State<AddMenu> {
                                 });
                               },
                             ),
-                            FlatButton(
-                              color: CustomColor.primaryLight,
-                              textColor: Colors.white,
-                              shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.all(Radius.circular(10))
+                            TextButton(
+                              // minWidth: CustomSize.sizeWidth(context),
+                              style: TextButton.styleFrom(
+                                backgroundColor: CustomColor.primaryLight,
+                                padding: EdgeInsets.all(0),
+                                shape: const RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.all(Radius.circular(10))
+                                ),
                               ),
-                              child: Text('Iya'),
+                              child: Text('Iya', style: TextStyle(color: Colors.white)),
                               onPressed: () async{
                                 is_available = '1';
                                 if (namaMenu.text != '' && hargaMenu.text != '' && tipeMenu.text != '' && deskMenu.text != '' && image.toString() != 'null') {

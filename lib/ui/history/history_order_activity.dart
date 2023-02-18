@@ -156,6 +156,43 @@ class _HistoryOrderActivityState extends State<HistoryOrderActivity> {
     });
   }
 
+  Future _getPending(String operation, String id)async{
+    List<Transaction> _transaction = [];
+
+    SharedPreferences pref = await SharedPreferences.getInstance();
+    String token = pref.getString("token") ?? "";
+    var apiResult = await http.get(Uri.parse(Links.mainUrl + '/trans/op/$operation/$id'), headers: {
+      "Accept": "Application/json",
+      "Authorization": "Bearer $token"
+    });
+    print(apiResult.body);
+    var data = json.decode(apiResult.body);
+    print(data);
+
+    Navigator.pushReplacement(
+        context,
+        PageTransition(
+            type: PageTransitionType.fade,
+            child: new HistoryOrderActivity()));
+    setState(() {});
+
+    // for(var v in data['trx']['process']){
+    //   Transaction r = Transaction.resto(
+    //       id: v['id'],
+    //       status: v['status'],
+    //       username: v['username'],
+    //       total: int.parse(v['total']),
+    //       type: v['type']
+    //   );
+    //   _transaction.add(r);
+    // }
+
+    setState(() {
+      // transaction = _transaction;
+      print(operation+'   '+id);
+    });
+  }
+
   String NameDriver = 'Tunggu';
   String PhoneDriver = '0';
   String PhotoDriver = '';
@@ -178,13 +215,17 @@ class _HistoryOrderActivityState extends State<HistoryOrderActivity> {
     print('driver puki '+apiResult.body.toString());
     // print('driver '+idResto.toString());
     if (apiResult.body.toString() != '"not found"') {
-      if (data['courier'].toString().contains('name') == false) {
-        StatusDriver = (apiResult.body.toString() != '"not found"')?data['status'].toString():'Tidak Ditemukan';
+      if (data['status'].toString() == 'parcel_picked_up' || data['status'].toString() == 'completed' || data['status'].toString() == 'done') {
+        _getPending('ready', id.toString());
       } else {
-        NameDriver = (apiResult.body.toString() != '"not found"')?data['courier']['name'].toString():'Tidak Ditemukan';
-        PhoneDriver = (apiResult.body.toString() != '"not found"')?data['courier']['phone'].toString():'0';
-        PhotoDriver = (apiResult.body.toString() != '"not found"')?data['courier']['photo'].toString():'';
-        StatusDriver = (apiResult.body.toString() != '"not found"')?(data['status'].toString() != 'active')?'Sudah sampai':data['status'].toString():'Tidak Ditemukan';
+        if (data['courier'].toString().contains('name') == false) {
+          StatusDriver = (apiResult.body.toString() != '"not found"')?data['status'].toString():'Tidak Ditemukan';
+        } else {
+          NameDriver = (apiResult.body.toString() != '"not found"')?data['courier']['name'].toString():'Tidak Ditemukan';
+          PhoneDriver = (apiResult.body.toString() != '"not found"')?data['courier']['phone'].toString():'0';
+          PhotoDriver = (apiResult.body.toString() != '"not found"')?data['courier']['photo'].toString():'';
+          StatusDriver = (apiResult.body.toString() != '"not found"')?(data['status'].toString() != 'active')?'Sudah sampai':data['status'].toString():'Tidak Ditemukan';
+        }
       }
     } else {
       NameDriver = 'Tidak Ditemukan';
@@ -494,6 +535,15 @@ class _HistoryOrderActivityState extends State<HistoryOrderActivity> {
           // });
         } else if (v['type_text'] == 'Pesan antar' && v['status'] == 'pending') {
           _checkPayFirst(v['id'].toString());
+        } else if (v['type_text'] != 'Pesan antar' && v['status'] == 'pending') {
+          if (v['type_text'].startsWith('Reservasi') == false && (v['total']??0).toString() == '0') {
+            _getReady('process', v['id'].toString());
+            print('(v[total]??0).toString()');
+            print((v['total']??0).toString());
+          }
+          // if (v['total'].toString() == '0') {
+          //   _getPending('process', v['id'].toString());
+          // }
         }
         if (v['type_text'].startsWith('Reservasi') == true && v['status'] == '') {
 
@@ -673,13 +723,13 @@ class _HistoryOrderActivityState extends State<HistoryOrderActivity> {
   showAlertDialog(String id) {
 
     // set up the buttons
-    Widget cancelButton = FlatButton(
+    Widget cancelButton = TextButton(
       child: Text("Batal", style: TextStyle(color: CustomColor.primary)),
       onPressed:  () {
         Navigator.pop(context);
       },
     );
-    Widget continueButton = FlatButton(
+    Widget continueButton = TextButton(
       child: Text("Hapus", style: TextStyle(color: CustomColor.primary)),
       onPressed:  () {
         _delPromo(id);
@@ -1111,13 +1161,15 @@ class _HistoryOrderActivityState extends State<HistoryOrderActivity> {
                                                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                                 children: [
                                                   MediaQuery(
-                                                    child: CustomText.bodyLight12(text: (transaction[index].status != 'cancel')?(transaction[index].status != 'pending')?(transaction[index].status != 'process')?(transaction[index].status == 'ready')?(transaction[index].type != 'Pesan antar')?'Pesanan Siap':'Sudah diterima?':'Selesai':(transaction[index].type.toString().contains('Reservasi'))?'Telah disetujui':'Diproses':'Menunggu':'Dibatalkan', sizeNew: double.parse(((MediaQuery.of(context).size.width*0.03).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.03)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.03)).toString()),
+                                                    // child: CustomText.bodyLight12(text: (transaction[index].status != 'cancel')?(transaction[index].status != 'pending')?(transaction[index].status != 'process')?(transaction[index].status == 'ready')?(transaction[index].type != 'Pesan antar')?'Pesanan Siap':'Sudah diterima?':'Selesai':(transaction[index].type.toString().contains('Reservasi'))?'Telah disetujui':'Diproses':'Menunggu':'Dibatalkan', sizeNew: double.parse(((MediaQuery.of(context).size.width*0.03).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.03)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.03)).toString()),
+                                                    child: CustomText.bodyLight12(text: (transaction[index].status != 'cancel')?(transaction[index].status != 'pending')?(transaction[index].status != 'process')?(transaction[index].status == 'ready')?(transaction[index].type == 'Ambil Langsung')?'Sudah diambil?':'Sudah diterima?':'Selesai':(transaction[index].type.toString().contains('Reservasi'))?'Telah disetujui':'Diproses':'Menunggu':'Dibatalkan', sizeNew: double.parse(((MediaQuery.of(context).size.width*0.03).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.03)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.03)).toString()),
                                                         // CustomText.bodyLight12(text: (transaction[index].status != 'cancel')?(transaction[index].status != 'pending')?(transaction[index].status != 'process')?(transaction[index].status != 'ready')?Colors.amberAccent:Colors.amberAccent:Colors.green:Colors.blue:CustomColor.redBtn, minSize: 12,
                                                         color: (transaction[index].status != 'cancel')?(transaction[index].status != 'pending')?(transaction[index].status != 'process')?(transaction[index].status != 'ready')?CustomColor.primary:CustomColor.primary:Colors.green:Colors.blue:CustomColor.redBtn),
                                                     data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0),
                                                   ),
-                                          (transaction[index].status == 'ready')?(transaction[index].type != 'Pesan antar')?MediaQuery(child: CustomText.bodyMedium14(text: NumberFormat.currency(locale: 'id', symbol: '', decimalDigits: 0).format((transaction[index].type!.startsWith('Reservasi'))?(transaction[index].total!):(transaction[index].total!+1000)), sizeNew: double.parse(((MediaQuery.of(context).size.width*0.035).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.035)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.035)).toString())),
-                                            data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0),):
+                                          // (transaction[index].status == 'ready')?(transaction[index].type != 'Pesan antar')?MediaQuery(child: CustomText.bodyMedium14(text: NumberFormat.currency(locale: 'id', symbol: '', decimalDigits: 0).format((transaction[index].type!.startsWith('Reservasi'))?(transaction[index].total!):(transaction[index].total!+1000)), sizeNew: double.parse(((MediaQuery.of(context).size.width*0.035).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.035)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.035)).toString())),
+                                          //   data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0),):
+                                          (transaction[index].status == 'ready')?
                                           GestureDetector(
                                             onTap: (){
                                               // _search(recomMenu[index], '');
@@ -1154,7 +1206,7 @@ class _HistoryOrderActivityState extends State<HistoryOrderActivity> {
                                               ),
                                             ),
                                           ):
-                                          MediaQuery(child: CustomText.bodyMedium14(text: NumberFormat.currency(locale: 'id', symbol: '', decimalDigits: 0).format((transaction[index].type!.startsWith('Reservasi'))?(transaction[index].total!):(transaction[index].total!+1000)), sizeNew: double.parse(((MediaQuery.of(context).size.width*0.035).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.035)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.035)).toString())),
+                                          MediaQuery(child: CustomText.bodyMedium14(text: (transaction[index].total.toString() == '0' && transaction[index].type != 'Pesan antar')?'Free':NumberFormat.currency(locale: 'id', symbol: '', decimalDigits: 0).format((transaction[index].type!.startsWith('Reservasi'))?(transaction[index].total!):(transaction[index].total!+1000)), sizeNew: double.parse(((MediaQuery.of(context).size.width*0.035).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.035)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.035)).toString())),
                                             data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0),),
                                                 ],
                                               )

@@ -10,6 +10,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_icons/flutter_icons.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:google_sign_in/google_sign_in.dart';
 import 'package:in_app_update/in_app_update.dart';
 import 'package:kam5ia/model/Menu.dart';
 import 'package:kam5ia/model/MenuJson.dart';
@@ -53,6 +54,10 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:http/http.dart' as http;
 
 import '../../utils/utils.dart';
+import '../detail/diskon_ongkir.dart';
+import '../maintenance.dart';
+import '../ui_resto/home/home_activity.dart';
+import '../welcome_screen.dart';
 
 class Location {
   /// Initializes the plugin and starts listening for potential platform events.
@@ -143,7 +148,9 @@ class _HomeActivityState extends State<HomeActivity> with WidgetsBindingObserver
   ScrollController _controller = ScrollController();
   List<imgBanner> images = [];
   List<String> images2 = ['assets/banner1.png','assets/banner2.png','assets/banner3.png'];
-  bool isLoading = false;
+  List<String> kamPromo0 = ['assets/irg_promo_0.png'];
+  List<String> kamPromo1 = ['assets/irg_promo_1.png'];
+  bool isLoading = true;
   bool isLoading2 = false;
   bool isSearch = false;
   String inCart = "";
@@ -175,7 +182,7 @@ class _HomeActivityState extends State<HomeActivity> with WidgetsBindingObserver
     print('driver puki '+apiResult.body.toString());
     // print('driver '+idResto.toString());
     if (apiResult.body.toString() != '"not found"') {
-      if (data['status'].toString() == 'parcel_picked_up') {
+      if (data['status'].toString() == 'parcel_picked_up' || data['status'].toString() == 'completed' || data['status'].toString() == 'done') {
         _getPending('ready', id.toString());
       } else {
         if (data['courier'].toString().contains('name') == false) {
@@ -330,7 +337,7 @@ class _HomeActivityState extends State<HomeActivity> with WidgetsBindingObserver
     var data = json.decode(apiResult.body);
     print('QR CODE 2');
     print(data);
-    print(data['response']['detail_info'].toString().contains('Unpaid').toString());
+    print(data['response']['detaiparcel_picked_upl_info'].toString().contains('Unpaid').toString());
     // statusPay = data['response']['detail_info'].toString().contains('Unpaid').toString();
     if (data['response']['detail_info'].toString().contains('Unpaid') == true) {
       // Fluttertoast.showToast(
@@ -503,6 +510,7 @@ class _HomeActivityState extends State<HomeActivity> with WidgetsBindingObserver
   List<String> restoId = [];
   List<String> startCuisine = [];
   List<String> qty = [];
+  String ses_arr = '';
   List<Resto> resto = [];
   List<Resto> kakilima = [];
   List<Resto> foodstall = [];
@@ -538,9 +546,10 @@ class _HomeActivityState extends State<HomeActivity> with WidgetsBindingObserver
     setState(() {
       isLoading = true;
     });
+    ses_arr = '';
     SharedPreferences pref = await SharedPreferences.getInstance();
     String token = pref.getString("token") ?? "";
-    var apiResult = await http.get(Uri.parse(Links.mainUrl + '/page/home?lat=$lat&long=$long'), headers: {
+    var apiResult = await http.get(Uri.parse(Links.mainUrl + '/page/home?lat=$lat&long=$long&reset_ses=1'), headers: {
       "Accept": "Application/json",
       "Authorization": "Bearer $token"
     });
@@ -550,6 +559,8 @@ class _HomeActivityState extends State<HomeActivity> with WidgetsBindingObserver
     // print('all data'+data['tipe'][0].toString());
     print('all data'+data['tipe'][0].toString());
     print('all data1'+data['trans'].toString());
+    print('tipename'+data['ses_arr'].toString());
+    print('tipename'+data['tipename'].toString());
     print('all data'+lat.toString());
     print('all data'+long.toString());
     // print(data['resto']);
@@ -584,6 +595,15 @@ class _HomeActivityState extends State<HomeActivity> with WidgetsBindingObserver
           });
         } else if (v['type_text'] == 'Pesan antar' && v['status'] == 'pending') {
           _checkPayFirst(v['id'].toString());
+        } else if (v['type_text'] != 'Pesan antar' && v['status'] == 'pending') {
+          if (v['type_text'].startsWith('Reservasi') == false && (v['total']??0).toString() == '0') {
+            _getPending('process', v['id'].toString());
+            print('(v[total]??0).toString()');
+            print((v['total']??0).toString());
+          }
+          // if (v['total'].toString() == '0') {
+          //   _getPending('process', v['id'].toString());
+          // }
         }
         if (v['type_text'].startsWith('Reservasi') == true && v['status'] == '') {
 
@@ -800,6 +820,7 @@ class _HomeActivityState extends State<HomeActivity> with WidgetsBindingObserver
           _randomRes7.add(r);
         }
       }
+      ses_arr = data['tipename'].toString().replaceAll('[', '').replaceAll(']', '');
     }
 
 
@@ -886,7 +907,7 @@ class _HomeActivityState extends State<HomeActivity> with WidgetsBindingObserver
 
     SharedPreferences pref = await SharedPreferences.getInstance();
     String token = pref.getString("token") ?? "";
-    var apiResult = await http.get(Uri.parse(Links.mainUrl + '/page/home?lat=$lat&long=$long&page=$page'), headers: {
+    var apiResult = await http.get(Uri.parse(Links.mainUrl + '/page/home?lat=$lat&long=$long'), headers: {
       "Accept": "Application/json",
       "Authorization": "Bearer $token"
     });
@@ -896,10 +917,13 @@ class _HomeActivityState extends State<HomeActivity> with WidgetsBindingObserver
     // print('all data'+data['tipe'][0].toString());
     // print('all data'+data['again'].toString());
     print('Puki');
+    print(data);
     print('all data2'+page.toString());
     // print('all data2'+data.toString());
-    print('all data2'+data['tipe'][0].toString());
-    print('all data2'+data['tipename'].toString());
+    // print('all data2'+data['tipe'][0].toString());
+    print(page.toString());
+    print('tipename2'+data['ses_arr'].toString());
+    print('tipename2'+data['tipename'].toString());
     // print('all data2'+data['tipe'][0].toString());
     // print(data['resto']);
 
@@ -1151,13 +1175,13 @@ class _HomeActivityState extends State<HomeActivity> with WidgetsBindingObserver
         if (randomRes8.toString() == '[]' && randomRes9.toString() == '[]' && randomRes10.toString() == '[]' && randomRes11.toString() == '[]' && randomRes12.toString() == '[]' && randomRes13.toString() == '[]' && randomRes14.toString() == '[]') {
           tipe8 = (data['tipename'].toString().split('[')[1].split(']')[0].split(',').length >= 2 || data['tipename'].toString().split('[')[1].split(']')[0].split(',').length >= 3 || data['tipename'].toString().split('[')[1].split(']')[0].split(',').length >= 4 || data['tipename'].toString().split('[')[1].split(']')[0].split(',').length >= 5 || data['tipename'].toString().split('[')[1].split(']')[0].split(',').length >= 6 || data['tipename'].toString().split('[')[1].split(']')[0].split(',').length >= 7)?data['tipename'].toString().split('[')[1].split(']')[0].split(',')[0].toString():data['tipename'].toString().split('[')[1].split(']')[0].toString();
           if (tipe != tipe8) {
-            randomRes8 = _randomRes1;
-            randomRes9 = _randomRes2;
-            randomRes10 = _randomRes3;
-            randomRes11 = _randomRes4;
-            randomRes12 = _randomRes5;
-            randomRes13 = _randomRes6;
-            randomRes14 = _randomRes7;
+            randomRes8 = (ses_arr.contains(((data['tipename'].toString().split('[')[1].split(']')[0].split(',').length >= 2 || data['tipename'].toString().split('[')[1].split(']')[0].split(',').length >= 3 || data['tipename'].toString().split('[')[1].split(']')[0].split(',').length >= 4 || data['tipename'].toString().split('[')[1].split(']')[0].split(',').length >= 5 || data['tipename'].toString().split('[')[1].split(']')[0].split(',').length >= 6 || data['tipename'].toString().split('[')[1].split(']')[0].split(',').length >= 7)?data['tipename'].toString().split('[')[1].split(']')[0].split(',')[0].toString():data['tipename'].toString().split('[')[1].split(']')[0].toString())) == true)?[]:_randomRes1;
+            randomRes9 = (ses_arr.contains(((data['tipename'].toString().split('[')[1].split(']')[0].split(',').length >= 2)?data['tipename'].toString().split('[')[1].split(']')[0].split(', ')[1].toString():'')) == true)?[]:_randomRes2;
+            randomRes10 = (ses_arr.contains(((data['tipename'].toString().split('[')[1].split(']')[0].split(',').length >= 3)?data['tipename'].toString().split('[')[1].split(']')[0].split(', ')[2].toString():'')) == true)?[]:_randomRes3;
+            randomRes11 = (ses_arr.contains(((data['tipename'].toString().split('[')[1].split(']')[0].split(',').length >= 4)?data['tipename'].toString().split('[')[1].split(']')[0].split(', ')[3].toString():'')) == true)?[]:_randomRes4;
+            randomRes12 = (ses_arr.contains(((data['tipename'].toString().split('[')[1].split(']')[0].split(',').length >= 5)?data['tipename'].toString().split('[')[1].split(']')[0].split(', ')[4].toString():'')) == true)?[]:_randomRes5;
+            randomRes13 = (ses_arr.contains(((data['tipename'].toString().split('[')[1].split(']')[0].split(',').length >= 6)?data['tipename'].toString().split('[')[1].split(']')[0].split(', ')[5].toString():'')) == true)?[]:_randomRes6;
+            randomRes14 = (ses_arr.contains(((data['tipename'].toString().split('[')[1].split(']')[0].split(',').length >= 7)?data['tipename'].toString().split('[')[1].split(']')[0].split(', ')[6].toString():'')) == true)?[]:_randomRes7;
             tipe8 = (data['tipename'].toString().split('[')[1].split(']')[0].split(',').length >= 2 || data['tipename'].toString().split('[')[1].split(']')[0].split(',').length >= 3 || data['tipename'].toString().split('[')[1].split(']')[0].split(',').length >= 4 || data['tipename'].toString().split('[')[1].split(']')[0].split(',').length >= 5 || data['tipename'].toString().split('[')[1].split(']')[0].split(',').length >= 6 || data['tipename'].toString().split('[')[1].split(']')[0].split(',').length >= 7)?data['tipename'].toString().split('[')[1].split(']')[0].split(',')[0].toString():data['tipename'].toString().split('[')[1].split(']')[0].toString();
             tipe9 = (data['tipename'].toString().split('[')[1].split(']')[0].split(',').length >= 2)?data['tipename'].toString().split('[')[1].split(']')[0].split(', ')[1].toString():'';
             tipe10 = (data['tipename'].toString().split('[')[1].split(']')[0].split(',').length >= 3)?data['tipename'].toString().split('[')[1].split(']')[0].split(', ')[2].toString():'';
@@ -1174,6 +1198,9 @@ class _HomeActivityState extends State<HomeActivity> with WidgetsBindingObserver
             startCuisine.add(tipe14);
             page = '2';
             print('CUOK');
+            ses_arr = ses_arr +', '+data['tipename'].toString().replaceAll('[', '').replaceAll(']', '');
+            print(ses_arr);
+            print((data['tipename'].toString().split('[')[1].split(']')[0].split(',').length >= 2)?data['tipename'].toString().split('[')[1].split(']')[0].split(', ')[1].toString():'');
             isLoading2 = false;
           } else {
             print('CUOK2');
@@ -1184,13 +1211,13 @@ class _HomeActivityState extends State<HomeActivity> with WidgetsBindingObserver
         } else if (randomRes15.toString() == '[]' && randomRes16.toString() == '[]' && randomRes17.toString() == '[]' && randomRes18.toString() == '[]' && randomRes19.toString() == '[]' && randomRes20.toString() == '[]' && randomRes21.toString() == '[]') {
           tipe15 = (data['tipename'].toString().split('[')[1].split(']')[0].split(',').length >= 2 || data['tipename'].toString().split('[')[1].split(']')[0].split(',').length >= 3 || data['tipename'].toString().split('[')[1].split(']')[0].split(',').length >= 4 || data['tipename'].toString().split('[')[1].split(']')[0].split(',').length >= 5 || data['tipename'].toString().split('[')[1].split(']')[0].split(',').length >= 6 || data['tipename'].toString().split('[')[1].split(']')[0].split(',').length >= 7)?data['tipename'].toString().split('[')[1].split(']')[0].split(',')[0].toString():data['tipename'].toString().split('[')[1].split(']')[0].toString();
           if (tipe != tipe15) {
-            randomRes15 = _randomRes1;
-            randomRes16 = _randomRes2;
-            randomRes17 = _randomRes3;
-            randomRes18 = _randomRes4;
-            randomRes19 = _randomRes5;
-            randomRes20 = _randomRes6;
-            randomRes21 = _randomRes7;
+            randomRes15 = (ses_arr.contains(((data['tipename'].toString().split('[')[1].split(']')[0].split(',').length >= 2 || data['tipename'].toString().split('[')[1].split(']')[0].split(',').length >= 3 || data['tipename'].toString().split('[')[1].split(']')[0].split(',').length >= 4 || data['tipename'].toString().split('[')[1].split(']')[0].split(',').length >= 5 || data['tipename'].toString().split('[')[1].split(']')[0].split(',').length >= 6 || data['tipename'].toString().split('[')[1].split(']')[0].split(',').length >= 7)?data['tipename'].toString().split('[')[1].split(']')[0].split(',')[0].toString():data['tipename'].toString().split('[')[1].split(']')[0].toString())) == true)?[]:_randomRes1;
+            randomRes16 = (ses_arr.contains(((data['tipename'].toString().split('[')[1].split(']')[0].split(',').length >= 2)?data['tipename'].toString().split('[')[1].split(']')[0].split(', ')[1].toString():'')) == true)?[]:_randomRes2;
+            randomRes17 = (ses_arr.contains(((data['tipename'].toString().split('[')[1].split(']')[0].split(',').length >= 3)?data['tipename'].toString().split('[')[1].split(']')[0].split(', ')[2].toString():'')) == true)?[]:_randomRes3;
+            randomRes18 = (ses_arr.contains(((data['tipename'].toString().split('[')[1].split(']')[0].split(',').length >= 4)?data['tipename'].toString().split('[')[1].split(']')[0].split(', ')[3].toString():'')) == true)?[]:_randomRes4;
+            randomRes19 = (ses_arr.contains(((data['tipename'].toString().split('[')[1].split(']')[0].split(',').length >= 5)?data['tipename'].toString().split('[')[1].split(']')[0].split(', ')[4].toString():'')) == true)?[]:_randomRes5;
+            randomRes20 = (ses_arr.contains(((data['tipename'].toString().split('[')[1].split(']')[0].split(',').length >= 6)?data['tipename'].toString().split('[')[1].split(']')[0].split(', ')[5].toString():'')) == true)?[]:_randomRes6;
+            randomRes21 = (ses_arr.contains(((data['tipename'].toString().split('[')[1].split(']')[0].split(',').length >= 7)?data['tipename'].toString().split('[')[1].split(']')[0].split(', ')[6].toString():'')) == true)?[]:_randomRes7;
             tipe15 = (data['tipename'].toString().split('[')[1].split(']')[0].split(',').length >= 2 || data['tipename'].toString().split('[')[1].split(']')[0].split(',').length >= 3 || data['tipename'].toString().split('[')[1].split(']')[0].split(',').length >= 4 || data['tipename'].toString().split('[')[1].split(']')[0].split(',').length >= 5 || data['tipename'].toString().split('[')[1].split(']')[0].split(',').length >= 6 || data['tipename'].toString().split('[')[1].split(']')[0].split(',').length >= 7)?data['tipename'].toString().split('[')[1].split(']')[0].split(',')[0].toString():data['tipename'].toString().split('[')[1].split(']')[0].toString();
             tipe16 = (data['tipename'].toString().split('[')[1].split(']')[0].split(',').length >= 2)?data['tipename'].toString().split('[')[1].split(']')[0].split(', ')[1].toString():'';
             tipe17 = (data['tipename'].toString().split('[')[1].split(']')[0].split(',').length >= 3)?data['tipename'].toString().split('[')[1].split(']')[0].split(', ')[2].toString():'';
@@ -1206,6 +1233,8 @@ class _HomeActivityState extends State<HomeActivity> with WidgetsBindingObserver
             startCuisine.add(tipe20);
             startCuisine.add(tipe21);
             page = '3';
+            ses_arr = ses_arr +', '+data['tipename'].toString().replaceAll('[', '').replaceAll(']', '');
+            print(ses_arr);
             isLoading2 = false;
           } else {
             tipe15 = '';
@@ -1214,13 +1243,13 @@ class _HomeActivityState extends State<HomeActivity> with WidgetsBindingObserver
         } else if (randomRes22.toString() == '[]' && randomRes23.toString() == '[]' && randomRes24.toString() == '[]' && randomRes25.toString() == '[]' && randomRes26.toString() == '[]' && randomRes27.toString() == '[]' && randomRes28.toString() == '[]') {
           tipe22 = (data['tipename'].toString().split('[')[1].split(']')[0].split(',').length >= 2 || data['tipename'].toString().split('[')[1].split(']')[0].split(',').length >= 3 || data['tipename'].toString().split('[')[1].split(']')[0].split(',').length >= 4 || data['tipename'].toString().split('[')[1].split(']')[0].split(',').length >= 5 || data['tipename'].toString().split('[')[1].split(']')[0].split(',').length >= 6 || data['tipename'].toString().split('[')[1].split(']')[0].split(',').length >= 7)?data['tipename'].toString().split('[')[1].split(']')[0].split(',')[0].toString():data['tipename'].toString().split('[')[1].split(']')[0].toString();
           if (tipe != tipe22) {
-            randomRes22 = _randomRes1;
-            randomRes23 = _randomRes2;
-            randomRes24 = _randomRes3;
-            randomRes25 = _randomRes4;
-            randomRes26 = _randomRes5;
-            randomRes27 = _randomRes6;
-            randomRes28 = _randomRes7;
+            randomRes22 = (ses_arr.contains(((data['tipename'].toString().split('[')[1].split(']')[0].split(',').length >= 2 || data['tipename'].toString().split('[')[1].split(']')[0].split(',').length >= 3 || data['tipename'].toString().split('[')[1].split(']')[0].split(',').length >= 4 || data['tipename'].toString().split('[')[1].split(']')[0].split(',').length >= 5 || data['tipename'].toString().split('[')[1].split(']')[0].split(',').length >= 6 || data['tipename'].toString().split('[')[1].split(']')[0].split(',').length >= 7)?data['tipename'].toString().split('[')[1].split(']')[0].split(',')[0].toString():data['tipename'].toString().split('[')[1].split(']')[0].toString())) == true)?[]:_randomRes1;
+            randomRes23 = (ses_arr.contains(((data['tipename'].toString().split('[')[1].split(']')[0].split(',').length >= 2)?data['tipename'].toString().split('[')[1].split(']')[0].split(', ')[1].toString():'')) == true)?[]:_randomRes2;
+            randomRes24 = (ses_arr.contains(((data['tipename'].toString().split('[')[1].split(']')[0].split(',').length >= 3)?data['tipename'].toString().split('[')[1].split(']')[0].split(', ')[2].toString():'')) == true)?[]:_randomRes3;
+            randomRes25 = (ses_arr.contains(((data['tipename'].toString().split('[')[1].split(']')[0].split(',').length >= 4)?data['tipename'].toString().split('[')[1].split(']')[0].split(', ')[3].toString():'')) == true)?[]:_randomRes4;
+            randomRes26 = (ses_arr.contains(((data['tipename'].toString().split('[')[1].split(']')[0].split(',').length >= 5)?data['tipename'].toString().split('[')[1].split(']')[0].split(', ')[4].toString():'')) == true)?[]:_randomRes5;
+            randomRes27 = (ses_arr.contains(((data['tipename'].toString().split('[')[1].split(']')[0].split(',').length >= 6)?data['tipename'].toString().split('[')[1].split(']')[0].split(', ')[5].toString():'')) == true)?[]:_randomRes6;
+            randomRes28 = (ses_arr.contains(((data['tipename'].toString().split('[')[1].split(']')[0].split(',').length >= 7)?data['tipename'].toString().split('[')[1].split(']')[0].split(', ')[6].toString():'')) == true)?[]:_randomRes7;
             tipe22 = (data['tipename'].toString().split('[')[1].split(']')[0].split(',').length >= 2 || data['tipename'].toString().split('[')[1].split(']')[0].split(',').length >= 3 || data['tipename'].toString().split('[')[1].split(']')[0].split(',').length >= 4 || data['tipename'].toString().split('[')[1].split(']')[0].split(',').length >= 5 || data['tipename'].toString().split('[')[1].split(']')[0].split(',').length >= 6 || data['tipename'].toString().split('[')[1].split(']')[0].split(',').length >= 7)?data['tipename'].toString().split('[')[1].split(']')[0].split(',')[0].toString():data['tipename'].toString().split('[')[1].split(']')[0].toString();
             tipe23 = (data['tipename'].toString().split('[')[1].split(']')[0].split(',').length >= 2)?data['tipename'].toString().split('[')[1].split(']')[0].split(', ')[1].toString():'';
             tipe24 = (data['tipename'].toString().split('[')[1].split(']')[0].split(',').length >= 3)?data['tipename'].toString().split('[')[1].split(']')[0].split(', ')[2].toString():'';
@@ -1236,6 +1265,8 @@ class _HomeActivityState extends State<HomeActivity> with WidgetsBindingObserver
             startCuisine.add(tipe27);
             startCuisine.add(tipe28);
             page = 'null';
+            ses_arr = ses_arr +', '+data['tipename'].toString().replaceAll('[', '').replaceAll(']', '');
+            print(ses_arr);
             isLoading2 = false;
           } else {
             tipe22 = '';
@@ -1457,6 +1488,7 @@ class _HomeActivityState extends State<HomeActivity> with WidgetsBindingObserver
     qty = [];
     SharedPreferences pref2 = await SharedPreferences.getInstance();
     pref2.setString("homepg", "");
+    pref2.remove('inDetail');
     inCart = pref2.getString('inCart')??"";
     if(pref2.getString('inCart') == '1'){
       name = pref2.getString('menuJson')??"";
@@ -2910,10 +2942,212 @@ class _HomeActivityState extends State<HomeActivity> with WidgetsBindingObserver
 
   }
 
+  Future<bool> _checkForSession() async {
+    await Future.delayed(Duration(milliseconds: 3000), () {});
+
+    return true;
+  }
+
+  String homepg = "";
+  getHomePg() async {
+    SharedPreferences pref = await SharedPreferences.getInstance();
+    setState(() {
+      homepg = (pref.getString('homepg')??'');
+      print(homepg);
+    });
+  }
+
+  GoogleSignIn _googleSignIn = GoogleSignIn(
+    clientId: "887058389150-nesf8jr9jdk5n2dtt1t30to2el1v3bbi.apps.googleusercontent.com",
+    scopes: [
+      'email',
+      'https://www.googleapis.com/auth/userinfo.profile',
+      // 'https://www.googleapis.com/auth/user.birthday.read',
+      // 'https://www.googleapis.com/auth/user.gender.read',
+      // 'https://www.googleapis.com/auth/user.phonenumbers.read'
+    ],
+  );
+
+  Future maintenance() async {
+    SharedPreferences pref = await SharedPreferences.getInstance();
+    String token = pref.getString("token") ?? "";
+    getHomePg();
+    print('token');
+    print(token);
+    if (token != '') {
+      var apiResult = await http.get(Uri.parse('https://irg.devus-sby.com/api/v2/index'), headers: {
+        "Accept": "Application/json",
+        "Authorization": "Bearer $token"
+      });
+      // print('maintenance');
+      // print(apiResult.body);
+      var data = json.decode(apiResult.body);
+      print(apiResult.statusCode);
+      print('maintenance');
+      print(apiResult.body);
+      // if (data['is_open'].toString() == 'true') {
+      //   pref.setString("is_open_all", '');
+      // pref.remove("is_open_all");
+      if (data['is_maintenance'].toString() == 'false') {
+        if (data['authenticated'].toString() == 'null') {
+          _googleSignIn.signOut();
+          SharedPreferences pref = await SharedPreferences.getInstance();
+          pref.clear();
+          Navigator.of(context).pushReplacement(MaterialPageRoute(
+              builder: (BuildContext context) => WelcomeScreen()));
+        } else {
+          // _checkForSession().then((status) {
+          //   if (status) {
+          //     Navigator.of(context).pushReplacement(MaterialPageRoute(
+          //         builder: (BuildContext context) => (homepg != "1")?HomeActivity():HomeActivityResto()));
+          //   }
+          // });
+        }
+      } else {
+        Navigator.of(context).pushReplacement(MaterialPageRoute(
+            builder: (BuildContext context) => Maintenance()));
+      }
+      // } else {
+      //   Navigator.of(context).pushReplacement(MaterialPageRoute(
+      //       builder: (BuildContext context) => KamsiaClosed()));
+      // }
+    } else {
+      var apiResult = await http.get(Uri.parse('https://irg.devus-sby.com/api/v2/index'), headers: {
+        "Accept": "Application/json",
+      });
+      print(apiResult.statusCode);
+      var data = json.decode(apiResult.body);
+      print('maintenance');
+      print(apiResult.body);
+      // if (data['is_open'].toString() == 'true') {
+      if (data['is_maintenance'].toString() == 'false') {
+        if (data['authenticated'].toString() == 'null') {
+          _googleSignIn.signOut();
+          SharedPreferences pref = await SharedPreferences.getInstance();
+          pref.clear();
+          Navigator.of(context).pushReplacement(MaterialPageRoute(
+              builder: (BuildContext context) => WelcomeScreen()));
+        } else {
+          // _checkForSession().then((status) {
+          //   if (status) {
+          //     Navigator.of(context).pushReplacement(MaterialPageRoute(
+          //         builder: (BuildContext context) => (homepg != "1")?HomeActivity():HomeActivityResto()));
+          //   }
+          // });
+        }
+      } else {
+        Navigator.of(context).pushReplacement(MaterialPageRoute(
+            builder: (BuildContext context) => Maintenance()));
+      }
+      // } else {
+      //   Navigator.of(context).pushReplacement(MaterialPageRoute(
+      //       builder: (BuildContext context) => KamsiaClosed()));
+      // }
+    }
+  }
+
+
+  List<Resto> listDisc50 = [];
+  Future disc50(String latDisc, String longDisc)async{
+    // List<History> _history = [];
+    List<Resto> _listDisc50 = [];
+
+    setState(() {
+      // isLoading = true;
+    });
+    SharedPreferences pref = await SharedPreferences.getInstance();
+    String token = pref.getString("token") ?? "";
+    var apiResult = await http.get(Uri.parse(Links.mainUrl + '/page/diskon-ongkir?lat=$latDisc&long=$longDisc&i=0'), headers: {
+      "Accept": "Application/json",
+      "Authorization": "Bearer $token"
+    });
+    print('disc50');
+    print(apiResult.body);
+    var data = json.decode(apiResult.body);
+
+
+    for(var v in data['resto']['data']){
+      Resto r = Resto.all(
+        id: v['id'],
+        name: v['name'],
+        distance: double.parse(v['distance'].toString()),
+        img: v['img'],
+        isOpen: v['isOpen'].toString(),
+      );
+      _listDisc50.add(r);
+    }
+
+    // for(var v in data['trans']){
+    //   History h = History(
+    //       id: v['id'],
+    //       name: v['resto_name'],
+    //       time: v['time'],
+    //       price: v['price'],
+    //       img: v['resto_img'],
+    //       type: v['type']
+    //   );
+    //   _history.add(h);
+    // }
+
+    setState(() {
+      // history = _history;
+      listDisc50 = _listDisc50;
+      // isLoading = false;
+    });
+  }
+
+  List<Resto> listDisc100 = [];
+  Future disc100(String latDisc, String longDisc)async{
+    // List<History> _history = [];
+    List<Resto> _listDisc100 = [];
+
+    setState(() {
+      // isLoading = true;
+    });
+    SharedPreferences pref = await SharedPreferences.getInstance();
+    String token = pref.getString("token") ?? "";
+    var apiResult = await http.get(Uri.parse(Links.mainUrl + '/page/diskon-ongkir?lat=$latDisc&long=$longDisc&i=1'), headers: {
+      "Accept": "Application/json",
+      "Authorization": "Bearer $token"
+    });
+    print(apiResult.body);
+    var data = json.decode(apiResult.body);
+
+    for(var v in data['resto']['data']){
+      Resto r = Resto.all(
+        id: v['id'],
+        name: v['name'],
+        distance: double.parse(v['distance'].toString()),
+        img: v['img'],
+        isOpen: v['isOpen'].toString(),
+      );
+      _listDisc100.add(r);
+    }
+
+    // for(var v in data['trans']){
+    //   History h = History(
+    //       id: v['id'],
+    //       name: v['resto_name'],
+    //       time: v['time'],
+    //       price: v['price'],
+    //       img: v['resto_img'],
+    //       type: v['type']
+    //   );
+    //   _history.add(h);
+    // }
+
+    setState(() {
+      listDisc100 = _listDisc100;
+      // history = _history;
+      // isLoading = false;
+    });
+  }
+
 
   @override
   void initState() {
     WidgetsBinding.instance!.addObserver(this);
+    maintenance();
     // initDynamicLinks().then((status) {
     //   print('OI1 '+deepLink2);
     //   print('PPPP');
@@ -2940,6 +3174,8 @@ class _HomeActivityState extends State<HomeActivity> with WidgetsBindingObserver
     Location.instance.getLocation().then((value) {
       setState(() {
         checkForUpdate();
+        disc50(value.latitude.toString(), value.longitude.toString());
+        disc100(value.latitude.toString(), value.longitude.toString());
         _getDataHome(value.latitude.toString(), value.longitude.toString());
         latitude = value.latitude!;
         longitude = value.longitude!;
@@ -3555,7 +3791,7 @@ class _HomeActivityState extends State<HomeActivity> with WidgetsBindingObserver
                                                               Container(
                                                                   width: (transaction[index].chat_user != '0' && transaction[index].chat_user != 'null')?CustomSize.sizeWidth(context) / 2.6:CustomSize.sizeWidth(context) / 2.2,
                                                                   child: MediaQuery(child: Container(
-                                                                      width: CustomSize.sizeWidth(context) / 2.2,
+                                                                      width: CustomSize.sizeWidth(context) / 3.2,
                                                                       child: CustomText.bodyMedium14(text: transaction[index].nameResto.toString(), sizeNew: double.parse(((MediaQuery.of(context).size.width*0.035).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.035)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.035)).toString()), maxLines: 2)
                                                                   ),
                                                                     data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0),)),
@@ -3590,13 +3826,15 @@ class _HomeActivityState extends State<HomeActivity> with WidgetsBindingObserver
                                                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                                         children: [
                                                           MediaQuery(
-                                                            child: CustomText.bodyLight12(text: (transaction[index].status != 'cancel')?(transaction[index].status != 'pending')?(transaction[index].status != 'process')?(transaction[index].status == 'ready')?(transaction[index].type != 'Pesan antar')?'Pesanan Siap':'Sudah diterima?':'Selesai':(transaction[index].type.toString().contains('Reservasi'))?'Telah disetujui':'Diproses':'Menunggu':'Dibatalkan', sizeNew: double.parse(((MediaQuery.of(context).size.width*0.03).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.03)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.03)).toString()),
+                                                            // child: CustomText.bodyLight12(text: (transaction[index].status != 'cancel')?(transaction[index].status != 'pending')?(transaction[index].status != 'process')?(transaction[index].status == 'ready')?(transaction[index].type != 'Pesan antar')?'Pesanan Siap':'Sudah diterima?':'Selesai':(transaction[index].type.toString().contains('Reservasi'))?'Telah disetujui':'Diproses':'Menunggu':'Dibatalkan', sizeNew: double.parse(((MediaQuery.of(context).size.width*0.03).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.03)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.03)).toString()),
+                                                            child: CustomText.bodyLight12(text: (transaction[index].status != 'cancel')?(transaction[index].status != 'pending')?(transaction[index].status != 'process')?(transaction[index].status == 'ready')?(transaction[index].type == 'Ambil Langsung')?'Sudah diambil?':'Sudah diterima?':'Selesai':(transaction[index].type.toString().contains('Reservasi'))?'Telah disetujui':'Diproses':'Menunggu':'Dibatalkan', sizeNew: double.parse(((MediaQuery.of(context).size.width*0.03).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.03)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.03)).toString()),
                                                             // CustomText.bodyLight12(text: (transaction[index].status != 'cancel')?(transaction[index].status != 'pending')?(transaction[index].status != 'process')?(transaction[index].status != 'ready')?Colors.amberAccent:Colors.amberAccent:Colors.green:Colors.blue:CustomColor.redBtn, minSize: 12,
                                                                 color: (transaction[index].status != 'cancel')?(transaction[index].status != 'pending')?(transaction[index].status != 'process')?(transaction[index].status != 'ready')?CustomColor.primary:CustomColor.primary:Colors.green:Colors.blue:CustomColor.redBtn),
                                                             data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0),
                                                           ),
-                                                          (transaction[index].status == 'ready')?(transaction[index].type != 'Pesan antar')?MediaQuery(child: CustomText.bodyMedium14(text: NumberFormat.currency(locale: 'id', symbol: '', decimalDigits: 0).format((transaction[index].type!.startsWith('Reservasi'))?(transaction[index].total!):(transaction[index].total!+1000)), sizeNew: double.parse(((MediaQuery.of(context).size.width*0.035).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.035)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.035)).toString())),
-                                                            data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0),):
+                                                          // (transaction[index].status == 'ready')?(transaction[index].type != 'Pesan antar')?MediaQuery(child: CustomText.bodyMedium14(text: NumberFormat.currency(locale: 'id', symbol: '', decimalDigits: 0).format((transaction[index].type!.startsWith('Reservasi'))?(transaction[index].total!):(transaction[index].total!+1000)), sizeNew: double.parse(((MediaQuery.of(context).size.width*0.035).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.035)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.035)).toString())),
+                                                          //   data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0),)
+                                                          (transaction[index].status == 'ready')?
                                                           GestureDetector(
                                                             onTap: (){
                                                               // _search(recomMenu[index], '');
@@ -3633,7 +3871,7 @@ class _HomeActivityState extends State<HomeActivity> with WidgetsBindingObserver
                                                               ),
                                                             ),
                                                           ):
-                                                          MediaQuery(child: CustomText.bodyMedium14(text: NumberFormat.currency(locale: 'id', symbol: '', decimalDigits: 0).format((transaction[index].type!.startsWith('Reservasi'))?(transaction[index].total!):(transaction[index].total!+1000)), sizeNew: double.parse(((MediaQuery.of(context).size.width*0.035).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.035)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.035)).toString())),
+                                                          MediaQuery(child: CustomText.bodyMedium14(text: (transaction[index].total.toString() == '0' && transaction[index].type != 'Pesan antar')?'Free':NumberFormat.currency(locale: 'id', symbol: '', decimalDigits: 0).format((transaction[index].type!.startsWith('Reservasi'))?(transaction[index].total!):(transaction[index].total!+1000)), sizeNew: double.parse(((MediaQuery.of(context).size.width*0.035).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.035)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.035)).toString())),
                                                             data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0),),
                                                         ],
                                                       )
@@ -3651,6 +3889,109 @@ class _HomeActivityState extends State<HomeActivity> with WidgetsBindingObserver
                             ),
                           ):Container(),
                           (transaction.toString() != '[]')?SizedBox(height: CustomSize.sizeHeight(context) / 48,):Container(),
+
+
+                          (listDisc50.toString() != '[]')?Container(
+                            width: CustomSize.sizeWidth(context),
+                            height: CustomSize.sizeHeight(context) / 7.10,
+                            child: Stack(
+                              children: [
+                                Container(
+                                  width: CustomSize.sizeWidth(context),
+                                  // height: CustomSize.sizeHeight(context) / 7.6,
+                                  child: CarouselSlider(
+                                    options: CarouselOptions(
+                                      viewportFraction: 1,
+                                      enableInfiniteScroll: false,
+                                      autoPlay: false,
+                                      // height: CustomSize.sizeHeight(context) / 7.6,
+                                      scrollDirection: Axis.horizontal,
+                                    ),
+                                    items: kamPromo0.map((e) {
+                                      return GestureDetector(
+                                        onTap: (){
+                                          Navigator.push(
+                                              context,
+                                              PageTransition(
+                                                  type: PageTransitionType.rightToLeft,
+                                                  child: new DiskonOngkirActivity('0')));
+                                          // if (e.id != 0) {
+                                          //   Navigator.push(
+                                          //       context,
+                                          //       PageTransition(
+                                          //           type: PageTransitionType.rightToLeft,
+                                          //           child: new DetailResto(e.id.toString())));
+                                          // }
+                                          // print(e.id.toString());
+                                        },
+                                        child: Container(
+                                          decoration: BoxDecoration(
+                                              image: DecorationImage(
+                                                  image: AssetImage(e),
+                                                  // image: AssetImage(e),
+                                                  fit: BoxFit.fitWidth
+                                              )
+                                          ),
+                                        ),
+                                      );
+                                    }).toList(),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ):Container(),
+                          (listDisc100.toString() != '[]')?Container():SizedBox(height: CustomSize.sizeHeight(context) / 48,),
+
+                          (listDisc100.toString() != '[]')?Container(
+                            width: CustomSize.sizeWidth(context),
+                            height: CustomSize.sizeHeight(context) / 7.10,
+                            child: Stack(
+                              children: [
+                                Container(
+                                  width: CustomSize.sizeWidth(context),
+                                  // height: CustomSize.sizeHeight(context) / 7.6,
+                                  child: CarouselSlider(
+                                    options: CarouselOptions(
+                                      viewportFraction: 1,
+                                      enableInfiniteScroll: false,
+                                      autoPlay: false,
+                                      // height: CustomSize.sizeHeight(context) / 7.6,
+                                      scrollDirection: Axis.horizontal,
+                                    ),
+                                    items: kamPromo1.map((e) {
+                                      return GestureDetector(
+                                        onTap: (){
+                                          Navigator.push(
+                                              context,
+                                              PageTransition(
+                                                  type: PageTransitionType.rightToLeft,
+                                                  child: new DiskonOngkirActivity('1')));
+                                          // if (e.id != 0) {
+                                          //   Navigator.push(
+                                          //       context,
+                                          //       PageTransition(
+                                          //           type: PageTransitionType.rightToLeft,
+                                          //           child: new DetailResto(e.id.toString())));
+                                          // }
+                                          // print(e.id.toString());
+                                        },
+                                        child: Container(
+                                          decoration: BoxDecoration(
+                                              image: DecorationImage(
+                                                  image: AssetImage(e),
+                                                  // image: AssetImage(e),
+                                                  fit: BoxFit.fitWidth
+                                              )
+                                          ),
+                                        ),
+                                      );
+                                    }).toList(),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ):Container(),
+                          (listDisc100.toString() != '[]')?SizedBox(height: CustomSize.sizeHeight(context) / 48,):Container(),
 
                           // (kakilima.toString() != '[]')?Padding(
                           //   padding: EdgeInsets.symmetric(horizontal: CustomSize.sizeWidth(context) / 24),

@@ -7,9 +7,7 @@ import 'package:fluttertoast/fluttertoast.dart';
 import 'package:kam5ia/model/Resto.dart';
 import 'package:kam5ia/ui/detail/detail_resto.dart';
 import 'package:kam5ia/ui/promo/add_promo.dart';
-import 'package:kam5ia/ui/promo/edit_promo.dart';
 import 'package:kam5ia/utils/utils.dart';
-import 'package:intl/intl.dart';
 import 'package:location/location.dart';
 import 'package:page_transition/page_transition.dart';
 import 'package:pull_to_refresh/pull_to_refresh.dart';
@@ -17,8 +15,6 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:location_platform_interface/location_platform_interface.dart';
 import 'package:http/http.dart' as http;
 
-import '../../model/Menu.dart';
-import '../../model/Price.dart';
 import '../../model/Promo.dart';
 
 class Location {
@@ -119,6 +115,7 @@ class _TermurahActivityState extends State<TermurahActivity> {
 
   List<Resto> promo = [];
   List<String> promo2 = [];
+  String doubleRes = '';
   Future<void> _getPromo(String lat, String long)async{
     List<Resto> _promo = [];
     List<String> _promo2 = [];
@@ -144,6 +141,11 @@ class _TermurahActivityState extends State<TermurahActivity> {
           img: v['img']??null,
           isOpen: v['isOpen'].toString()
       );
+      if (doubleRes == '') {
+        doubleRes = v['name'];
+      } else {
+        doubleRes = doubleRes + ', ' + v['name'];
+      }
       _promo.add(r);
     }
 
@@ -273,13 +275,13 @@ class _TermurahActivityState extends State<TermurahActivity> {
   showAlertDialog(String id) {
 
     // set up the buttons
-    Widget cancelButton = FlatButton(
+    Widget cancelButton = TextButton(
       child: Text("Batal", style: TextStyle(color: CustomColor.primary)),
       onPressed:  () {
         Navigator.pop(context);
       },
     );
-    Widget continueButton = FlatButton(
+    Widget continueButton = TextButton(
       child: Text("Hapus", style: TextStyle(color: CustomColor.primary)),
       onPressed:  () {
         _delPromo(id);
@@ -362,7 +364,12 @@ class _TermurahActivityState extends State<TermurahActivity> {
           img: v['img']??null,
           isOpen: v['isOpen'].toString()
       );
-      promo.add(r);
+      if (doubleRes.contains(v['name']) == false) {
+        promo.add(r);
+        doubleRes = doubleRes + ', ' + v['name'];
+        print('doubleRes2');
+        print(doubleRes);
+      }
     }
 
     setState(() {

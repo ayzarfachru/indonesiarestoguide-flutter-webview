@@ -50,10 +50,10 @@ class _ReservationDoneState extends State<ReservationDone> {
           datetime: v['datetime'],
           table: v['table'].toString(),
           img: v['user_img'],
-          total: int.parse(v['price']),
+          total: int.parse(v['price'].toString()),
             chatroom: '',
-            chat_user: v['chat_user']??'0',
-            is_opened: v['is_opened']??'1'
+            chat_user: (v['chat_user']??0).toString(),
+            is_opened: (v['is_opened']??1).toString()
         );
         _transaction.add(r);
       }
@@ -392,8 +392,8 @@ class _ReservationDoneState extends State<ReservationDone> {
       status = data['trx']['status'];
       datetime = data['trx']['datetime'];
       table = data['trx']['table'].toString();
-      total = data['trx']['price'];
-      username = data['trx']['user_name'];
+      total = data['trx']['price'].toString();
+      username = data['trx']['user_name'].toString();
       phone = (data['trx']['no_telp_user']??'').toString();
       // print(price);
       // detTransaction = _detTransaction;

@@ -42,7 +42,7 @@ class _DepositActivityState extends State<DepositActivity> {
       "Accept": "Application/json",
       "Authorization": "Bearer $token"
     });
-    print('oi');
+    print('oi1');
     print(apiResult.body);
     var data = json.decode(apiResult.body);
 
@@ -54,16 +54,17 @@ class _DepositActivityState extends State<DepositActivity> {
     print('inquiry: ' + apiResult1.body.toString());
 
     for (var h in data['history']) {
-      Category c = Category(
-          id: int.parse(h['amount']),
+      Category c = Category.nguponYuk(
+          id: int.parse(h['amount'].toString()),
           nama: h['trans_code'] ?? "topup",
           created: h['created_at'],
-          img: '');
+          img: '',
+          isNguponYuk: h['is_using_nguponyuk'].toString());
       history.add(c);
     }
 
     setState(() {
-      balance = int.parse(data['balance']);
+      balance = int.parse(data['balance'].toString());
     });
   }
 
@@ -78,7 +79,7 @@ class _DepositActivityState extends State<DepositActivity> {
       "Accept": "Application/json",
       "Authorization": "Bearer $token"
     });
-    print('oi');
+    print('oi2');
     print(DateFormat('d-M-y').format(selectedDate).toString());
     print(apiResult.body);
     var data = json.decode(apiResult.body);
@@ -92,10 +93,12 @@ class _DepositActivityState extends State<DepositActivity> {
 
     if (data.toString().contains('history') == true ) {
       for(var h in data['history']){
-        Category c = Category(
-            id: int.parse(h['amount']),
+        Category c = Category.nguponYuk(
+            id: int.parse(h['amount'].toString()),
             nama: h['trans_code']??"topup",
-            created: h['created_at'], img: ''
+            created: h['created_at'],
+            img: '',
+            isNguponYuk: h['is_using_nguponyuk'].toString()
         );
         history.add(c);
       }
@@ -345,13 +348,16 @@ class _DepositActivityState extends State<DepositActivity> {
                                               //     });
                                               //   },
                                               // ),
-                                              FlatButton(
-                                                color: CustomColor.accent,
-                                                textColor: Colors.white,
-                                                shape: RoundedRectangleBorder(
-                                                    borderRadius: BorderRadius.all(Radius.circular(10))
+                                              TextButton(
+                                                // minWidth: CustomSize.sizeWidth(context),
+                                                style: TextButton.styleFrom(
+                                                  backgroundColor: CustomColor.accent,
+                                                  padding: EdgeInsets.all(0),
+                                                  shape: const RoundedRectangleBorder(
+                                                      borderRadius: BorderRadius.all(Radius.circular(10))
+                                                  ),
                                                 ),
-                                                child: Text('Oke'),
+                                                child: Text('Oke', style: TextStyle(color: Colors.white)),
                                                 onPressed: () async{
                                                   Navigator.pop(context);
                                                   // String qrcode = '';
@@ -905,7 +911,7 @@ class _DepositActivityState extends State<DepositActivity> {
                                               ? history[index].nama
                                               : "💸 Topup"
                                           : "💸 Transaksi " +
-                                              history[index].nama,
+                                              history[index].nama.toString(),
                                       sizeNew: double.parse(
                                           ((MediaQuery.of(context).size.width *
                                                           0.03)
@@ -940,12 +946,16 @@ class _DepositActivityState extends State<DepositActivity> {
                                                           symbol: 'Rp. ',
                                                           decimalDigits: 0)
                                                       .format(history[index].id)
-                                          : "+ " +
-                                              NumberFormat.currency(
+                                          : (history[index].isNguponYuk != '1')? "+ " + NumberFormat.currency(
                                                       locale: 'id',
                                                       symbol: 'Rp. ',
                                                       decimalDigits: 0)
-                                                  .format(history[index].id),
+                                                  .format(history[index].id)
+                                          : (history[index].id! < 0)? "Ngupon Yuk" : 'Ngupon Yuk' + " + " + NumberFormat.currency(
+                                          locale: 'id',
+                                          symbol: 'Rp. ',
+                                          decimalDigits: 0)
+                                          .format(history[index].id),
                                       sizeNew: double.parse(
                                           ((MediaQuery.of(context).size.width *
                                                           0.03)
@@ -991,7 +1001,7 @@ class _DepositActivityState extends State<DepositActivity> {
                                                   0.04)
                                               .toString()),
                                   text: DateFormat("d MMM yyyy - HH:mm").format(
-                                      DateTime.parse(history[index].created)),
+                                      DateTime.parse(history[index].created.toString())),
                                   color: Colors.grey,
                                 ),
                               ),

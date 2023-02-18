@@ -10,6 +10,8 @@ import 'package:google_sign_in/google_sign_in.dart';
 import 'package:kam5ia/model/User.dart';
 import 'package:kam5ia/ui/auth/login_activity.dart';
 import 'package:kam5ia/ui/home/home_activity.dart';
+import 'package:kam5ia/ui/ngupon_yuk/ngupon_yuk_activity.dart';
+import 'package:kam5ia/ui/ngupon_yuk/ngupon_yuk_referral_activity.dart';
 import 'package:kam5ia/ui/ui_resto/add_resto/add_view_resto.dart';
 import 'package:kam5ia/ui/ui_resto/home/home_activity.dart';
 import 'package:kam5ia/utils/utils.dart';
@@ -225,7 +227,7 @@ class _ProfileActivityState extends State<ProfileActivity> {
       print(name);
       email = (pref.getString('email')??'');
       print(email);
-      img = (pref.getString('img')??'');
+      img = (pref.getString('img')??"");
       print(img);
       notelp = (pref.getString('notelp')??"");
       print(notelp);
@@ -311,13 +313,13 @@ class _ProfileActivityState extends State<ProfileActivity> {
   showAlertDialog(String id) {
 
     // set up the buttons
-    Widget cancelButton = FlatButton(
+    Widget cancelButton = TextButton(
       child: Text("Batal", style: TextStyle(color: CustomColor.primary)),
       onPressed:  () {
         Navigator.pop(context);
       },
     );
-    Widget continueButton = FlatButton(
+    Widget continueButton = TextButton(
       child: Text("Hapus", style: TextStyle(color: CustomColor.primary),),
       onPressed:  () {
         _delMenu(id);
@@ -527,11 +529,61 @@ class _ProfileActivityState extends State<ProfileActivity> {
     }
   }
 
+  bool isNguponYuk = false;
+  Future _getNguponYuk()async{
+
+    setState(() {});
+    SharedPreferences pref = await SharedPreferences.getInstance();
+    String token = pref.getString("token") ?? "";
+    String email = (pref.getString('email')??'');
+    var apiResult = await http.get(Uri.parse(Links.nguponUrl + '/kupon?action=use&user=$email'), headers: {
+      "Accept": "Application/json",
+      "Authorization": "Bearer $token"
+    });
+    print('_getNguponYuk');
+    print(apiResult.body);
+    var data = json.decode(apiResult.body);
+
+    var apiResultRef = await http.get(Uri.parse(Links.nguponUrl + '/coupon/ref?user=$email'), headers: {
+      "Accept": "Application/json",
+      "Authorization": "Bearer $token"
+    });
+    print('_getNguponYuk ref');
+    print(Links.nguponUrl + '/coupon/ref?user=$email');
+    print(apiResultRef.body);
+    var dataRef = json.decode(apiResultRef.body);
+
+    if (data['data']['unpaid'].toString() == '[]' && data['data']['paid'].toString() == '[]' && dataRef['data'].toString() == '[]') {
+      isNguponYuk = false;
+    } else {
+      isNguponYuk = true;
+    }
+
+
+    // for(var v in data['trans']){
+    //   History h = History(
+    //     id: v['id'],
+    //     name: v['resto_name'],
+    //     time: v['time'],
+    //     price: v['price'],
+    //     img: v['resto_img'],
+    //     type: v['type'],
+    //     status: v['status'],
+    //   );
+    //   _history.add(h);
+    // }
+
+    setState(() {
+
+    });
+  }
+
   ScrollController _scrollController = ScrollController();
 
   @override
   void initState() {
     super.initState();
+    _getNguponYuk();
     _getOwnerResto();
     // _getUserResto();
     getName();
@@ -971,6 +1023,60 @@ class _ProfileActivityState extends State<ProfileActivity> {
                         ),
                       ):Container(),
                       (homepg != "1")?Divider():Container(),
+                      (isNguponYuk != false)?(homepg != "1")?GestureDetector(
+                        onTap: (){
+                          Navigator.pushReplacement(
+                              context,
+                              PageTransition(
+                                  type: PageTransitionType.rightToLeft,
+                                  child: new NguponYukActivity()));
+                        },
+                        child: Padding(
+                          padding: EdgeInsets.symmetric(
+                              horizontal: CustomSize.sizeWidth(context) / 48,
+                              vertical: CustomSize.sizeHeight(context) / 86
+                          ),
+                          child: Row(
+                            children: [
+                              Icon(FontAwesome.ticket),
+                              SizedBox(width: CustomSize.sizeWidth(context) / 48,),
+                              CustomText.bodyRegular16(
+                                  text: "Ngupon Yuk",
+                                  sizeNew: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.04)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.04)).toString()),
+                                  maxLines: 1
+                              ),
+                            ],
+                          ),
+                        ),
+                      ):Container():Container(),
+                      (isNguponYuk != false)?(homepg != "1")?Divider():Container():Container(),
+                      (isNguponYuk != false)?(homepg != "1")?GestureDetector(
+                        onTap: (){
+                          Navigator.pushReplacement(
+                              context,
+                              PageTransition(
+                                  type: PageTransitionType.rightToLeft,
+                                  child: new NguponYukRefActivity()));
+                        },
+                        child: Padding(
+                          padding: EdgeInsets.symmetric(
+                              horizontal: CustomSize.sizeWidth(context) / 48,
+                              vertical: CustomSize.sizeHeight(context) / 86
+                          ),
+                          child: Row(
+                            children: [
+                              Icon(FontAwesome.link),
+                              SizedBox(width: CustomSize.sizeWidth(context) / 48,),
+                              CustomText.bodyRegular16(
+                                  text: "Referral",
+                                  sizeNew: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.04)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.04)).toString()),
+                                  maxLines: 1
+                              ),
+                            ],
+                          ),
+                        ),
+                      ):Container():Container(),
+                      (isNguponYuk != false)?(homepg != "1")?Divider():Container():Container(),
                       (homepg != "1")?SizedBox(height: CustomSize.sizeHeight(context) / 32,):Container(),
                       (homepg != "1")?Padding(
                         padding: EdgeInsets.symmetric(horizontal: CustomSize.sizeWidth(context) / 48),
@@ -1008,23 +1114,76 @@ class _ProfileActivityState extends State<ProfileActivity> {
                   ),
                   GestureDetector(
                     onTap: () async{
-                      if (owner == 'true' && homepg == "1") {
-                        _googleSignIn.signOut();
-                        _getOwnerOut();
-                        SharedPreferences pref = await SharedPreferences.getInstance();
-                        pref.clear();
-                        setState(() {
-                          Navigator.pushReplacement(context, PageTransition(type: PageTransitionType.fade, child: new LoginActivity()));
-                        });
-                      } else {
-                        _googleSignIn.signOut();
-                        logOut();
-                        SharedPreferences pref = await SharedPreferences.getInstance();
-                        pref.clear();
-                        setState(() {
-                          Navigator.pushReplacement(context, PageTransition(type: PageTransitionType.fade, child: new LoginActivity()));
-                        });
-                      }
+                      showDialog(
+                          context: context,
+                          builder: (context) {
+                            return AlertDialog(
+                              contentPadding: EdgeInsets.only(left: 25, right: 25, top: 15, bottom: 5),
+                              shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.all(Radius.circular(10))
+                              ),
+                              title: Center(child: Text('Peringatan!', style: TextStyle(color: CustomColor.redBtn))),
+                              content: Text('Apakah anda ingin keluar dari akun anda?', style: TextStyle(fontSize: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.04)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.04)).toString()), fontWeight: FontWeight.w500), textAlign: TextAlign.center),
+                              // '\n \nSemua proses pembayaran dan transaksi di luar tanggung jawab IRG!', style: TextStyle(fontSize: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.04)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.04)).toString()), fontWeight: FontWeight.w500), textAlign: TextAlign.center),
+                              actions: <Widget>[
+                                Center(
+                                  child: Row(
+                                    mainAxisAlignment: MainAxisAlignment.spaceAround,
+                                    children: [
+                                      TextButton(
+                                        // minWidth: CustomSize.sizeWidth(context),
+                                        style: TextButton.styleFrom(
+                                          backgroundColor: CustomColor.redBtn,
+                                          padding: EdgeInsets.all(0),
+                                          shape: const RoundedRectangleBorder(
+                                              borderRadius: BorderRadius.all(Radius.circular(10))
+                                          ),
+                                        ),
+                                        child: Text('Batal', style: TextStyle(color: Colors.white)),
+                                        onPressed: () async{
+                                          setState(() {
+                                            // codeDialog = valueText;
+                                            Navigator.pop(context);
+                                          });
+                                        },
+                                      ),
+                                      TextButton(
+                                        // minWidth: CustomSize.sizeWidth(context),
+                                        style: TextButton.styleFrom(
+                                          backgroundColor: CustomColor.accent,
+                                          padding: EdgeInsets.all(0),
+                                          shape: const RoundedRectangleBorder(
+                                              borderRadius: BorderRadius.all(Radius.circular(10))
+                                          ),
+                                        ),
+                                        child: Text('Iya', style: TextStyle(color: Colors.white)),
+                                        onPressed: () async{
+                                          if (owner == 'true' && homepg == "1") {
+                                            _googleSignIn.signOut();
+                                            _getOwnerOut();
+                                            SharedPreferences pref = await SharedPreferences.getInstance();
+                                            pref.clear();
+                                            setState(() {
+                                              Navigator.pushReplacement(context, PageTransition(type: PageTransitionType.fade, child: new LoginActivity()));
+                                            });
+                                          } else {
+                                            _googleSignIn.signOut();
+                                            logOut();
+                                            SharedPreferences pref = await SharedPreferences.getInstance();
+                                            pref.clear();
+                                            setState(() {
+                                              Navigator.pushReplacement(context, PageTransition(type: PageTransitionType.fade, child: new LoginActivity()));
+                                            });
+                                          }
+                                        },
+                                      ),
+                                    ],
+                                  ),
+                                ),
+
+                              ],
+                            );
+                          });
                     },
                     child: Padding(
                       padding: EdgeInsets.only(bottom: CustomSize.sizeHeight(context) / 48),

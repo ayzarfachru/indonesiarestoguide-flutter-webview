@@ -3,7 +3,6 @@ import 'dart:convert';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
-import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:intl/intl.dart';
 import 'package:kam5ia/ui/home/home_activity.dart';
 import 'package:kam5ia/ui/ui_resto/home/home_activity.dart';
@@ -821,7 +820,7 @@ class _PaymentRestoState extends State<PaymentResto> {
     var apiResult = await http.post(Uri.parse(Links.mainUrl + '/payment/checkout'), body: {
       'amount': priceReferral.toString(),
       // 'amount': '5000',
-      'ref': codeProgram.text
+      'ref': codeProgram.text.toUpperCase().toString()
     }, headers: {
       "Accept": "Application/json",
       "Authorization": "Bearer $token"
@@ -1278,14 +1277,16 @@ class _PaymentRestoState extends State<PaymentResto> {
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceAround,
                   children: [
-                    FlatButton(
+                    TextButton(
                       // minWidth: CustomSize.sizeWidth(context),
-                      color: CustomColor.redBtn,
-                      textColor: Colors.white,
-                      shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.all(Radius.circular(10))
+                      style: TextButton.styleFrom(
+                        backgroundColor: CustomColor.redBtn,
+                        padding: EdgeInsets.all(0),
+                        shape: const RoundedRectangleBorder(
+                            borderRadius: BorderRadius.all(Radius.circular(10))
+                        ),
                       ),
-                      child: Text('Batal'),
+                      child: Text('Batal', style: TextStyle(color: Colors.white)),
                       onPressed: () async{
                         setState(() {
                           // codeDialog = valueText;
@@ -1293,13 +1294,16 @@ class _PaymentRestoState extends State<PaymentResto> {
                         });
                       },
                     ),
-                    FlatButton(
-                      color: CustomColor.primaryLight,
-                      textColor: Colors.white,
-                      shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.all(Radius.circular(10))
+                    TextButton(
+                      // minWidth: CustomSize.sizeWidth(context),
+                      style: TextButton.styleFrom(
+                        backgroundColor: CustomColor.primaryLight,
+                        padding: EdgeInsets.all(0),
+                        shape: const RoundedRectangleBorder(
+                            borderRadius: BorderRadius.all(Radius.circular(10))
+                        ),
                       ),
-                      child: Text('Iya'),
+                      child: Text('Iya', style: TextStyle(color: Colors.white)),
                       onPressed: () async{
                         if (homepg != "1") {
                           Navigator.pushReplacement(context, PageTransition(type: PageTransitionType.fade, child: HomeActivity()));
@@ -1959,14 +1963,16 @@ class _PaymentRestoState extends State<PaymentResto> {
                                       child: Row(
                                         mainAxisAlignment: MainAxisAlignment.spaceAround,
                                         children: [
-                                          FlatButton(
+                                          TextButton(
                                             // minWidth: CustomSize.sizeWidth(context),
-                                            color: CustomColor.redBtn,
-                                            textColor: Colors.white,
-                                            shape: RoundedRectangleBorder(
-                                                borderRadius: BorderRadius.all(Radius.circular(10))
+                                            style: TextButton.styleFrom(
+                                              backgroundColor: CustomColor.redBtn,
+                                              padding: EdgeInsets.all(0),
+                                              shape: const RoundedRectangleBorder(
+                                                  borderRadius: BorderRadius.all(Radius.circular(10))
+                                              ),
                                             ),
-                                            child: Text('Batal'),
+                                            child: Text('Batal', style: TextStyle(color: Colors.white)),
                                             onPressed: () async{
                                               setState(() {
                                                 // codeDialog = valueText;
@@ -1974,13 +1980,16 @@ class _PaymentRestoState extends State<PaymentResto> {
                                               });
                                             },
                                           ),
-                                          FlatButton(
-                                            color: CustomColor.primaryLight,
-                                            textColor: Colors.white,
-                                            shape: RoundedRectangleBorder(
-                                                borderRadius: BorderRadius.all(Radius.circular(10))
+                                          TextButton(
+                                            // minWidth: CustomSize.sizeWidth(context),
+                                            style: TextButton.styleFrom(
+                                              backgroundColor: CustomColor.primaryLight,
+                                              padding: EdgeInsets.all(0),
+                                              shape: const RoundedRectangleBorder(
+                                                  borderRadius: BorderRadius.all(Radius.circular(10))
+                                              ),
                                             ),
-                                            child: Text('Iya'),
+                                            child: Text('Iya', style: TextStyle(color: Colors.white)),
                                             onPressed: () async{
                                               if (homepg != "1") {
                                                 Navigator.pushReplacement(context, PageTransition(type: PageTransitionType.fade, child: HomeActivity()));
@@ -2074,7 +2083,7 @@ class _PaymentRestoState extends State<PaymentResto> {
                                         child: InkWell(
                                           borderRadius: BorderRadius.circular(10),
                                           splashColor: Colors.white.withOpacity(.2),
-                                          highlightColor: CustomColor.accent,
+                                          highlightColor: Colors.grey,
                                           onTap: (){
                                             showDialog(
                                                 context: context,
@@ -2105,14 +2114,16 @@ class _PaymentRestoState extends State<PaymentResto> {
                                                       Center(
                                                         child: Padding(
                                                           padding: const EdgeInsets.only(left: 10.0, right: 10.0, bottom: 8.0),
-                                                          child: FlatButton(
-                                                            minWidth: CustomSize.sizeWidth(context),
-                                                            color: CustomColor.primaryLight,
-                                                            textColor: Colors.white,
-                                                            shape: RoundedRectangleBorder(
-                                                                borderRadius: BorderRadius.all(Radius.circular(10))
+                                                          child: TextButton(
+                                                            // minWidth: CustomSize.sizeWidth(context),
+                                                            style: TextButton.styleFrom(
+                                                              backgroundColor: CustomColor.primaryLight,
+                                                              padding: EdgeInsets.all(0),
+                                                              shape: const RoundedRectangleBorder(
+                                                                  borderRadius: BorderRadius.all(Radius.circular(10))
+                                                              ),
                                                             ),
-                                                            child: Text('Cek', style: TextStyle(fontSize: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.04)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.04)).toString()),),),
+                                                            child: Text('Cek', style: TextStyle(color: Colors.white, fontSize: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.04)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.04)).toString()),),),
                                                             onPressed: () async{
                                                               if (checking == true) {
                                                                 Fluttertoast.showToast(msg: "Tunggu . . .");
@@ -2161,7 +2172,7 @@ class _PaymentRestoState extends State<PaymentResto> {
                                         child: InkWell(
                                           borderRadius: BorderRadius.circular(10),
                                           splashColor: Colors.white.withOpacity(.2),
-                                          highlightColor: CustomColor.accent,
+                                          highlightColor: Colors.grey,
                                           onTap: (){
                                             showDialog(
                                                 context: context,
@@ -2176,14 +2187,16 @@ class _PaymentRestoState extends State<PaymentResto> {
                                                       Center(
                                                         child: Padding(
                                                           padding: const EdgeInsets.only(left: 10.0, right: 10.0, bottom: 8.0),
-                                                          child: FlatButton(
-                                                            minWidth: CustomSize.sizeWidth(context),
-                                                            color: CustomColor.primaryLight,
-                                                            textColor: Colors.white,
-                                                            shape: RoundedRectangleBorder(
-                                                                borderRadius: BorderRadius.all(Radius.circular(10))
+                                                          child: TextButton(
+                                                            // minWidth: CustomSize.sizeWidth(context),
+                                                            style: TextButton.styleFrom(
+                                                              backgroundColor: CustomColor.primaryLight,
+                                                              padding: EdgeInsets.all(10),
+                                                              shape: const RoundedRectangleBorder(
+                                                                  borderRadius: BorderRadius.all(Radius.circular(10))
+                                                              ),
                                                             ),
-                                                            child: Text('Hubungi sekarang', style: TextStyle(fontSize: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.04)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.04)).toString()),),),
+                                                            child: Text('Hubungi sekarang', style: TextStyle(color: Colors.white, fontSize: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.04)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.04)).toString()), fontWeight: FontWeight.w500), ),
                                                             onPressed: () async{
                                                               launch("https://wa.me/6285852270555");
                                                             },

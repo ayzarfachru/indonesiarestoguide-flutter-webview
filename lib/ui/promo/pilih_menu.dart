@@ -2,7 +2,6 @@ import 'dart:convert';
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_icons/flutter_icons.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:kam5ia/model/CategoryMenu.dart';
 import 'package:kam5ia/model/Menu.dart';
@@ -10,8 +9,6 @@ import 'package:kam5ia/model/MenuJson.dart';
 import 'package:kam5ia/model/Price.dart';
 import 'package:kam5ia/model/Promo.dart';
 import 'package:kam5ia/ui/promo/add_promo.dart';
-import 'package:kam5ia/ui/ui_resto/menu/add_menu.dart';
-import 'package:kam5ia/ui/ui_resto/menu/edit_menu.dart';
 import 'package:kam5ia/utils/utils.dart';
 import 'package:intl/intl.dart';
 import 'package:page_transition/page_transition.dart';
@@ -68,7 +65,7 @@ class _PilihMenuActivityState extends State<PilihMenuActivity> {
               id: a['id'],
               name: a['name'],
               desc: a['desc'],
-              is_available: a['is_available'],
+              is_available: a['is_available'].toString(),
               // is_available: '0',
               price: Price.delivery(a['price'], a['delivery_price']),
               urlImg: a['img'], type: '', restoId: '', delivery_price: null, distance: null, restoName: '', qty: '', is_recommended: ''
@@ -108,11 +105,11 @@ class _PilihMenuActivityState extends State<PilihMenuActivity> {
           desc: v['desc'],
           urlImg: v['img'],
           type: v['type'],
-          is_available: v['is_available'],
+          is_available: v['is_available'].toString(),
           // is_available: '0',
-          is_recommended: v['is_recommended'],
+          is_recommended: v['is_recommended'].toString(),
           price: Price(original: int.parse(v['price'].toString()), discounted: null, delivery: null),
-          delivery_price: Price(original: int.parse(v['price']), delivery: null, discounted: null), restoId: '', distance: null, restoName: '', qty: ''
+          delivery_price: Price(original: int.parse(v['price'].toString()), delivery: null, discounted: null), restoId: '', distance: null, restoName: '', qty: ''
       );
       _menu.add(p);
     }
@@ -150,10 +147,10 @@ class _PilihMenuActivityState extends State<PilihMenuActivity> {
           desc: v['desc'],
           urlImg: v['img'],
           type: v['type'],
-          is_recommended: v['is_recommended'],
-          is_available: v['is_available'],
+          is_recommended: v['is_recommended'].toString(),
+          is_available: v['is_available'].toString(),
           price: Price(original: int.parse(v['price'].toString()), discounted: null, delivery: null),
-          delivery_price: Price(original: int.parse(v['price']), delivery: null, discounted: null), restoId: '', distance: null, restoName: '', qty: ''
+          delivery_price: Price(original: int.parse(v['price'].toString()), delivery: null, discounted: null), restoId: '', distance: null, restoName: '', qty: ''
       );
       idMenu.add(v['id']);
       nameMenu.add(v['name']);
@@ -194,7 +191,7 @@ class _PilihMenuActivityState extends State<PilihMenuActivity> {
       title: Text("Hapus Menu"),
       content: Text("Apakah anda ingin menghapus menu?"),
       actions: [
-        FlatButton(
+        TextButton(
           child: Text("Batal", style: TextStyle(color: CustomColor.primary),),
           onPressed: () async{
             setState(() {});
@@ -202,7 +199,7 @@ class _PilihMenuActivityState extends State<PilihMenuActivity> {
           },
           // => Navigator.of(context).pop(),
         ),
-        FlatButton(
+        TextButton(
           child: Text("Oke", style: TextStyle(color: CustomColor.primary),),
           onPressed: () async{
             setState(() {});

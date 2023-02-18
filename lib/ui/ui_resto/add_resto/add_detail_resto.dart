@@ -211,7 +211,7 @@ class _AddDetailRestoState extends State<AddDetailResto> {
               ),
             ),
             actions: <Widget>[
-              FlatButton(
+              TextButton(
                 child: Text("Simpan"),
                 onPressed: () async{
                   SharedPreferences pref = await SharedPreferences.getInstance();
@@ -280,7 +280,7 @@ class _AddDetailRestoState extends State<AddDetailResto> {
               ),
             ),
             actions: <Widget>[
-              FlatButton(
+              TextButton(
                 child: Text("Simpan"),
                 onPressed: () async{
                   SharedPreferences pref = await SharedPreferences.getInstance();
@@ -1230,14 +1230,16 @@ class _AddDetailRestoState extends State<AddDetailResto> {
                                                 child: Row(
                                                   mainAxisAlignment: MainAxisAlignment.spaceAround,
                                                   children: [
-                                                    FlatButton(
+                                                    TextButton(
                                                       // minWidth: CustomSize.sizeWidth(context),
-                                                      color: CustomColor.redBtn,
-                                                      textColor: Colors.white,
-                                                      shape: RoundedRectangleBorder(
-                                                          borderRadius: BorderRadius.all(Radius.circular(10))
+                                                      style: TextButton.styleFrom(
+                                                        backgroundColor: CustomColor.redBtn,
+                                                        padding: EdgeInsets.all(0),
+                                                        shape: const RoundedRectangleBorder(
+                                                            borderRadius: BorderRadius.all(Radius.circular(10))
+                                                        ),
                                                       ),
-                                                      child: Text('Batal'),
+                                                      child: Text('Batal', style: TextStyle(color: Colors.white)),
                                                       onPressed: () async{
                                                         setState(() {
                                                           // codeDialog = valueText;
@@ -1245,13 +1247,16 @@ class _AddDetailRestoState extends State<AddDetailResto> {
                                                         });
                                                       },
                                                     ),
-                                                    FlatButton(
-                                                      color: CustomColor.primaryLight,
-                                                      textColor: Colors.white,
-                                                      shape: RoundedRectangleBorder(
-                                                          borderRadius: BorderRadius.all(Radius.circular(10))
+                                                    TextButton(
+                                                      // minWidth: CustomSize.sizeWidth(context),
+                                                      style: TextButton.styleFrom(
+                                                        backgroundColor: CustomColor.primaryLight,
+                                                        padding: EdgeInsets.all(0),
+                                                        shape: const RoundedRectangleBorder(
+                                                            borderRadius: BorderRadius.all(Radius.circular(10))
+                                                        ),
                                                       ),
-                                                      child: Text('Iya'),
+                                                      child: Text('Iya', style: TextStyle(color: Colors.white)),
                                                       onPressed: () async{
                                                         Navigator.pop(context);
                                                         String qrcode = '';
@@ -1271,13 +1276,16 @@ class _AddDetailRestoState extends State<AddDetailResto> {
                                                                       child: Row(
                                                                         mainAxisAlignment: MainAxisAlignment.center,
                                                                         children: [
-                                                                          FlatButton(
-                                                                            color: CustomColor.primaryLight,
-                                                                            textColor: Colors.white,
-                                                                            shape: RoundedRectangleBorder(
-                                                                                borderRadius: BorderRadius.all(Radius.circular(10))
+                                                                          TextButton(
+                                                                            // minWidth: CustomSize.sizeWidth(context),
+                                                                            style: TextButton.styleFrom(
+                                                                              backgroundColor: CustomColor.primaryLight,
+                                                                              padding: EdgeInsets.all(0),
+                                                                              shape: const RoundedRectangleBorder(
+                                                                                  borderRadius: BorderRadius.all(Radius.circular(10))
+                                                                              ),
                                                                             ),
-                                                                            child: Text('Atur Kembali'),
+                                                                            child: Text('Atur Kembali', style: TextStyle(color: Colors.white)),
                                                                             onPressed: () async{
                                                                               Navigator.pop(context);
                                                                               // String qrcode = '';
@@ -1379,14 +1387,16 @@ class _AddDetailRestoState extends State<AddDetailResto> {
                                                 child: Row(
                                                   mainAxisAlignment: MainAxisAlignment.spaceAround,
                                                   children: [
-                                                    FlatButton(
+                                                    TextButton(
                                                       // minWidth: CustomSize.sizeWidth(context),
-                                                      color: CustomColor.redBtn,
-                                                      textColor: Colors.white,
-                                                      shape: RoundedRectangleBorder(
-                                                          borderRadius: BorderRadius.all(Radius.circular(10))
+                                                      style: TextButton.styleFrom(
+                                                        backgroundColor: CustomColor.redBtn,
+                                                        padding: EdgeInsets.all(0),
+                                                        shape: const RoundedRectangleBorder(
+                                                            borderRadius: BorderRadius.all(Radius.circular(10))
+                                                        ),
                                                       ),
-                                                      child: Text('Batal'),
+                                                      child: Text('Batal', style: TextStyle(color: Colors.white)),
                                                       onPressed: () async{
                                                         setState(() {
                                                           // codeDialog = valueText;
@@ -1394,13 +1404,16 @@ class _AddDetailRestoState extends State<AddDetailResto> {
                                                         });
                                                       },
                                                     ),
-                                                    FlatButton(
-                                                      color: CustomColor.primaryLight,
-                                                      textColor: Colors.white,
-                                                      shape: RoundedRectangleBorder(
-                                                          borderRadius: BorderRadius.all(Radius.circular(10))
+                                                    TextButton(
+                                                      // minWidth: CustomSize.sizeWidth(context),
+                                                      style: TextButton.styleFrom(
+                                                        backgroundColor: CustomColor.primaryLight,
+                                                        padding: EdgeInsets.all(0),
+                                                        shape: const RoundedRectangleBorder(
+                                                            borderRadius: BorderRadius.all(Radius.circular(10))
+                                                        ),
                                                       ),
-                                                      child: Text('Iya'),
+                                                      child: Text('Iya', style: TextStyle(color: Colors.white)),
                                                       onPressed: () async{
                                                         Navigator.pop(context);
                                                         String qrcode = '';
@@ -1420,13 +1433,16 @@ class _AddDetailRestoState extends State<AddDetailResto> {
                                                                       child: Row(
                                                                         mainAxisAlignment: MainAxisAlignment.center,
                                                                         children: [
-                                                                          FlatButton(
-                                                                            color: CustomColor.primaryLight,
-                                                                            textColor: Colors.white,
-                                                                            shape: RoundedRectangleBorder(
-                                                                                borderRadius: BorderRadius.all(Radius.circular(10))
+                                                                          TextButton(
+                                                                            // minWidth: CustomSize.sizeWidth(context),
+                                                                            style: TextButton.styleFrom(
+                                                                              backgroundColor: CustomColor.primaryLight,
+                                                                              padding: EdgeInsets.all(0),
+                                                                              shape: const RoundedRectangleBorder(
+                                                                                  borderRadius: BorderRadius.all(Radius.circular(10))
+                                                                              ),
                                                                             ),
-                                                                            child: Text('Atur Kembali'),
+                                                                            child: Text('Atur Kembali', style: TextStyle(color: Colors.white)),
                                                                             onPressed: () async{
                                                                               Navigator.pop(context);
                                                                               // String qrcode = '';

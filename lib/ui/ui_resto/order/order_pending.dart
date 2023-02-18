@@ -63,11 +63,21 @@ class _OrderPendingState extends State<OrderPending> {
             username: v['username'].toString(),
             total: (v['total'] != null)?int.parse(v['total'].toString()):0,
             type: v['type'].toString(),
-            img: v['user_image'].toString(), chatroom: '', chat_user: v['chat_user']??'0',
-            is_opened: v['is_opened']??'1',
+            img: v['user_image'].toString(), chatroom: '', chat_user: (v['chat_user']??0).toString(),
+            is_opened: (v['is_opened']??1).toString(),
             date_trans: ''
         );
         _transaction.add(r);
+        if (v['type'] != 'Pesan antar' && v['status'] == 'pending') {
+          if ((v['total']??0).toString() == '0') {
+            _getPending('process', v['id'].toString());
+            print('(v[total]??0).toString()');
+            print((v['total']??0).toString());
+          }
+          // if (v['total'].toString() == '0') {
+          //   _getPending('process', v['id'].toString());
+          // }
+        }
       }
     } else {
       ksg = true;
@@ -405,7 +415,7 @@ class _OrderPendingState extends State<OrderPending> {
             urlImg: v['img'],
             type: v['type'],
             is_available: '',
-            is_recommended: v['is_recommended'],
+            is_recommended: v['is_recommended'].toString(),
             price: Price(original: int.parse(v['price'].toString()),discounted: int.parse(v['discounted_price'].toString()), delivery: null), restoName: '', distance: null, delivery_price: null, restoId: '',
         );
         _menu.add(p);
@@ -707,7 +717,7 @@ class _OrderPendingState extends State<OrderPending> {
                                             Row(mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                               children: [
                                                 CustomText.bodyLight16(text: "Harga", sizeNew: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.04)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.04)).toString())),
-                                                CustomText.bodyLight16(text: NumberFormat.currency(locale: 'id', symbol: '', decimalDigits: 0).format(total), sizeNew: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.04)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.04)).toString())
+                                                CustomText.bodyLight16(text: (total.toString() == '0')?'Free':NumberFormat.currency(locale: 'id', symbol: '', decimalDigits: 0).format(total), sizeNew: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.04)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.04)).toString())
                                                   // NumberFormat.currency(locale: 'id', symbol: '', decimalDigits: 0).format(harga)
                                                 ),
                                               ],
@@ -1143,8 +1153,8 @@ class _OrderPendingState extends State<OrderPending> {
       print('chatt '+chatroom.toString());
       Meja = (data['trx']['restaurant_tables_id'] != null)?(data['trx']['restaurant_tables_id']??'null').toString():'null';
       // Meja = '1';
-      ongkir = int.parse(data['trx']['ongkir']);
-      total = int.parse(data['trx']['total']);
+      ongkir = int.parse(data['trx']['ongkir'].toString());
+      total = int.parse(data['trx']['total'].toString());
       all = total+ongkir;
       type = data['trx']['type'].toString();
       address = data['trx']['address'].toString();
@@ -1344,6 +1354,7 @@ class _OrderPendingState extends State<OrderPending> {
     // });
     SharedPreferences pref = await SharedPreferences.getInstance();
     String token = pref.getString("token") ?? "";
+    pref.setString('inDetail', '2');
     var apiResult = await http.get(Uri.parse(Links.mainUrl + '/resto/table'), headers: {
       "Accept": "Application/json",
       "Authorization": "Bearer $token"
@@ -1355,7 +1366,7 @@ class _OrderPendingState extends State<OrderPending> {
     for(var v in data['table']){
       Meja2 p = Meja2(
         id: v['id'],
-        name: v['name'],
+        name: v['name'].toString(),
         qr: v['barcode'],
         url: v['img'],
       );

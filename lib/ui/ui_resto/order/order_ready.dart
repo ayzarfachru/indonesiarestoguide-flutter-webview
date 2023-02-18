@@ -90,13 +90,13 @@ class _OrderReadyState extends State<OrderReady> {
     for(var v in data['trx']['item']){
       Menu p = Menu(
         id: v['id'],
-        name: v['name'],
+        name: v['name'].toString(),
         desc: v['desc'],
         qty: v['qty'].toString(),
         urlImg: v['img'],
         type: v['type'],
         is_available: '',
-        is_recommended: v['is_recommended'],
+        is_recommended: v['is_recommended'].toString(),
         price: Price(original: int.parse(v['price'].toString()),discounted: int.parse(v['discounted_price'].toString()), delivery: null), restoName: '', distance: null, delivery_price: null, restoId: '',
       );
       _menu.add(p);
@@ -359,7 +359,7 @@ class _OrderReadyState extends State<OrderReady> {
                                             Row(mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                               children: [
                                                 CustomText.bodyLight16(text: "Harga", sizeNew: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.04)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.04)).toString())),
-                                                CustomText.bodyLight16(text: NumberFormat.currency(locale: 'id', symbol: '', decimalDigits: 0).format(total), sizeNew: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.04)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.04)).toString())
+                                                CustomText.bodyLight16(text: (total.toString() == '0')?'Free':NumberFormat.currency(locale: 'id', symbol: '', decimalDigits: 0).format(total), sizeNew: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.04)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.04)).toString())
                                                   // NumberFormat.currency(locale: 'id', symbol: '', decimalDigits: 0).format(harga)
                                                 ),
                                               ],
@@ -377,7 +377,7 @@ class _OrderReadyState extends State<OrderReady> {
                                             Row(mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                               children: [
                                                 CustomText.bodyLight16(text: "Platform Fee", minSize: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.04)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.04)).toString())),
-                                                CustomText.bodyLight16(text: NumberFormat.currency(locale: 'id', symbol: '', decimalDigits: 0).format(1000), minSize: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.04)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.04)).toString())),
+                                                CustomText.bodyLight16(text: (all.toString() == '0')?'Free':NumberFormat.currency(locale: 'id', symbol: '', decimalDigits: 0).format(1000), minSize: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.04)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.04)).toString())),
                                               ],
                                             ),
                                             SizedBox(height: CustomSize.sizeHeight(context) / 64,),
@@ -389,7 +389,7 @@ class _OrderReadyState extends State<OrderReady> {
                                                 Row(mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                                   children: [
                                                     CustomText.textTitle3(text: "Total Pembayaran", sizeNew: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.04)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.04)).toString())),
-                                                    CustomText.textTitle3(text: NumberFormat.currency(locale: 'id', symbol: '', decimalDigits: 0).format((all+1000)), sizeNew: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.04)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.04)).toString())
+                                                    CustomText.textTitle3(text: (all.toString() == '0')?'Ngupon Yuk':NumberFormat.currency(locale: 'id', symbol: '', decimalDigits: 0).format((all+1000)), sizeNew: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.04)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.04)).toString())
                                                       // NumberFormat.currency(locale: 'id', symbol: '', decimalDigits: 0).format(int.parse(totalHarga))
                                                     ),
                                                   ],
@@ -806,27 +806,102 @@ class _OrderReadyState extends State<OrderReady> {
                                   //           child: OrderActivity()));
                                   // });
                                   if (type != 'delivery') {
-                                    _getReady(operation = "done", id!);
-                                    setStateModal(() {});
-                                    Future.delayed(Duration(seconds: 0)).then((_) async{
-                                      // var collection = FirebaseFirestore.instance.collection('room');
-                                      // var snapshot = await collection.where(chatroom).get();
-                                      // for (var doc in snapshot.docs) {
-                                      //   await doc.reference.delete();
-                                      // }
-                                      // var collection = _firestore.collection('room');
+                                    showDialog(
+                                        context: context,
+                                        builder: (context) {
+                                          return AlertDialog(
+                                            contentPadding: EdgeInsets.only(left: 25, right: 25, top: 15, bottom: 5),
+                                            shape: RoundedRectangleBorder(
+                                                borderRadius: BorderRadius.all(Radius.circular(10))
+                                            ),
+                                            title: Center(child: Text('Peringatan!', style: TextStyle(color: CustomColor.redBtn))),
+                                            content: Text('Apakah pesanan ini sudah diterima konsumen?', style: TextStyle(fontSize: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.04)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.04)).toString()), fontWeight: FontWeight.w500), textAlign: TextAlign.center),
+                                            actions: <Widget>[
+                                              Center(
+                                                child: Padding(
+                                                  padding: EdgeInsets.only(left: 25, right: 25),
+                                                  child: Row(
+                                                    mainAxisAlignment: MainAxisAlignment.spaceAround,
+                                                    children: [
+                                                      // OutlineButton(
+                                                      //   // minWidth: CustomSize.sizeWidth(context),
+                                                      //   shape: StadiumBorder(),
+                                                      //   highlightedBorderColor: CustomColor.secondary,
+                                                      //   borderSide: BorderSide(
+                                                      //       width: 2,
+                                                      //       color: CustomColor.redBtn
+                                                      //   ),
+                                                      //   child: Text('Batal'),
+                                                      //   onPressed: () async{
+                                                      //     setState(() {
+                                                      //       // codeDialog = valueText;
+                                                      //       Navigator.pop(context);
+                                                      //     });
+                                                      //   },
+                                                      // ),
+                                                      OutlinedButton(
+                                                        // minWidth: CustomSize.sizeWidth(context),
+                                                        // shape: StadiumBorder(),
+                                                        // highlightedBorderColor: CustomColor.secondary,
+                                                        // borderSide: BorderSide(
+                                                        //     width: 2,
+                                                        //     color: CustomColor.accent
+                                                        // ),
+                                                        style: OutlinedButton.styleFrom(shape: StadiumBorder(), surfaceTintColor: CustomColor.redBtn),
+                                                        child: Text('Belum', style: TextStyle(color: CustomColor.redBtn)),
+                                                        onPressed: () async{
+                                                          Navigator.pop(context);
+                                                          // _getProcess(operation = "ready", id.toString());
+                                                          // setStateModal(() {});
+                                                          // String qrcode = '';
+                                                        },
+                                                      ),
+                                                      OutlinedButton(
+                                                        // minWidth: CustomSize.sizeWidth(context),
+                                                        // shape: StadiumBorder(),
+                                                        // highlightedBorderColor: CustomColor.secondary,
+                                                        // borderSide: BorderSide(
+                                                        //     width: 2,
+                                                        //     color: CustomColor.accent
+                                                        // ),
+                                                        style: OutlinedButton.styleFrom(shape: StadiumBorder(), surfaceTintColor: CustomColor.accent),
+                                                        child: Text('Sudah', style: TextStyle(color: CustomColor.accent)),
+                                                        onPressed: () async{
+                                                          Navigator.pop(context);
+                                                          Navigator.pop(context);
+                                                          _getReady(operation = "done", id!);
+                                                          setStateModal(() {});
+                                                          Future.delayed(Duration(seconds: 0)).then((_) async{
+                                                            // var collection = FirebaseFirestore.instance.collection('room');
+                                                            // var snapshot = await collection.where(chatroom).get();
+                                                            // for (var doc in snapshot.docs) {
+                                                            //   await doc.reference.delete();
+                                                            // }
+                                                            // var collection = _firestore.collection('room');
 
-                                      //   _onDeleteItemPressed(index);
-                                      // await _firestore.collection("room").document(chatroom).delete().then((_) {
-                                      //   print("BERHASIL!");
-                                      // });
+                                                            //   _onDeleteItemPressed(index);
+                                                            // await _firestore.collection("room").document(chatroom).delete().then((_) {
+                                                            //   print("BERHASIL!");
+                                                            // });
 
-                                      Navigator.pushReplacement(
-                                          context,
-                                          PageTransition(
-                                              type: PageTransitionType.fade,
-                                              child: OrderActivity()));
-                                    });
+                                                            Navigator.pushReplacement(
+                                                                context,
+                                                                PageTransition(
+                                                                    type: PageTransitionType.fade,
+                                                                    child: OrderActivity()));
+                                                          });
+                                                          // setStateModal(() {});
+                                                          // String qrcode = '';
+                                                        },
+                                                      ),
+                                                    ],
+                                                  ),
+                                                ),
+                                              ),
+
+                                            ],
+                                          );
+                                        });
                                   } else {
                                     Fluttertoast.showToast(msg: 'Status hanya bisa di ubah oleh customer');
                                   }
@@ -862,7 +937,7 @@ class _OrderReadyState extends State<OrderReady> {
                                           mainAxisAlignment: MainAxisAlignment.center,
                                           crossAxisAlignment: CrossAxisAlignment.center,
                                           children: [
-                                            CustomText.textHeading7(text: (type == 'delivery')?"Belum diterima customer":"Selesai", color: Colors.white, sizeNew: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.04)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.04)).toString())),
+                                            CustomText.textHeading7(text: (type == 'delivery')?"Belum diterima customer":"Telah di terima konsumen", color: Colors.white, sizeNew: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.04)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.04)).toString())),
                                           ],
                                         ),
                                       ),
@@ -891,8 +966,8 @@ class _OrderReadyState extends State<OrderReady> {
       waiting = false;
       chatroom = (data['trx']['chatroom'] != null)?(data['trx']['chatroom']['id']??'null').toString():'null';
       Meja = (data['trx']['restaurant_tables_id'] != null)?(data['trx']['restaurant_tables_id']??'null').toString():'null';
-      ongkir = int.parse(data['trx']['ongkir']);
-      total = int.parse(data['trx']['total']);
+      ongkir = int.parse(data['trx']['ongkir'].toString());
+      total = int.parse(data['trx']['total'].toString());
       all = total+ongkir;
       type = data['trx']['type'].toString();
       address = data['trx']['address'].toString();
@@ -1003,11 +1078,11 @@ class _OrderReadyState extends State<OrderReady> {
             id: v['id'],
             status: v['status'],
             username: v['username'],
-            total: int.parse(v['total']),
+            total: int.parse(v['total'].toString()),
             type: v['type'],
             img: v['user_image'],
             chatroom: '',
-            chat_user: v['chat_user']??'0'
+            chat_user: (v['chat_user']??0).toString()
         );
         _transaction.add(r);
       }
@@ -1077,7 +1152,7 @@ class _OrderReadyState extends State<OrderReady> {
     for(var v in data['table']){
       Meja2 p = Meja2(
         id: v['id'],
-        name: v['name'],
+        name: v['name'].toString(),
         qr: v['barcode'],
         url: v['img'],
       );
@@ -1207,7 +1282,7 @@ class _OrderReadyState extends State<OrderReady> {
                                               SizedBox(height: CustomSize.sizeHeight(context) / 26,),
                                               Row(
                                                 children: [
-                                                  CustomText.bodyRegular12(text: (transaction[index].total!+1000).toString(), sizeNew: double.parse(((MediaQuery.of(context).size.width*0.035).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.035)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.035)).toString())),
+                                                  CustomText.bodyRegular12(text: (transaction[index].type.toString() != "Pesan antar")?(transaction[index].total.toString() == '0')?'"Ngupon Yuk" Free':(transaction[index].total!+1000).toString():((transaction[index].total == 0)?'"Ngupon Yuk" + Ongkir':transaction[index].total!+1000).toString(), sizeNew: double.parse(((MediaQuery.of(context).size.width*0.035).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.035)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.035)).toString())),
                                                 ],
                                               )
                                             ],

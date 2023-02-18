@@ -73,8 +73,9 @@ class _SearchActivityState extends State<SearchActivity> {
     print(apiResult.body);
     var data = json.decode(apiResult.body);
     print('ini loh sob rese '+data.toString());
-    print('LOHH '+data['data']['resto'].toString());
-    print('ini loh sob rese '+data['data']['resto'].toString());
+    // print('LOHH '+data['data']['resto'].toString());
+    // print('ini loh sob rese1 '+data['resto'][0].toString());
+    // print('ini loh sob rese2 '+data['resto'][1].toString());
 
     if (data['menu'] != null) {
       for(var v in data['menu']){
@@ -641,7 +642,7 @@ class _SearchActivityState extends State<SearchActivity> {
         }
     );
     var jsonData = jsonDecode(data.body);
-    print('ini id'+jsonData.toString());
+    print('ini id'+jsonData['data'].toString());
 
     for(var v in jsonData['data']){
       facilityList.add(v['name']);

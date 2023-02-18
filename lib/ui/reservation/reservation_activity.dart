@@ -593,13 +593,16 @@ class _ReservationActivityState extends State<ReservationActivity> {
                                                         //     });
                                                         //   },
                                                         // ),
-                                                        FlatButton(
-                                                          color: CustomColor.accent,
-                                                          textColor: Colors.white,
-                                                          shape: RoundedRectangleBorder(
-                                                              borderRadius: BorderRadius.all(Radius.circular(10))
+                                                        TextButton(
+                                                          // minWidth: CustomSize.sizeWidth(context),
+                                                          style: TextButton.styleFrom(
+                                                            backgroundColor: CustomColor.accent,
+                                                            padding: EdgeInsets.all(0),
+                                                            shape: const RoundedRectangleBorder(
+                                                                borderRadius: BorderRadius.all(Radius.circular(10))
+                                                            ),
                                                           ),
-                                                          child: Text('Oke'),
+                                                          child: Text('Oke', style: TextStyle(color: Colors.white)),
                                                           onPressed: () async{
                                                             Navigator.pop(context);
                                                             showDialog(
@@ -617,14 +620,16 @@ class _ReservationActivityState extends State<ReservationActivity> {
                                                                         child: Row(
                                                                           mainAxisAlignment: MainAxisAlignment.spaceAround,
                                                                           children: [
-                                                                            FlatButton(
+                                                                            TextButton(
                                                                               // minWidth: CustomSize.sizeWidth(context),
-                                                                              color: CustomColor.redBtn,
-                                                                              textColor: Colors.white,
-                                                                              shape: RoundedRectangleBorder(
-                                                                                  borderRadius: BorderRadius.all(Radius.circular(10))
+                                                                              style: TextButton.styleFrom(
+                                                                                backgroundColor: CustomColor.redBtn,
+                                                                                padding: EdgeInsets.all(0),
+                                                                                shape: const RoundedRectangleBorder(
+                                                                                    borderRadius: BorderRadius.all(Radius.circular(10))
+                                                                                ),
                                                                               ),
-                                                                              child: Text('Batal'),
+                                                                              child: Text('Batal', style: TextStyle(color: Colors.white)),
                                                                               onPressed: () async{
                                                                                 setState(() {
                                                                                   // codeDialog = valueText;
@@ -632,13 +637,16 @@ class _ReservationActivityState extends State<ReservationActivity> {
                                                                                 });
                                                                               },
                                                                             ),
-                                                                            FlatButton(
-                                                                              color: CustomColor.accent,
-                                                                              textColor: Colors.white,
-                                                                              shape: RoundedRectangleBorder(
-                                                                                  borderRadius: BorderRadius.all(Radius.circular(10))
+                                                                            TextButton(
+                                                                              // minWidth: CustomSize.sizeWidth(context),
+                                                                              style: TextButton.styleFrom(
+                                                                                backgroundColor: CustomColor.accent,
+                                                                                padding: EdgeInsets.all(0),
+                                                                                shape: const RoundedRectangleBorder(
+                                                                                    borderRadius: BorderRadius.all(Radius.circular(10))
+                                                                                ),
                                                                               ),
-                                                                              child: Text('Setuju'),
+                                                                              child: Text('Setuju', style: TextStyle(color: Colors.white)),
                                                                               onPressed: () async{
                                                                                 Navigator.pop(context);
                                                                                 makeReservation();

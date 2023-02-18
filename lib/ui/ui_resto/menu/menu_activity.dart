@@ -12,6 +12,7 @@ import 'package:kam5ia/model/Price.dart';
 import 'package:kam5ia/model/Promo.dart';
 import 'package:kam5ia/ui/ui_resto/menu/add_menu.dart';
 import 'package:kam5ia/ui/ui_resto/menu/edit_menu.dart';
+import 'package:kam5ia/ui/ui_resto/menu/sub_kategori/sub_kategori.dart';
 import 'package:kam5ia/utils/utils.dart';
 import 'package:intl/intl.dart';
 import 'package:page_transition/page_transition.dart';
@@ -109,11 +110,11 @@ class _MenuActivityState extends State<MenuActivity> {
             desc: v['desc'],
             urlImg: v['img'],
             type: v['type'],
-            is_recommended: v['is_recommended'],
-            is_available: v['is_available'],
+            is_recommended: v['is_recommended'].toString(),
+            is_available: v['is_available'].toString(),
             // is_available: '0',
             price: Price(original: int.parse(v['price'].toString()), discounted: null, delivery: null),
-            delivery_price: Price(original: int.parse(v['price']), delivery: null, discounted: null), restoId: '', restoName: '', distance: null, qty: ''
+            delivery_price: Price(original: int.parse(v['price'].toString()), delivery: null, discounted: null), restoId: '', restoName: '', distance: null, qty: ''
         );
       _menu.add(p);
     }
@@ -130,13 +131,13 @@ class _MenuActivityState extends State<MenuActivity> {
   showAlertDialog(String id) {
 
     // set up the buttons
-    Widget cancelButton = FlatButton(
+    Widget cancelButton = TextButton(
       child: Text("Batal", style: TextStyle(color: CustomColor.primary)),
       onPressed:  () {
         Navigator.pop(context);
       },
     );
-    Widget continueButton = FlatButton(
+    Widget continueButton = TextButton(
       child: Text("Hapus", style: TextStyle(color: CustomColor.primary),),
       onPressed:  () {
         _delMenu(id);
@@ -383,7 +384,7 @@ class _MenuActivityState extends State<MenuActivity> {
                         );
                       }
                   ):Container(),
-                  (menu.toString() != '[]')?SizedBox(height: CustomSize.sizeHeight(context) / 48,):Container()
+                  (menu.toString() != '[]')?(menu.length > 3)?SizedBox(height: CustomSize.sizeHeight(context) / 6):SizedBox(height: CustomSize.sizeHeight(context) / 48,):Container()
                 ],
               ):Stack(
                 children: [
@@ -432,23 +433,82 @@ class _MenuActivityState extends State<MenuActivity> {
             ),
           ),
         ),
-          floatingActionButton: GestureDetector(
-            onTap: (){
-              Navigator.push(
-                  context,
-                  PageTransition(
-                      type: PageTransitionType.rightToLeft,
-                      child: AddMenu()));
-            },
-            child: Container(
-              width: CustomSize.sizeWidth(context) / 6.6,
-              height: CustomSize.sizeWidth(context) / 6.6,
-              decoration: BoxDecoration(
-                  color: CustomColor.primaryLight,
-                  shape: BoxShape.circle
+          floatingActionButton: Column(
+            mainAxisAlignment: MainAxisAlignment.end,
+            crossAxisAlignment: CrossAxisAlignment.end,
+            children: [
+              GestureDetector(
+                onTap: (){
+                  Navigator.push(
+                      context,
+                      PageTransition(
+                          type: PageTransitionType.rightToLeft,
+                          child: AddMenu()));
+                },
+                child: Container(
+                  width: CustomSize.sizeWidth(context) / 6.6,
+                  height: CustomSize.sizeWidth(context) / 6.6,
+                  decoration: BoxDecoration(
+                      color: CustomColor.primaryLight,
+                      shape: BoxShape.circle
+                  ),
+                  child: Center(child: Icon(FontAwesome.plus, color: Colors.white, size: 29,)),
+                ),
               ),
-              child: Center(child: Icon(FontAwesome.plus, color: Colors.white, size: 29,)),
-            ),
+
+              SizedBox(height: CustomSize.sizeHeight(context) / 98,),
+              GestureDetector(
+                onTap: () async{
+                  Navigator.push(
+                      context,
+                      PageTransition(
+                          type: PageTransitionType.rightToLeft,
+                          child: SubKategoriActivity()));
+                  // if(openAndClose == '0'){
+                  //   SharedPreferences pref = await SharedPreferences.getInstance();
+                  //   pref.setString("openclose", "1");
+                  // }else if(openAndClose == '1'){
+                  //   SharedPreferences pref = await SharedPreferences.getInstance();
+                  //   pref.setString("openclose", '0');
+                  // }
+                  // setState(() {
+                  //   isLoading = false;
+                  // });
+
+                  // if (status == 'active') {
+                  //   if (isOpen == 'true') {
+                  //     _closeNow();
+                  //   } else {
+                  //     Fluttertoast.showToast(msg: "Tokomu saat ini sudah tutup",);
+                  //   }
+                  // } else {
+                  //   _closeNow();
+                  // }
+                  // if (isOpen != 'false') {
+                  //   _closeNow();
+                  // } else {
+                  //   Fluttertoast.showToast(msg: "Tokomu saat ini sudah tutup",);
+                  // }
+
+                  // SharedPreferences pref = await SharedPreferences.getInstance();
+                  // pref.setString("name", _loginTextName.text.toString());
+                  // pref.setString("email", _loginEmailName.text.toString());
+                  // pref.setString("img", (image == null)?img:base64Encode(image.readAsBytesSync()).toString());
+                  // pref.setString("gender", gender);
+                  // pref.setString("tgl", tgl);
+                  // pref.setString("notelp", _loginNotelpName.text.toString());
+                },
+                child: Container(
+                  width: CustomSize.sizeWidth(context) / 1.1,
+                  height: CustomSize.sizeHeight(context) / 14,
+                  decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(30),
+                      color: CustomColor.accent
+                  ),
+                  child: Center(child: CustomText.bodyRegular16(text: "Sub Kategori", color: Colors.white, sizeNew: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.04).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.04).toString()))),
+                ),
+              )
+            ],
           )
       ),
       data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0),

@@ -140,7 +140,7 @@ class _EditScheduleState extends State<EditSchedule> {
               },
             ),
             actions: <Widget>[
-              FlatButton(
+              TextButton(
                 child: Text("Simpan", style: TextStyle(color: CustomColor.accent),),
                 onPressed: () async{
                   SharedPreferences pref = await SharedPreferences.getInstance();
@@ -192,7 +192,7 @@ class _EditScheduleState extends State<EditSchedule> {
               },
             ),
             actions: <Widget>[
-              FlatButton(
+              TextButton(
                 child: Text("Simpan", style: TextStyle(color: CustomColor.accent),),
                 onPressed: () async{
                   SharedPreferences pref = await SharedPreferences.getInstance();

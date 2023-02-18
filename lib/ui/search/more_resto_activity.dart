@@ -7,9 +7,7 @@ import 'package:fluttertoast/fluttertoast.dart';
 import 'package:kam5ia/model/Resto.dart';
 import 'package:kam5ia/ui/detail/detail_resto.dart';
 import 'package:kam5ia/ui/promo/add_promo.dart';
-import 'package:kam5ia/ui/promo/edit_promo.dart';
 import 'package:kam5ia/utils/utils.dart';
-import 'package:intl/intl.dart';
 import 'package:location/location.dart';
 import 'package:page_transition/page_transition.dart';
 import 'package:pull_to_refresh/pull_to_refresh.dart';
@@ -17,8 +15,6 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:location_platform_interface/location_platform_interface.dart';
 import 'package:http/http.dart' as http;
 
-import '../../model/Menu.dart';
-import '../../model/Price.dart';
 import '../../model/Promo.dart';
 
 class Location {
@@ -288,13 +284,13 @@ class _MoreRestoActivityState extends State<MoreRestoActivity> {
   showAlertDialog(String id) {
 
     // set up the buttons
-    Widget cancelButton = FlatButton(
+    Widget cancelButton = TextButton(
       child: Text("Batal", style: TextStyle(color: CustomColor.primary)),
       onPressed:  () {
         Navigator.pop(context);
       },
     );
-    Widget continueButton = FlatButton(
+    Widget continueButton = TextButton(
       child: Text("Hapus", style: TextStyle(color: CustomColor.primary)),
       onPressed:  () {
         _delPromo(id);

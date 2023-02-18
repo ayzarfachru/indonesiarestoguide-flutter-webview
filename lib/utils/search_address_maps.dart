@@ -27,6 +27,7 @@ class SearchAddressMaps extends StatefulWidget {
 
 class Secrets {
   // Add your Google Maps API Key here
+  // static const API_KEY = 'AIzaSyB6JZGEaiyrHrG0PvrvHTFr72RMCU9Wn7c';
   static const API_KEY = 'AIzaSyDZH54AvqWFepAGB7wh2VQPAhASjFzI-lE';
 }
 
@@ -170,7 +171,7 @@ class _SearchAddressMapsState extends State<SearchAddressMaps> {
                 width: double.infinity,
                 height: double.infinity,
                 child: GoogleMap(
-                  mapType: MapType.normal,
+                  mapType: MapType.hybrid,
                   initialCameraPosition: CameraPosition(
                     target: LatLng(latitude, longitude),
                     zoom: 18,
@@ -204,10 +205,10 @@ class _SearchAddressMapsState extends State<SearchAddressMaps> {
                             placemarks[0].country!;
                       });
                     });
-                    var first = addresses.streetAddress;
+                    // var first = addresses.streetAddress;
                     setState(() {
                       isMove = false;
-                      address = first.toString();
+                      address = address.toString();
                     });
                   },
                   onCameraMoveStarted: (){
@@ -273,6 +274,10 @@ class _SearchAddressMapsState extends State<SearchAddressMaps> {
                                 print(distan.toString());
                                 print(distan.toString().length);
                                 pref.setString("addressDelivTrans", address);
+                                pref.setString("latitudeUser", _lat.toString());
+                                pref.setString("longitudeUser", _long.toString());
+                                // pref.setString("latitudeUser", _lat.toString());
+                                // pref.setString("longitudeUser", _long.toString());
                                 pref.setString("lat", latitude.toString());
                                 pref.setString("long", longitude.toString());
                                 pref.setString("latUser", _lat.toString());
@@ -301,7 +306,7 @@ class _SearchAddressMapsState extends State<SearchAddressMaps> {
                               child: Padding(
                                 padding: EdgeInsets.symmetric(
                                     horizontal: 22.0, vertical: 4.0),
-                                child: Text("Choose Location", style: TextStyle(color: Colors.white),),
+                                child: Text("Pilih Lokasi", style: TextStyle(color: Colors.white),),
                               ),
                             ),
                           )

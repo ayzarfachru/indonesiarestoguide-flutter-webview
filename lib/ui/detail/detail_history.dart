@@ -397,7 +397,7 @@ class _DetailHistoryState extends State<DetailHistory> {
                                     data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0),
                                   ),
                                   MediaQuery(
-                                      child: CustomText.bodyLight16(text: NumberFormat.currency(locale: 'id', symbol: '', decimalDigits: 0).format(harga), sizeNew: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.04).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.04).toString())),
+                                      child: CustomText.bodyLight16(text: (harga.toString() == '0')?'Free':NumberFormat.currency(locale: 'id', symbol: '', decimalDigits: 0).format(harga), sizeNew: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.04).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.04).toString())),
                                     data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0),
                                   ),
                                 ],
@@ -410,7 +410,7 @@ class _DetailHistoryState extends State<DetailHistory> {
                                     data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0),
                                   ),
                                   MediaQuery(
-                                      child: CustomText.bodyLight16(text: NumberFormat.currency(locale: 'id', symbol: '', decimalDigits: 0).format(ongkir), sizeNew: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.04).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.04).toString())),
+                                      child: CustomText.bodyLight16(text: (ongkir == 0)?'Gratis Ongkir':NumberFormat.currency(locale: 'id', symbol: '', decimalDigits: 0).format(ongkir), minSize: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.04)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.04)).toString())),
                                     data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0),
                                   ),
                                 ],
@@ -423,7 +423,7 @@ class _DetailHistoryState extends State<DetailHistory> {
                                     data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0),
                                   ),
                                   MediaQuery(
-                                    child: CustomText.bodyLight16(text: NumberFormat.currency(locale: 'id', symbol: '', decimalDigits: 0).format(1000), sizeNew: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.04).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.04).toString())),
+                                    child: CustomText.bodyLight16(text: (total.toString() == '0')?'Free':NumberFormat.currency(locale: 'id', symbol: '', decimalDigits: 0).format(1000), sizeNew: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.04).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.04).toString())),
                                     data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0),
                                   ),
                                 ],
@@ -438,7 +438,7 @@ class _DetailHistoryState extends State<DetailHistory> {
                                     data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0),
                                   ),
                                   MediaQuery(
-                                      child: CustomText.textTitle3(text: NumberFormat.currency(locale: 'id', symbol: '', decimalDigits: 0).format((type != 'Pesan antar')?(type != 'Ambil Langsung')?total:(total+1000):(total+1000)), sizeNew: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.04).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.04).toString())),
+                                      child: CustomText.textTitle3(text: (total.toString() == '0')?'Ngupon Yuk':NumberFormat.currency(locale: 'id', symbol: '', decimalDigits: 0).format((type != 'Pesan antar')?(type != 'Ambil Langsung')?total:(total+1000):(total+1000)), sizeNew: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?(MediaQuery.of(context).size.width*0.04).toString().split('.')[0]:(MediaQuery.of(context).size.width*0.04).toString())),
                                     data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0),
                                   ),
                                 ],

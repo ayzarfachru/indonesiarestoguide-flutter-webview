@@ -9,14 +9,11 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:full_screen_image_null_safe/full_screen_image_null_safe.dart';
 // import 'package:full_screen_image/full_screen_image.dart';
 import 'package:kam5ia/model/CategoryMenu.dart';
-import 'package:kam5ia/model/Cuisine.dart';
 import 'package:kam5ia/model/Menu.dart';
 import 'package:kam5ia/model/MenuJson.dart';
-import 'package:kam5ia/model/PrefCart.dart';
 import 'package:kam5ia/model/Price.dart';
 import 'package:kam5ia/model/Promo.dart';
 import 'package:kam5ia/ui/cart/cart_activity.dart';
-import 'package:kam5ia/ui/home/home_activity.dart';
 import 'package:kam5ia/ui/reservation/reservation_activity.dart';
 import 'package:kam5ia/ui/ui_resto/add_resto/add_slider.dart';
 import 'package:kam5ia/utils/utils.dart';
@@ -158,7 +155,7 @@ class _DetailRestoAdminState extends State<DetailRestoAdmin> {
               name: a['name'],
               desc: a['desc'],
               is_available: '',
-              price: Price.delivery(a['price'], int.parse(a['delivery_price'])),
+              price: Price.delivery(a['price'], int.parse(a['delivery_price'].toString())),
               urlImg: a['img'], distance: null, is_recommended: '', restoName: '', type: '', qty: '', restoId: '', delivery_price: null
           );
           _cateMenu.add(m);
@@ -389,13 +386,13 @@ class _DetailRestoAdminState extends State<DetailRestoAdmin> {
   showAlertDialog(String id) {
 
     // set up the buttons
-    Widget cancelButton = FlatButton(
+    Widget cancelButton = TextButton(
       child: Text("Batal", style: TextStyle(color: CustomColor.primary),),
       onPressed:  () {
         Navigator.pop(context);
       },
     );
-    Widget continueButton = FlatButton(
+    Widget continueButton = TextButton(
       child: Text("Hapus", style: TextStyle(color: CustomColor.primary)),
       onPressed:  () {
         Navigator.pop(context);

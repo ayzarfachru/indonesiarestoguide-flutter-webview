@@ -65,6 +65,7 @@ class _DetailTransactionState extends State<DetailTransaction> {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
   List<Menu> menu = [];
+  String menuKurir = '';
   List<String> menu2 = [];
   List<MenuJson> menu3 = [];
   List<String> menu4 = [];
@@ -80,10 +81,20 @@ class _DetailTransactionState extends State<DetailTransaction> {
     List<String> _menu5 = [];
 
     setState(() {
+      if (statusTrans == '') {
+        statusTrans = 'pending';
+        print('statusTrans');
+        print(statusTrans);
+      } else if (statusTrans == 'null'){
+        print('statusTrans');
+        print(statusTrans);
+        statusTrans = 'pending';
+      }
       // isLoading = true;
     });
     SharedPreferences pref = await SharedPreferences.getInstance();
     var token = pref.getString("token") ?? "";
+    pref.setString('inDetail', '1');
 
     var apiResult = await http.get(Uri.parse(Links.mainUrl + '/trans/$id'),
         headers: {
@@ -105,6 +116,11 @@ class _DetailTransactionState extends State<DetailTransaction> {
           is_available: '',
           desc: v['desc'], is_recommended: '', restoName: '', type: '', distance: null, restoId: '', delivery_price: null
       );
+      if (menuKurir == '') {
+        menuKurir = v['name']+': '+v['qty'].toString();
+      } else {
+        menuKurir = menuKurir+', '+v['name']+': '+v['qty'].toString();
+      }
       _menu.add(m);
     }
     for(var v in data['menu']){
@@ -147,20 +163,48 @@ class _DetailTransactionState extends State<DetailTransaction> {
       menu4 = _menu4;
       menu5 = _menu5;
       type = data['trans']['type'];
-      if (type == 'delivery' && statusTrans == 'process' || statusTrans == 'ready') {
-        _getDriver().whenComplete((){
-          _getDetail(idResto);
-        });
-      } else if (type == 'delivery' && statusTrans == 'pending') {
-        tungguProses = 'true';
-      }
+      // if (type != 'delivery') {
+      //   if (data['trans']['total'].toString() == '0') {
+      //     _platformfee = 0;
+      //   }
+      // }
+
+      // else if (type == 'delivery' && statusTrans == 'pending') {
+      //   tungguProses = 'true';
+      // }
+      latUser = data['trans']['lat']??'';
+      longUser = data['trans']['long']??'';
+      print('LATLONG');
+      print(latUser);
+      print(longUser);
       address = data['trans']['address']??'';
       ongkir = data['trans']['ongkir'];
       total = data['trans']['total'];
-      totalAll = data['trans']['total']+data['trans']['ongkir'];
+      if (type != 'delivery') {
+        if (data['trans']['total'].toString() == '0') {
+          _platformfee = 0;
+          totalAll = 0;
+          isLoadChekPayFirst = false;
+          _getDetail(idResto);
+          print('&&');
+          print(statusTrans);
+          if (statusTrans == 'pending' || statusTrans == '') {
+            print('&& succ');
+            _getPending('process', id.toString());
+            statusTrans = 'process';
+            pref.setString('statusTrans', 'process');
+            setState((){});
+          }
+        } else {
+          totalAll = data['trans']['total']+data['trans']['ongkir'];
+          _checkPayFirst();
+        }
+      } else {
+        totalAll = data['trans']['total']+data['trans']['ongkir'];
+        _checkPayFirst();
+      }
       harga = data['trans']['total'] - data['trans']['ongkir'];
       chatroom = data['chatroom'].toString();
-      _checkPayFirst();
       phone = data['phone_number'].toString();
       print('NO TELP');
       print(phone);
@@ -231,8 +275,8 @@ class _DetailTransactionState extends State<DetailTransaction> {
     // }
   }
 
-  String NameDriver = 'Tunggu';
-  String PhoneDriver = 'Tunggu';
+  String NameDriver = 'Belum mencari';
+  String PhoneDriver = '-';
   String PhotoDriver = '';
   String StatusDriver = 'Tunggu sebentar';
   Future<void> _getDriver()async{
@@ -251,32 +295,45 @@ class _DetailTransactionState extends State<DetailTransaction> {
     print(data);
 
     print('driver '+apiResult.body.toString());
+    print('driver ID '+id.toString());
     print('driver '+idResto.toString());
     if (apiResult.body.toString() != '"not found"') {
-      if (data['status'].toString() == 'parcel_picked_up') {
-        _getPending('ready', id.toString());
+      if (data['status'].toString() == 'parcel_picked_up' || data['status'].toString() == 'completed' || data['status'].toString() == 'done') {
+        NameDriver = (apiResult.body.toString() != '"not found"')?data['courier']['name'].toString():'Tidak Ditemukan';
+        PhoneDriver = (apiResult.body.toString() != '"not found"')?data['courier']['phone'].toString():'0';
+        PhotoDriver = (apiResult.body.toString() != '"not found"')?data['courier']['photo'].toString():'';
+        // StatusDriver = (apiResult.body.toString() != '"not found"')?(data['status'].toString() != 'active')?'Sudah sampai':data['status'].toString():'Tidak Ditemukan';
+        StatusDriver = (apiResult.body.toString() != '"not found"')?data['status'].toString():'Tidak Ditemukan';
+        if (statusTrans == 'process') {
+          pref.setString("statusTrans", 'ready');
+          _getPending('ready', id.toString());
+        }
+        setState((){});
       } else {
         if (data['courier'].toString().contains('name') == false) {
           StatusDriver = (apiResult.body.toString() != '"not found"')?data['status'].toString():'Tidak Ditemukan';
           PhoneDriver = 'Tunggu';
         } else {
+          print('pending123');
           NameDriver = (apiResult.body.toString() != '"not found"')?data['courier']['name'].toString():'Tidak Ditemukan';
           PhoneDriver = (apiResult.body.toString() != '"not found"')?data['courier']['phone'].toString():'Tidak Ditemukan';
           PhotoDriver = (apiResult.body.toString() != '"not found"')?data['courier']['photo'].toString():'';
           // StatusDriver = (apiResult.body.toString() != '"not found"')?(data['status'].toString() != 'active')?'Sudah sampai':data['status'].toString():'Tidak Ditemukan';
-          StatusDriver = (apiResult.body.toString() != '"not found"')?data['status'].toString():'Tidak Ditemukan';
+          StatusDriver = (apiResult.body.toString() != '"not found"')?(data['status'].toString() == 'sent')?'parcel_picked_up':(data['status'].toString() == 'done')?'completed':data['status'].toString():'Tidak Ditemukan';
         }
       }
     } else {
-      _getDetail(idResto).whenComplete((){
-        _getDetailTrans(id.toString()).whenComplete((){
-          cariKurir();
+      if (statusTrans != 'pending') {
+        _getDetail(idResto).whenComplete((){
+          _getDetailTrans(id.toString()).whenComplete((){
+            cariKurir();
+          });
         });
-      });
-      NameDriver = 'Tidak Ditemukan';
-      PhoneDriver = 'Tidak Ditemukan';
-      PhotoDriver = '';
-      StatusDriver = 'Tidak Ditemukan';
+        NameDriver = 'Tidak Ditemukan';
+        PhoneDriver = 'Tidak Ditemukan';
+        PhotoDriver = '';
+        StatusDriver = 'Tidak Ditemukan';
+      }
     }
     print('NameDriver');
     print(NameDriver);
@@ -352,6 +409,7 @@ class _DetailTransactionState extends State<DetailTransaction> {
 
   String phoneRestoTrans = "";
   String delivAddress = "";
+  int _platformfee = 1000;
   String userNamePembeli = "";
   String notelp = "";
   String latUser = "";
@@ -385,7 +443,7 @@ class _DetailTransactionState extends State<DetailTransaction> {
     // }
 
 
-    if (data['trx']['type'].toString() == 'delivery') {
+    if (data['trx']['type'].toString() == 'delivery' && latUser == '' && longUser == '') {
       var addresses = await
       locationFromAddress(data['trx']['address'].toString(),
           localeIdentifier: 'id_ID')
@@ -463,7 +521,11 @@ class _DetailTransactionState extends State<DetailTransaction> {
 
     var apiResult = await http.post(Uri.parse('https://qurir.devastic.com/api/borzo/checkout'),
         body: {
-          'resto_name': nameRestoTrans,
+          'resto_name': (note != '' && note != '[]' && note.contains('keterangan') == true)?
+          (note.contains(', {keterangan') == true)?
+          'IRG'+' - '+'Pengambilan di '+nameRestoTrans.toString()+', '+'pesanan: '+'('+menuKurir+')'+'. Jika ada masalah terkait merchant, hubungi kami sebagai penyelenggara aplikasi di 082166070555'+'~~~keterangan alamat pengiriman: '+note.split(', {keterangan: ')[1].replaceAll('[', '').replaceAll(']', '').replaceAll('{', '').replaceAll('}, ', '\n').replaceAll('}', ''):
+          'IRG'+' - '+'Pengambilan di '+nameRestoTrans.toString()+', '+'pesanan: '+'('+menuKurir+')'+'. Jika ada masalah terkait merchant, hubungi kami sebagai penyelenggara aplikasi di 082166070555'+'~~~keterangan alamat pengiriman: '+note.split('{keterangan: ')[1].replaceAll('[', '').replaceAll(']', '').replaceAll('{', '').replaceAll('}, ', '\n').replaceAll('}', '')
+            :'IRG'+' - '+'Pengambilan di '+nameRestoTrans.toString()+', '+'pesanan: '+'('+menuKurir+')'+'. Jika ada masalah terkait merchant, hubungi kami sebagai penyelenggara aplikasi di 082166070555',
           'address_pick_up': restoAddress,
           'name_pick_up': pjTokoTrans,
           'phone_pick_up': phoneRestoTrans,
@@ -550,7 +612,7 @@ class _DetailTransactionState extends State<DetailTransaction> {
     }
   }
 
-  late String _base64="";
+  late String _base64 = "";
 
   bool loadQr = false;
   Future<void> _getQrBCA()async{
@@ -739,6 +801,7 @@ class _DetailTransactionState extends State<DetailTransaction> {
     SharedPreferences pref = await SharedPreferences.getInstance();
     String token = pref.getString("token") ?? "";
     var apiResult = await http.get(Uri.parse('https://erp.devastic.com:443/api/bca/inquiry?app_id=IRG&trx_id=$id'),
+    // var apiResult = await http.get(Uri.parse('https://erp.devastic.com:443/api/bca/inquiry?app_id=NGY&trx_id=$id'),
         // body: {'app_id': 'IRG', 'trx_id': id.toString(), 'amount': (totalAll+1000).toString()},
         // headers: {
         //   "Accept": "Application/json",
@@ -759,12 +822,17 @@ class _DetailTransactionState extends State<DetailTransaction> {
         _getDetail(idResto).whenComplete((){
           _getDetailTrans(id.toString()).whenComplete((){
             cariKurir();
+            pref.setString("statusTrans", 'process');
+            _getPending('process', id.toString());
           });
         });
+      } else {
+        if (statusTrans == 'pending') {
+          pref.setString("statusTrans", 'process');
+          _getPending('process', id.toString());
+        }
       }
       Navigator.pop(context);
-      pref.setString("statusTrans", 'process');
-      _getPending('process', id.toString());
       Fluttertoast.showToast(
         msg: "Pembayaran berhasil",);
     }
@@ -992,9 +1060,29 @@ class _DetailTransactionState extends State<DetailTransaction> {
         msg: "Anda belum membayar!",);
     } else {
       statusPay = 'false';
-      if (statusTrans == 'pending') {
-        pref.setString("statusTrans", 'process');
-        _getPending('process', id.toString());
+      if (type == 'delivery') {
+        if (statusTrans == 'process') {
+          _getDriver().whenComplete((){
+            _getDetail(idResto);
+          });
+          print('process');
+        } else if (statusTrans == 'ready') {
+          _getDriver().whenComplete((){
+            _getDetail(idResto);
+          });
+        } else if (statusTrans == 'pending') {
+          tungguProses = 'true';
+          print('pending');
+        } else if (statusTrans == 'cancel') {
+          print('cancel');
+        } else {
+          print('p');
+        }
+      } else {
+        if (statusTrans == 'pending') {
+          pref.setString("statusTrans", 'process');
+          _getPending('process', id.toString());
+        }
       }
       // _getDetail(idResto).whenComplete((){
       //   _getDetailTrans(id.toString()).whenComplete((){
@@ -1205,14 +1293,14 @@ class _DetailTransactionState extends State<DetailTransaction> {
   String userName = '';
   String timeLog = '';
   String chatUserCount = '';
-  String statusTrans = '';
+  String statusTrans = 'pending';
   Future getUser()async{
     SharedPreferences pref = await SharedPreferences.getInstance();
     setState(() {
       userName = (pref.getString('name')??'');
       timeLog = (pref.getString('timeLog')??'');
       chatUserCount = (pref.getString('chatUserCount')??'');
-      statusTrans = (pref.getString('statusTrans')??'');
+      statusTrans = (pref.getString('statusTrans')??'pending');
     });
   }
 
@@ -1380,6 +1468,15 @@ class _DetailTransactionState extends State<DetailTransaction> {
 
     // setStateModal(() {});
     setState(() {});
+  }
+
+  void chat() async {
+    var uri = Uri.parse((PhoneDriver.toString().substring(0, 1).toString() == '0')?"whatsapp://send?phone=+62"+PhoneDriver.toString().substring(1):"whatsapp://send?phone="+PhoneDriver.toString());
+    if (await canLaunchUrl(uri)) {
+      await launchUrl(uri);
+    } else {
+      throw 'Could not launch ${uri.toString()}';
+    }
   }
 
   toCart2() async {
@@ -2003,21 +2100,117 @@ class _DetailTransactionState extends State<DetailTransaction> {
                                   //   ),
                                   // ),
                                   SizedBox(width: CustomSize.sizeWidth(context) / 32,),
-                                  Container(
-                                    width: CustomSize.sizeWidth(context) / 1.6,
-                                    child: Column(
-                                      crossAxisAlignment: CrossAxisAlignment.start,
-                                      mainAxisAlignment: MainAxisAlignment.center,
-                                      children: [
-                                        GestureDetector(
-                                          onTap: (){
-                                            if (PhoneDriver == '0') {
+                                  GestureDetector(
+                                    onTap: (){
+                                      if (PhoneDriver == '0' || PhoneDriver == '-') {
 
-                                            } else {
-                                              launch("tel:$PhoneDriver");
+                                      } else {
+                                        showModalBottomSheet(
+                                            isScrollControlled: true,
+                                            shape: RoundedRectangleBorder(
+                                                borderRadius: BorderRadius.only(topLeft: Radius.circular(20), topRight: Radius.circular(20))
+                                            ),
+                                            context: context,
+                                            builder: (_){
+                                              return Column(
+                                                crossAxisAlignment: CrossAxisAlignment.start,
+                                                mainAxisSize: MainAxisSize.min,
+                                                children: [
+                                                  SizedBox(height: CustomSize.sizeHeight(context) / 86,),
+                                                  Padding(
+                                                    padding: EdgeInsets.symmetric(horizontal: CustomSize.sizeWidth(context) / 2.4),
+                                                    child: Divider(thickness: 4,),
+                                                  ),
+                                                  SizedBox(height: CustomSize.sizeHeight(context) / 106,),
+                                                  Padding(
+                                                    padding: EdgeInsets.symmetric(horizontal: CustomSize.sizeHeight(context) / 20),
+                                                    child: Row(
+                                                      crossAxisAlignment: CrossAxisAlignment.center,
+                                                      mainAxisAlignment: MainAxisAlignment.spaceAround,
+                                                      children: [
+                                                        GestureDetector(
+                                                          onTap: (){
+                                                            if (status != 'cancel') {
+                                                              Navigator.pop(context);
+                                                              chat();
+                                                            } else {
+                                                              Fluttertoast.showToast(msg: "Fitur chat tidak tersedia karena pesanan anda sudah ditolak.");
+                                                            }
+                                                          },
+                                                          child: Padding(
+                                                            padding: const EdgeInsets.symmetric(vertical: 8.0),
+                                                            child: Row(
+                                                              children: [
+                                                                Icon(FontAwesome.comments_o, color: (status != 'cancel')?CustomColor.accent:Colors.grey, size: 31,),
+                                                                SizedBox(width: CustomSize.sizeWidth(context) / 72,),
+                                                                Stack(
+                                                                  children: [
+                                                                    Padding(
+                                                                      padding: const EdgeInsets.symmetric(horizontal: 19.0, vertical: 8.0),
+                                                                      child: CustomText.textHeading5(
+                                                                          text: "Chat",
+                                                                          minSize: double.parse(((MediaQuery.of(context).size.width*0.043).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.043)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.043)).toString()),
+                                                                          maxLines: 1,
+                                                                          color: (status != 'cancel')?CustomColor.accent:Colors.grey
+                                                                      ),
+                                                                    ),
+                                                                    Positioned(  // draw a red marble
+                                                                      top: 0,
+                                                                      right: 0,
+                                                                      child: Stack(
+                                                                        alignment: Alignment.center,
+                                                                        children: [
+                                                                          Icon(Icons.circle, color: (status != 'cancel')?(chatUserCount != '0')?CustomColor.redBtn:Colors.transparent:Colors.transparent, size: 22,),
+                                                                          CustomText.bodyMedium14(text: chatUserCount, color: (status != 'cancel')?(chatUserCount != '0')?Colors.white:Colors.transparent:Colors.transparent, minSize: double.parse(((MediaQuery.of(context).size.width*0.035).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.035)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.035)).toString()))
+                                                                        ],
+                                                                      ),
+                                                                    )
+                                                                  ],
+                                                                ),
+                                                              ],
+                                                            ),
+                                                          ),
+                                                        ),
+                                                        GestureDetector(
+                                                          onTap: (){
+                                                            // Navigator.pop(context);
+                                                            print(phoneRestoTrans);
+                                                            Navigator.pop(context);
+                                                            (PhoneDriver.toString().contains('+') != true)?launch("tel:$PhoneDriver"):launch("tel:"+PhoneDriver.toString().replaceAll('+62', '0'));
+                                                          },
+                                                          child: Padding(
+                                                            padding: const EdgeInsets.symmetric(vertical: 8.0),
+                                                            child: Row(
+                                                              children: [
+                                                                Icon(FontAwesome.phone, color: CustomColor.redBtn, size: 27.5,),
+                                                                SizedBox(width: CustomSize.sizeWidth(context) / 88,),
+                                                                CustomText.textHeading5(
+                                                                    text: "Telpon",
+                                                                    minSize: double.parse(((MediaQuery.of(context).size.width*0.043).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.043)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.043)).toString()),
+                                                                    maxLines: 1,
+                                                                    color: CustomColor.redBtn
+                                                                ),
+                                                              ],
+                                                            ),
+                                                          ),
+                                                        ),
+                                                      ],
+                                                    ),
+                                                  ),
+                                                  SizedBox(height: CustomSize.sizeHeight(context) / 42,),
+                                                ],
+                                              );
                                             }
-                                          },
-                                          child: Container(
+                                        );
+                                      }
+                                    },
+                                    child: Container(
+                                      width: CustomSize.sizeWidth(context) / 1.6,
+                                      child: Column(
+                                        crossAxisAlignment: CrossAxisAlignment.start,
+                                        mainAxisAlignment: MainAxisAlignment.center,
+                                        children: [
+                                          Container(
                                             width: CustomSize.sizeWidth(context) / 1.2,
                                             child: CustomText.textHeading4(
                                                 text: (tungguProses != 'true')?(statusTrans != 'cancel')?(StatusDriver != 'pending')?NameDriver:'Mencari . . .':'Tidak ditemukan':'Tunggu . . .',
@@ -2025,55 +2218,48 @@ class _DetailTransactionState extends State<DetailTransaction> {
                                                 minSize: double.parse(((MediaQuery.of(context).size.width*0.045).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.045)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.045)).toString())
                                             ),
                                           ),
-                                        ),
-                                        GestureDetector(
-                                          onTap: (){
-                                            if (PhoneDriver == '0') {
-
-                                            } else {
-                                              (PhoneDriver.toString().contains('+') != true)?launch("tel:$PhoneDriver"):launch("tel:"+PhoneDriver.toString().replaceAll('+62', '0'));
-                                            }
-                                          },
-                                          child: Row(
+                                          Row(
                                             crossAxisAlignment: CrossAxisAlignment.start,
                                             children: [
                                               CustomText.bodyLight16(
                                                   text: 'Status: ',
                                                   maxLines: 1,
-                                                  minSize: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.04)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.04)).toString())
+                                                  minSize: double.parse(((MediaQuery.of(context).size.width*0.035).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.035)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.035)).toString())
                                               ),
                                               Container(
                                                 width: CustomSize.sizeWidth(context) / 2.2,
                                                 child: CustomText.bodyLight16(
-                                                    // text: (tungguProses != 'true')?(statusTrans != 'cancel')?(StatusDriver != 'pending')?(StatusDriver != 'Tidak Ditemukan')?(StatusDriver != 'active')?StatusDriver:'Sedang perjalanan':'Transaksi tidak ditemukan':'Sedang mencari driver':'Pemesanan dibatalkan pihak toko':'Menunggu persetujuan dari pihak toko',
-                                                    text: (tungguProses != 'true')?(statusTrans != 'cancel')?(StatusDriver != 'pending')?(StatusDriver != 'Tidak Ditemukan')?(StatusDriver == 'parcel_picked_up')?'Kurir menuju tempat anda':'Menunggu':'Transaksi tidak ditemukan':'Sedang mencari driver':'Pemesanan dibatalkan pihak toko':'Menunggu persetujuan dari pihak toko',
+                                                  // text: (tungguProses != 'true')?(statusTrans != 'cancel')?(StatusDriver != 'pending')?(StatusDriver != 'Tidak Ditemukan')?(StatusDriver != 'active')?StatusDriver:'Sedang perjalanan':'Transaksi tidak ditemukan':'Sedang mencari driver':'Pemesanan dibatalkan pihak toko':'Menunggu proses dari pihak toko',
+                                                    text: (tungguProses != 'true')?(statusTrans != 'cancel')?(StatusDriver != 'pending')?(StatusDriver != 'Tidak Ditemukan')?(StatusDriver != 'completed')?(StatusDriver == 'parcel_picked_up')?'Kurir menuju tempat anda':(StatusDriver == 'Tunggu sebentar')?'Silahkan bayar terlebih dahulu':'Menunggu':'Pengiriman selesai':'Transaksi tidak ditemukan':'Sedang mencari driver':'Pemesanan dibatalkan pihak toko':'Menunggu proses dari pihak toko',
                                                     maxLines: 5,
-                                                    minSize: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.04)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.04)).toString())
+                                                    minSize: double.parse(((MediaQuery.of(context).size.width*0.035).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.035)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.035)).toString())
                                                 ),
                                               ),
                                             ],
                                           ),
-                                        ),
-                                        GestureDetector(
-                                          onTap: (){
-                                            if (PhoneDriver == '0') {
-
-                                            } else {
-                                              launch("tel:$PhoneDriver");
-                                            }
-                                          },
-                                          child: Container(
-                                            width: CustomSize.sizeWidth(context) / 1.2,
-                                            child: CustomText.bodyRegular15(
-                                                text: (tungguProses != 'true')?(statusTrans != 'cancel')?(StatusDriver != 'pending')?'Telepon: $PhoneDriver':'Tunggu':'Tidak ditemukan':'Tunggu',
-                                                maxLines: 1,
-                                                minSize: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.04)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.04)).toString())
-                                            ),
+                                          Row(
+                                            crossAxisAlignment: CrossAxisAlignment.start,
+                                            children: [
+                                              CustomText.bodyLight16(
+                                                  text: 'Telpon: ',
+                                                  maxLines: 1,
+                                                  minSize: double.parse(((MediaQuery.of(context).size.width*0.035).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.035)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.035)).toString())
+                                              ),
+                                              Container(
+                                                width: CustomSize.sizeWidth(context) / 2.2,
+                                                child: CustomText.bodyLight16(
+                                                    text: (tungguProses != 'true')?(statusTrans != 'cancel')?(StatusDriver != 'pending')?(StatusDriver != 'Tidak Ditemukan')?(StatusDriver != 'active')?PhoneDriver:'+'+PhoneDriver:'-':'-':'-':'-',
+                                                    maxLines: 1,
+                                                    minSize: double.parse(((MediaQuery.of(context).size.width*0.03).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.035)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.035)).toString())
+                                                ),
+                                              ),
+                                            ],
                                           ),
-                                        ),
-                                        // CustomText.bodyLight16(text: 'Status', maxLines: 1, minSize: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.04)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.04)).toString())),
-                                        // (user[index].notelp != null)?CustomText.bodyLight16(text: user[index].notelp, maxLines: 1, minSize: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.04)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.04)).toString())):CustomText.bodyLight16(text: 'Belum diisi.', maxLines: 1, minSize: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.04)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.04)).toString()), color: CustomColor.redBtn),
-                                      ],
+
+                                          // CustomText.bodyLight16(text: 'Status', maxLines: 1, minSize: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.04)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.04)).toString())),
+                                          // (user[index].notelp != null)?CustomText.bodyLight16(text: user[index].notelp, maxLines: 1, minSize: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.04)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.04)).toString())):CustomText.bodyLight16(text: 'Belum diisi.', maxLines: 1, minSize: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.04)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.04)).toString()), color: CustomColor.redBtn),
+                                        ],
+                                      ),
                                     ),
                                   ),
                                 ],
@@ -2267,21 +2453,21 @@ class _DetailTransactionState extends State<DetailTransaction> {
                                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                       children: [
                                         CustomText.bodyLight16(text: "Harga", minSize: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.04)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.04)).toString())),
-                                        CustomText.bodyLight16(text: NumberFormat.currency(locale: 'id', symbol: '', decimalDigits: 0).format(total), minSize: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.04)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.04)).toString())),
+                                        CustomText.bodyLight16(text: (total == 0)?'Free':NumberFormat.currency(locale: 'id', symbol: '', decimalDigits: 0).format(total), minSize: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.04)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.04)).toString())),
                                       ],
                                     ),
                                     SizedBox(height: (type == 'delivery')?CustomSize.sizeHeight(context) / 100:0,),
                                     (type == 'delivery')?Row(mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                       children: [
                                         CustomText.bodyLight16(text: "Ongkir", minSize: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.04)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.04)).toString())),
-                                        CustomText.bodyLight16(text: NumberFormat.currency(locale: 'id', symbol: '', decimalDigits: 0).format(ongkir), minSize: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.04)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.04)).toString())),
+                                        CustomText.bodyLight16(text: (ongkir == 0)?'Gratis Ongkir':NumberFormat.currency(locale: 'id', symbol: '', decimalDigits: 0).format(ongkir), minSize: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.04)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.04)).toString())),
                                       ],
                                     ):SizedBox(),
                                     SizedBox(height: CustomSize.sizeHeight(context) / 100,),
                                     Row(mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                       children: [
                                         CustomText.bodyLight16(text: "Platform Fee", minSize: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.04)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.04)).toString())),
-                                        CustomText.bodyLight16(text: NumberFormat.currency(locale: 'id', symbol: '', decimalDigits: 0).format(1000), minSize: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.04)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.04)).toString())),
+                                        CustomText.bodyLight16(text: (_platformfee.toString() == '0')?'Free':NumberFormat.currency(locale: 'id', symbol: '', decimalDigits: 0).format(_platformfee), minSize: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.04)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.04)).toString())),
                                       ],
                                     ),
                                     SizedBox(height: CustomSize.sizeHeight(context) / 64,),
@@ -2290,7 +2476,7 @@ class _DetailTransactionState extends State<DetailTransaction> {
                                     Row(mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                       children: [
                                         CustomText.textTitle3(text: "Total Pembayaran", minSize: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.04)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.04)).toString())),
-                                        CustomText.textTitle3(text: NumberFormat.currency(locale: 'id', symbol: '', decimalDigits: 0).format(totalAll+1000), minSize: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.04)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.04)).toString())),
+                                        CustomText.textTitle3(text: (totalAll.toString() == '0')?'Free':NumberFormat.currency(locale: 'id', symbol: '', decimalDigits: 0).format(totalAll+1000), minSize: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.04)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.04)).toString())),
                                       ],
                                     ),
                                     // SizedBox(height: CustomSize.sizeHeight(context) / 34,),
@@ -2326,7 +2512,7 @@ class _DetailTransactionState extends State<DetailTransaction> {
                           //   ),
                           // ):SizedBox(),
                           SizedBox(height: CustomSize.sizeHeight(context) / 48,),
-                          (status != 'cancel')?(statusPay == 'true')?GestureDetector(
+                          (statusTrans != 'cancel')?(statusPay == 'true')?(total.toString() == '0' && type.toString() != 'delivery')?Container():GestureDetector(
                             onTap: (){
                               if (loadQr == false) {
                                 _getQrBCA();
@@ -2444,17 +2630,17 @@ class _DetailTransactionState extends State<DetailTransaction> {
                                         padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 2.5),
                                         child: CustomText.textTitle2(text: "Bayar Sekarang", color: Colors.white, minSize: double.parse(((MediaQuery.of(context).size.width*0.045).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.045)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.045)).toString())),
                                       ),
-                                      Positioned(  // draw a red marble
-                                        top: 0,
-                                        right: 0,
-                                        child: Stack(
-                                          alignment: Alignment.center,
-                                          children: [
-                                            Icon(Icons.circle, color: (chatUserCount != '0')?CustomColor.redBtn:Colors.transparent, size: 22,),
-                                            CustomText.bodyMedium14(text: chatUserCount, color: (chatUserCount != '0')?Colors.white:Colors.transparent, minSize: double.parse(((MediaQuery.of(context).size.width*0.035).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.035)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.035)).toString()))
-                                          ],
-                                        ),
-                                      )
+                                      // Positioned(  // draw a red marble
+                                      //   top: 0,
+                                      //   right: 0,
+                                      //   child: Stack(
+                                      //     alignment: Alignment.center,
+                                      //     children: [
+                                      //       Icon(Icons.circle, color: (chatUserCount != '0')?CustomColor.redBtn:Colors.transparent, size: 22,),
+                                      //       CustomText.bodyMedium14(text: chatUserCount, color: (chatUserCount != '0')?Colors.white:Colors.transparent, minSize: double.parse(((MediaQuery.of(context).size.width*0.035).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.035)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.035)).toString()))
+                                      //     ],
+                                      //   ),
+                                      // )
                                     ],
                                   ),
                                 ),
@@ -2491,7 +2677,7 @@ class _DetailTransactionState extends State<DetailTransaction> {
                                                 onTap: (){
                                                   if (status != 'cancel') {
                                                     Navigator.pop(context);
-                                                    Navigator.pushReplacement(
+                                                    Navigator.push(
                                                         context,
                                                         PageTransition(
                                                             type: PageTransitionType.rightToLeft,
@@ -2537,8 +2723,8 @@ class _DetailTransactionState extends State<DetailTransaction> {
                                               GestureDetector(
                                                 onTap: (){
                                                   // Navigator.pop(context);
-                                                  print(phone);
-                                                  launch("tel:$phone");
+                                                  print(phoneRestoTrans);
+                                                  launch("tel:$phoneRestoTrans");
                                                 },
                                                 child: Padding(
                                                   padding: const EdgeInsets.symmetric(vertical: 8.0),
@@ -2751,13 +2937,13 @@ class _DetailTransactionState extends State<DetailTransaction> {
                                       title: new Text("Hapus cart"),
                                       content: new Text("Apakah anda ingin mengganti item di cart dengan item yang baru ?"),
                                       actions: <Widget>[
-                                        new FlatButton(
+                                        new TextButton(
                                           child: new Text("Batal", style: TextStyle(color: CustomColor.primaryLight)),
                                           onPressed: () {
                                             Navigator.of(context).pop();
                                           },
                                         ),
-                                        new FlatButton(
+                                        new TextButton(
                                           child: new Text("Oke", style: TextStyle(color: CustomColor.primaryLight)),
                                           onPressed: () async{
                                             delCart().whenComplete((){

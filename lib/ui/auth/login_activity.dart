@@ -118,7 +118,7 @@ class _LoginActivityState extends State<LoginActivity> {
           pref.setInt("id", int.parse(data['user']['id'].toString()));
           pref.setString("name", data['user']['name'].toString());
           pref.setString("email", data['user']['email'].toString());
-          pref.setString("img", data['user']['img'].toString());
+          pref.setString("img", (data['user']['img'].toString() != 'null')?data['user']['img'].toString():'');
           pref.setString("gender", data['user']['gender'].toString());
           pref.setString("tgl", data['user']['ttl'].toString());
           pref.setString("notelp", data['user']['phone_number'].toString());
@@ -194,13 +194,16 @@ class _LoginActivityState extends State<LoginActivity> {
                           //     });
                           //   },
                           // ),
-                          FlatButton(
-                            color: CustomColor.primaryLight,
-                            textColor: Colors.white,
-                            shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.all(Radius.circular(10))
+                          TextButton(
+                            // minWidth: CustomSize.sizeWidth(context),
+                            style: TextButton.styleFrom(
+                              backgroundColor: CustomColor.primaryLight,
+                              padding: EdgeInsets.all(0),
+                              shape: const RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.all(Radius.circular(10))
+                              ),
                             ),
-                            child: Text('Setuju'),
+                            child: Text('Setuju', style: TextStyle(color: Colors.white)),
                             onPressed: () async{
                               Navigator.pop(context);
                               Navigator.pushReplacement(
@@ -260,7 +263,7 @@ class _LoginActivityState extends State<LoginActivity> {
         pref.setInt("id", int.parse(data['user']['id'].toString()));
         pref.setString("name", data['user']['name'].toString());
         pref.setString("email", data['user']['email'].toString());
-        pref.setString("img", data['user']['img'].toString());
+        pref.setString("img", (data['user']['img'].toString() != 'null')?data['user']['img'].toString():'');
         pref.setString("gender", data['user']['gender'].toString());
         pref.setString("tgl", data['user']['ttl'].toString());
         pref.setString("notelp", data['user']['phone_number'].toString());
@@ -343,13 +346,16 @@ class _LoginActivityState extends State<LoginActivity> {
                           //     });
                           //   },
                           // ),
-                          FlatButton(
-                            color: CustomColor.primaryLight,
-                            textColor: Colors.white,
-                            shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.all(Radius.circular(10))
+                          TextButton(
+                            // minWidth: CustomSize.sizeWidth(context),
+                            style: TextButton.styleFrom(
+                              backgroundColor: CustomColor.primaryLight,
+                              padding: EdgeInsets.all(0),
+                              shape: const RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.all(Radius.circular(10))
+                              ),
                             ),
-                            child: Text('Setuju'),
+                            child: Text('Setuju', style: TextStyle(color: Colors.white)),
                             onPressed: () async{
                               Navigator.pop(context);
                               Navigator.pushReplacement(

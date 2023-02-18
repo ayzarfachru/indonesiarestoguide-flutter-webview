@@ -5,6 +5,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_icons/flutter_icons.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:google_sign_in/google_sign_in.dart';
 import 'package:intl/intl.dart';
 import 'package:kam5ia/model/Category.dart';
 import 'package:kam5ia/model/Transaction.dart';
@@ -12,6 +13,7 @@ import 'package:kam5ia/ui/auth/login_activity.dart';
 import 'package:kam5ia/ui/detail/detail_resto.dart';
 import 'package:kam5ia/ui/history/history_activity.dart';
 import 'package:kam5ia/ui/home/home_activity.dart';
+import 'package:kam5ia/ui/maintenance.dart';
 import 'package:kam5ia/ui/profile/followers_activity.dart';
 import 'package:kam5ia/ui/profile/profile_activity.dart';
 // import 'package:kam5ia/ui/ui_resto/promo_resto/promo_activity.dart';
@@ -20,12 +22,14 @@ import 'package:kam5ia/ui/ui_resto/add_resto/payment_resto.dart';
 import 'package:kam5ia/ui/ui_resto/detail/detail_resto.dart';
 import 'package:kam5ia/ui/ui_resto/employees/employees_activity.dart';
 import 'package:kam5ia/ui/ui_resto/menu/menu_activity.dart';
+import 'package:kam5ia/ui/ui_resto/ngupon_yuk_resto/ngupon_yuk_resto.dart';
 import 'package:kam5ia/ui/ui_resto/order/order_activity.dart';
 import 'package:kam5ia/ui/ui_resto/owner/add_owner.dart';
 import 'package:kam5ia/ui/ui_resto/reservation_resto/reservation_activity.dart';
 import 'package:kam5ia/ui/ui_resto/deposit/deposit_activity.dart';
 import 'package:kam5ia/ui/ui_resto/reservation_resto/reservation_pending_page.dart';
 import 'package:kam5ia/model/Meja.dart';
+import 'package:kam5ia/ui/welcome_screen.dart';
 import 'package:pull_to_refresh/pull_to_refresh.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:kam5ia/ui/ui_resto/schedule_resto/schedule_activity.dart';
@@ -34,6 +38,71 @@ import 'package:kam5ia/utils/utils.dart';
 import 'package:page_transition/page_transition.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:http/http.dart' as http;
+import 'package:location_platform_interface/location_platform_interface.dart';
+
+import '../../../utils/update_maps_resto.dart';
+
+class Location {
+  /// Initializes the plugin and starts listening for potential platform events.
+  factory Location() => instance;
+
+  Location._();
+
+  static final Location instance = Location._();
+
+  /// Change settings of the location request.
+  ///
+  /// The [accuracy] argument is controlling the precision of the
+  /// [LocationData]. The [interval] and [distanceFilter] are controlling how
+  /// often a new location is sent through [onLocationChanged].
+  ///
+  /// [interval] and [distanceFilter] are not used on web.
+
+  /// Gets the current location of the user.
+  ///
+  /// Throws an error if the app has no permission to access location.
+  /// Returns a [LocationData] object.
+  Future<LocationData> getLocation() async {
+    return LocationPlatform.instance.getLocation();
+  }
+
+  /// Checks if the app has permission to access location.
+  ///
+  /// If the result is [PermissionStatus.deniedForever], no dialog will be
+  /// shown on [requestPermission].
+  /// Returns a [PermissionStatus] object.
+  Future<PermissionStatus> hasPermission() {
+    return LocationPlatform.instance.hasPermission();
+  }
+
+  /// Requests permission to access location.
+  ///
+  /// If the result is [PermissionStatus.deniedForever], no dialog will be
+  /// shown on [requestPermission].
+  /// Returns a [PermissionStatus] object.
+  Future<PermissionStatus> requestPermission() {
+    return LocationPlatform.instance.requestPermission();
+  }
+
+  /// Checks if the location service is enabled.
+  Future<bool> serviceEnabled() {
+    return LocationPlatform.instance.serviceEnabled();
+  }
+
+  /// Request the activation of the location service.
+  Future<bool> requestService() {
+    return LocationPlatform.instance.requestService();
+  }
+
+  /// Returns a stream of [LocationData] objects.
+  /// The frequency and accuracy of this stream can be changed with
+  /// [changeSettings]
+  ///
+  /// Throws an error if the app has no permission to access location.
+  Stream<LocationData> get onLocationChanged {
+    return LocationPlatform.instance.onLocationChanged;
+  }
+}
 
 class HomeActivityResto extends StatefulWidget {
   @override
@@ -52,6 +121,7 @@ class _HomeActivityRestoState extends State<HomeActivityResto> with WidgetsBindi
 
   getOwner() async {
     SharedPreferences pref = await SharedPreferences.getInstance();
+    pref.remove('inDetail');
     setState(() {
       owner = (pref.getString('owner')??'');
       nameOwner = (pref.getString('nameOwner')??'');
@@ -243,7 +313,7 @@ class _HomeActivityRestoState extends State<HomeActivityResto> with WidgetsBindi
       id = data['resto']['id'];
       pref.setString('idHomeResto', id.toString());
       idResto();
-      idUserRest = (owner != 'true')?int.parse(data['resto']['users_id']):idUser;
+      idUserRest = (owner != 'true')?int.parse(data['resto']['users_id'].toString()):idUser;
       // history = _history;
       openAndClose = (data['resto']['status'].toString() == "closed" || data['resto']['status'].toString() == "")?'0':'1';
       isLoading = false;
@@ -276,6 +346,11 @@ class _HomeActivityRestoState extends State<HomeActivityResto> with WidgetsBindi
   String address = '';
   bool reservation = false;
   String deposit = '';
+  String isUpdateMaps = "";
+  String oldLat = "";
+  String oldLong = "";
+  String latitude = '';
+  String longitude = '';
   Future _getDetail()async{
     List<String> _facility = [];
     SharedPreferences pref = await SharedPreferences.getInstance();
@@ -285,7 +360,7 @@ class _HomeActivityRestoState extends State<HomeActivityResto> with WidgetsBindi
       "Authorization": "Bearer $token"
     });
     var data = json.decode(apiResult.body);
-    print('Open '+data['data']['is_deposit'].toString());
+    print('Open '+apiResult.body.toString());
 
     // String id = pref.getString("idHomeResto") ?? "";
     var apiResult2 = await http
@@ -300,6 +375,8 @@ class _HomeActivityRestoState extends State<HomeActivityResto> with WidgetsBindi
     }
 
     setState(() {
+      oldLat = data['data']['lat'].toString();
+      oldLong = data['data']['long'].toString();
       reservation = (data['data']['reservation_fee'].toString() == '0')?false:true;
       // reservation = true;
       deposit = data2['balance'].toString();
@@ -330,6 +407,22 @@ class _HomeActivityRestoState extends State<HomeActivityResto> with WidgetsBindi
         pref.setString("jUsaha", _facility.toString().split('[')[1].split(']')[0].replaceAll(new RegExp(r",\s+"), ","));
       Future.delayed(Duration(seconds: 1), () async{
         wait = true;
+        isUpdateMaps = pref.getString('isUpdateMaps')??'';
+        if (isUpdateMaps == '') {
+          if (oldLat != 'null' || oldLong != 'null' || oldLat != '' || oldLong != '' || oldLat != '0' || oldLong != '0') {
+            Navigator.pushReplacement(
+                context,
+                PageTransition(
+                    type: PageTransitionType.rightToLeft,
+                    child: UpdateMapsResto(double.parse(oldLat),double.parse(oldLong))));
+          } else {
+            Navigator.pushReplacement(
+                context,
+                PageTransition(
+                    type: PageTransitionType.rightToLeft,
+                    child: UpdateMapsResto(double.parse(latitude),double.parse(longitude))));
+          }
+        }
         setState((){});
       });
     }
@@ -411,8 +504,8 @@ class _HomeActivityRestoState extends State<HomeActivityResto> with WidgetsBindi
         if (data['trx'].toString().contains('pending')) {
           for(var v in data['trx']['pending']){
             Transaction r = Transaction.home(
-                chat_user: v['chat_user'],
-                is_opened: v['is_opened']
+                chat_user: v['chat_user'].toString(),
+                is_opened: v['is_opened'].toString()
             );
             _transaction.add(r);
           }
@@ -423,8 +516,8 @@ class _HomeActivityRestoState extends State<HomeActivityResto> with WidgetsBindi
         if (data['trx'].toString().contains('process')) {
           for(var v in data['trx']['process']){
             Transaction r = Transaction.home(
-                chat_user: v['chat_user'],
-                is_opened: v['is_opened']
+                chat_user: v['chat_user'].toString(),
+                is_opened: v['is_opened'].toString()
             );
             _transaction2.add(r);
           }
@@ -435,8 +528,8 @@ class _HomeActivityRestoState extends State<HomeActivityResto> with WidgetsBindi
         if (data['trx'].toString().contains('ready')) {
           for(var v in data['trx']['ready']){
             Transaction r = Transaction.home(
-                chat_user: v['chat_user'],
-                is_opened: v['is_opened']
+                chat_user: v['chat_user'].toString(),
+                is_opened: v['is_opened'].toString()
             );
             _transaction3.add(r);
           }
@@ -489,8 +582,8 @@ class _HomeActivityRestoState extends State<HomeActivityResto> with WidgetsBindi
         if (data['trx'].toString().contains('pending')) {
           for(var v in data['trx']['pending']){
             Transaction r = Transaction.home(
-                chat_user: v['chat_user'],
-                is_opened: v['is_opened']
+                chat_user: v['chat_user'].toString(),
+                is_opened: v['is_opened'].toString()
             );
             _transactionR.add(r);
           }
@@ -501,8 +594,8 @@ class _HomeActivityRestoState extends State<HomeActivityResto> with WidgetsBindi
         if (data['trx'].toString().contains('process')) {
           for(var v in data['trx']['process']){
             Transaction r = Transaction.home(
-                chat_user: v['chat_user'],
-                is_opened: v['is_opened']
+                chat_user: v['chat_user'].toString(),
+                is_opened: v['is_opened'].toString()
             );
             _transaction2R.add(r);
           }
@@ -513,8 +606,8 @@ class _HomeActivityRestoState extends State<HomeActivityResto> with WidgetsBindi
         if (data['trx'].toString().contains('ready')) {
           for(var v in data['trx']['ready']){
             Transaction r = Transaction.home(
-                chat_user: v['chat_user'],
-                is_opened: v['is_opened']
+                chat_user: v['chat_user'].toString(),
+                is_opened: v['is_opened'].toString()
             );
             _transaction3R.add(r);
           }
@@ -589,6 +682,42 @@ class _HomeActivityRestoState extends State<HomeActivityResto> with WidgetsBindi
       }
     }
   }
+
+
+  bool isNgupon = false;
+
+  Future _getNguponYukPaid()async{
+
+    SharedPreferences pref = await SharedPreferences.getInstance();
+    String token = pref.getString("token") ?? "";
+    String email = (pref.getString('email')??'');
+    var apiResult = await http.get(Uri.parse(Links.nguponUrl + '/coupon/resto?restaurant=$id&action=used'), headers: {
+      "Accept": "Application/json",
+      "Authorization": "Bearer $token"
+    });
+    print('_getNguponYukPaid');
+    print(Links.nguponUrl + '/kupon?action=use&restaurant_id=$id');
+    var data = json.decode(apiResult.body);
+    print(data);
+
+    var apiResultPaid = await http.get(Uri.parse(Links.nguponUrl + '/coupon/resto?restaurant=$id&action=paid'), headers: {
+      "Accept": "Application/json",
+      "Authorization": "Bearer $token"
+    });
+    print('_getNguponYukUnpaid');
+    print(Links.nguponUrl + '/kupon?action=use&restaurant_id=$id');
+    var dataPaid = json.decode(apiResultPaid.body);
+    print(dataPaid);
+
+    setState(() {
+      if (data['data'].toString() == '[]' && dataPaid['data'].toString() == '[]') {
+        isNgupon = false;
+      } else {
+        isNgupon = true;
+      }
+    });
+  }
+
 
   @override
   void dispose() {
@@ -668,7 +797,7 @@ class _HomeActivityRestoState extends State<HomeActivityResto> with WidgetsBindi
     if (data.toString().contains('history') == true ) {
       for(var h in data['history']){
         Category c = Category(
-            id: int.parse(h['amount']),
+            id: int.parse(h['amount'].toString()),
             nama: h['trans_code']??"topup",
             created: h['created_at'], img: ''
         );
@@ -713,13 +842,16 @@ class _HomeActivityRestoState extends State<HomeActivityResto> with WidgetsBindi
                           //     });
                           //   },
                           // ),
-                          FlatButton(
-                            color: CustomColor.accent,
-                            textColor: Colors.white,
-                            shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.all(Radius.circular(10))
+                          TextButton(
+                            // minWidth: CustomSize.sizeWidth(context),
+                            style: TextButton.styleFrom(
+                              backgroundColor: CustomColor.accent,
+                              padding: EdgeInsets.all(0),
+                              shape: const RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.all(Radius.circular(10))
+                              ),
                             ),
-                            child: Text('Oke'),
+                            child: Text('Oke', style: TextStyle(color: Colors.white)),
                             onPressed: () async{
                               Navigator.pop(context);
                               // String qrcode = '';
@@ -737,23 +869,122 @@ class _HomeActivityRestoState extends State<HomeActivityResto> with WidgetsBindi
     });
   }
 
+  GoogleSignIn _googleSignIn = GoogleSignIn(
+    clientId: "887058389150-nesf8jr9jdk5n2dtt1t30to2el1v3bbi.apps.googleusercontent.com",
+    scopes: [
+      'email',
+      'https://www.googleapis.com/auth/userinfo.profile',
+      // 'https://www.googleapis.com/auth/user.birthday.read',
+      // 'https://www.googleapis.com/auth/user.gender.read',
+      // 'https://www.googleapis.com/auth/user.phonenumbers.read'
+    ],
+  );
+
+  Future maintenance() async {
+    SharedPreferences pref = await SharedPreferences.getInstance();
+    String token = pref.getString("token") ?? "";
+    getHomePg();
+    print('token');
+    print(token);
+    if (token != '') {
+      var apiResult = await http.get(Uri.parse('https://irg.devus-sby.com/api/v2/index'), headers: {
+        "Accept": "Application/json",
+        "Authorization": "Bearer $token"
+      });
+      // print('maintenance');
+      // print(apiResult.body);
+      var data = json.decode(apiResult.body);
+      print(apiResult.statusCode);
+      print('maintenance');
+      print(apiResult.body);
+      // if (data['is_open'].toString() == 'true') {
+      //   pref.setString("is_open_all", '');
+      // pref.remove("is_open_all");
+      if (data['is_maintenance'].toString() == 'false') {
+        if (data['authenticated'].toString() == 'null') {
+          _googleSignIn.signOut();
+          SharedPreferences pref = await SharedPreferences.getInstance();
+          pref.clear();
+          Navigator.of(context).pushReplacement(MaterialPageRoute(
+              builder: (BuildContext context) => WelcomeScreen()));
+        } else {
+          // _checkForSession().then((status) {
+          //   if (status) {
+          //     Navigator.of(context).pushReplacement(MaterialPageRoute(
+          //         builder: (BuildContext context) => (homepg != "1")?HomeActivity():HomeActivityResto()));
+          //   }
+          // });
+        }
+      } else {
+        Navigator.of(context).pushReplacement(MaterialPageRoute(
+            builder: (BuildContext context) => Maintenance()));
+      }
+      // } else {
+      //   Navigator.of(context).pushReplacement(MaterialPageRoute(
+      //       builder: (BuildContext context) => KamsiaClosed()));
+      // }
+    } else {
+      var apiResult = await http.get(Uri.parse('https://irg.devus-sby.com/api/v2/index'), headers: {
+        "Accept": "Application/json",
+      });
+      print(apiResult.statusCode);
+      var data = json.decode(apiResult.body);
+      print('maintenance');
+      print(apiResult.body);
+      // if (data['is_open'].toString() == 'true') {
+      if (data['is_maintenance'].toString() == 'false') {
+        if (data['authenticated'].toString() == 'null') {
+          _googleSignIn.signOut();
+          SharedPreferences pref = await SharedPreferences.getInstance();
+          pref.clear();
+          Navigator.of(context).pushReplacement(MaterialPageRoute(
+              builder: (BuildContext context) => WelcomeScreen()));
+        } else {
+          // _checkForSession().then((status) {
+          //   if (status) {
+          //     Navigator.of(context).pushReplacement(MaterialPageRoute(
+          //         builder: (BuildContext context) => (homepg != "1")?HomeActivity():HomeActivityResto()));
+          //   }
+          // });
+        }
+      } else {
+        Navigator.of(context).pushReplacement(MaterialPageRoute(
+            builder: (BuildContext context) => Maintenance()));
+      }
+      // } else {
+      //   Navigator.of(context).pushReplacement(MaterialPageRoute(
+      //       builder: (BuildContext context) => KamsiaClosed()));
+      // }
+    }
+  }
+
   @override
   void initState() {
     WidgetsBinding.instance!.addObserver(this);
     super.initState();
-    getOwner();
-    // _getUserResto();
-    // _getDetail();
-    initDynamicLinks();
-    _getTrans();
-    _getTrans2();
-    getImg();
-    getHomePg();
-    // idResto();
-    getInitial();
-    checkTest();
-    // getDepo();
-    // _getQr();
+    maintenance().whenComplete(() {
+      Location.instance.getLocation().then((value) {
+        setState(() {
+          latitude = value.latitude.toString();
+          longitude = value.longitude.toString();
+          getHomePg();
+        });
+      });
+      getOwner();
+      _getNguponYukPaid();
+      // _getUserResto();
+      // _getDetail();
+      initDynamicLinks();
+      _getTrans();
+      _getTrans2();
+      getImg();
+      getHomePg();
+      // idResto();
+      getInitial();
+      checkTest();
+      // getDepo();
+      // _getQr();
+    });
   }
 
   DateTime? currentBackPressTime;
@@ -896,7 +1127,7 @@ class _HomeActivityRestoState extends State<HomeActivityResto> with WidgetsBindi
                             child: Container(
                               width: CustomSize.sizeWidth(context) / 8,
                               height: CustomSize.sizeWidth(context) / 8,
-                              decoration: (img == "" || img == null)?BoxDecoration(
+                              decoration: (img == "" || img == null || img == 'null')?BoxDecoration(
                                   color: CustomColor.primary,
                                   shape: BoxShape.circle
                               ):BoxDecoration(
@@ -985,13 +1216,16 @@ class _HomeActivityRestoState extends State<HomeActivityResto> with WidgetsBindi
                                                     //     });
                                                     //   },
                                                     // ),
-                                                    FlatButton(
-                                                      color: CustomColor.accent,
-                                                      textColor: Colors.white,
-                                                      shape: RoundedRectangleBorder(
-                                                          borderRadius: BorderRadius.all(Radius.circular(10))
+                                                    TextButton(
+                                                      // minWidth: CustomSize.sizeWidth(context),
+                                                      style: TextButton.styleFrom(
+                                                        backgroundColor: CustomColor.accent,
+                                                        padding: EdgeInsets.all(0),
+                                                        shape: const RoundedRectangleBorder(
+                                                            borderRadius: BorderRadius.all(Radius.circular(10))
+                                                        ),
                                                       ),
-                                                      child: Text('Oke'),
+                                                      child: Text('Oke', style: TextStyle(color: Colors.white)),
                                                       onPressed: () async{
                                                         Navigator.pop(context);
                                                         // String qrcode = '';
@@ -1039,13 +1273,16 @@ class _HomeActivityRestoState extends State<HomeActivityResto> with WidgetsBindi
                                                     //     });
                                                     //   },
                                                     // ),
-                                                    FlatButton(
-                                                      color: CustomColor.accent,
-                                                      textColor: Colors.white,
-                                                      shape: RoundedRectangleBorder(
-                                                          borderRadius: BorderRadius.all(Radius.circular(10))
+                                                    TextButton(
+                                                      // minWidth: CustomSize.sizeWidth(context),
+                                                      style: TextButton.styleFrom(
+                                                        backgroundColor: CustomColor.accent,
+                                                        padding: EdgeInsets.all(0),
+                                                        shape: const RoundedRectangleBorder(
+                                                            borderRadius: BorderRadius.all(Radius.circular(10))
+                                                        ),
                                                       ),
-                                                      child: Text('Oke'),
+                                                      child: Text('Oke', style: TextStyle(color: Colors.white)),
                                                       onPressed: () async{
                                                         Navigator.pop(context);
                                                         // String qrcode = '';
@@ -2380,6 +2617,40 @@ class _HomeActivityRestoState extends State<HomeActivityResto> with WidgetsBindi
                                       ],
                                     ),
                                   ),
+                                ):(isNgupon == true)?GestureDetector(
+                                  onTap: (){
+                                    setState(() {
+                                      Navigator.push(context, PageTransition(type: PageTransitionType.fade, child: new NguponYukRestoActivity()));
+                                    });
+                                  },
+                                  child: Container(
+                                    width: CustomSize.sizeWidth(context) / 3.8,
+                                    height: CustomSize.sizeWidth(context) / 3.8,
+                                    decoration: BoxDecoration(
+                                      color: Colors.white,
+                                      borderRadius: BorderRadius.circular(20),
+                                      boxShadow: [
+                                        BoxShadow(
+                                          color: Colors.grey.withOpacity(0.5),
+                                          spreadRadius: 0,
+                                          blurRadius: 7,
+                                          offset: Offset(0, 7),
+                                        ),
+                                      ],
+                                    ),
+                                    child: Column(
+                                      mainAxisAlignment: MainAxisAlignment.center,
+                                      crossAxisAlignment: CrossAxisAlignment.center,
+                                      children: [
+                                        Icon(FontAwesome.ticket, color: CustomColor.primaryLight, size: 32,),
+                                        CustomText.bodyMedium14(
+                                            text: "Ngupon Yuk",
+                                            minSize: double.parse(((MediaQuery.of(context).size.width*0.035).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.035)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.035)).toString()),
+                                            maxLines: 1
+                                        ),
+                                      ],
+                                    ),
+                                  ),
                                 ):Container(),
                                 (idUserRest == idUser)?GestureDetector(
                                   onTap: (){
@@ -2538,6 +2809,46 @@ class _HomeActivityRestoState extends State<HomeActivityResto> with WidgetsBindi
                                         ),
                                       ),
                                     ):Container(
+                                      width: CustomSize.sizeWidth(context) / 3.8,
+                                      height: CustomSize.sizeWidth(context) / 3.8,),
+                                    (isNgupon == true)?GestureDetector(
+                                      onTap: (){
+                                        setState(() {
+                                          Navigator.push(context, PageTransition(type: PageTransitionType.fade, child: new NguponYukRestoActivity()));
+                                        });
+                                      },
+                                      child: Container(
+                                        width: CustomSize.sizeWidth(context) / 3.8,
+                                        height: CustomSize.sizeWidth(context) / 3.8,
+                                        decoration: BoxDecoration(
+                                          color: Colors.white,
+                                          borderRadius: BorderRadius.circular(20),
+                                          boxShadow: [
+                                            BoxShadow(
+                                              color: Colors.grey.withOpacity(0.5),
+                                              spreadRadius: 0,
+                                              blurRadius: 7,
+                                              offset: Offset(0, 7),
+                                            ),
+                                          ],
+                                        ),
+                                        child: Column(
+                                          mainAxisAlignment: MainAxisAlignment.center,
+                                          crossAxisAlignment: CrossAxisAlignment.center,
+                                          children: [
+                                            Icon(FontAwesome.ticket, color: CustomColor.primaryLight, size: 32,),
+                                            CustomText.bodyMedium14(
+                                                text: "Ngupon Yuk",
+                                                minSize: double.parse(((MediaQuery.of(context).size.width*0.035).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.035)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.035)).toString()),
+                                                maxLines: 1
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                    ):Container(
+                                      width: CustomSize.sizeWidth(context) / 3.8,
+                                      height: CustomSize.sizeWidth(context) / 3.8,),
+                                    Container(
                                       width: CustomSize.sizeWidth(context) / 3.8,
                                       height: CustomSize.sizeWidth(context) / 3.8,),
                                   ],

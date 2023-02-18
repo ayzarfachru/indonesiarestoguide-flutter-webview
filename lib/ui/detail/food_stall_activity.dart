@@ -8,9 +8,6 @@ import 'package:kam5ia/model/Resto.dart';
 import 'package:kam5ia/model/Transaction.dart';
 import 'package:kam5ia/model/imgBanner.dart';
 import 'package:kam5ia/ui/detail/detail_resto.dart';
-import 'package:kam5ia/ui/detail/detail_transaction.dart';
-import 'package:kam5ia/ui/promo/add_promo.dart';
-import 'package:kam5ia/ui/promo/edit_promo.dart';
 import 'package:kam5ia/utils/utils.dart';
 import 'package:intl/intl.dart';
 import 'package:location/location.dart';
@@ -429,13 +426,13 @@ class _FoodStallActivityState extends State<FoodStallActivity> {
   showAlertDialog(String id) {
 
     // set up the buttons
-    Widget cancelButton = FlatButton(
+    Widget cancelButton = TextButton(
       child: Text("Batal", style: TextStyle(color: CustomColor.primaryLight)),
       onPressed:  () {
         Navigator.pop(context);
       },
     );
-    Widget continueButton = FlatButton(
+    Widget continueButton = TextButton(
       child: Text("Hapus", style: TextStyle(color: CustomColor.primaryLight)),
       onPressed:  () {
         _delPromo(id);

@@ -62,7 +62,7 @@ class _SearchAddressMapsRestoState extends State<SearchAddressMapsResto> {
                 width: double.infinity,
                 height: double.infinity,
                 child: GoogleMap(
-                  mapType: MapType.normal,
+                  mapType: MapType.hybrid,
                   initialCameraPosition: CameraPosition(
                     target: LatLng(latitude, longitude),
                     zoom: 18,

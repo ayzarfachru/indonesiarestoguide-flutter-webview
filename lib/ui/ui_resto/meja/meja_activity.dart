@@ -4,17 +4,9 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_icons/flutter_icons.dart';
 import 'package:fluttertoast/fluttertoast.dart';
-import 'package:kam5ia/model/CategoryMenu.dart';
-import 'package:kam5ia/model/Menu.dart';
-import 'package:kam5ia/model/MenuJson.dart';
-import 'package:kam5ia/model/Price.dart';
-import 'package:kam5ia/model/Promo.dart';
 import 'package:kam5ia/model/Meja.dart';
-import 'package:kam5ia/ui/ui_resto/menu/add_menu.dart';
-import 'package:kam5ia/ui/ui_resto/menu/edit_menu.dart';
 import 'package:kam5ia/utils/utils.dart';
 import 'package:page_transition/page_transition.dart';
-import 'package:kam5ia/model/Transaction.dart';
 import 'package:qr_flutter/qr_flutter.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:http/http.dart' as http;
@@ -56,7 +48,7 @@ class _MejaActivityState extends State<MejaActivity> {
     for(var v in data['table']){
       Meja p = Meja(
           id: v['id'],
-          name: v['name'],
+          name: v['name'].toString(),
           qr: v['barcode'],
           url: v['img'],
       );
@@ -72,13 +64,13 @@ class _MejaActivityState extends State<MejaActivity> {
   showAlertDialog(String id) {
 
     // set up the buttons
-    Widget cancelButton = FlatButton(
+    Widget cancelButton = TextButton(
       child: Text("Batal", style: TextStyle(color: CustomColor.primary)),
       onPressed:  () {
         Navigator.pop(context);
       },
     );
-    Widget continueButton = FlatButton(
+    Widget continueButton = TextButton(
       child: Text("Hapus", style: TextStyle(color: CustomColor.primary)),
       onPressed:  () {
         _delMeja(id);

@@ -8,9 +8,6 @@ import 'package:kam5ia/model/Resto.dart';
 import 'package:kam5ia/model/Transaction.dart';
 import 'package:kam5ia/model/imgBanner.dart';
 import 'package:kam5ia/ui/detail/detail_resto.dart';
-import 'package:kam5ia/ui/detail/detail_transaction.dart';
-import 'package:kam5ia/ui/promo/add_promo.dart';
-import 'package:kam5ia/ui/promo/edit_promo.dart';
 import 'package:kam5ia/utils/utils.dart';
 import 'package:intl/intl.dart';
 import 'package:location/location.dart';
@@ -432,13 +429,13 @@ class _FoodTruckActivityState extends State<FoodTruckActivity> {
   showAlertDialog(String id) {
 
     // set up the buttons
-    Widget cancelButton = FlatButton(
+    Widget cancelButton = TextButton(
       child: Text("Batal", style: TextStyle(color: CustomColor.primaryLight)),
       onPressed:  () {
         Navigator.pop(context);
       },
     );
-    Widget continueButton = FlatButton(
+    Widget continueButton = TextButton(
       child: Text("Hapus", style: TextStyle(color: CustomColor.primaryLight)),
       onPressed:  () {
         _delPromo(id);
@@ -703,33 +700,35 @@ class _FoodTruckActivityState extends State<FoodTruckActivity> {
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                (randomRes1[index].status == 'active')?(randomRes1[index].isOpen != 'true')?Container(
-                                  width: CustomSize.sizeWidth(context),
-                                  height: CustomSize.sizeHeight(context) / 5.8,
-                                  decoration: BoxDecoration(
-                                    borderRadius: BorderRadius.circular(20),
-                                  ),
-                                  child: ClipRRect(
-                                    borderRadius: BorderRadius.circular(20),
-                                    child: ColorFiltered(
-                                      colorFilter: ColorFilter.mode(
-                                        Colors.grey,
-                                        BlendMode.saturation,
-                                      ),
-                                      child: Container(
-                                        decoration: (randomRes1[index].img != null)?BoxDecoration(
-                                          image: DecorationImage(
-                                              image: NetworkImage(Links.subUrl + randomRes1[index].img!),
-                                              fit: BoxFit.cover
-                                          ),
-                                          borderRadius: BorderRadius.circular(20),
-                                        ):BoxDecoration(
-                                            color: CustomColor.primaryLight
-                                        ),
-                                      ),
-                                    ),
-                                  ),
-                                ):Container(
+                                // (randomRes1[index].status == 'active')?(randomRes1[index].isOpen != 'true')?Container(
+                                //   width: CustomSize.sizeWidth(context),
+                                //   height: CustomSize.sizeHeight(context) / 5.8,
+                                //   decoration: BoxDecoration(
+                                //     borderRadius: BorderRadius.circular(20),
+                                //   ),
+                                //   child: ClipRRect(
+                                //     borderRadius: BorderRadius.circular(20),
+                                //     child: ColorFiltered(
+                                //       colorFilter: ColorFilter.mode(
+                                //         Colors.grey,
+                                //         BlendMode.saturation,
+                                //       ),
+                                //       child: Container(
+                                //         decoration: (randomRes1[index].img != null)?BoxDecoration(
+                                //           image: DecorationImage(
+                                //               image: NetworkImage(Links.subUrl + randomRes1[index].img!),
+                                //               fit: BoxFit.cover
+                                //           ),
+                                //           borderRadius: BorderRadius.circular(20),
+                                //         ):BoxDecoration(
+                                //             color: CustomColor.primaryLight
+                                //         ),
+                                //       ),
+                                //     ),
+                                //   ),
+                                // ):
+                                (randomRes1[index].status == 'active')?
+                                Container(
                                   width: CustomSize.sizeWidth(context),
                                   height: CustomSize.sizeHeight(context) / 5.8,
                                   decoration: (randomRes1[index].img != null)?BoxDecoration(

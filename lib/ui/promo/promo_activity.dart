@@ -140,7 +140,7 @@ class _PromoActivityState extends State<PromoActivity> {
           restoName: v['resto_name'],
           desc: v['desc']??'',
           urlImg: v['img'],
-          is_available: v['is_available'],
+          is_available: v['is_available'].toString(),
           // is_available: '0',
           price: Price.discounted(int.parse(v['price'].toString()), int.parse(v['discounted_price'].toString())),
           distance: double.parse(v['resto_distance'].toString()), is_recommended: '', qty: '', type: '', delivery_price: null
@@ -174,18 +174,18 @@ class _PromoActivityState extends State<PromoActivity> {
       for (var a in data['promo']) {
         Promo b = Promo.resto(
           id: a['id'],
-          menus_id: int.parse(a['menus_id']),
+          menus_id: int.parse(a['menus_id'].toString()),
           word: a['description'],
-          discountedPrice: (a['discount'] != null)?int.parse(a['discount']):a['discount'],
-          potongan: (a['potongan'] != null)?int.parse(a['potongan']):a['potongan'],
-          ongkir: (a['ongkir'] != null)?int.parse(a['ongkir']):a['ongkir'],
+          discountedPrice: (a['discount'] != null)?int.parse(a['discount'].toString()):a['discount'],
+          potongan: (a['potongan'] != null)?int.parse(a['potongan'].toString()):a['potongan'],
+          ongkir: (a['ongkir'] != null)?int.parse(a['ongkir'].toString()):a['ongkir'],
           expired_at: a['expired_at'],
           menu: Menu(
               id: a['menus']['id']??null,
               name: a['menus']['name']??null,
               desc: a['menus']['desc']??null,
               urlImg: a['menus']['img'],
-              is_available: a['menus']['is_available'],
+              is_available: a['menus']['is_available'].toString(),
               // is_available: '0',
               price: Price.promo(
                   a['menus']['price'].toString(), a['menus']['delivery_price'].toString()), type: '', distance: null, delivery_price: null, restoId: '', restoName: '', is_recommended: '', qty: ''
@@ -240,13 +240,13 @@ class _PromoActivityState extends State<PromoActivity> {
   showAlertDialog(String id) {
 
     // set up the buttons
-    Widget cancelButton = FlatButton(
+    Widget cancelButton = TextButton(
       child: Text("Batal", style: TextStyle(color: CustomColor.primary)),
       onPressed:  () {
         Navigator.pop(context);
       },
     );
-    Widget continueButton = FlatButton(
+    Widget continueButton = TextButton(
       child: Text("Hapus", style: TextStyle(color: CustomColor.primary)),
       onPressed:  () {
         _delPromo(id);

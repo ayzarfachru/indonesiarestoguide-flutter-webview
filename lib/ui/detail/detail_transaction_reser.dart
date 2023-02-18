@@ -81,6 +81,7 @@ class _DetailTransactionReserState extends State<DetailTransactionReser> {
     });
     SharedPreferences pref = await SharedPreferences.getInstance();
     var token = pref.getString("token") ?? "";
+    pref.setString('inDetail', '1');
 
     var apiResult = await http.get(Uri.parse(Links.mainUrl + '/resto/reservation/$id'),
         headers: {
@@ -180,6 +181,7 @@ class _DetailTransactionReserState extends State<DetailTransactionReser> {
     // print(apiResult.body);
     var data = json.decode(apiResult.body);
 
+    print('id e '+apiResult.body.toString());
     print('id e '+id.toString());
     print('id e2 '+data['badan_usaha'].toString());
     // for(var v in data['menu']){
@@ -1739,14 +1741,16 @@ class _DetailTransactionReserState extends State<DetailTransactionReser> {
                                             child: Row(
                                               mainAxisAlignment: MainAxisAlignment.spaceAround,
                                               children: [
-                                                FlatButton(
+                                                TextButton(
                                                   // minWidth: CustomSize.sizeWidth(context),
-                                                  color: Colors.blue,
-                                                  textColor: Colors.white,
-                                                  shape: RoundedRectangleBorder(
-                                                      borderRadius: BorderRadius.all(Radius.circular(10))
+                                                  style: TextButton.styleFrom(
+                                                    backgroundColor: Colors.blue,
+                                                    padding: EdgeInsets.all(0),
+                                                    shape: const RoundedRectangleBorder(
+                                                        borderRadius: BorderRadius.all(Radius.circular(10))
+                                                    ),
                                                   ),
-                                                  child: Text('Qris'),
+                                                  child: Text('Qris', style: TextStyle(color: Colors.white)),
                                                   onPressed: () async{
                                                     setState(() {
                                                       // codeDialog = valueText;
@@ -1754,13 +1758,16 @@ class _DetailTransactionReserState extends State<DetailTransactionReser> {
                                                     });
                                                   },
                                                 ),
-                                                FlatButton(
-                                                  color: CustomColor.primaryLight,
-                                                  textColor: Colors.white,
-                                                  shape: RoundedRectangleBorder(
-                                                      borderRadius: BorderRadius.all(Radius.circular(10))
+                                                TextButton(
+                                                  // minWidth: CustomSize.sizeWidth(context),
+                                                  style: TextButton.styleFrom(
+                                                    backgroundColor: CustomColor.primaryLight,
+                                                    padding: EdgeInsets.all(0),
+                                                    shape: const RoundedRectangleBorder(
+                                                        borderRadius: BorderRadius.all(Radius.circular(10))
+                                                    ),
                                                   ),
-                                                  child: Text('Tunai / Debit'),
+                                                  child: Text('Tunai / Debit', style: TextStyle(color: Colors.white)),
                                                   onPressed: () async{
                                                     Navigator.pop(context);
                                                   },
@@ -1796,17 +1803,17 @@ class _DetailTransactionReserState extends State<DetailTransactionReser> {
                                       padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 2.5),
                                       child: CustomText.textTitle2(text: "Bayar Sekarang", color: Colors.white, minSize: double.parse(((MediaQuery.of(context).size.width*0.045).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.045)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.045)).toString())),
                                     ),
-                                    Positioned(  // draw a red marble
-                                      top: 0,
-                                      right: 0,
-                                      child: Stack(
-                                        alignment: Alignment.center,
-                                        children: [
-                                          Icon(Icons.circle, color: (chatUserCount != '0')?CustomColor.redBtn:Colors.transparent, size: 22,),
-                                          CustomText.bodyMedium14(text: chatUserCount, color: (chatUserCount != '0')?Colors.white:Colors.transparent, minSize: double.parse(((MediaQuery.of(context).size.width*0.035).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.035)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.035)).toString()))
-                                        ],
-                                      ),
-                                    )
+                                    // Positioned(  // draw a red marble
+                                    //   top: 0,
+                                    //   right: 0,
+                                    //   child: Stack(
+                                    //     alignment: Alignment.center,
+                                    //     children: [
+                                    //       Icon(Icons.circle, color: (chatUserCount != '0')?CustomColor.redBtn:Colors.transparent, size: 22,),
+                                    //       CustomText.bodyMedium14(text: chatUserCount, color: (chatUserCount != '0')?Colors.white:Colors.transparent, minSize: double.parse(((MediaQuery.of(context).size.width*0.035).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.035)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.035)).toString()))
+                                    //     ],
+                                    //   ),
+                                    // )
                                   ],
                                 ),
                               ),
@@ -1843,7 +1850,7 @@ class _DetailTransactionReserState extends State<DetailTransactionReser> {
                                               onTap: (){
                                                 if (chatroom != 'null') {
                                                   Navigator.pop(context);
-                                                  Navigator.pushReplacement(
+                                                  Navigator.push(
                                                       context,
                                                       PageTransition(
                                                           type: PageTransitionType.rightToLeft,
@@ -2104,13 +2111,13 @@ class _DetailTransactionReserState extends State<DetailTransactionReser> {
                                     title: new Text("Hapus cart"),
                                     content: new Text("Apakah anda ingin mengganti item di cart dengan item yang baru ?"),
                                     actions: <Widget>[
-                                      new FlatButton(
+                                      new TextButton(
                                         child: new Text("Batal", style: TextStyle(color: CustomColor.primaryLight)),
                                         onPressed: () {
                                           Navigator.of(context).pop();
                                         },
                                       ),
-                                      new FlatButton(
+                                      new TextButton(
                                         child: new Text("Oke", style: TextStyle(color: CustomColor.primaryLight)),
                                         onPressed: () async{
                                           delCart().whenComplete((){

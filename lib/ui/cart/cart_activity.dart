@@ -1039,6 +1039,18 @@ class _CartActivityState extends State<CartActivity> {
     print('_useNguponYuk');
     print(apiResult.body);
     var data = json.decode(apiResult.body);
+    if (apiResult.statusCode.toString() != '200') {
+      var apiResultSecond = await http.delete(Uri.parse(Links.secondNguponUrl + '/kupon/${qrcode.replaceAll('#', '')}'), headers: {
+        "Accept": "Application/json",
+        "Authorization": "Bearer $token"
+      });
+      data = json.decode(apiResultSecond.body);
+      print('_apiResultSecond data 2');
+      // print(data);
+      setState((){});
+    } else {
+      print('_apiResultSecond success');
+    }
 
     // if (data['data'].toString().contains('code') == true) {
     //   refCode = data['data']['ref_code'].toString();
@@ -1366,6 +1378,18 @@ class _CartActivityState extends State<CartActivity> {
     print('_getNguponYuk');
     print(apiResult.body);
     var data = json.decode(apiResult.body);
+    if (apiResult.statusCode.toString() != '200') {
+      var apiResultSecond = await http.get(Uri.parse(Links.secondNguponUrl + '/kupon?action=use&user=$email'), headers: {
+        "Accept": "Application/json",
+        "Authorization": "Bearer $token"
+      });
+      data = json.decode(apiResultSecond.body);
+      print('_apiResultSecond data 2');
+      // print(data);
+      setState((){});
+    } else {
+      print('_apiResultSecond success');
+    }
 
     for (var h in data['data']['paid']) {
       NguponYuk c = NguponYuk.sub(
@@ -1449,6 +1473,18 @@ class _CartActivityState extends State<CartActivity> {
     print(kupon_id);
     print(apiResult.body);
     var data = json.decode(apiResult.body);
+    if (apiResult.statusCode.toString() != '200') {
+      var apiResultSecond = await http.get(Uri.parse(Links.secondNguponUrl + '/kupon/$kupon_id?restaurant_id=$checkId'), headers: {
+        "Accept": "Application/json",
+        "Authorization": "Bearer $token"
+      });
+      data = json.decode(apiResultSecond.body);
+      print('_apiResultSecond data 2');
+      // print(data);
+      setState((){});
+    } else {
+      print('_apiResultSecond success');
+    }
     
     if (data['message'].toString() == 'Data saved successfully') {
       return true;

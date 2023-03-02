@@ -1470,8 +1470,8 @@ class _DetailTransactionState extends State<DetailTransaction> {
     setState(() {});
   }
 
-  void chat() async {
-    var uri = Uri.parse((PhoneDriver.toString().substring(0, 1).toString() == '0')?"whatsapp://send?phone=+62"+PhoneDriver.toString().substring(1):"whatsapp://send?phone="+PhoneDriver.toString());
+  void chat(String urlChat) async {
+    var uri = Uri.parse(urlChat);
     if (await canLaunchUrl(uri)) {
       await launchUrl(uri);
     } else {
@@ -2132,7 +2132,8 @@ class _DetailTransactionState extends State<DetailTransaction> {
                                                           onTap: (){
                                                             if (status != 'cancel') {
                                                               Navigator.pop(context);
-                                                              chat();
+                                                              chat((PhoneDriver.toString().substring(0, 1).toString() == '0')?"whatsapp://send?phone=+62"+PhoneDriver.toString().substring(1):"whatsapp://send?phone="+PhoneDriver.toString());
+                                                              setState((){});
                                                             } else {
                                                               Fluttertoast.showToast(msg: "Fitur chat tidak tersedia karena pesanan anda sudah ditolak.");
                                                             }

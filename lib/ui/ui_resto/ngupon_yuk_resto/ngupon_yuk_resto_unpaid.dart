@@ -55,6 +55,18 @@ class _NguponYukRestoUnpaidState extends State<NguponYukRestoUnpaid> {
     });
     print('_getNguponYukSearch');
     var data = json.decode(apiResult.body);
+    if (apiResult.statusCode.toString() != '200') {
+      var apiResultSecond = await http.get(Uri.parse(Links.secondNguponUrl + '/kupon?action=use&user=$searchEmail'), headers: {
+        "Accept": "Application/json",
+        "Authorization": "Bearer $token"
+      });
+      data = json.decode(apiResultSecond.body);
+      print('_apiResultSecond data 2');
+      // print(data);
+      setState((){});
+    } else {
+      print('_apiResultSecond success');
+    }
     print(data['data']['paid']);
 
     nguponYuk = [];
@@ -115,6 +127,18 @@ class _NguponYukRestoUnpaidState extends State<NguponYukRestoUnpaid> {
     print('_getNguponYukUnpaid');
     print(Links.nguponUrl + '/kupon?action=use&restaurant_id=$id');
     var data = json.decode(apiResult.body);
+    if (apiResult.statusCode.toString() != '200') {
+      var apiResultSecond = await http.get(Uri.parse(Links.secondNguponUrl + '/coupon/resto?restaurant=$id&action=paid'), headers: {
+        "Accept": "Application/json",
+        "Authorization": "Bearer $token"
+      });
+      data = json.decode(apiResultSecond.body);
+      print('_apiResultSecond data 2');
+      // print(data);
+      setState((){});
+    } else {
+      print('_apiResultSecond success');
+    }
     print(data);
     // print(data['data']['unpaid']);
 
@@ -294,6 +318,24 @@ class _NguponYukRestoUnpaidState extends State<NguponYukRestoUnpaid> {
           "Authorization": "Bearer $token"
         });
     var data = json.decode(apiResult.body);
+    if (apiResult.statusCode.toString() != '200') {
+      var apiResultSecond = await http.post(Uri.parse(Links.secondNguponUrl + '/kupon'),
+          body: {
+            'email' : email,
+            'batch_id' : trx_id.toString(),
+            'action' : 'paid'
+          },
+          headers: {
+            "Accept": "Application/json",
+            "Authorization": "Bearer $token"
+          });
+          data = json.decode(apiResultSecond.body);
+          print('_apiResultSecond data 2');
+          // print(data);
+          setState((){});
+        } else {
+          print('_apiResultSecond success');
+        }
     print('_checkoutNguponYuk');
     print(data.toString());
 

@@ -65,6 +65,18 @@ class _NguponYukUnpaidState extends State<NguponYukUnpaid> {
     });
     print('_getNguponYuk');
     var data = json.decode(apiResult.body);
+    if (apiResult.statusCode.toString() != '200') {
+      var apiResultSecond = await http.get(Uri.parse(Links.secondNguponUrl + '/kupon?action=use&user=$email'), headers: {
+        "Accept": "Application/json",
+        "Authorization": "Bearer $token"
+      });
+      data = json.decode(apiResultSecond.body);
+      print('_apiResultSecond data 2');
+      // print(data);
+      setState((){});
+    } else {
+      print('_apiResultSecond success');
+    }
     print(data['data']['unpaid']);
 
     for (var h in data['data']['unpaid']) {
@@ -409,6 +421,24 @@ class _NguponYukUnpaidState extends State<NguponYukUnpaid> {
           "Authorization": "Bearer $token"
         });
     var data = json.decode(apiResult.body);
+    if (apiResult.statusCode.toString() != '200') {
+      var apiResultSecond = await http.post(Uri.parse(Links.secondNguponUrl + '/kupon'),
+          body: {
+            'email' : email,
+            'batch_id' : trx_id.toString(),
+            'action' : 'paid'
+          },
+          headers: {
+            "Accept": "Application/json",
+            "Authorization": "Bearer $token"
+          });
+          data = json.decode(apiResultSecond.body);
+          print('_apiResultSecond data 2');
+          // print(data);
+          setState((){});
+        } else {
+          print('_apiResultSecond success');
+        }
     print('_checkoutNguponYuk');
     print('email'+':'+email+', '+'batch_id'+':'+trx_id.toString()+', '+'action'+':'+'paid');
     print(data.toString());

@@ -5,7 +5,8 @@ import 'package:page_transition/page_transition.dart';
 
 class Links{
   static String mainUrl = "http://irg.devus-sby.com/api/v2";
-  static String nguponUrl = "http://nguponyuk.devastic.com/api";
+  static String nguponUrl = "http://nguponyuk.jiitu.co.id/api";
+  static String secondNguponUrl = "http://nguponyuk.devastic.com/api";
   static String subUrl = "http://irg.devus-sby.com";
 
   // static String mainUrl = "http://irg.devastic.com/api/v2";

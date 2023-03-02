@@ -673,6 +673,18 @@ class _DetailRestoState extends State<DetailResto> {
     print('_getNguponYukKode');
     print(id);
     print(data.toString());
+    if (apiResult.statusCode.toString() != '200') {
+      var apiResultSecond = await http.get(Uri.parse(Links.secondNguponUrl + '/kupon?action=buy&restaurant_id=$id'), headers: {
+        "Accept": "Application/json",
+        "Authorization": "Bearer $token"
+      });
+      data = json.decode(apiResultSecond.body);
+      print('_apiResultSecond data 2');
+      // print(data);
+      setState((){});
+    } else {
+      print('_apiResultSecond success');
+    }
 
     for(var v in data['data']){
       if (v['restaurant_id'].toString() == id.toString()) {

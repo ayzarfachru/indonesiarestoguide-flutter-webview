@@ -45,6 +45,18 @@ class _HorizontalCouponExample2 extends State<HorizontalCouponExample2> {
       "Authorization": "Bearer $token"
     });
     var data = json.decode(apiResult.body);
+    if (apiResult.statusCode.toString() != '200') {
+      var apiResultSecond = await http.get(Uri.parse(Links.secondNguponUrl + '/kupon?action=buy&restaurant_id=$id'), headers: {
+        "Accept": "Application/json",
+        "Authorization": "Bearer $token"
+      });
+      data = json.decode(apiResultSecond.body);
+      print('_apiResultSecond data 2');
+      // print(data);
+      setState((){});
+    } else {
+      print('_apiResultSecond success');
+    }
     print('_getNguponYuk');
     print(data.toString());
 
@@ -140,6 +152,18 @@ class _HorizontalCouponExample2 extends State<HorizontalCouponExample2> {
       "Authorization": "Bearer $token"
     });
     var data = json.decode(apiResult.body);
+    if (apiResult.statusCode.toString() != '200') {
+      var apiResultSecond = await http.get(Uri.parse(Links.secondNguponUrl + '/kupon?action=buy&restaurant_id=$id&ref_code=${ref.replaceAll('#', '')}'), headers: {
+        "Accept": "Application/json",
+        "Authorization": "Bearer $token"
+      });
+      data = json.decode(apiResultSecond.body);
+      print('_apiResultSecond data 2');
+      // print(data);
+      setState((){});
+    } else {
+      print('_apiResultSecond success');
+    }
     print('_getNguponYukKode');
     print(Links.nguponUrl + '/kupon?action=buy&restaurant_id=$id&ref_code=${ref.replaceAll('#', '')}');
     print(data.toString());
@@ -252,6 +276,25 @@ class _HorizontalCouponExample2 extends State<HorizontalCouponExample2> {
           "Authorization": "Bearer $token"
     });
     var data = json.decode(apiResult.body);
+    if (apiResult.statusCode.toString() != '200') {
+      var apiResultSecond = await http.post(Uri.parse(Links.secondNguponUrl + '/kupon'),
+          body: {
+            'email' : email,
+            'batch_id' : couponId,
+            'action' : 'new',
+            'restaurant' : id.toString(),
+          },
+          headers: {
+            "Accept": "Application/json",
+            "Authorization": "Bearer $token"
+          });
+          data = json.decode(apiResultSecond.body);
+          print('_apiResultSecond data 2');
+          // print(data);
+          setState((){});
+        } else {
+          print('_apiResultSecond success');
+        }
     print('_checkoutNguponYuk');
     print(data.toString());
 
@@ -288,6 +331,26 @@ class _HorizontalCouponExample2 extends State<HorizontalCouponExample2> {
           "Authorization": "Bearer $token"
     });
     var data = json.decode(apiResult.body);
+    if (apiResult.statusCode.toString() != '200') {
+      var apiResultSecond = await http.post(Uri.parse(Links.secondNguponUrl + '/kupon'),
+          body: {
+            'email' : email,
+            'batch_id' : couponId,
+            'action' : 'new',
+            'restaurant' : id.toString(),
+            'ref_code' : ref_code.toString(),
+          },
+          headers: {
+            "Accept": "Application/json",
+            "Authorization": "Bearer $token"
+          });
+      data = json.decode(apiResultSecond.body);
+      print('_apiResultSecond data 2');
+      // print(data);
+      setState((){});
+    } else {
+      print('_apiResultSecond success');
+    }
     print('_checkoutNguponYuk');
     print(data.toString());
 
@@ -313,6 +376,18 @@ class _HorizontalCouponExample2 extends State<HorizontalCouponExample2> {
     });
     print('_checkUnpaidNguponYuk');
     var data = json.decode(apiResult.body);
+    if (apiResult.statusCode.toString() != '200') {
+      var apiResultSecond = await http.get(Uri.parse(Links.secondNguponUrl + '/kupon?action=use&user=$email'), headers: {
+            "Accept": "Application/json",
+            "Authorization": "Bearer $token"
+          });
+      data = json.decode(apiResultSecond.body);
+      print('_apiResultSecond data 2');
+      // print(data);
+      setState((){});
+    } else {
+      print('_apiResultSecond success');
+    }
     print(data['data']['unpaid']);
 
     if (data['data']['unpaid'].toString() != '[]') {
@@ -466,6 +541,18 @@ class _HorizontalCouponExample2 extends State<HorizontalCouponExample2> {
     });
     print('_getUnpaidNguponYuk');
     var data = json.decode(apiResult.body);
+    if (apiResult.statusCode.toString() != '200') {
+      var apiResultSecond = await http.get(Uri.parse(Links.secondNguponUrl + '/kupon?action=use&user=$email'), headers: {
+        "Accept": "Application/json",
+        "Authorization": "Bearer $token"
+      });
+      data = json.decode(apiResultSecond.body);
+      print('_apiResultSecond data 2');
+      // print(data);
+      setState((){});
+    } else {
+      print('_apiResultSecond success');
+    }
     print(data['data']['unpaid']);
 
     for (var h in data['data']['unpaid']) {
@@ -730,6 +817,24 @@ class _HorizontalCouponExample2 extends State<HorizontalCouponExample2> {
           "Authorization": "Bearer $token"
         });
     var data = json.decode(apiResult.body);
+    if (apiResult.statusCode.toString() != '200') {
+      var apiResultSecond = await http.post(Uri.parse(Links.secondNguponUrl + '/kupon'),
+          body: {
+            'email' : email,
+            'batch_id' : trx_id.toString(),
+            'action' : 'paid',
+          },
+          headers: {
+            "Accept": "Application/json",
+            "Authorization": "Bearer $token"
+          });
+          data = json.decode(apiResultSecond.body);
+          print('_apiResultSecond data 2');
+          // print(data);
+          setState((){});
+        } else {
+          print('_apiResultSecond success');
+        }
     print('_checkoutNguponYukSecond');
     print(data.toString());
 

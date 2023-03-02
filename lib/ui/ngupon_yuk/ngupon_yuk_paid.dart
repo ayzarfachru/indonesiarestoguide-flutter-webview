@@ -56,6 +56,18 @@ class _NguponYukPaidState extends State<NguponYukPaid> {
     print('_getNguponYuk');
     print(apiResult.body);
     var data = json.decode(apiResult.body);
+    if (apiResult.statusCode.toString() != '200') {
+      var apiResultSecond = await http.get(Uri.parse(Links.secondNguponUrl + '/kupon?action=use&user=$email'), headers: {
+        "Accept": "Application/json",
+        "Authorization": "Bearer $token"
+      });
+      data = json.decode(apiResultSecond.body);
+      print('_apiResultSecond data 2');
+      // print(data);
+      setState((){});
+    } else {
+      print('_apiResultSecond success');
+    }
 
     for (var h in data['data']['paid']) {
       NguponYuk c = NguponYuk.sub(
@@ -160,6 +172,22 @@ class _NguponYukPaidState extends State<NguponYukPaid> {
           "Authorization": "Bearer $token"
         });
     var data = json.decode(apiResult.body);
+    if (apiResult.statusCode.toString() != '200') {
+      var apiResultSecond = await http.put(Uri.parse(Links.secondNguponUrl + '/kupon/$idShare'),
+          body: {
+            'email' : emailShare,
+          },
+          headers: {
+            "Accept": "Application/json",
+            "Authorization": "Bearer $token"
+          });
+          data = json.decode(apiResultSecond.body);
+          print('_apiResultSecond data 2');
+          // print(data);
+          setState((){});
+        } else {
+          print('_apiResultSecond success');
+      }
     print('_bagikanNguponYuk');
     print(data.toString());
 

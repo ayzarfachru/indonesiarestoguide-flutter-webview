@@ -540,9 +540,26 @@ class _ProfileActivityState extends State<ProfileActivity> {
       "Accept": "Application/json",
       "Authorization": "Bearer $token"
     });
-    print('_getNguponYuk');
-    print(apiResult.body);
     var data = json.decode(apiResult.body);
+    print('_getNguponYuk');
+    print(email);
+    print(apiResult.statusCode);
+    print(apiResult.body);
+    setState((){});
+    if (apiResult.statusCode.toString() != '200') {
+      var apiResultSecond = await http.get(Uri.parse(Links.secondNguponUrl + '/kupon?action=use&user=$email'), headers: {
+        "Accept": "Application/json",
+        "Authorization": "Bearer $token"
+      });
+      data = json.decode(apiResultSecond.body);
+      print('_getNguponYuk data 2');
+      print(data);
+      setState((){});
+    } else {
+      print('_getNguponYuk success');
+    }
+    print('_getNguponYuk 1');
+    print(data['data']['paid'].toString());
 
     var apiResultRef = await http.get(Uri.parse(Links.nguponUrl + '/coupon/ref?user=$email'), headers: {
       "Accept": "Application/json",
@@ -550,8 +567,21 @@ class _ProfileActivityState extends State<ProfileActivity> {
     });
     print('_getNguponYuk ref');
     print(Links.nguponUrl + '/coupon/ref?user=$email');
+    print(apiResultRef.statusCode);
     print(apiResultRef.body);
     var dataRef = json.decode(apiResultRef.body);
+    if (apiResultRef.statusCode.toString() != '200') {
+      var apiResultRefSecond = await http.get(Uri.parse(Links.secondNguponUrl + '/coupon/ref?user=$email'), headers: {
+        "Accept": "Application/json",
+        "Authorization": "Bearer $token"
+      });
+      dataRef = json.decode(apiResultRefSecond.body);
+      print('_apiResultRef data 2');
+      // print(data);
+      setState((){});
+    } else {
+      print('_apiResultRef success');
+    }
 
     if (data['data']['unpaid'].toString() == '[]' && data['data']['paid'].toString() == '[]' && dataRef['data'].toString() == '[]') {
       isNguponYuk = false;

@@ -67,6 +67,18 @@ class _NguponYukRefUserState extends State<NguponYukRefUser> {
     print(Links.nguponUrl + '/coupon/ref?user=$email');
     print(apiResult.body);
     var data = json.decode(apiResult.body);
+    if (apiResult.statusCode.toString() != '200') {
+      var apiResultSecond = await http.get(Uri.parse(Links.secondNguponUrl + '/coupon/ref?user=$email'), headers: {
+        "Accept": "Application/json",
+        "Authorization": "Bearer $token"
+      });
+      data = json.decode(apiResultSecond.body);
+      print('_apiResultSecond data 2');
+      // print(data);
+      setState((){});
+    } else {
+      print('_apiResultSecond success');
+    }
 
     for (var h in data['data']) {
       NguponYuk c = NguponYuk.sub(

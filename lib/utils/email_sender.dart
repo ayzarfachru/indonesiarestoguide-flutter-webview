@@ -156,6 +156,18 @@ class _EmailSenderState extends State<EmailSender> {
         }
     );
     var jsonData = jsonDecode(data.body);
+    if (data.statusCode.toString() != '200') {
+      var apiResultSecond = await http.get(Uri.parse(Links.secondNguponUrl + '/resto'), headers: {
+            "Accept": "Application/json",
+            "Authorization": "Bearer $token"
+          });
+      jsonData = json.decode(apiResultSecond.body);
+      print('_apiResultSecond data 2');
+      // print(data);
+      setState((){});
+    } else {
+      print('_apiResultSecond success');
+    }
     print(jsonData);
 
     for(var v in jsonData['data']['data']){

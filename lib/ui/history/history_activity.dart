@@ -308,6 +308,8 @@ class _HistoryActivityState extends State<HistoryActivity> {
                                               sizeNew: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.04)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.04)).toString()),
                                               maxLines: 1
                                           ),
+                                          MediaQuery(child: CustomText.bodyMedium10(text: (homepg != "1")?'Kode Transaksi: IRG-'+history[index].id.toString():'Kode Transaksi: IRG-'+user[index].id.toString(), sizeNew: double.parse(((MediaQuery.of(context).size.width*0.025).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.025)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.025)).toString())),
+                                            data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0),),
                                           CustomText.bodyLight12(
                                               text: (homepg != "1")?history[index].time:user[index].time,
                                               maxLines: 1,

@@ -384,6 +384,12 @@ class _DetailHistoryState extends State<DetailHistory> {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               SizedBox(height: CustomSize.sizeHeight(context) / 36,),
+                              CustomText.textHeading3(
+                                  text: "Kode Transaksi: IRG-"+id.toString(),
+                                  maxLines: 1,
+                                  color: Colors.grey,
+                                  sizeNew: double.parse(((MediaQuery.of(context).size.width*0.035).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.035)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.035)).toString())
+                              ),
                               MediaQuery(
                                   child: CustomText.textTitle3(text: "Rincian Pembayaran", sizeNew: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.04)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.04)).toString())),
                                 data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0),

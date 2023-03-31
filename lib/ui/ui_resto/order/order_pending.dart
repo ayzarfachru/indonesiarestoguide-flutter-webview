@@ -691,6 +691,12 @@ class _OrderPendingState extends State<OrderPending> {
                                           crossAxisAlignment: CrossAxisAlignment.start,
                                           children: [
                                             SizedBox(height: CustomSize.sizeHeight(context) / 36,),
+                                            CustomText.textHeading3(
+                                                text: "Kode Transaksi: IRG-"+id.toString(),
+                                                maxLines: 1,
+                                                color: CustomColor.primary,
+                                                sizeNew: double.parse(((MediaQuery.of(context).size.width*0.035).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.035)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.035)).toString())
+                                            ),
                                             CustomText.textTitle3(text: "Rincian Pembayaran", sizeNew: double.parse(((MediaQuery.of(context).size.width*0.04).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.04)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.04)).toString())),
                                             // CustomText.bodyLight12(
                                             //     text: date_trans.toString().split('T')[1].split(':')[0]+':'+date_trans.toString().split('T')[1].split(':')[1]+', '+DateFormat('dd-MM-y').format(DateTime.parse(date_trans)).toString(),
@@ -1840,6 +1846,12 @@ class _OrderPendingState extends State<OrderPending> {
                                               //     maxLines: 1,
                                               //     minSize: 10
                                               // ),
+                                              CustomText.textHeading3(
+                                                  text: "Kode Transaksi: IRG-"+transaction[index].id.toString(),
+                                                  maxLines: 1,
+                                                  color: CustomColor.primary,
+                                                  sizeNew: double.parse(((MediaQuery.of(context).size.width*0.03).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.03)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.03)).toString())
+                                              ),
                                               CustomText.textHeading4(
                                                   text: transaction[index].username.toString(),
                                                   sizeNew: double.parse(((MediaQuery.of(context).size.width*0.05).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.05)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.05)).toString()),

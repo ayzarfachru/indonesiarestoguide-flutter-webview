@@ -3805,6 +3805,8 @@ class _HomeActivityState extends State<HomeActivity> with WidgetsBindingObserver
                                                               ):Container()
                                                             ],
                                                           ),
+                                                          MediaQuery(child: CustomText.bodyMedium10(text: 'Kode Transaksi: IRG-'+transaction[index].id.toString().replaceAll('untuk ', '').replaceAll('orang', 'meja'), sizeNew: double.parse(((MediaQuery.of(context).size.width*0.025).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.025)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.025)).toString())),
+                                                            data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0),),
                                                           (transaction[index].type!.startsWith('Reservasi'))?Column(
                                                             crossAxisAlignment: CrossAxisAlignment.start,
                                                             children: [

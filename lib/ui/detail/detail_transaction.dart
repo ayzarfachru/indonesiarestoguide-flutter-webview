@@ -1650,6 +1650,18 @@ class _DetailTransactionState extends State<DetailTransaction> {
                     // SizedBox(height: CustomSize.sizeHeight(context) / 32,),
                     SizedBox(height: CustomSize.sizeHeight(context) * 0.0075),
                     Divider(thickness: 6, color: CustomColor.secondary,),
+                    Container(
+                      color: Colors.white,
+                      child: Padding(
+                        padding: EdgeInsets.only(
+                          left: CustomSize.sizeWidth(context) / 32,
+                          right: CustomSize.sizeWidth(context) / 32,
+                        ),
+                        child: CustomText.textHeading4(text: "Kode Transaksi: IRG-$id", color: CustomColor.primary, minSize: double.parse(((MediaQuery.of(context).size.width*0.0375).toString().contains('.')==true)?((MediaQuery.of(context).size.width*0.0375)).toString().split('.')[0]:((MediaQuery.of(context).size.width*0.0375)).toString())),
+                      ),
+                    ),
+                    // SizedBox(height: CustomSize.sizeHeight(context) * 0.0075),
+                    // Divider(thickness: 6, color: CustomColor.secondary,),
                     (type == 'delivery' || type == 'takeaway')?Container(
                       color: Colors.white,
                       child: Column(

@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:firebase_dynamic_links/firebase_dynamic_links.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_icons/flutter_icons.dart';
@@ -46,10 +47,35 @@ class _MejaActivityState extends State<MejaActivity> {
     print(data);
 
     for(var v in data['table']){
+      link = '';
+      SharedPreferences pref = await SharedPreferences.getInstance();
+      idLink = pref.getString('idHomeResto').toString();
+      setState(() {});
+
+      print('barcode');
+      print(v['barcode'].toString());
+      var parameters = DynamicLinkParameters(
+        uriPrefix: 'https://irgresto.page.link',
+        link: Uri.parse('https://irgresto.page.link/open/?id=$idLink/?qr='+v['barcode'].toString()),
+        androidParameters: AndroidParameters(
+          packageName: "com.devus.indonesiarestoguide",
+        ),
+        iosParameters: IOSParameters(
+          bundleId: "com.exmple.test",
+          appStoreId: '1498909115',
+        ),
+      );
+      var dynamicUrl = await dynamicLinks.buildLink(parameters);
+      var shortLink = await dynamicLinks.buildShortLink(parameters);
+      var shortUrl = shortLink.shortUrl;
+      print(shortUrl.toString());
+
+      link = shortUrl.toString();
+      setState((){});
       Meja p = Meja(
           id: v['id'],
           name: v['name'].toString(),
-          qr: v['barcode'],
+          qr: shortUrl.toString(),
           url: v['img'],
       );
       _meja.add(p);
@@ -163,9 +189,10 @@ class _MejaActivityState extends State<MejaActivity> {
     var data = json.decode(apiResult.body);
     // var link = data['link'];
 
-    if (data['msg'].toString() == 'Success') {
-      Navigator.pushReplacement(context, PageTransition(type: PageTransitionType.fade, child: new MejaActivity()));
-    }
+    Navigator.pushReplacement(context, PageTransition(type: PageTransitionType.fade, child: new MejaActivity()));
+    // if (data['msg'].toString() == 'Success') {
+    //   Navigator.pushReplacement(context, PageTransition(type: PageTransitionType.fade, child: new MejaActivity()));
+    // }
 
     setState(() {
       // downloadAll = data['link'];
@@ -176,8 +203,34 @@ class _MejaActivityState extends State<MejaActivity> {
   }
 
   List<String?>? items;
-  getNumber() async {
+  String idLink = '';
+  String link = "";
+  FirebaseDynamicLinks dynamicLinks = FirebaseDynamicLinks.instance;
+  Future<String> createDynamicLink() async {
+    SharedPreferences pref = await SharedPreferences.getInstance();
+    idLink = pref.getString('idHomeResto').toString();
+    setState(() {});
 
+    var parameters = DynamicLinkParameters(
+      uriPrefix: 'https://irgresto.page.link',
+      link: Uri.parse('https://irgresto.page.link/open/?id=$idLink/'),
+      androidParameters: AndroidParameters(
+        packageName: "com.devus.indonesiarestoguide",
+      ),
+      iosParameters: IOSParameters(
+        bundleId: "com.exmple.test",
+        appStoreId: '1498909115',
+      ),
+    );
+    var dynamicUrl = await dynamicLinks.buildLink(parameters);
+    var shortLink = await dynamicLinks.buildShortLink(parameters);
+    var shortUrl = shortLink.shortUrl;
+    print(shortUrl.toString());
+
+    link = shortUrl.toString();
+    setState((){});
+
+    return shortUrl.toString();
   }
 
   @override

@@ -3,6 +3,7 @@ import 'dart:convert';
 // import 'package:barcode_scan/barcode_scan.dart';
 import 'package:barcode_scan2/gen/protos/protos.pb.dart';
 import 'package:barcode_scan2/platform_wrapper.dart';
+import 'package:firebase_dynamic_links/firebase_dynamic_links.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_icons/flutter_icons.dart';
@@ -692,6 +693,30 @@ class _CartActivityState extends State<CartActivity> {
   String homepg = "";
   TextEditingController noteKurir = TextEditingController(text: '');
   Future<String?>? makeTransaction(String qrscan)async{
+    if (_transCode == 3) {
+      final PendingDynamicLinkData? data = await FirebaseDynamicLinks.instance.getDynamicLink(Uri.parse(qrscan));
+      if (data != null){
+        if (data.link.toString().isEmpty) {
+          print('kosong');
+          // return HomeActivity();
+        }
+        print(data.link.path);
+        if (data.link.path == "/open/") {
+          final qr = data.link.queryParameters["id"];
+          print('id = '+qr.toString());
+          // if (id != null) {
+          //   return DetailResto(id.toString());
+          // }
+          qrscan = qr.toString().split('/?qr=')[1];
+        }
+      }
+    } else {
+      qrscan = '';
+    }
+
+    setState((){});
+    print((codeNguponYukJson.toString() != '[]')?jsonEncode(codeNguponYuk).toString():'[]');
+    print('qrscan');
     print(qrscan);
     SharedPreferences pref = await SharedPreferences.getInstance();
     var token = pref.getString("token") ?? "";

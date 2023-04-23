@@ -15,29 +15,19 @@ import 'package:in_app_update/in_app_update.dart';
 import 'package:kam5ia/model/Menu.dart';
 import 'package:kam5ia/model/MenuJson.dart';
 import 'package:kam5ia/model/Price.dart';
-import 'package:kam5ia/model/Promo.dart';
 import 'package:kam5ia/model/Resto.dart';
 import 'package:kam5ia/model/Transaction.dart' as trans;
 import 'package:kam5ia/model/imgBanner.dart';
 import 'package:kam5ia/ui/auth/login_activity.dart';
-import 'package:kam5ia/ui/bonus/es_activity.dart';
-import 'package:kam5ia/ui/bonus/nasgor_activity.dart';
 import 'package:kam5ia/ui/bookmark/bookmark_activity.dart';
 import 'package:kam5ia/ui/cart/cart_activity.dart';
 import 'package:kam5ia/ui/detail/detail_resto.dart';
 import 'package:kam5ia/ui/detail/detail_transaction.dart';
 import 'package:kam5ia/ui/detail/detail_transaction_reser.dart';
-import 'package:kam5ia/ui/detail/food_stall_activity.dart';
 import 'package:kam5ia/ui/detail/food_truck_activity.dart';
-import 'package:kam5ia/ui/detail/kaki_lima_list_activity.dart';
-import 'package:kam5ia/ui/detail/other_activity.dart';
 import 'package:kam5ia/ui/detail/pesananmu_activity.dart';
-import 'package:kam5ia/ui/detail/toko_oleh2_activity.dart';
-import 'package:kam5ia/ui/detail/toko_roti_activity.dart';
-import 'package:kam5ia/ui/history/history_activity.dart';
 import 'package:kam5ia/ui/history/history_order_activity.dart';
 import 'package:kam5ia/ui/profile/profile_activity.dart';
-import 'package:kam5ia/ui/promo/promo_activity.dart';
 import 'package:kam5ia/ui/search/search_activity.dart';
 import 'package:kam5ia/ui/top_home/lagi_diskon_activity.dart';
 import 'package:kam5ia/ui/top_home/terdekat_activity.dart';
@@ -47,7 +37,6 @@ import 'package:kam5ia/utils/utils.dart';
 import 'package:intl/intl.dart';
 import 'package:location/location.dart';
 import 'package:location_platform_interface/location_platform_interface.dart';
-import 'package:onesignal_flutter/onesignal_flutter.dart';
 import 'package:page_transition/page_transition.dart';
 import 'package:pull_to_refresh/pull_to_refresh.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -2723,11 +2712,14 @@ class _HomeActivityState extends State<HomeActivity> with WidgetsBindingObserver
   }
 
   Future toDet(id) async {
+    print('TOL');
+    print(id.toString());
     if (id.toString().contains('-') == true) {
       SharedPreferences pref = await SharedPreferences.getInstance();
       pref.setString("resumed", '1');
       pref.setString('idMenus', id.toString().split('-')[1]);
-      print('TOL');
+      print('TOL 2');
+      print(id.toString());
       Navigator.push(
           context,
           PageTransition(

@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:kam5ia/ui/home/home_activity.dart';
 import 'package:kam5ia/ui/ui_resto/home/home_activity.dart';
+import 'package:kam5ia/ui/validation_activity.dart';
 import 'package:kam5ia/ui/welcome_screen.dart';
 import 'package:kam5ia/utils/utils.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -42,7 +43,7 @@ class _SplashScreenState extends State<SplashScreen> {
           _checkForSession().then((status) {
             if (status) {
               Navigator.of(context).pushReplacement(MaterialPageRoute(
-                  builder: (BuildContext context) => (homepg != "1")?HomeActivity():HomeActivityResto()));
+                  builder: (BuildContext context) => (homepg != "3")?(homepg != "1")?HomeActivity():HomeActivityResto():ValidationActivity()));
             }
           });
         }
@@ -81,6 +82,7 @@ class _SplashScreenState extends State<SplashScreen> {
     SharedPreferences pref = await SharedPreferences.getInstance();
     setState(() {
       homepg = (pref.getString('homepg')??'');
+      print('homepg');
       print(homepg);
     });
   }
@@ -93,6 +95,7 @@ class _SplashScreenState extends State<SplashScreen> {
     print(token);
     if (token != '') {
       var apiResult = await http.get(Uri.parse('https://irg.devus-sby.com/api/v2/index'), headers: {
+      // var apiResult = await http.get(Uri.parse('https://jiitu.co.id/api/irg/index'), headers: {
         "Accept": "Application/json",
         "Authorization": "Bearer $token"
       });
@@ -115,7 +118,7 @@ class _SplashScreenState extends State<SplashScreen> {
           _checkForSession().then((status) {
             if (status) {
               Navigator.of(context).pushReplacement(MaterialPageRoute(
-                  builder: (BuildContext context) => (homepg != "1")?HomeActivity():HomeActivityResto()));
+                  builder: (BuildContext context) => (homepg != "3")?(homepg != "1")?HomeActivity():HomeActivityResto():ValidationActivity()));
             }
           });
         }
@@ -129,6 +132,7 @@ class _SplashScreenState extends State<SplashScreen> {
       // }
     } else {
       var apiResult = await http.get(Uri.parse('https://irg.devus-sby.com/api/v2/index'), headers: {
+      // var apiResult = await http.get(Uri.parse('https://jiitu.co.id/api/irg/index'), headers: {
         "Accept": "Application/json",
       });
       print(apiResult.statusCode);
@@ -147,7 +151,7 @@ class _SplashScreenState extends State<SplashScreen> {
           _checkForSession().then((status) {
             if (status) {
               Navigator.of(context).pushReplacement(MaterialPageRoute(
-                  builder: (BuildContext context) => (homepg != "1")?HomeActivity():HomeActivityResto()));
+                  builder: (BuildContext context) => (homepg != "3")?(homepg != "1")?HomeActivity():HomeActivityResto():ValidationActivity()));
             }
           });
         }

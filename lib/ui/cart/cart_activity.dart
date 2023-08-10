@@ -717,6 +717,8 @@ class _CartActivityState extends State<CartActivity> {
     setState((){});
     print((codeNguponYukJson.toString() != '[]')?jsonEncode(codeNguponYuk).toString():'[]');
     print('qrscan');
+    print(codeNguponYukJson);
+    print(codeNguponYuk);
     print(qrscan);
     SharedPreferences pref = await SharedPreferences.getInstance();
     var token = pref.getString("token") ?? "";
@@ -745,6 +747,8 @@ class _CartActivityState extends State<CartActivity> {
       if (data['msg'].toString() == 'meja tidak tersedia') {
         Fluttertoast.showToast(msg: 'Gunakan hp sebelumnya yang sama untuk memesan');
       }
+      print('status_code');
+      print(data['status_code']);
 
       for(var v in data['device_id']){
         // User p = User.resto(
@@ -826,7 +830,7 @@ class _CartActivityState extends State<CartActivity> {
             });
       }
 
-      if(data['status_code'] == 200 && data['message'] != 'resto tutup'){
+      if(apiResult.statusCode == 200 && data['message'] != 'resto tutup'){
         if (codeNguponYukJson != []) {
           for (var x in codeNguponYukJson){
             print('bukan delivery');
@@ -985,7 +989,7 @@ class _CartActivityState extends State<CartActivity> {
             });
       }
 
-      if(data['status_code'] == 200 && data['message'] != 'resto tutup'){
+      if(apiResult.statusCode == 200 && data['message'] != 'resto tutup'){
         if (codeNguponYukJson != []) {
           for (var x in codeNguponYukJson){
             print('bukan delivery');
@@ -1186,7 +1190,7 @@ class _CartActivityState extends State<CartActivity> {
     //   // _user.add(p);
     // }
 
-    if(data['status_code'] == 200){
+    if(apiResult.statusCode == 200){
       print(restoAddress);
       print(pjTokoTrans);
       print(phoneRestoTrans);
@@ -1341,7 +1345,7 @@ class _CartActivityState extends State<CartActivity> {
     //   // _user.add(p);
     // }
 
-    if(data['status_code'] == 200){
+    if(apiResult.statusCode == 200){
       print(restoAddress);
       print(pjTokoTrans);
       print(phoneRestoTrans);

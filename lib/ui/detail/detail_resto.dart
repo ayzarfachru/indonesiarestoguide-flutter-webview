@@ -229,6 +229,7 @@ class _DetailRestoState extends State<DetailResto> {
       "Authorization": "Bearer $token"
     });
     var data = json.decode(apiResult.body);
+    print(id);
     print('ini loh sob rese '+data.toString());
     print('LOHH '+data['data']['resto'].toString());
     print('ini loh sob rese '+data['data']['resto'].toString());

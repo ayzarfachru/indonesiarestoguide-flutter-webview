@@ -546,7 +546,7 @@ class _HomeActivityState extends State<HomeActivity> with WidgetsBindingObserver
     var data = json.decode(apiResult.body);
     // print('all data'+data['tipename'].toString().split(',').length.toString());
     // print('all data'+data['tipe'][0].toString());
-    print('all data'+data['tipe'][0].toString());
+    // print('all data'+data['tipe'][0].toString());
     print('all data1'+data['trans'].toString());
     print('tipename'+data['ses_arr'].toString());
     print('tipename'+data['tipename'].toString());
@@ -718,98 +718,100 @@ class _HomeActivityState extends State<HomeActivity> with WidgetsBindingObserver
     // print('all data'+_randomRes.toString().contains('[').toString());
 
     if (data.toString().contains('tipe')) {
-      if (data['tipename'].toString().split(',').length >= 1) {
-        for(var v in data['tipe'][0]){
-          Resto r = Resto.all(
-              id: v['id'],
-              name: v['name'],
-              distance: double.parse(v['distance'].toString()),
-              img: ((v['img'].toString() != '[]')?v['img'][0]['img']:'').toString(),
-              status: v['status'].toString(),
-              isOpen: v['isOpen'].toString()
-          );
-          _randomRes1.add(r);
+      if (data['tipe'].toString() != '[]') {
+        if (data['tipename'].toString().split(',').length >= 1) {
+          for(var v in data['tipe'][0]){
+            Resto r = Resto.all(
+                id: v['id'],
+                name: v['name'],
+                distance: double.parse(v['distance'].toString()),
+                img: ((v['img'].toString() != '[]')?v['img'][0]['img']:'').toString(),
+                status: v['status'].toString(),
+                isOpen: v['isOpen'].toString()
+            );
+            _randomRes1.add(r);
+          }
         }
-      }
-      if (data['tipename'].toString().split(',').length >= 2) {
-        for(var v in data['tipe'][1]){
-          Resto r = Resto.all(
-              id: v['id'],
-              name: v['name'],
-              distance: double.parse(v['distance'].toString()),
-              img: ((v['img'].toString() != '[]')?v['img'][0]['img']:'').toString(),
-              status: v['status'].toString(),
-              isOpen: v['isOpen'].toString()
-          );
-          _randomRes2.add(r);
+        if (data['tipename'].toString().split(',').length >= 2) {
+          for(var v in data['tipe'][1]){
+            Resto r = Resto.all(
+                id: v['id'],
+                name: v['name'],
+                distance: double.parse(v['distance'].toString()),
+                img: ((v['img'].toString() != '[]')?v['img'][0]['img']:'').toString(),
+                status: v['status'].toString(),
+                isOpen: v['isOpen'].toString()
+            );
+            _randomRes2.add(r);
+          }
         }
-      }
-      if (data['tipename'].toString().split(',').length >= 3) {
-        for(var v in data['tipe'][2]){
-          Resto r = Resto.all(
-              id: v['id'],
-              name: v['name'],
-              distance: double.parse(v['distance'].toString()),
-              img: ((v['img'].toString() != '[]')?v['img'][0]['img']:'').toString(),
-              status: v['status'].toString(),
-              isOpen: v['isOpen'].toString()
-          );
-          _randomRes3.add(r);
+        if (data['tipename'].toString().split(',').length >= 3) {
+          for(var v in data['tipe'][2]){
+            Resto r = Resto.all(
+                id: v['id'],
+                name: v['name'],
+                distance: double.parse(v['distance'].toString()),
+                img: ((v['img'].toString() != '[]')?v['img'][0]['img']:'').toString(),
+                status: v['status'].toString(),
+                isOpen: v['isOpen'].toString()
+            );
+            _randomRes3.add(r);
+          }
         }
-      }
-      if (data['tipename'].toString().split(',').length >= 4) {
-        for(var v in data['tipe'][3]){
-          Resto r = Resto.all(
-              id: v['id'],
-              name: v['name'],
-              distance: double.parse(v['distance'].toString()),
-              img: ((v['img'].toString() != '[]')?v['img'][0]['img']:'').toString(),
-              status: v['status'].toString(),
-              isOpen: v['isOpen'].toString()
-          );
-          _randomRes4.add(r);
+        if (data['tipename'].toString().split(',').length >= 4) {
+          for(var v in data['tipe'][3]){
+            Resto r = Resto.all(
+                id: v['id'],
+                name: v['name'],
+                distance: double.parse(v['distance'].toString()),
+                img: ((v['img'].toString() != '[]')?v['img'][0]['img']:'').toString(),
+                status: v['status'].toString(),
+                isOpen: v['isOpen'].toString()
+            );
+            _randomRes4.add(r);
+          }
         }
-      }
-      if (data['tipename'].toString().split(',').length >= 5) {
-        for(var v in data['tipe'][4]){
-          Resto r = Resto.all(
-              id: v['id'],
-              name: v['name'],
-              distance: double.parse(v['distance'].toString()),
-              img: ((v['img'].toString() != '[]')?v['img'][0]['img']:'').toString(),
-              status: v['status'].toString(),
-              isOpen: v['isOpen'].toString()
-          );
-          _randomRes5.add(r);
+        if (data['tipename'].toString().split(',').length >= 5) {
+          for(var v in data['tipe'][4]){
+            Resto r = Resto.all(
+                id: v['id'],
+                name: v['name'],
+                distance: double.parse(v['distance'].toString()),
+                img: ((v['img'].toString() != '[]')?v['img'][0]['img']:'').toString(),
+                status: v['status'].toString(),
+                isOpen: v['isOpen'].toString()
+            );
+            _randomRes5.add(r);
+          }
         }
-      }
-      if (data['tipename'].toString().split(',').length >= 6) {
-        for(var v in data['tipe'][5]){
-          Resto r = Resto.all(
-              id: v['id'],
-              name: v['name'],
-              distance: double.parse(v['distance'].toString()),
-              img: ((v['img'].toString() != '[]')?v['img'][0]['img']:'').toString(),
-              status: v['status'].toString(),
-              isOpen: v['isOpen'].toString()
-          );
-          _randomRes6.add(r);
+        if (data['tipename'].toString().split(',').length >= 6) {
+          for(var v in data['tipe'][5]){
+            Resto r = Resto.all(
+                id: v['id'],
+                name: v['name'],
+                distance: double.parse(v['distance'].toString()),
+                img: ((v['img'].toString() != '[]')?v['img'][0]['img']:'').toString(),
+                status: v['status'].toString(),
+                isOpen: v['isOpen'].toString()
+            );
+            _randomRes6.add(r);
+          }
         }
-      }
-      if (data['tipename'].toString().split(',').length >= 7) {
-        for(var v in data['tipe'][6]){
-          Resto r = Resto.all(
-              id: v['id'],
-              name: v['name'],
-              distance: double.parse(v['distance'].toString()),
-              img: ((v['img'].toString() != '[]')?v['img'][0]['img']:'').toString(),
-              status: v['status'].toString(),
-              isOpen: v['isOpen'].toString()
-          );
-          _randomRes7.add(r);
+        if (data['tipename'].toString().split(',').length >= 7) {
+          for(var v in data['tipe'][6]){
+            Resto r = Resto.all(
+                id: v['id'],
+                name: v['name'],
+                distance: double.parse(v['distance'].toString()),
+                img: ((v['img'].toString() != '[]')?v['img'][0]['img']:'').toString(),
+                status: v['status'].toString(),
+                isOpen: v['isOpen'].toString()
+            );
+            _randomRes7.add(r);
+          }
         }
+        ses_arr = data['tipename'].toString().replaceAll('[', '').replaceAll(']', '');
       }
-      ses_arr = data['tipename'].toString().replaceAll('[', '').replaceAll(']', '');
     }
 
 
@@ -2968,6 +2970,7 @@ class _HomeActivityState extends State<HomeActivity> with WidgetsBindingObserver
     print(token);
     if (token != '') {
       var apiResult = await http.get(Uri.parse('https://irg.devus-sby.com/api/v2/index'), headers: {
+      // var apiResult = await http.get(Uri.parse('https://jiitu.co.id/api/irg/index'), headers: {
         "Accept": "Application/json",
         "Authorization": "Bearer $token"
       });
@@ -3005,6 +3008,7 @@ class _HomeActivityState extends State<HomeActivity> with WidgetsBindingObserver
       // }
     } else {
       var apiResult = await http.get(Uri.parse('https://irg.devus-sby.com/api/v2/index'), headers: {
+      // var apiResult = await http.get(Uri.parse('https://jiitu.co.id/api/irg/index'), headers: {
         "Accept": "Application/json",
       });
       print(apiResult.statusCode);

@@ -112,6 +112,7 @@ class _BookmarkActivityState extends State<BookmarkActivity> {
       "Accept": "Application/json",
       "Authorization": "Bearer $token"
     });
+    print('Token $token');
     print(apiResult.body);
     var data = json.decode(apiResult.body);
 

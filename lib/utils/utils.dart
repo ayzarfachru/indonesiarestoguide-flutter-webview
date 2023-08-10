@@ -8,8 +8,11 @@ class Links{
   static String subUrl = "http://irg.devus-sby.com";
   static String nguponUrl = "http://nguponyuk.jiitu.co.id/api";
   static String secondNguponUrl = "http://nguponyuk.devastic.com/api";
+  // static String mainUrl = "http://192.168.100.38:8000/api/irg";
+  // static String subUrl = "http://192.168.100.38:8000";
+
   // static String mainUrl = "https://jiitu.co.id/api/irg";
-  // static String subUrl = "https://jituu.co.id";
+  // static String subUrl = "https://jiitu.co.id/";
   // static String nguponUrl = "http://nguponyuk.jiitu.co.id/api";
   // static String secondNguponUrl = "http://nguponyuk.devastic.com/api";
 

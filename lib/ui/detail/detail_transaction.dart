@@ -813,7 +813,7 @@ class _DetailTransactionState extends State<DetailTransaction> {
     print(data);
     print(data['response']['detail_info'].toString().contains('Unpaid').toString());
     statusPay = data['response']['detail_info'].toString().contains('Unpaid').toString();
-    if (data['response']['detail_info'].toString().contains('Unpaid') != true) {
+    if (data['response']['detail_info'].toString().contains('Unpaid') == true) {
       Fluttertoast.showToast(
         msg: "Anda belum membayar!",);
     } else {
@@ -1050,12 +1050,12 @@ class _DetailTransactionState extends State<DetailTransaction> {
       statusPay = 'true';
       setState((){});
     }
-    var data = json.decode(apiResult.body);
     print('QR CODE 2');
-    print(data);
+    print(apiResult.body);
+    var data = json.decode(apiResult.body);
     print(data['response']['detail_info'].toString().contains('Unpaid').toString());
     statusPay = data['response']['detail_info'].toString().contains('Unpaid').toString();
-    if (data['response']['detail_info'].toString().contains('Unpaid') != true) {
+    if (data['response']['detail_info'].toString().contains('Unpaid') == true) {
       Fluttertoast.showToast(
         msg: "Anda belum membayar!",);
     } else {

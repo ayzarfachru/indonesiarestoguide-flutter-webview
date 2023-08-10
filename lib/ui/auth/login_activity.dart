@@ -255,6 +255,7 @@ class _LoginActivityState extends State<LoginActivity> {
       print(playerId.toString()+' ply');
       var apiResult = await http.post(Uri.parse(Links.mainUrl + '/auth/login/google'),
           body: {'email': value?.email, 'name': value?.displayName, 'photoUrl': value?.photoUrl, 'device_id': playerId});
+      print('print auth');
       print(apiResult.body);
       var data = json.decode(apiResult.body);
       if (data['status_code'].toString() == "200") {

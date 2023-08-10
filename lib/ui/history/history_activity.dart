@@ -46,6 +46,7 @@ class _HistoryActivityState extends State<HistoryActivity> {
       "Authorization": "Bearer $token"
     });
     print('History User');
+    print('$token');
     print(apiResult.body);
     var data = json.decode(apiResult.body);
 

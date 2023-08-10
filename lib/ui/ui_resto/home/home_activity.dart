@@ -215,6 +215,7 @@ class _HomeActivityRestoState extends State<HomeActivityResto> with WidgetsBindi
   }
 
 
+  bool jiitu = true;
   getHomePg() async {
     SharedPreferences pref = await SharedPreferences.getInstance();
     setState(() {
@@ -291,6 +292,8 @@ class _HomeActivityRestoState extends State<HomeActivityResto> with WidgetsBindi
     });
     // print(apiResult.body);
     var data = json.decode(apiResult.body);
+    print(data);
+    print(data['resto']['users_id']);
     print(idUser);
 
     // for(var v in data['trans']){
@@ -495,7 +498,8 @@ class _HomeActivityRestoState extends State<HomeActivityResto> with WidgetsBindi
     // print(apiResult.body);
     var data = json.decode(apiResult.body);
     print('OILO');
-    print(data['trx']['process']);
+    print(data);
+    // print(data['trx']['process']);
 
     if (apiResult.statusCode == 200) {
       // print('PPP '+data['trx']['pending'].toString());
@@ -912,6 +916,7 @@ class _HomeActivityRestoState extends State<HomeActivityResto> with WidgetsBindi
     print(token);
     if (token != '') {
       var apiResult = await http.get(Uri.parse('https://irg.devus-sby.com/api/v2/index'), headers: {
+      // var apiResult = await http.get(Uri.parse('https://jiitu.co.id/api/irg/index'), headers: {
         "Accept": "Application/json",
         "Authorization": "Bearer $token"
       });
@@ -949,6 +954,7 @@ class _HomeActivityRestoState extends State<HomeActivityResto> with WidgetsBindi
       // }
     } else {
       var apiResult = await http.get(Uri.parse('https://irg.devus-sby.com/api/v2/index'), headers: {
+      // var apiResult = await http.get(Uri.parse('https://jiitu.co.id/api/irg/index'), headers: {
         "Accept": "Application/json",
       });
       print(apiResult.statusCode);
@@ -1005,7 +1011,7 @@ class _HomeActivityRestoState extends State<HomeActivityResto> with WidgetsBindi
       getHomePg();
       // idResto();
       getInitial();
-      checkTest();
+      // checkTest();
       // getDepo();
       // _getQr();
     });
@@ -1431,6 +1437,49 @@ class _HomeActivityRestoState extends State<HomeActivityResto> with WidgetsBindi
                                   onTap: (){
                                     setState(() {
                                       Navigator.push(context, PageTransition(type: PageTransitionType.fade, child: new MenuActivity()));
+                                      // if (jiitu == true) {
+                                      //   showDialog(
+                                      //       context: context,
+                                      //       builder: (context) {
+                                      //         return AlertDialog(
+                                      //           contentPadding: EdgeInsets.only(left: 25, right: 25, top: 15, bottom: 5),
+                                      //           shape: RoundedRectangleBorder(
+                                      //               borderRadius: BorderRadius.all(Radius.circular(10))
+                                      //           ),
+                                      //           title: Center(child: Text('Perhatian!', style: TextStyle(color: CustomColor.accent))),
+                                      //           content: Text('Anda hanya bisa melakukan perubahan menu melalui "JIITU"', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500), textAlign: TextAlign.center),
+                                      //           actions: <Widget>[
+                                      //             Center(
+                                      //               child: Row(
+                                      //                 mainAxisAlignment: MainAxisAlignment.spaceAround,
+                                      //                 children: [
+                                      //                   TextButton(
+                                      //                     // minWidth: CustomSize.sizeWidth(context),
+                                      //                     style: TextButton.styleFrom(
+                                      //                       backgroundColor: CustomColor.accent,
+                                      //                       padding: EdgeInsets.all(0),
+                                      //                       shape: const RoundedRectangleBorder(
+                                      //                           borderRadius: BorderRadius.all(Radius.circular(10))
+                                      //                       ),
+                                      //                     ),
+                                      //                     child: Text('Mengerti', style: TextStyle(color: Colors.white)),
+                                      //                     onPressed: () async{
+                                      //                       setState(() {
+                                      //                         // codeDialog = valueText;
+                                      //                         Navigator.pop(context);
+                                      //                       });
+                                      //                     },
+                                      //                   ),
+                                      //                 ],
+                                      //               ),
+                                      //             ),
+                                      //
+                                      //           ],
+                                      //         );
+                                      //       });
+                                      // } else {
+                                      //   Navigator.push(context, PageTransition(type: PageTransitionType.fade, child: new MenuActivity()));
+                                      // }
                                     });
                                   },
                                   child: Container(

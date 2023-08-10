@@ -72,6 +72,8 @@ class _SearchActivityState extends State<SearchActivity> {
         });
     print(apiResult.body);
     var data = json.decode(apiResult.body);
+    print('/page/search?q=$q&type=$tipe&lat=$lat&long=$long&limit=0&city=$kota2&facility=$facilityList2');
+    print('$token');
     print('ini loh sob rese '+data.toString());
     // print('LOHH '+data['data']['resto'].toString());
     // print('ini loh sob rese1 '+data['resto'][0].toString());
@@ -158,7 +160,7 @@ class _SearchActivityState extends State<SearchActivity> {
     SharedPreferences pref = await SharedPreferences.getInstance();
     var token = pref.getString("token") ?? "";
 
-    var apiResult = await http.get(Uri.parse('http://irg.devus-sby.com/api/v2/util/province'),
+    var apiResult = await http.get(Uri.parse(Links.mainUrl +'/util/province'),
         headers: {
           "Accept": "Application/json",
           "Authorization": "Bearer $token"
@@ -1063,7 +1065,7 @@ class _SearchActivityState extends State<SearchActivity> {
                             itemCount: cuisine.length,
                             itemBuilder: (_, index){
                               return Container(
-                                width: CustomSize.sizeWidth(context) / 2.7,
+                                width: CustomSize.sizeWidth(context) / 3,
                                 child: GestureDetector(
                                   onTap: (){
                                     _search('', '');

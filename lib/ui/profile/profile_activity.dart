@@ -130,6 +130,7 @@ class _ProfileActivityState extends State<ProfileActivity> {
       "Accept": "Application/json",
       "Authorization": "Bearer $token"
     });
+    print(token);
     print(apiResult.body);
     var data = json.decode(apiResult.body);
 
@@ -228,7 +229,7 @@ class _ProfileActivityState extends State<ProfileActivity> {
       email = (pref.getString('email')??'');
       print(email);
       img = (pref.getString('img')??"");
-      print(img);
+      print('image '+img);
       notelp = (pref.getString('notelp')??"");
       print(notelp);
       // gender = (pref.getString('gender'));
@@ -254,8 +255,8 @@ class _ProfileActivityState extends State<ProfileActivity> {
       "Authorization": "Bearer $token"
     });
     print('owner');
-    print(apiResult.body);
     var data = json.decode(apiResult.body);
+    print(data);
 
     // for(var v in data['trans']){
     //   History h = History(

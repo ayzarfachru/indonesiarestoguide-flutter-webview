@@ -25,20 +25,29 @@ import 'package:page_transition/page_transition.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_dynamic_links/firebase_dynamic_links.dart';
+import 'package:permission_handler/permission_handler.dart';
+import 'package:kam5ia/welcome.dart';
+import 'package:kam5ia/webview_activity.dart';
 
 import 'model/Resto.dart';
 
-class MyHttpOverrides extends HttpOverrides{
+class MyHttpOverrides extends HttpOverrides {
   @override
-  HttpClient createHttpClient(SecurityContext? context){
+  HttpClient createHttpClient(SecurityContext? context) {
     return super.createHttpClient(context)
-      ..badCertificateCallback = (X509Certificate cert, String host, int port)=> true;
+      ..badCertificateCallback =
+          (X509Certificate cert, String host, int port) => true;
   }
 }
 
-void main() async{
+void main() async {
   HttpOverrides.global = new MyHttpOverrides();
   WidgetsFlutterBinding.ensureInitialized();
+  await Permission.camera.request();
+  await Permission.audio.request();
+  await Permission.location.request();
+  await Permission.manageExternalStorage.request();
+  await Permission.storage.request();
   SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle(
     statusBarColor: Colors.transparent,
     statusBarBrightness: Brightness.dark,
@@ -51,8 +60,8 @@ void main() async{
   // GestureBinding.instance?.resamplingEnabled = true;
   // var resto = Api.getResto(4) as Resto;
   OneSignal.shared.setAppId(
-      "4fe55f91-4eb4-4b48-a92c-d7a1c31b114b",
-      // iOSSettings: null
+    "4fe55f91-4eb4-4b48-a92c-d7a1c31b114b",
+    // iOSSettings: null
   );
   OneSignal.shared.addTrigger("prompt_ios", "true");
   // OneSignal.shared.setInFocusDisplayType(OSNotificationDisplayType.notification);
@@ -69,13 +78,14 @@ void main() async{
   runApp(MyApp());
 }
 
-class MyApp extends StatefulWidget{
+class MyApp extends StatefulWidget {
   @override
   _MyAppState createState() => _MyAppState();
 }
 
 class _MyAppState extends State<MyApp> {
-  final GlobalKey<NavigatorState> navigatorKey = new GlobalKey<NavigatorState>();
+  final GlobalKey<NavigatorState> navigatorKey =
+      new GlobalKey<NavigatorState>();
 
   Future<bool> _checkForSession() async {
     await Future.delayed(Duration.zero, () {});
@@ -125,48 +135,50 @@ class _MyAppState extends State<MyApp> {
   //   });
   // }
 
-  Future<Widget> initDynamicLinks() async {
-    final PendingDynamicLinkData? data = await FirebaseDynamicLinks.instance.getInitialLink();
+  Future initDynamicLinks() async {
+    SharedPreferences pref = await SharedPreferences.getInstance();
+    final PendingDynamicLinkData? data =
+        await FirebaseDynamicLinks.instance.getInitialLink();
 
-    if (data != null){
-      return getRoute(data.link);
+    print('dylink1');
+    if (data != null) {
+      print(data.link);
+      pref.setString("url_dylink", data.link.queryParameters["url"].toString());
     }
-    FirebaseDynamicLinks.instance.onLink.listen((PendingDynamicLinkData dynamicLink) async {
-      print('pppp');
-      print(dynamicLink.link);
-      getRoute(dynamicLink.link);
-    }
-    );
-    return HomeActivity();
+    FirebaseDynamicLinks.instance.onLink
+        .listen((PendingDynamicLinkData dynamicLink) async {
+      print('dylink2');
+      print(dynamicLink.link.queryParameters["url"]);
+      pref.setString(
+          "url_dylink", dynamicLink.link.queryParameters["url"].toString());
+    });
   }
 
-  Future<Widget> getRoute(deepLink) async{
-    if (deepLink.toString().isEmpty) {
-      return HomeActivity();
-    } else {
-      // if (deepLink.path == "/open") {
-      //   final id = deepLink.queryParameters["id"];
-      //   if (id != null) {
-      //     if (id.toString().contains('-') == true) {
-      //       SharedPreferences pref = await SharedPreferences.getInstance();
-      //       // pref.getString('restoIdUsr')??'';
-      //       print('TOL');
-      //       return DetailResto(id.toString().split('-')[0]);
-      //     } else {
-      //       print('PUK');
-      //       return DetailResto(id);
-      //     }
-      //   }
-      // }
-    }
-    return HomeActivity();
-  }
-
+  // Future<Widget> getRoute(deepLink) async {
+  //   if (deepLink.toString().isEmpty) {
+  //     return HomeActivity();
+  //   } else {
+  //     // if (deepLink.path == "/open") {
+  //     //   final id = deepLink.queryParameters["id"];
+  //     //   if (id != null) {
+  //     //     if (id.toString().contains('-') == true) {
+  //     //       SharedPreferences pref = await SharedPreferences.getInstance();
+  //     //       // pref.getString('restoIdUsr')??'';
+  //     //       print('TOL');
+  //     //       return DetailResto(id.toString().split('-')[0]);
+  //     //     } else {
+  //     //       print('PUK');
+  //     //       return DetailResto(id);
+  //     //     }
+  //     //   }
+  //     // }
+  //   }
+  //   return HomeActivity();
+  // }
 
   String owner = 'false';
 
-
-  Future _getOwnerResto()async{
+  Future _getOwnerResto() async {
     // List<History> _history = [];
 
     // setState(() {
@@ -175,10 +187,11 @@ class _MyAppState extends State<MyApp> {
     // List<User> _user = [];
     SharedPreferences pref = await SharedPreferences.getInstance();
     String token = pref.getString("token") ?? "";
-    var apiResult = await http.get(Uri.parse(Links.mainUrl + '/owner'), headers: {
-      "Accept": "Application/json",
-      "Authorization": "Bearer $token"
-    });
+    var apiResult = await http.get(Uri.parse(Links.mainUrl + '/owner'),
+        headers: {
+          "Accept": "Application/json",
+          "Authorization": "Bearer $token"
+        });
     print('owner');
     print(apiResult.body);
     var data = json.decode(apiResult.body);
@@ -219,8 +232,8 @@ class _MyAppState extends State<MyApp> {
         SharedPreferences pref = await SharedPreferences.getInstance();
         pref.setInt("ownerId", int.parse(res.split('_')[1]));
         pref.setString("owner", 'true');
-        pref.setString("nameOwner", pref.getString('name')??'');
-        pref.setString("emailOwner", pref.getString('email')??'');
+        pref.setString("nameOwner", pref.getString('name') ?? '');
+        pref.setString("emailOwner", pref.getString('email') ?? '');
         pref.setString("homepg", "1");
         _getCheckResto();
         // for(var v in data['resto']){
@@ -243,7 +256,7 @@ class _MyAppState extends State<MyApp> {
     });
   }
 
-  Future _getCheckResto()async{
+  Future _getCheckResto() async {
     // List<History> _history = [];
 
     // setState(() {
@@ -252,10 +265,12 @@ class _MyAppState extends State<MyApp> {
     SharedPreferences pref = await SharedPreferences.getInstance();
     String token = pref.getString("token") ?? "";
     int idRes = pref.getInt("ownerId") ?? 0;
-    var apiResult = await http.get(Uri.parse(Links.mainUrl + '/owner/activate/'+idRes.toString()), headers: {
-      "Accept": "Application/json",
-      "Authorization": "Bearer $token"
-    });
+    var apiResult = await http.get(
+        Uri.parse(Links.mainUrl + '/owner/activate/' + idRes.toString()),
+        headers: {
+          "Accept": "Application/json",
+          "Authorization": "Bearer $token"
+        });
     print(apiResult.body);
     print(idRes);
     var data = json.decode(apiResult.body);
@@ -301,8 +316,7 @@ class _MyAppState extends State<MyApp> {
         // pref.setString("homerestoname", restoName);
         setState(() {
           navigatorKey.currentState?.pushReplacement(new MaterialPageRoute(
-              builder: (context) =>
-              new HomeActivityResto()));
+              builder: (context) => new HomeActivityResto()));
         });
       }
     }
@@ -313,7 +327,7 @@ class _MyAppState extends State<MyApp> {
   String restoName = "";
   String openAndClose = "0";
   String kosong = '';
-  Future _getUserResto()async{
+  Future _getUserResto() async {
     // List<History> _history = [];
 
     setState(() {
@@ -322,10 +336,11 @@ class _MyAppState extends State<MyApp> {
     print(res.split('_')[0]);
     SharedPreferences pref = await SharedPreferences.getInstance();
     String token = pref.getString("token") ?? "";
-    var apiResult = await http.get(Uri.parse(Links.mainUrl + '/resto'), headers: {
-      "Accept": "Application/json",
-      "Authorization": "Bearer $token"
-    });
+    var apiResult = await http.get(Uri.parse(Links.mainUrl + '/resto'),
+        headers: {
+          "Accept": "Application/json",
+          "Authorization": "Bearer $token"
+        });
     print(apiResult.body);
     var data = json.decode(apiResult.body);
 
@@ -342,10 +357,14 @@ class _MyAppState extends State<MyApp> {
     // }
 
     setState(() {
-      id = (data['msg'].toString() == "User tidak punya resto")?'':data['resto']['id'].toString();
-      restoName = (data['msg'].toString() == "User tidak punya resto")?'':data['resto']['name'];
+      id = (data['msg'].toString() == "User tidak punya resto")
+          ? ''
+          : data['resto']['id'].toString();
+      restoName = (data['msg'].toString() == "User tidak punya resto")
+          ? ''
+          : data['resto']['name'];
       // history = _history;
-      openAndClose = (data['status'].toString() == "closed")?'1':'0';
+      openAndClose = (data['status'].toString() == "closed") ? '1' : '0';
       isLoading = false;
     });
 
@@ -370,31 +389,76 @@ class _MyAppState extends State<MyApp> {
         // pref.setString("homerestoname", restoName);
         setState(() {
           navigatorKey.currentState?.pushReplacement(new MaterialPageRoute(
-              builder: (context) =>
-              new HomeActivityResto()));
+              builder: (context) => new HomeActivityResto()));
         });
       }
     }
   }
 
-  Future _toDetailRes()async{
+  Future _toWebViewDetailResto(String id) async {
+    navigatorKey.currentState?.pushReplacement(new MaterialPageRoute(
+        builder: (context) => new WebViewActivity(
+              codeNotif: "",
+              url: "https://m.kam5ia.com/resto-detail/" + id,
+            )));
+  }
+
+  Future _toDetailRes() async {
     // SharedPreferences pref = await SharedPreferences.getInstance();
     // pref.setString("homepg", "");
     navigatorKey.currentState?.pushReplacement(new MaterialPageRoute(
-        builder: (context) =>
-        new DetailResto(res.split('_')[1])));
+        builder: (context) => new DetailResto(res.split('_')[1])));
+  }
+
+  String codeNotif = "";
+  Future _toWebView() async {
+    SharedPreferences pref = await SharedPreferences.getInstance();
+    navigatorKey.currentState?.pushReplacement(new MaterialPageRoute(
+        builder: (context) => new WebViewActivity(
+              codeNotif: codeNotif,
+              url: pref.getString("url") ?? "",
+            )));
   }
 
   bool isLogin = false;
   String res = '';
   @override
   void initState() {
-    OneSignal.shared.setNotificationOpenedHandler((OSNotificationOpenedResult result) {
-      print('"OneSignal: notification opened: '+result.notification.collapseId.toString());
+    OneSignal.shared.setNotificationWillShowInForegroundHandler(
+        (OSNotificationReceivedEvent result) {
+      // Display Notification, send null to not display, send notification to display
+      print(result.notification.body);
+      if (result.notification.body.toString().contains("IRG-")) {
+        setState(() {
+          codeNotif = result.notification.body.toString();
+        });
+        print(result.notification.body);
+        _toWebView();
+      }
+      result.complete(result.notification);
+    });
+
+    OneSignal.shared
+        .setNotificationOpenedHandler((OSNotificationOpenedResult result) {
+      print(result.notification.body.toString().contains("IRG-"));
+      if (result.notification.body.toString().contains("IRG-")) {
+        setState(() {
+          codeNotif = result.notification.body.toString();
+        });
+        _toWebView();
+      }
+      print(result.notification.collapseId.toString().split("home_user_")[1]);
+      if (result.notification.collapseId.toString().contains("home_user")) {
+        _toWebViewDetailResto(
+            result.notification.collapseId.toString().split("home_user_")[1]);
+      }
+      print('"OneSignal: notification opened: ' +
+          result.notification.collapseId.toString());
       res = result.notification.collapseId.toString();
       // print(result.notification.payload.collapseId);
       print(res.split('_')[0]);
-      if(result.notification.collapseId.toString().split('_')[0] == 'forUser'){
+      if (result.notification.collapseId.toString().split('_')[0] ==
+          'forUser') {
         _toDetailRes();
         // navigatorKey.currentState?.pushReplacement(new MaterialPageRoute(
         //     builder: (context) =>
@@ -403,7 +467,8 @@ class _MyAppState extends State<MyApp> {
         //       builder: (context) =>
         //       new OrderPending()));
         // });
-      }else if(result.notification.collapseId.toString().split('_')[0] == 'forAdmin'){
+      } else if (result.notification.collapseId.toString().split('_')[0] ==
+          'forAdmin') {
         if (owner != 'true') {
           print(result.notification.collapseId);
           // SharedPreferences pref = await SharedPreferences.getInstance();
@@ -429,7 +494,7 @@ class _MyAppState extends State<MyApp> {
         _navigateHome();
       }
     });
-    print('OI2 '+deepLink2);
+    print('OI2 ' + deepLink2);
     super.initState();
   }
   //
@@ -483,9 +548,9 @@ class _MyAppState extends State<MyApp> {
     return MaterialApp(
       navigatorKey: navigatorKey,
       debugShowCheckedModeBanner: false,
-          // routes: <String, WidgetBuilder>{
-          //   '/open': (BuildContext context) => DetailResto(4.toString()),
-          // },
+      // routes: <String, WidgetBuilder>{
+      //   '/open': (BuildContext context) => DetailResto(4.toString()),
+      // },
       theme: ThemeData(
         primaryColor: CustomColor.primary,
         primaryColorBrightness: Brightness.light,
@@ -494,12 +559,10 @@ class _MyAppState extends State<MyApp> {
         accentColorBrightness: Brightness.light,
         visualDensity: VisualDensity.adaptivePlatformDensity,
         appBarTheme: AppBarTheme(
-            color: CustomColor.background,
-            centerTitle: true,
-            elevation: 0
-        ),
+            color: CustomColor.background, centerTitle: true, elevation: 0),
       ),
-      home: (isLogin)?new SplashScreen():new WelcomeScreen(),
+      // home: (isLogin)?new SplashScreen():new WelcomeScreen(),
+      home: new Welcome(),
     );
   }
 }

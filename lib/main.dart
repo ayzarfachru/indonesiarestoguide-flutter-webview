@@ -489,11 +489,11 @@ class _MyAppState extends State<MyApp> {
     //   print('OI1 '+deepLink2);
     // });
     // WidgetsBinding.instance!.addObserver(this);
-    _checkForSession().then((status) {
-      if (status) {
-        _navigateHome();
-      }
-    });
+    // _checkForSession().then((status) {
+    //   if (status) {
+    //     _navigateHome();
+    //   }
+    // });
     print('OI2 ' + deepLink2);
     super.initState();
   }

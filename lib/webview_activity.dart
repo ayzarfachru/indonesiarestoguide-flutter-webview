@@ -248,8 +248,8 @@ class _WebViewActivityState extends State<WebViewActivity>
 
                     if (url == Uri.parse('$mainUrl/about')) {
                       controller.goBack();
-                      if (await canLaunch('$mainUrl')) {
-                        await launch('$mainUrl');
+                      if (await canLaunch('https://indonesiarestoguide.id')) {
+                        await launch('https://indonesiarestoguide.id');
                       } else {
                         throw 'Could not launch url';
                       }

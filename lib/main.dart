@@ -399,7 +399,7 @@ class _MyAppState extends State<MyApp> {
     navigatorKey.currentState?.pushReplacement(new MaterialPageRoute(
         builder: (context) => new WebViewActivity(
               codeNotif: "",
-              url: "https://m.kam5ia.com/resto-detail/" + id,
+              url: "https://m.indonesiarestoguide.id/resto-detail/" + id,
             )));
   }
 

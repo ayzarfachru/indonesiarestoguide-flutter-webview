@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:in_app_update/in_app_update.dart';
 import 'package:kam5ia/utils/utils.dart';
 import 'package:onesignal_flutter/onesignal_flutter.dart';
 import 'package:kam5ia/webview_activity.dart';
@@ -19,8 +20,38 @@ class _WelcomeState extends State<Welcome> {
     return true;
   }
 
+  // Future idPlayer() async {
+  //   await OneSignal.shared.getDeviceState().then((status) async {
+  //     print(playerId);
+  //     setState(() {
+  //       playerId = status?.userId;
+  //     });
+  //
+  //     print(playerId);
+  //     if (playerId == null) {
+  //       CustomNavigator.navigatorPushReplacementWelcome(context, new Welcome());
+  //     } else {
+  //       await initDynamicLinks().whenComplete(() async {
+  //         SharedPreferences pref = await SharedPreferences.getInstance();
+  //         String urlDyLink = pref.getString("url_dylink") ?? "";
+  //         pref.setString("url_dylink", "");
+  //         _checkForSession().then((status) {
+  //           if (status) {
+  //             CustomNavigator.navigatorPushReplacement(
+  //                 context,
+  //                 new WebViewActivity(
+  //                   codeNotif: "",
+  //                   url: urlDyLink,
+  //                 ));
+  //           }
+  //         });
+  //       });
+  //     }
+  //   });
+  // }
+
   Future idPlayer() async {
-    await OneSignal.shared.getDeviceState().then((status) async {
+    await OneSignal.shared.getDeviceState().then((status) {
       print(playerId);
       setState(() {
         playerId = status?.userId;
@@ -30,42 +61,116 @@ class _WelcomeState extends State<Welcome> {
       if (playerId == null) {
         CustomNavigator.navigatorPushReplacementWelcome(context, new Welcome());
       } else {
-        await initDynamicLinks().whenComplete(() async {
-          SharedPreferences pref = await SharedPreferences.getInstance();
-          String urlDyLink = pref.getString("url_dylink") ?? "";
-          pref.setString("url_dylink", "");
-          _checkForSession().then((status) {
-            if (status) {
-              CustomNavigator.navigatorPushReplacement(
-                  context,
-                  new WebViewActivity(
-                    codeNotif: "",
-                    url: urlDyLink,
-                  ));
-            }
-          });
+        _checkForSession().then((status) {
+          print('_checkForSession 1');
+          print(status);
+          if (status) {
+            initDynamicLinks();
+          }
         });
       }
     });
   }
 
+  AppUpdateInfo? _updateInfo;
+  Future<void> checkForUpdate() async {
+
+    print('UpdateAvailability.updateAvailable');
+    print(UpdateAvailability.updateAvailable);
+    print(_updateInfo?.updateAvailability);
+
+    InAppUpdate.checkForUpdate().then((info) {
+
+      setState(() {
+
+        _updateInfo = info;
+
+        print('UpdateAvailability.updateAvailable');
+        print(info);
+        print(UpdateAvailability.updateAvailable);
+        print('_updateInfo?.updateAvailability 1');
+        print(_updateInfo?.updateAvailability);
+        print('UpdateAvailability.updateAvailable 1');
+        print(UpdateAvailability.updateAvailable);
+        print(_updateInfo?.availableVersionCode);
+        print(UpdateAvailability.updateNotAvailable);
+        print('UpdateAvailability.updateAvailable');
+        if (_updateInfo?.updateAvailability == UpdateAvailability.updateAvailable) {
+          InAppUpdate.performImmediateUpdate().catchError((e) => showSnack(e.toString()));
+        } else {
+          _checkForSession().then((status) {
+            print('_checkForSession');
+            print(status);
+            if (status) {
+              print('check');
+              initDynamicLinks();
+            }
+          });
+        }
+      });
+
+    }).catchError((e) {
+
+      showSnack(e.toString());
+
+    });
+  }
+
+  final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey();
+  void showSnack(String text) {
+
+    if (_scaffoldKey.currentContext != null) {
+
+      ScaffoldMessenger.of(_scaffoldKey.currentContext!)
+
+          .showSnackBar(SnackBar(content: Text(text)));
+
+    }
+
+  }
+
+  // Future initDynamicLinks() async {
+  //   SharedPreferences pref = await SharedPreferences.getInstance();
+  //   final PendingDynamicLinkData? data =
+  //       await FirebaseDynamicLinks.instance.getInitialLink();
+  //
+  //   print('dylink1');
+  //   if (data != null) {
+  //     print(data.link);
+  //     pref.setString("url_dylink", data.link.queryParameters["url"].toString());
+  //   }
+  //   FirebaseDynamicLinks.instance.onLink
+  //       .listen((PendingDynamicLinkData dynamicLink) async {
+  //     print('dylink2');
+  //     print(dynamicLink.link.queryParameters["url"]);
+  //     pref.setString(
+  //         "url_dylink", dynamicLink.link.queryParameters["url"].toString());
+  //   });
+  // }
+
   Future initDynamicLinks() async {
-    SharedPreferences pref = await SharedPreferences.getInstance();
     final PendingDynamicLinkData? data =
-        await FirebaseDynamicLinks.instance.getInitialLink();
+    await FirebaseDynamicLinks.instance.getInitialLink();
 
     print('dylink1');
+    print(data?.link);
     if (data != null) {
-      print(data.link);
-      pref.setString("url_dylink", data.link.queryParameters["url"].toString());
+      if (data.link.toString().contains('resto-detail')) {
+        CustomNavigator.navigatorPushReplacement(
+            context,
+            new WebViewActivity(
+              codeNotif: "",
+              url: data.link.toString().split('open/?url=')[1].toString(),
+            ));
+      }
+    } else {
+      CustomNavigator.navigatorPushReplacement(
+          context,
+          new WebViewActivity(
+            codeNotif: "",
+            url: "",
+          ));
     }
-    FirebaseDynamicLinks.instance.onLink
-        .listen((PendingDynamicLinkData dynamicLink) async {
-      print('dylink2');
-      print(dynamicLink.link.queryParameters["url"]);
-      pref.setString(
-          "url_dylink", dynamicLink.link.queryParameters["url"].toString());
-    });
   }
 
   @override
@@ -77,7 +182,7 @@ class _WelcomeState extends State<Welcome> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: CustomColor.primaryLight,
+      backgroundColor: Colors.white,
       body: Padding(
         padding: EdgeInsets.symmetric(
             horizontal: CustomSize.sizeWidth(context) / 86),

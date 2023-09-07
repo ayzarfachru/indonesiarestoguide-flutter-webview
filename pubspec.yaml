@@ -26,7 +26,7 @@ dependencies:
 
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.
-  cupertino_icons: ^1.0.2
+#  cupertino_icons: ^1.0.2
   #  cupertino_icons: ^1.0.1
   auto_size_text: ^3.0.0
   #  auto_size_text: ^2.1.0
@@ -34,11 +34,11 @@ dependencies:
   #  page_transition: ^1.1.7+6
   google_fonts: ^4.0.1
   #  google_fonts: ^1.1.2
-  flutter_icons: ^1.1.0
-  carousel_slider: ^4.0.0
+#  flutter_icons: ^1.1.0
+#  carousel_slider: ^4.0.0
   #  carousel_slider: ^3.0.0
   #  intl: ^0.17.0
-  http: ^0.13.4
+#  http: ^0.13.4
   #  http: ^0.12.2
   google_sign_in: ^5.2.3
   #  google_sign_in: ^4.5.9
@@ -46,74 +46,76 @@ dependencies:
   #  shared_preferences: ^0.5.12+4
   fluttertoast: ^8.0.9
   #  fluttertoast: ^7.1.8
-  flutter_datetime_picker: ^1.5.1
+#  flutter_datetime_picker: ^1.5.1
   #  flutter_datetime_picker: ^1.5.0
-  image_picker: ^0.8.6
+#  image_picker: ^0.8.6
   #  image_picker: ^0.6.7+22
-  location: ^4.3.0
+#  location: ^4.3.0
   #  location: ^3.2.4
-  flutter_staggered_grid_view: ^0.4.0
+#  flutter_staggered_grid_view: ^0.4.0
   url_launcher: ^6.1.10
   #  url_launcher: ^5.7.8
-  google_maps_flutter: ^2.0.0
+#  google_maps_flutter: ^2.0.0
   #  google_maps_flutter: ^1.0.2
-  geolocator: ^8.1.1
+#  geolocator: ^8.1.1
   #  geolocator: ^6.2.1
   #  geocoder: ^0.2.1
   barcode_scan2: ^4.2.1
   #  barcode_scan: ^2.0.1
-  day_night_time_picker: ^1.0.5
-  qr_code_scanner: ^1.0.1
+#  day_night_time_picker: ^1.0.5
+#  qr_code_scanner: ^1.0.1
   #  day_night_time_picker: ^0.5.0
 
-  pull_to_refresh: 2.0.0
-  cloud_firestore: ^4.3.1
+#  pull_to_refresh: 2.0.0
+#  cloud_firestore: ^4.3.1
   #  cloud_firestore: ^0.14.0+2
-  firebase_storage: ^11.0.10
+#  firebase_storage: ^11.0.10
   #  firebase_storage: ^4.0.0
   font_awesome_flutter: ^10.1.0
   #  font_awesome_flutter: ^8.12.0
 
-  smart_select: ^4.3.2
-  dio: ^4.0.6
+#  smart_select: ^4.3.2
+#  dio: ^4.0.6
   #  dio: ^3.0.10
-  multi_select_flutter: ^4.1.2
+#  multi_select_flutter: ^4.1.2
   #  multi_select_flutter: ^3.1.8
-  date_time_picker: ^2.1.0
+#  date_time_picker: ^2.1.0
   #  date_time_picker: ^1.1.1
 
-  qr_flutter: ^4.0.0
+#  qr_flutter: ^4.0.0
   #  qr_flutter: ^3.2.0
-  uni_links: ^0.5.1
+#  uni_links: ^0.5.1
   #  uni_links: ^0.4.0
   onesignal_flutter: ^3.3.0
   #  onesignal_flutter: ^2.6.3
   #  firebase_core: ^0.5.0
-  firebase_messaging: ^14.2.1
+#  firebase_messaging: ^14.2.1
   #  firebase_messaging: ^8.0.0-dev.1
-  dropdown_search: ^3.0.0
+#  dropdown_search: ^3.0.0
   #  dropdown_search: ^0.6.0
-  photo_view: ^0.14.0
+#  photo_view: ^0.14.0
   #  photo_view: ^0.10.2
-  full_screen_image_null_safe: ^2.0.0
+#  full_screen_image_null_safe: ^2.0.0
   #  full_screen_image: ^1.0.2
-  coupon_uikit: ^0.2.0
+#  coupon_uikit: ^0.2.0
 
-  flutter_polyline_points: ^1.0.0
+#  flutter_polyline_points: ^1.0.0
   #  flutter_polyline_points: ^0.2.4
-  screenshot: ^1.2.3
+#  screenshot: ^1.2.3
 
-  geocoding: ^2.0.5
+#  geocoding: ^2.0.5
   #  geocoding: ^1.0.2
   firebase_dynamic_links: ^5.0.11
   #  firebase_dynamic_links: ^0.5.0+11
   share: ^2.0.4
   in_app_update: ^4.0.1
   #  share: ^0.6.5+4
-  flutter_email_sender: ^5.2.0
-  mailer: ^6.0.0
+#  flutter_email_sender: ^5.2.0
+#  mailer: ^6.0.0
   flutter_inappwebview: ^5.7.2+3
   permission_handler: ^10.4.3
+  image: ^4.0.17
+  image_gallery_saver: ^2.0.3
 
 dev_dependencies:
   flutter_test:

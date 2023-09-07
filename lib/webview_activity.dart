@@ -1,10 +1,19 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/gestures.dart';
 import 'dart:async';
 import 'package:flutter/foundation.dart';
+import 'package:flutter/services.dart';
 import 'dart:typed_data';
+import 'package:image/image.dart' as img;
+import 'package:image_gallery_saver/image_gallery_saver.dart';
+import 'package:kam5ia/permissionLocation.dart';
+import 'package:path_provider/path_provider.dart';
+import 'dart:io' as dartIo;
 
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:kam5ia/utils/utils.dart';
 import 'package:kam5ia/ui/maintenance.dart';
 import 'package:onesignal_flutter/onesignal_flutter.dart';
@@ -62,13 +71,48 @@ class _WebViewActivityState extends State<WebViewActivity>
     return shortUrl.toString();
   }
 
+  // Future initDynamicLinks() async {
+  //   final PendingDynamicLinkData? data =
+  //       await FirebaseDynamicLinks.instance.getInitialLink();
+  //
+  //   print('dylink1');
+  //   if (data != null) {
+  //     print(data.link);
+  //   }
+  //   FirebaseDynamicLinks.instance.onLink
+  //       .listen((PendingDynamicLinkData dynamicLink) async {
+  //     print('dylink2');
+  //     print(dynamicLink.link.queryParameters["url"]);
+  //     _webViewController!.loadUrl(
+  //         urlRequest: URLRequest(
+  //             url: Uri.parse(
+  //                 dynamicLink.link.queryParameters["url"].toString())));
+  //   });
+  // }
+
+  String dataLink = '';
+
   Future initDynamicLinks() async {
     final PendingDynamicLinkData? data =
-        await FirebaseDynamicLinks.instance.getInitialLink();
+    await FirebaseDynamicLinks.instance.getInitialLink();
 
     print('dylink1');
+    // print(data?.link);
     if (data != null) {
+      // dataLink = data.link.toString();
       print(data.link);
+      if (widget.url.toString().contains('resto-detail')) {
+        _webViewController!.loadUrl(
+            urlRequest: URLRequest(url: Uri.parse(widget.url.toString())));
+      }
+      // print(dataLink.split('open')[1].toString());
+      // print(dataLink.split('open/?url=')[1].toString());
+      // if (dataLink.toString().contains('resto-detail')) {
+      //   _webViewController!.loadUrl(
+      //       urlRequest: URLRequest(
+      //           url: Uri.parse(
+      //               dataLink.split('open/?url=')[1].toString())));
+      // }
     }
     FirebaseDynamicLinks.instance.onLink
         .listen((PendingDynamicLinkData dynamicLink) async {
@@ -81,27 +125,66 @@ class _WebViewActivityState extends State<WebViewActivity>
     });
   }
 
+  // Future<bool> _handleBackButton() async {
+  //   SharedPreferences pref = await SharedPreferences.getInstance();
+  //   pref.setString("url_dylink", "");
+  //   if (notifOrder) {
+  //     return false;
+  //   } else if (_webViewController != null &&
+  //       await _webViewController!.canGoBack()) {
+  //     _webViewController?.getUrl().then((value) {
+  //       if (value.toString().contains("resto-detail")) {
+  //         _webViewController!.loadUrl(
+  //             urlRequest: URLRequest(url: Uri.parse('$mainUrl/resto')));
+  //       } else if (value.toString() != '$mainUrl/resto' &&
+  //           value.toString() != '$mainUrl/login' &&
+  //           value.toString() != '$mainUrl/owner/resto-create') {
+  //         _webViewController!.goBack();
+  //       }
+  //     });
+  //     return false;
+  //   } else {
+  //     return true;
+  //   }
+  // }
+
+  DateTime? currentBackPressTime;
   Future<bool> _handleBackButton() async {
-    SharedPreferences pref = await SharedPreferences.getInstance();
-    pref.setString("url_dylink", "");
-    if (notifOrder) {
-      return false;
-    } else if (_webViewController != null &&
-        await _webViewController!.canGoBack()) {
-      _webViewController?.getUrl().then((value) {
-        if (value.toString().contains("resto-detail")) {
-          _webViewController!.loadUrl(
-              urlRequest: URLRequest(url: Uri.parse('$mainUrl/resto')));
-        } else if (value.toString() != '$mainUrl/resto' &&
-            value.toString() != '$mainUrl/login' &&
-            value.toString() != '$mainUrl/owner/resto-create') {
-          _webViewController!.goBack();
+    _webViewController?.getUrl().then((value) {
+      print(value.toString());
+      if (value.toString() == '$mainUrl/resto' &&
+          value.toString() == '$mainUrl/login') {
+        DateTime now = DateTime.now();
+        if (currentBackPressTime == null ||
+            now.difference(currentBackPressTime!) > Duration(seconds: 2)) {
+          currentBackPressTime = now;
+          Fluttertoast.showToast(msg: 'Tekan kembali lagi untuk keluar');
+          return Future.value(false);
         }
-      });
-      return false;
-    } else {
-      return true;
-    }
+        // SystemNavigator.pop();
+        SystemChannels.platform.invokeMethod('SystemNavigator.pop');
+        return Future.value(true);
+      } else if (value.toString() != '$mainUrl/owner/resto-create') {
+        DateTime now = DateTime.now();
+        if (currentBackPressTime == null ||
+            now.difference(currentBackPressTime!) > Duration(seconds: 2)) {
+          currentBackPressTime = now;
+          Fluttertoast.showToast(msg: 'Tekan kembali lagi untuk keluar');
+          return Future.value(false);
+        }
+        // SystemNavigator.pop();
+        _webViewController!.loadUrl(
+            urlRequest: URLRequest(
+                url: Uri.parse(
+                    '$mainUrl/profile/user')));
+        return Future.value(true);
+      } else {
+        _webViewController!.goBack();
+        return Future.value(true);
+        // Fluttertoast.showToast(msg: 'Tekan sekali lagi untuk keluar');
+      }
+    });
+    return false;
   }
 
   String qrcode = "";
@@ -121,6 +204,46 @@ class _WebViewActivityState extends State<WebViewActivity>
   }
 
   String? playerId;
+
+  Future<void> saveBase64Image(String name, String base64String) async {
+    try {
+      // Decode the Base64 string to bytes
+      Uint8List bytes = base64.decode(base64String);
+
+      // Create an Image object from the decoded bytes
+      img.Image? image = img.decodeImage(bytes);
+
+      // Get the application documents directory
+      final appDocumentsDirectory = await getApplicationDocumentsDirectory();
+
+      print('name');
+      print(name);
+
+      // Define the file path where you want to save the image
+      final filePath = '${appDocumentsDirectory.path}/$name';
+
+      String newName = name.split('.')[0].replaceAll(' ', '_');
+
+      // Encode the image to PNG format and save it to the file
+      dartIo.File(filePath).writeAsBytesSync(img.encodePng(image!));
+
+      // Display a message or perform any other action as needed
+      print('Image saved to: $filePath');
+      print(newName);
+
+      // Save the image to the gallery
+      final result = await ImageGallerySaver.saveFile(filePath, isReturnPathOfIOS: true, name: newName);
+
+      if (result['isSuccess'] == true) {
+        print('Image saved to gallery: ${result['filePath']}');
+        Fluttertoast.showToast(msg: 'Gambar ${name.split('.')[0].replaceAll('_', ' ')} tersimpan di galeri anda');
+      } else {
+        print('Failed to save image to gallery.');
+      }
+    } catch (e) {
+      print('Error: $e');
+    }
+  }
 
   @override
   void initState() {
@@ -301,6 +424,29 @@ class _WebViewActivityState extends State<WebViewActivity>
                       controller.goBack();
                       String phone = url.toString().split('call-resto/')[1];
                       launch("tel:$phone");
+                    }
+
+                    if (url.toString() != '$mainUrl'  && url.toString() != '$mainUrl/') {
+                      if (url.toString().contains(mainUrl)) {
+                        await Permission.location.status.isGranted.then((value) async {
+                          print(value);
+                          if (!value) {
+                            CustomNavigator.navigatorPushReplacement(
+                                context,
+                                new permissionLocation());
+                          }
+                        });
+                        // new permissionLocation();
+                      }
+                    }
+
+                    if (url.toString().contains(":tableName;")) {
+                      controller.goBack();
+                      Fluttertoast.showToast(msg: 'Tunggu sebentar');
+                      String? dataQr = await controller.evaluateJavascript(
+                          source: '''localStorage.getItem('dataQr');''');
+                      print(dataQr!.toString().split(':~;/')[0].replaceAll(' ', '_'));
+                      saveBase64Image(dataQr!.toString().split(':~;/')[0].replaceAll(' ', '_'), dataQr.toString().split(':~;/')[1]);
                     }
 
                     if (url == Uri.parse('$mainUrl/login-google')) {

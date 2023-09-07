@@ -46,6 +46,28 @@ class CustomText {
     );
   }
 
+  static Widget permissionText({
+    String? text,
+    Color? color,
+    double? sizeNew,
+    int? maxLines,
+    TextDecoration? decoration,
+  }) {
+    return AutoSizeText(
+      text.toString(),
+      style: GoogleFonts.poppins(
+          textStyle: TextStyle(
+            // fontSize: 16,
+              fontSize: sizeNew,
+              fontWeight: FontWeight.w500,
+              color: color ??= Colors.black,
+              decoration: decoration ?? TextDecoration.none)),
+      minFontSize: (sizeNew == 0) ? 0 : 0,
+      maxLines: maxLines ?? 1,
+      textAlign: TextAlign.center,
+    );
+  }
+
   static Widget textHeading1({
     String? text,
     Color? color,

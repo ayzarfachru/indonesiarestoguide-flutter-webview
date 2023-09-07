@@ -1,27 +1,11 @@
 import 'dart:convert';
 import 'dart:io';
 
-import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:kam5ia/ui/auth/login_activity.dart';
 import 'package:http/http.dart' as http;
-import 'package:kam5ia/ui/bookmark/bookmark_activity.dart';
-import 'package:kam5ia/ui/cart/cart_activity.dart';
-import 'package:kam5ia/ui/detail/detail_resto.dart';
-import 'package:kam5ia/ui/history/history_activity.dart';
-import 'package:kam5ia/ui/home/home_activity.dart';
-import 'package:kam5ia/ui/profile/edit_profile.dart';
-import 'package:kam5ia/ui/profile/profile_activity.dart';
-import 'package:kam5ia/ui/promo/promo_activity.dart';
-import 'package:kam5ia/ui/search/search_activity.dart';
-import 'package:kam5ia/ui/splash_screen.dart';
-import 'package:kam5ia/ui/ui_resto/home/home_activity.dart';
-import 'package:kam5ia/ui/ui_resto/order/order_pending.dart';
-import 'package:kam5ia/ui/welcome_screen.dart';
 import 'package:kam5ia/utils/utils.dart';
 import 'package:onesignal_flutter/onesignal_flutter.dart';
-import 'package:page_transition/page_transition.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_dynamic_links/firebase_dynamic_links.dart';
@@ -29,7 +13,6 @@ import 'package:permission_handler/permission_handler.dart';
 import 'package:kam5ia/welcome.dart';
 import 'package:kam5ia/webview_activity.dart';
 
-import 'model/Resto.dart';
 
 class MyHttpOverrides extends HttpOverrides {
   @override
@@ -315,8 +298,8 @@ class _MyAppState extends State<MyApp> {
         pref.setString("homepg", "1");
         // pref.setString("homerestoname", restoName);
         setState(() {
-          navigatorKey.currentState?.pushReplacement(new MaterialPageRoute(
-              builder: (context) => new HomeActivityResto()));
+          // navigatorKey.currentState?.pushReplacement(new MaterialPageRoute(
+          //     builder: (context) => new HomeActivityResto()));
         });
       }
     }
@@ -388,8 +371,8 @@ class _MyAppState extends State<MyApp> {
         pref.setString("homepg", "1");
         // pref.setString("homerestoname", restoName);
         setState(() {
-          navigatorKey.currentState?.pushReplacement(new MaterialPageRoute(
-              builder: (context) => new HomeActivityResto()));
+          // navigatorKey.currentState?.pushReplacement(new MaterialPageRoute(
+          //     builder: (context) => new HomeActivityResto()));
         });
       }
     }
@@ -406,8 +389,8 @@ class _MyAppState extends State<MyApp> {
   Future _toDetailRes() async {
     // SharedPreferences pref = await SharedPreferences.getInstance();
     // pref.setString("homepg", "");
-    navigatorKey.currentState?.pushReplacement(new MaterialPageRoute(
-        builder: (context) => new DetailResto(res.split('_')[1])));
+    // navigatorKey.currentState?.pushReplacement(new MaterialPageRoute(
+    //     builder: (context) => new DetailResto(res.split('_')[1])));
   }
 
   String codeNotif = "";

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:kam5ia/utils/utils.dart';
 import 'package:kam5ia/webview_activity.dart';
 import 'package:permission_handler/permission_handler.dart';
@@ -28,6 +29,9 @@ class _permissionLocationState extends State<permissionLocation> {
                 codeNotif: "",
                 url: "",
               ));
+        } else {
+          Fluttertoast.showToast(msg: 'Aktifkan izin berbagi lokasi anda');
+          openAppSettings();
         }
       });
     });
@@ -115,6 +119,13 @@ class _permissionLocationState extends State<permissionLocation> {
                     print(value);
                     if (!value) {
                       reqHandlePermission();
+                    } else {
+                      CustomNavigator.navigatorPushReplacement(
+                          context,
+                          new WebViewActivity(
+                            codeNotif: "",
+                            url: "",
+                          ));
                     }
                   });
                 },

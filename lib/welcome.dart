@@ -75,6 +75,7 @@ class _WelcomeState extends State<Welcome> {
   AppUpdateInfo? _updateInfo;
   Future<void> checkForUpdate() async {
 
+
     print('UpdateAvailability.updateAvailable');
     print(UpdateAvailability.updateAvailable);
     print(_updateInfo?.updateAvailability);

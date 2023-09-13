@@ -43,6 +43,7 @@ class _WebViewActivityState extends State<WebViewActivity>
   PullToRefreshController? pullToRefreshController;
 
   String mainUrl = 'https://m.indonesiarestoguide.id';
+
   // String mainUrl = 'http://192.168.43.184:8080';
   bool notifOrder = false;
   String url = "";
@@ -94,7 +95,7 @@ class _WebViewActivityState extends State<WebViewActivity>
 
   Future initDynamicLinks() async {
     final PendingDynamicLinkData? data =
-    await FirebaseDynamicLinks.instance.getInitialLink();
+        await FirebaseDynamicLinks.instance.getInitialLink();
 
     print('dylink1');
     // print(data?.link);
@@ -149,10 +150,11 @@ class _WebViewActivityState extends State<WebViewActivity>
   // }
 
   DateTime? currentBackPressTime;
+
   Future<bool> _handleBackButton() async {
     _webViewController?.getUrl().then((value) {
       print(value.toString());
-      if (value.toString() == '$mainUrl/resto' &&
+      if (value.toString() == '$mainUrl/resto' ||
           value.toString() == '$mainUrl/login') {
         DateTime now = DateTime.now();
         if (currentBackPressTime == null ||
@@ -164,7 +166,7 @@ class _WebViewActivityState extends State<WebViewActivity>
         // SystemNavigator.pop();
         SystemChannels.platform.invokeMethod('SystemNavigator.pop');
         return Future.value(true);
-      } else if (value.toString() != '$mainUrl/owner/resto-create') {
+      } else if (value.toString() == '$mainUrl/owner/resto-create') {
         DateTime now = DateTime.now();
         if (currentBackPressTime == null ||
             now.difference(currentBackPressTime!) > Duration(seconds: 2)) {
@@ -174,9 +176,11 @@ class _WebViewActivityState extends State<WebViewActivity>
         }
         // SystemNavigator.pop();
         _webViewController!.loadUrl(
-            urlRequest: URLRequest(
-                url: Uri.parse(
-                    '$mainUrl/profile/user')));
+            urlRequest: URLRequest(url: Uri.parse('$mainUrl/profile/user')));
+        return Future.value(true);
+      } else if (value.toString().contains('resto-feature')) {
+        _webViewController!
+            .loadUrl(urlRequest: URLRequest(url: Uri.parse('$mainUrl/resto')));
         return Future.value(true);
       } else {
         _webViewController!.goBack();
@@ -188,6 +192,7 @@ class _WebViewActivityState extends State<WebViewActivity>
   }
 
   String qrcode = "";
+
   Future QRScanner() async {
     await BarcodeScanner.scan().then((value) {
       print(value.rawContent);
@@ -232,11 +237,14 @@ class _WebViewActivityState extends State<WebViewActivity>
       print(newName);
 
       // Save the image to the gallery
-      final result = await ImageGallerySaver.saveFile(filePath, isReturnPathOfIOS: true, name: newName);
+      final result = await ImageGallerySaver.saveFile(filePath,
+          isReturnPathOfIOS: true, name: newName);
 
       if (result['isSuccess'] == true) {
         print('Image saved to gallery: ${result['filePath']}');
-        Fluttertoast.showToast(msg: 'Gambar ${name.split('.')[0].replaceAll('_', ' ')} tersimpan di galeri anda');
+        Fluttertoast.showToast(
+            msg:
+                'Gambar ${name.split('.')[0].replaceAll('_', ' ')} tersimpan di galeri anda');
       } else {
         print('Failed to save image to gallery.');
       }
@@ -426,14 +434,15 @@ class _WebViewActivityState extends State<WebViewActivity>
                       launch("tel:$phone");
                     }
 
-                    if (url.toString() != '$mainUrl'  && url.toString() != '$mainUrl/') {
+                    if (url.toString() != '$mainUrl' &&
+                        url.toString() != '$mainUrl/') {
                       if (url.toString().contains(mainUrl)) {
-                        await Permission.location.status.isGranted.then((value) async {
+                        await Permission.location.status.isGranted
+                            .then((value) async {
                           print(value);
                           if (!value) {
                             CustomNavigator.navigatorPushReplacement(
-                                context,
-                                new permissionLocation());
+                                context, new permissionLocation());
                           }
                         });
                         // new permissionLocation();
@@ -445,8 +454,16 @@ class _WebViewActivityState extends State<WebViewActivity>
                       Fluttertoast.showToast(msg: 'Tunggu sebentar');
                       String? dataQr = await controller.evaluateJavascript(
                           source: '''localStorage.getItem('dataQr');''');
-                      print(dataQr!.toString().split(':~;/')[0].replaceAll(' ', '_'));
-                      saveBase64Image(dataQr!.toString().split(':~;/')[0].replaceAll(' ', '_'), dataQr.toString().split(':~;/')[1]);
+                      print(dataQr!
+                          .toString()
+                          .split(':~;/')[0]
+                          .replaceAll(' ', '_'));
+                      saveBase64Image(
+                          dataQr!
+                              .toString()
+                              .split(':~;/')[0]
+                              .replaceAll(' ', '_'),
+                          dataQr.toString().split(':~;/')[1]);
                     }
 
                     if (url == Uri.parse('$mainUrl/login-google')) {
@@ -633,48 +650,46 @@ class _WebViewActivityState extends State<WebViewActivity>
                                         Padding(
                                           padding:
                                               const EdgeInsets.only(left: 2),
-                                          child: Expanded(
-                                            child: GestureDetector(
-                                              onTap: () async {
-                                                setState(() {
-                                                  notifOrder = false;
-                                                });
+                                          child: GestureDetector(
+                                            onTap: () async {
+                                              setState(() {
+                                                notifOrder = false;
+                                              });
 
-                                                String idHistory = widget
-                                                    .codeNotif
-                                                    .toString()
-                                                    .split(" sudah")[0]
-                                                    .split("IRG-")[1];
-                                                await _webViewController!
-                                                    .evaluateJavascript(
-                                                        source:
-                                                            "window.localStorage.setItem('id_history', '$idHistory')");
-                                                _webViewController!.loadUrl(
-                                                    urlRequest: URLRequest(
-                                                        url: Uri.parse(
-                                                            '$mainUrl/history')));
-                                              },
-                                              child: Column(
-                                                mainAxisAlignment:
-                                                    MainAxisAlignment.center,
-                                                crossAxisAlignment:
-                                                    CrossAxisAlignment.center,
-                                                children: [
-                                                  FaIcon(
-                                                    FontAwesomeIcons.check,
-                                                    color: CustomColor.primary,
-                                                    size: 28,
-                                                  ),
-                                                  CustomText.text(
-                                                      textAlign:
-                                                          TextAlign.center,
-                                                      text: "Terima",
-                                                      minSize: 18,
-                                                      weight: FontWeight.bold,
-                                                      color:
-                                                          CustomColor.primary),
-                                                ],
-                                              ),
+                                              String idHistory = widget
+                                                  .codeNotif
+                                                  .toString()
+                                                  .split(" sudah")[0]
+                                                  .split("IRG-")[1];
+                                              await _webViewController!
+                                                  .evaluateJavascript(
+                                                      source:
+                                                          "window.localStorage.setItem('id_history', '$idHistory')");
+                                              _webViewController!.loadUrl(
+                                                  urlRequest: URLRequest(
+                                                      url: Uri.parse(
+                                                          '$mainUrl/history')));
+                                            },
+                                            child: Column(
+                                              mainAxisAlignment:
+                                                  MainAxisAlignment.center,
+                                              crossAxisAlignment:
+                                                  CrossAxisAlignment.center,
+                                              children: [
+                                                FaIcon(
+                                                  FontAwesomeIcons.check,
+                                                  color: CustomColor.primary,
+                                                  size: 28,
+                                                ),
+                                                CustomText.text(
+                                                    textAlign:
+                                                        TextAlign.center,
+                                                    text: "Terima",
+                                                    minSize: 18,
+                                                    weight: FontWeight.bold,
+                                                    color:
+                                                        CustomColor.primary),
+                                              ],
                                             ),
                                           ),
                                         ),

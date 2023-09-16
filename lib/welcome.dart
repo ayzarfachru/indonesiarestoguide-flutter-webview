@@ -73,17 +73,14 @@ class _WelcomeState extends State<Welcome> {
   }
 
   AppUpdateInfo? _updateInfo;
+
   Future<void> checkForUpdate() async {
-
-
     print('UpdateAvailability.updateAvailable');
     print(UpdateAvailability.updateAvailable);
     print(_updateInfo?.updateAvailability);
 
     InAppUpdate.checkForUpdate().then((info) {
-
       setState(() {
-
         _updateInfo = info;
 
         print('UpdateAvailability.updateAvailable');
@@ -96,8 +93,10 @@ class _WelcomeState extends State<Welcome> {
         print(_updateInfo?.availableVersionCode);
         print(UpdateAvailability.updateNotAvailable);
         print('UpdateAvailability.updateAvailable');
-        if (_updateInfo?.updateAvailability == UpdateAvailability.updateAvailable) {
-          InAppUpdate.performImmediateUpdate().catchError((e) => showSnack(e.toString()));
+        if (_updateInfo?.updateAvailability ==
+            UpdateAvailability.updateAvailable) {
+          InAppUpdate.performImmediateUpdate()
+              .catchError((e) => showSnack(e.toString()));
         } else {
           _checkForSession().then((status) {
             print('_checkForSession');
@@ -109,25 +108,18 @@ class _WelcomeState extends State<Welcome> {
           });
         }
       });
-
     }).catchError((e) {
-
       showSnack(e.toString());
-
     });
   }
 
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey();
+
   void showSnack(String text) {
-
     if (_scaffoldKey.currentContext != null) {
-
       ScaffoldMessenger.of(_scaffoldKey.currentContext!)
-
           .showSnackBar(SnackBar(content: Text(text)));
-
     }
-
   }
 
   // Future initDynamicLinks() async {
@@ -151,17 +143,56 @@ class _WelcomeState extends State<Welcome> {
 
   Future initDynamicLinks() async {
     final PendingDynamicLinkData? data =
-    await FirebaseDynamicLinks.instance.getInitialLink();
+        await FirebaseDynamicLinks.instance.getInitialLink();
 
-    print('dylink1');
+    print('dylink1 welcome');
     print(data?.link);
     if (data != null) {
-      if (data.link.toString().contains('resto-detail')) {
+      if (data.link.hasQuery) {
+        if (data.link.toString().contains('resto-detail')) {
+          if (data.link.toString().contains("/?qr")) {
+            handleTableLink(data.link.toString()).whenComplete(() {
+              CustomNavigator.navigatorPushReplacement(
+                  context,
+                  new WebViewActivity(
+                    codeNotif: "",
+                    url: (data.link.queryParameters["url"]
+                        .toString()
+                        .contains('resto-detail/'))
+                        ? data.link.queryParameters["url"].toString()
+                        : data.link.queryParameters["url"]
+                        .toString()
+                        .replaceAll('resto-detail', 'resto-detail/'),
+                  ));
+            });
+          } else {
+            CustomNavigator.navigatorPushReplacement(
+                context,
+                new WebViewActivity(
+                  codeNotif: "",
+                  url: (data.link.queryParameters["url"]
+                      .toString()
+                      .contains('resto-detail/'))
+                      ? data.link.queryParameters["url"].toString()
+                      : data.link.queryParameters["url"]
+                      .toString()
+                      .replaceAll('resto-detail', 'resto-detail/'),
+                ));
+          }
+        } else {
+          CustomNavigator.navigatorPushReplacement(
+              context,
+              new WebViewActivity(
+                codeNotif: "",
+                url: "",
+              ));
+        }
+      } else {
         CustomNavigator.navigatorPushReplacement(
             context,
             new WebViewActivity(
               codeNotif: "",
-              url: data.link.toString().split('open/?url=')[1].toString(),
+              url: "",
             ));
       }
     } else {
@@ -172,6 +203,31 @@ class _WelcomeState extends State<Welcome> {
             url: "",
           ));
     }
+  }
+
+  FirebaseDynamicLinks dynamicLinks = FirebaseDynamicLinks.instance;
+
+  Future handleTableLink(String urlLink) async {
+    var parameters = DynamicLinkParameters(
+      uriPrefix: 'https://irgresto.page.link',
+      link: Uri.parse(urlLink),
+      androidParameters: AndroidParameters(
+        packageName: "com.devus.indonesiarestoguide",
+        fallbackUrl: Uri.parse("https://jiitu.co.id"),
+      ),
+      iosParameters: IOSParameters(
+        bundleId: "com.devus.indonesiarestoguide",
+        appStoreId: "1498909115",
+      ),
+    );
+    var shortLink = await dynamicLinks.buildShortLink(parameters);
+    var shortUrl = shortLink.shortUrl;
+
+    print('table');
+    print(urlLink);
+    print(shortUrl);
+    SharedPreferences pref = await SharedPreferences.getInstance();
+    pref.setString("table", shortUrl.toString());
   }
 
   @override

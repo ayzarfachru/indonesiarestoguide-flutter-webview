@@ -49,7 +49,7 @@ void main() async {
   OneSignal.shared.addTrigger("prompt_ios", "true");
   // OneSignal.shared.setInFocusDisplayType(OSNotificationDisplayType.notification);
   await OneSignal.shared
-      .promptUserForPushNotificationPermission(fallbackToSettings: true);
+      .promptUserForPushNotificationPermission(fallbackToSettings: Platform.isIOS).then((value) => runApp(MyApp()));
 
   // runApp(MaterialApp(
   //     debugShowCheckedModeBanner: false,
@@ -88,7 +88,7 @@ class _MyAppState extends State<MyApp> {
         });
       } else {
         setState(() {
-          initDynamicLinks();
+          // initDynamicLinks();
           print('IKI LOH COK');
           isLogin = true;
         });
@@ -123,14 +123,14 @@ class _MyAppState extends State<MyApp> {
     final PendingDynamicLinkData? data =
         await FirebaseDynamicLinks.instance.getInitialLink();
 
-    print('dylink1');
+    print('GATEL');
     if (data != null) {
       print(data.link);
       pref.setString("url_dylink", data.link.queryParameters["url"].toString());
     }
     FirebaseDynamicLinks.instance.onLink
         .listen((PendingDynamicLinkData dynamicLink) async {
-      print('dylink2');
+      print('dylink2 nya GATEL');
       print(dynamicLink.link.queryParameters["url"]);
       pref.setString(
           "url_dylink", dynamicLink.link.queryParameters["url"].toString());
@@ -407,6 +407,7 @@ class _MyAppState extends State<MyApp> {
   String res = '';
   @override
   void initState() {
+    // initDynamicLinks();
     OneSignal.shared.setNotificationWillShowInForegroundHandler(
         (OSNotificationReceivedEvent result) {
       // Display Notification, send null to not display, send notification to display

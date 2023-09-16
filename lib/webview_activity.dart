@@ -98,7 +98,7 @@ class _WebViewActivityState extends State<WebViewActivity>
         await FirebaseDynamicLinks.instance.getInitialLink();
 
     print('dylink1');
-    // print(data?.link);
+    print(data?.link);
     if (data != null) {
       // dataLink = data.link.toString();
       print(data.link);
@@ -118,12 +118,64 @@ class _WebViewActivityState extends State<WebViewActivity>
     FirebaseDynamicLinks.instance.onLink
         .listen((PendingDynamicLinkData dynamicLink) async {
       print('dylink2');
-      print(dynamicLink.link.queryParameters["url"]);
-      _webViewController!.loadUrl(
-          urlRequest: URLRequest(
-              url: Uri.parse(
-                  dynamicLink.link.queryParameters["url"].toString())));
+      print(dynamicLink.link.toString());
+      if (dynamicLink.link.hasQuery) {
+        if (dynamicLink.link.toString().contains('resto-detail')) {
+          if (dynamicLink.link.toString().contains("/?qr")) {
+            handleTableLink(dynamicLink.link.toString()).whenComplete(() {
+              _webViewController!.loadUrl(
+                  urlRequest: URLRequest(
+                      url: Uri.parse((dynamicLink.link.queryParameters["url"]
+                          .toString()
+                          .contains('resto-detail/'))
+                          ? dynamicLink.link.queryParameters["url"].toString()
+                          : dynamicLink.link.queryParameters["url"]
+                          .toString()
+                          .replaceAll('resto-detail', 'resto-detail/'))));
+            });
+          } else {
+            _webViewController!.loadUrl(
+                urlRequest: URLRequest(
+                    url: Uri.parse((dynamicLink.link.queryParameters["url"]
+                        .toString()
+                        .contains('resto-detail/'))
+                        ? dynamicLink.link.queryParameters["url"].toString()
+                        : dynamicLink.link.queryParameters["url"]
+                        .toString()
+                        .replaceAll('resto-detail', 'resto-detail/'))));
+          }
+        } else {
+          _webViewController!.loadUrl(
+              urlRequest: URLRequest(url: Uri.parse('$mainUrl/resto')));
+        }
+      } else {
+        _webViewController!
+            .loadUrl(urlRequest: URLRequest(url: Uri.parse('$mainUrl/resto')));
+      }
     });
+  }
+
+  Future handleTableLink(String urlLink) async {
+    var parameters = DynamicLinkParameters(
+      uriPrefix: 'https://irgresto.page.link',
+      link: Uri.parse(urlLink),
+      androidParameters: AndroidParameters(
+        packageName: "com.devus.indonesiarestoguide",
+        fallbackUrl: Uri.parse("https://jiitu.co.id"),
+      ),
+      iosParameters: IOSParameters(
+        bundleId: "com.devus.indonesiarestoguide",
+        appStoreId: "1498909115",
+      ),
+    );
+    var shortLink = await dynamicLinks.buildShortLink(parameters);
+    var shortUrl = shortLink.shortUrl;
+
+    print('table 2');
+    print(urlLink);
+    print(shortUrl);
+    SharedPreferences pref = await SharedPreferences.getInstance();
+    pref.setString("table", shortUrl.toString());
   }
 
   // Future<bool> _handleBackButton() async {
@@ -318,15 +370,15 @@ class _WebViewActivityState extends State<WebViewActivity>
                   initialUrlRequest: URLRequest(url: Uri.parse(url)),
                   initialOptions: InAppWebViewGroupOptions(
                     crossPlatform: InAppWebViewOptions(
-                      verticalScrollBarEnabled: false,
-                      horizontalScrollBarEnabled: false,
-                      supportZoom: false,
-                      useShouldOverrideUrlLoading: true,
-                      mediaPlaybackRequiresUserGesture: false,
-                      javaScriptEnabled: true,
-                      useOnLoadResource: true,
-                      cacheEnabled: true,
-                    ),
+                        verticalScrollBarEnabled: false,
+                        horizontalScrollBarEnabled: false,
+                        supportZoom: false,
+                        useShouldOverrideUrlLoading: true,
+                        mediaPlaybackRequiresUserGesture: false,
+                        javaScriptEnabled: true,
+                        useOnLoadResource: true,
+                        cacheEnabled: true,
+                        transparentBackground: true),
                     android: AndroidInAppWebViewOptions(
                       builtInZoomControls: false,
                       initialScale: 100,
@@ -351,6 +403,18 @@ class _WebViewActivityState extends State<WebViewActivity>
                         await SharedPreferences.getInstance();
                     pref.setString("url", url.toString());
 
+                    var tableShared = pref.getString("table") ?? "";
+
+                    if (tableShared != "") {
+                      await controller
+                          .evaluateJavascript(
+                              source:
+                                  "window.localStorage.setItem('table', '$tableShared')")
+                          .whenComplete(() {
+                        pref.remove("table");
+                      });
+                    }
+
                     await controller.evaluateJavascript(
                         source:
                             "window.localStorage.setItem('device_id', '$playerId')");
@@ -358,10 +422,51 @@ class _WebViewActivityState extends State<WebViewActivity>
                     String? value = await controller.evaluateJavascript(
                         source: '''localStorage.getItem('token');''');
 
+                    // String? table = await controller.evaluateJavascript(
+                    //     source: '''localStorage.getItem('table');''');
+                    //
+                    // print('local storage meja');
+                    // print(table);
+
                     String? restoDetailID = await controller.evaluateJavascript(
                         source: '''localStorage.getItem('resto-detail-id');''');
 
                     String urlDyLink = pref.getString("url_dylink") ?? "";
+
+                    if (url == Uri.parse('$mainUrl/login-google')) {
+                      GoogleSignIn _googleSignIn = GoogleSignIn(
+                        clientId:
+                            "839490096186-4ulavkeso7qrl384n3tmd55qmh4iot2o.apps.googleusercontent.com",
+                        scopes: [
+                          'email',
+                          'https://www.googleapis.com/auth/userinfo.profile',
+                        ],
+                      );
+                      _googleSignIn.signOut();
+                      await _googleSignIn.signIn().then((value) async {
+                        if (value == null) {
+                          _webViewController!.loadUrl(
+                              urlRequest:
+                                  URLRequest(url: Uri.parse('$mainUrl/login')));
+                        } else {
+                          String email = value!.email;
+                          String displayName = value.displayName.toString();
+                          String photoUrl = value.photoUrl.toString();
+
+                          await controller.evaluateJavascript(
+                              source:
+                                  "window.localStorage.setItem('email_google', '$email')");
+                          await controller.evaluateJavascript(
+                              source:
+                                  "window.localStorage.setItem('name_google', '$displayName')");
+                          await controller.evaluateJavascript(
+                              source:
+                                  "window.localStorage.setItem('photo_google', '$photoUrl')");
+
+                          controller.goBack();
+                        }
+                      });
+                    }
 
                     if (url == Uri.parse('$mainUrl')) {
                       if (value != null && value != "") {
@@ -378,25 +483,28 @@ class _WebViewActivityState extends State<WebViewActivity>
                     }
 
                     if (url == Uri.parse('$mainUrl/about')) {
-                      controller.goBack();
-                      if (await canLaunch('https://indonesiarestoguide.id')) {
-                        await launch('https://indonesiarestoguide.id');
-                      } else {
-                        throw 'Could not launch url';
-                      }
+                      await controller.goBack().whenComplete(() async {
+                        if (await canLaunch('https://indonesiarestoguide.id')) {
+                          await launch('https://indonesiarestoguide.id');
+                        } else {
+                          throw 'Could not launch url';
+                        }
+                      });
                     }
 
                     if (url == Uri.parse('$mainUrl/feedback')) {
-                      controller.goBack();
-                      launch('mailto:info@indonesiarestoguide.id');
+                      await controller.goBack().whenComplete(() {
+                        launch('mailto:info@indonesiarestoguide.id');
+                      });
                     }
 
                     if (url == Uri.parse('$mainUrl/share-resto')) {
-                      controller.goBack();
-                      createDynamicLink(
-                              '$mainUrl/resto-detail/' + restoDetailID!)
-                          .whenComplete(() {
-                        Share.share('Kunjungi Restaurant kami di ' + link);
+                      await controller.goBack().whenComplete(() {
+                        createDynamicLink(
+                                '$mainUrl/resto-detail/' + restoDetailID!)
+                            .whenComplete(() {
+                          Share.share('Kunjungi Restaurant kami di ' + link);
+                        });
                       });
                     }
 
@@ -429,9 +537,10 @@ class _WebViewActivityState extends State<WebViewActivity>
                     }
 
                     if (url.toString().contains("call-resto")) {
-                      controller.goBack();
-                      String phone = url.toString().split('call-resto/')[1];
-                      launch("tel:$phone");
+                      await controller.goBack().whenComplete(() {
+                        String phone = url.toString().split('call-resto/')[1];
+                        launch("tel:$phone");
+                      });
                     }
 
                     if (url.toString() != '$mainUrl' &&
@@ -450,48 +559,20 @@ class _WebViewActivityState extends State<WebViewActivity>
                     }
 
                     if (url.toString().contains(":tableName;")) {
-                      controller.goBack();
-                      Fluttertoast.showToast(msg: 'Tunggu sebentar');
-                      String? dataQr = await controller.evaluateJavascript(
-                          source: '''localStorage.getItem('dataQr');''');
-                      print(dataQr!
-                          .toString()
-                          .split(':~;/')[0]
-                          .replaceAll(' ', '_'));
-                      saveBase64Image(
-                          dataQr!
-                              .toString()
-                              .split(':~;/')[0]
-                              .replaceAll(' ', '_'),
-                          dataQr.toString().split(':~;/')[1]);
-                    }
-
-                    if (url == Uri.parse('$mainUrl/login-google')) {
-                      GoogleSignIn _googleSignIn = GoogleSignIn(
-                        clientId:
-                            "839490096186-4ulavkeso7qrl384n3tmd55qmh4iot2o.apps.googleusercontent.com",
-                        scopes: [
-                          'email',
-                          'https://www.googleapis.com/auth/userinfo.profile',
-                        ],
-                      );
-                      _googleSignIn.signOut();
-                      await _googleSignIn.signIn().then((value) async {
-                        String email = value!.email;
-                        String displayName = value.displayName.toString();
-                        String photoUrl = value.photoUrl.toString();
-
-                        await controller.evaluateJavascript(
-                            source:
-                                "window.localStorage.setItem('email_google', '$email')");
-                        await controller.evaluateJavascript(
-                            source:
-                                "window.localStorage.setItem('name_google', '$displayName')");
-                        await controller.evaluateJavascript(
-                            source:
-                                "window.localStorage.setItem('photo_google', '$photoUrl')");
-
-                        controller.goBack();
+                      await controller.goBack().whenComplete(() async {
+                        Fluttertoast.showToast(msg: 'Tunggu sebentar');
+                        String? dataQr = await controller.evaluateJavascript(
+                            source: '''localStorage.getItem('dataQr');''');
+                        print(dataQr!
+                            .toString()
+                            .split(':~;/')[0]
+                            .replaceAll(' ', '_'));
+                        saveBase64Image(
+                            dataQr!
+                                .toString()
+                                .split(':~;/')[0]
+                                .replaceAll(' ', '_'),
+                            dataQr.toString().split(':~;/')[1]);
                       });
                     }
 
@@ -502,6 +583,7 @@ class _WebViewActivityState extends State<WebViewActivity>
                   onLoadStop: (InAppWebViewController controller, url) async {
                     SharedPreferences pref =
                         await SharedPreferences.getInstance();
+
                     if (url.toString().contains("resto-detail")) {
                       pref.setString("url_dylink", "");
                     }
@@ -682,13 +764,11 @@ class _WebViewActivityState extends State<WebViewActivity>
                                                   size: 28,
                                                 ),
                                                 CustomText.text(
-                                                    textAlign:
-                                                        TextAlign.center,
+                                                    textAlign: TextAlign.center,
                                                     text: "Terima",
                                                     minSize: 18,
                                                     weight: FontWeight.bold,
-                                                    color:
-                                                        CustomColor.primary),
+                                                    color: CustomColor.primary),
                                               ],
                                             ),
                                           ),

@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:in_app_update/in_app_update.dart';
 import 'package:kam5ia/utils/utils.dart';
@@ -5,6 +7,7 @@ import 'package:onesignal_flutter/onesignal_flutter.dart';
 import 'package:kam5ia/webview_activity.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:firebase_dynamic_links/firebase_dynamic_links.dart';
+import 'package:http/http.dart' as http;
 
 class Welcome extends StatefulWidget {
   @override
@@ -82,17 +85,6 @@ class _WelcomeState extends State<Welcome> {
     InAppUpdate.checkForUpdate().then((info) {
       setState(() {
         _updateInfo = info;
-
-        print('UpdateAvailability.updateAvailable');
-        print(info);
-        print(UpdateAvailability.updateAvailable);
-        print('_updateInfo?.updateAvailability 1');
-        print(_updateInfo?.updateAvailability);
-        print('UpdateAvailability.updateAvailable 1');
-        print(UpdateAvailability.updateAvailable);
-        print(_updateInfo?.availableVersionCode);
-        print(UpdateAvailability.updateNotAvailable);
-        print('UpdateAvailability.updateAvailable');
         if (_updateInfo?.updateAvailability ==
             UpdateAvailability.updateAvailable) {
           InAppUpdate.performImmediateUpdate()
@@ -147,15 +139,30 @@ class _WelcomeState extends State<Welcome> {
 
     print('dylink1 welcome');
     print(data?.link);
-    if (data != null) {
-      if (data.link.hasQuery) {
-        if (data.link.toString().contains('resto-detail')) {
-          if (data.link.toString().contains("/?qr")) {
-            handleTableLink(data.link.toString()).whenComplete(() {
+    checkToken().whenComplete(() {
+      if (data != null) {
+        if (data.link.hasQuery) {
+          if (data.link.toString().contains('resto-detail')) {
+            if (data.link.toString().contains("/?qr")) {
+              handleTableLink(data.link.toString()).whenComplete(() {
+                CustomNavigator.navigatorPushReplacement(
+                    context,
+                    new WebViewActivity(
+                      codeNotif: codeNotif,
+                      url: (data.link.queryParameters["url"]
+                          .toString()
+                          .contains('resto-detail/'))
+                          ? data.link.queryParameters["url"].toString()
+                          : data.link.queryParameters["url"]
+                          .toString()
+                          .replaceAll('resto-detail', 'resto-detail/'),
+                    ));
+              });
+            } else {
               CustomNavigator.navigatorPushReplacement(
                   context,
                   new WebViewActivity(
-                    codeNotif: "",
+                    codeNotif: codeNotif,
                     url: (data.link.queryParameters["url"]
                         .toString()
                         .contains('resto-detail/'))
@@ -164,26 +171,20 @@ class _WelcomeState extends State<Welcome> {
                         .toString()
                         .replaceAll('resto-detail', 'resto-detail/'),
                   ));
-            });
+            }
           } else {
             CustomNavigator.navigatorPushReplacement(
                 context,
                 new WebViewActivity(
-                  codeNotif: "",
-                  url: (data.link.queryParameters["url"]
-                      .toString()
-                      .contains('resto-detail/'))
-                      ? data.link.queryParameters["url"].toString()
-                      : data.link.queryParameters["url"]
-                      .toString()
-                      .replaceAll('resto-detail', 'resto-detail/'),
+                  codeNotif: codeNotif,
+                  url: "",
                 ));
           }
         } else {
           CustomNavigator.navigatorPushReplacement(
               context,
               new WebViewActivity(
-                codeNotif: "",
+                codeNotif: codeNotif,
                 url: "",
               ));
         }
@@ -191,18 +192,11 @@ class _WelcomeState extends State<Welcome> {
         CustomNavigator.navigatorPushReplacement(
             context,
             new WebViewActivity(
-              codeNotif: "",
+              codeNotif: codeNotif,
               url: "",
             ));
       }
-    } else {
-      CustomNavigator.navigatorPushReplacement(
-          context,
-          new WebViewActivity(
-            codeNotif: "",
-            url: "",
-          ));
-    }
+    });
   }
 
   FirebaseDynamicLinks dynamicLinks = FirebaseDynamicLinks.instance;
@@ -230,10 +224,62 @@ class _WelcomeState extends State<Welcome> {
     pref.setString("table", shortUrl.toString());
   }
 
+  String codeNotif = '';
+  // bool notifOrder = false;
+  Future checkToken() async {
+    SharedPreferences pref = await SharedPreferences.getInstance();
+    String token = pref.getString("token") ?? "";
+    if(token != "" && token != "null"){
+      var apiResult = await http
+          .get(Uri.parse('https://jiitu.co.id/api/irg/v2/transaction/user-check'), headers: {
+        "Accept": "Application/json",
+        "Authorization": "Bearer $token"
+      });
+      print(apiResult.body);
+      if (apiResult.body.toString().contains('Unauthenticated') == false) {
+        if(json.decode(apiResult.body)['transaction'] != false){
+          var data = json.decode(apiResult.body)['transaction']['id'];
+          print(data);
+
+          setState(() {
+            codeNotif = "IRG-" + data.toString().padLeft(5, '0') + " sudah siap diambil";
+            // notifOrder = true;
+          });
+        }
+      }
+    }
+  }
+
   @override
   void initState() {
     super.initState();
     idPlayer();
+    OneSignal.shared.setNotificationOpenedHandler((OSNotificationOpenedResult result) {
+      print('"OneSignal: notification opened: '+result.notification.collapseId.toString());
+      var res = result.notification.collapseId.toString();
+      // print(result.notification.payload.collapseId);
+      print('res onesignal');
+      print(res);
+      if (res.contains('home_user')) {
+        if (res.split('home_')[1].split('_')[0] == 'user'){
+          CustomNavigator.navigatorPushReplacement(
+              context,
+              new WebViewActivity(
+                codeNotif: codeNotif,
+                url: ('https://m.indonesiarestoguide.id/resto-detail/'+res.split('home_user_')[1]),
+              ));
+        }
+      } else if (res.contains('home_admin')) {
+        if (res.split('home_')[1].split('_')[0] == 'admin'){
+          CustomNavigator.navigatorPushReplacement(
+              context,
+              new WebViewActivity(
+                codeNotif: codeNotif,
+                url: ('https://m.indonesiarestoguide.id/profile/user/?page=/redirectToTrasaction/'+res.split('home_admin_')[1]),
+              ));
+        }
+      }
+    });
   }
 
   @override

@@ -1,7 +1,6 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
-import 'package:flutter/gestures.dart';
 import 'dart:async';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
@@ -11,6 +10,7 @@ import 'package:image_gallery_saver/image_gallery_saver.dart';
 import 'package:kam5ia/permissionLocation.dart';
 import 'package:path_provider/path_provider.dart';
 import 'dart:io' as dartIo;
+import 'package:http/http.dart' as http;
 
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 import 'package:fluttertoast/fluttertoast.dart';
@@ -117,32 +117,38 @@ class _WebViewActivityState extends State<WebViewActivity>
     }
     FirebaseDynamicLinks.instance.onLink
         .listen((PendingDynamicLinkData dynamicLink) async {
-      print('dylink2');
+      print('getDynamicLink');
       print(dynamicLink.link.toString());
       if (dynamicLink.link.hasQuery) {
         if (dynamicLink.link.toString().contains('resto-detail')) {
           if (dynamicLink.link.toString().contains("/?qr")) {
-            handleTableLink(dynamicLink.link.toString()).whenComplete(() {
+            handleTableLink(
+                    (dynamicLink.link.toString().contains('resto-detail/'))
+                        ? dynamicLink.link.toString()
+                        : dynamicLink.link
+                            .toString()
+                            .replaceAll('resto-detail', 'resto-detail/'))
+                .whenComplete(() {
               _webViewController!.loadUrl(
                   urlRequest: URLRequest(
                       url: Uri.parse((dynamicLink.link.queryParameters["url"]
-                          .toString()
-                          .contains('resto-detail/'))
+                              .toString()
+                              .contains('resto-detail/'))
                           ? dynamicLink.link.queryParameters["url"].toString()
                           : dynamicLink.link.queryParameters["url"]
-                          .toString()
-                          .replaceAll('resto-detail', 'resto-detail/'))));
+                              .toString()
+                              .replaceAll('resto-detail', 'resto-detail/'))));
             });
           } else {
             _webViewController!.loadUrl(
                 urlRequest: URLRequest(
                     url: Uri.parse((dynamicLink.link.queryParameters["url"]
-                        .toString()
-                        .contains('resto-detail/'))
+                            .toString()
+                            .contains('resto-detail/'))
                         ? dynamicLink.link.queryParameters["url"].toString()
                         : dynamicLink.link.queryParameters["url"]
-                        .toString()
-                        .replaceAll('resto-detail', 'resto-detail/'))));
+                            .toString()
+                            .replaceAll('resto-detail', 'resto-detail/'))));
           }
         } else {
           _webViewController!.loadUrl(
@@ -165,7 +171,7 @@ class _WebViewActivityState extends State<WebViewActivity>
       ),
       iosParameters: IOSParameters(
         bundleId: "com.devus.indonesiarestoguide",
-        appStoreId: "1498909115",
+        appStoreId: "6447268805",
       ),
     );
     var shortLink = await dynamicLinks.buildShortLink(parameters);
@@ -174,6 +180,9 @@ class _WebViewActivityState extends State<WebViewActivity>
     print('table 2');
     print(urlLink);
     print(shortUrl);
+    final PendingDynamicLinkData? data =
+        await FirebaseDynamicLinks.instance.getDynamicLink(shortUrl);
+    print(data);
     SharedPreferences pref = await SharedPreferences.getInstance();
     pref.setString("table", shortUrl.toString());
   }
@@ -234,6 +243,30 @@ class _WebViewActivityState extends State<WebViewActivity>
         _webViewController!
             .loadUrl(urlRequest: URLRequest(url: Uri.parse('$mainUrl/resto')));
         return Future.value(true);
+      } else if (value.toString().contains('resto-detail')) {
+        _webViewController!
+            .loadUrl(urlRequest: URLRequest(url: Uri.parse('$mainUrl/resto')));
+        return Future.value(true);
+      } else if (value.toString().contains('/owner/home')) {
+        DateTime now = DateTime.now();
+        if (currentBackPressTime == null ||
+            now.difference(currentBackPressTime!) > Duration(seconds: 2)) {
+          currentBackPressTime = now;
+          Fluttertoast.showToast(msg: 'Tekan kembali lagi untuk kembali');
+          return Future.value(false);
+        }
+        _webViewController!
+            .loadUrl(urlRequest: URLRequest(url: Uri.parse('$mainUrl/resto')));
+        return Future.value(true);
+      } else if (value.toString().contains('/owner/transaction')) {
+        if (value.toString().contains('/owner/transaction/') != true) {
+          _webViewController!
+              .loadUrl(urlRequest: URLRequest(url: Uri.parse('$mainUrl/owner/home')));
+          return Future.value(true);
+        } else {
+          _webViewController!.goBack();
+          return Future.value(true);
+        }
       } else {
         _webViewController!.goBack();
         return Future.value(true);
@@ -305,20 +338,73 @@ class _WebViewActivityState extends State<WebViewActivity>
     }
   }
 
+  String doneCodeNotif = 'null';
+  bool done = false;
+  Future checkToken() async {
+    String? token = await _webViewController
+        ?.evaluateJavascript(source: '''localStorage.getItem('token');''');
+    if (token != "" && token != "null") {
+      var apiResult = await http.get(
+          Uri.parse('https://jiitu.co.id/api/irg/v2/transaction/user-check'),
+          headers: {
+            "Accept": "Application/json",
+            "Authorization": "Bearer $token"
+          });
+      print(apiResult.body);
+      if (apiResult.body.toString().contains('Unauthenticated') == false) {
+        if (json.decode(apiResult.body)['transaction'] != false) {
+          var data = json.decode(apiResult.body)['transaction']['id'];
+          print(data);
+
+          setState(() {
+            widget.codeNotif = "IRG-" +
+                data.toString().padLeft(5, '0') +
+                " sudah siap diambil";
+            notifOrder = true;
+          });
+        }
+      }
+    }
+    // SharedPreferences pref = await SharedPreferences.getInstance();
+    // String token = pref.getString("token") ?? "";
+  }
+
   @override
   void initState() {
+    WidgetsBinding.instance!.addObserver(this);
     idPlayer();
     initDynamicLinks();
-    if (widget.codeNotif != "") {
-      setState(() {
-        notifOrder = true;
-      });
-    }
+    checkToken();
+    // if (widget.codeNotif != "") {
+    //   setState(() {
+    //     notifOrder = true;
+    //   });
+    // }
     setState(() {
       if (widget.url == "") {
         url = '$mainUrl';
       } else {
         url = widget.url ?? '$mainUrl';
+      }
+    });
+    OneSignal.shared.setNotificationOpenedHandler((OSNotificationOpenedResult result) {
+      print('"OneSignal: notification opened: '+result.notification.collapseId.toString());
+      var res = result.notification.collapseId.toString();
+      // print(result.notification.payload.collapseId);
+      print('res onesignal');
+      print(res);
+      if (res.contains('home_user')) {
+        if (res.split('home_')[1].split('_')[0] == 'user'){
+          _webViewController!.loadUrl(
+              urlRequest: URLRequest(
+                  url: Uri.parse('$mainUrl/resto-detail/'+res.split('home_user_')[1])));
+        }
+      } else if (res.contains('home_admin')) {
+        if (res.split('home_')[1].split('_')[0] == 'admin'){
+          _webViewController!.loadUrl(
+              urlRequest: URLRequest(
+                  url: Uri.parse('$mainUrl/profile/user/?page=/redirectToTrasaction/'+res.split('home_admin_')[1])));
+        }
       }
     });
 
@@ -340,10 +426,17 @@ class _WebViewActivityState extends State<WebViewActivity>
   }
 
   @override
+  void dispose() {
+    WidgetsBinding.instance!.removeObserver(this);
+    super.dispose();
+  }
+
+  @override
   void didChangeAppLifecycleState(AppLifecycleState state) async {
     if (state == AppLifecycleState.resumed) {
       print('resumed');
-      initDynamicLinks();
+      // initDynamicLinks();
+      checkToken();
     }
     if (state == AppLifecycleState.inactive) {
       print('inactive');
@@ -396,8 +489,79 @@ class _WebViewActivityState extends State<WebViewActivity>
                     return GeolocationPermissionShowPromptResponse(
                         origin: origin, allow: true, retain: true);
                   },
+                  onProgressChanged: (InAppWebViewController controller, url) async {
+                    SharedPreferences pref =
+                    await SharedPreferences.getInstance();
+
+                    String? token = await controller.evaluateJavascript(
+                        source: '''localStorage.getItem('token');''');
+                    if (token == null || token == "") {
+                      pref.remove("token");
+                    }
+
+                    controller.getUrl().then((value) async {
+                      if (value.toString() == '$mainUrl/login') {
+                        controller.evaluateJavascript(
+                            source: "window.localStorage.removeItem('token');");
+                        var is_ios = await controller.evaluateJavascript(
+                            source: '''localStorage.getItem("is_ios");''');
+                        var device_id = await controller.evaluateJavascript(
+                            source: '''localStorage.getItem("device_id");''');
+                        var latitude = await controller.evaluateJavascript(
+                            source: '''localStorage.getItem("lat");''');
+                        var longitude = await controller.evaluateJavascript(
+                            source: '''localStorage.getItem("long");''');
+                        var getIfHasLocation = await controller.evaluateJavascript(
+                            source: '''localStorage.getItem("activedPermissionLocation");''');
+                        controller.evaluateJavascript(
+                            source: "window.localStorage.clear();");
+                        controller.evaluateJavascript(
+                            source: "window.localStorage.setItem('is_ios', '$is_ios');");
+                        controller.evaluateJavascript(
+                            source: "window.localStorage.setItem('device_id', '$device_id');");
+                        controller.evaluateJavascript(
+                            source: "window.localStorage.setItem('lat', '$latitude');");
+                        controller.evaluateJavascript(
+                            source: "window.localStorage.setItem('long', '$longitude');");
+                        controller.evaluateJavascript(
+                            source: "window.localStorage.setItem('activedPermissionLocation', '$getIfHasLocation');");
+                      }
+                    });
+
+                    String tokenValue = await pref.getString("token") ?? "";
+                    // print('uhuy');
+                    // print(value);
+                    // String? value = await controller.evaluateJavascript(
+                    //     source: '''localStorage.getItem('token');''');
+
+                    if (tokenValue == null || tokenValue == "") {
+                      pref.remove("token");
+                      Future.delayed(Duration(seconds: 3), () async {
+                        String? secondValue = await controller.evaluateJavascript(
+                            source: '''localStorage.getItem('token');''');
+                        if (secondValue != null && secondValue != "") {
+                          setState(() {
+                            if (done != true) {
+                              setState(() {
+                                done = true;
+                              });
+                              checkToken();
+                            }
+                          });
+                        } else {
+                          pref.remove("token");
+                        }
+                      });
+                    }
+                  },
                   onLoadStart: (InAppWebViewController controller, url) async {
                     // controller.clearCache();
+
+                    // if (widget.codeNotif != "") {
+                    //   setState(() {
+                    //     notifOrder = true;
+                    //   });
+                    // }
 
                     SharedPreferences pref =
                         await SharedPreferences.getInstance();
@@ -421,12 +585,6 @@ class _WebViewActivityState extends State<WebViewActivity>
 
                     String? value = await controller.evaluateJavascript(
                         source: '''localStorage.getItem('token');''');
-
-                    // String? table = await controller.evaluateJavascript(
-                    //     source: '''localStorage.getItem('table');''');
-                    //
-                    // print('local storage meja');
-                    // print(table);
 
                     String? restoDetailID = await controller.evaluateJavascript(
                         source: '''localStorage.getItem('resto-detail-id');''');
@@ -536,6 +694,16 @@ class _WebViewActivityState extends State<WebViewActivity>
                       await Permission.audio.request();
                     }
 
+                    if (url.toString().contains("open-jiitu")) {
+                      await controller.goBack().whenComplete(() async {
+                        if (await canLaunch('https://jiitu.co.id/')) {
+                          await launch('https://jiitu.co.id/');
+                        } else {
+                          throw 'Could not launch url';
+                        }
+                      });
+                    }
+
                     if (url.toString().contains("call-resto")) {
                       await controller.goBack().whenComplete(() {
                         String phone = url.toString().split('call-resto/')[1];
@@ -548,7 +716,6 @@ class _WebViewActivityState extends State<WebViewActivity>
                       if (url.toString().contains(mainUrl)) {
                         await Permission.location.status.isGranted
                             .then((value) async {
-                          print(value);
                           if (!value) {
                             CustomNavigator.navigatorPushReplacement(
                                 context, new permissionLocation());
@@ -736,6 +903,7 @@ class _WebViewActivityState extends State<WebViewActivity>
                                             onTap: () async {
                                               setState(() {
                                                 notifOrder = false;
+                                                doneCodeNotif = widget.codeNotif.toString();
                                               });
 
                                               String idHistory = widget

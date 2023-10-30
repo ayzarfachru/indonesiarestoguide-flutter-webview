@@ -19,6 +19,7 @@ import 'package:kam5ia/ui/maintenance.dart';
 import 'package:onesignal_flutter/onesignal_flutter.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:uni_links/uni_links.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:firebase_dynamic_links/firebase_dynamic_links.dart';
 import 'package:share/share.dart';
@@ -161,6 +162,78 @@ class _WebViewActivityState extends State<WebViewActivity>
     });
   }
 
+
+  Uri? _initialURI;
+  Uri? _currentURI;
+  Object? _err;
+  StreamSubscription? _streamSubscription;
+  bool _initialURILinkHandled = false;
+  String urlDeepLinks = '';
+
+  void _incomingLinkHandler() {
+    if (!kIsWeb) {
+      // 2
+      _streamSubscription = uriLinkStream.listen((Uri? uri) async {
+        if (!mounted) {
+          return;
+        }
+        // uri = Uri.parse('irg://indonesiarestoguide.id/?url=https://m.indonesiarestoguide.id/resto-detail/36?qr=ca4deab5-ceda-40a9-b888-07d065097432');
+        debugPrint('Received URI: $uri');
+        print(uri?.queryParameters['qr']);
+        print(uri?.queryParameters['url']);
+
+        if (uri.toString().contains('url')) {
+          if (uri.toString().contains('qr')) {
+            _webViewController!.loadUrl(
+                urlRequest: URLRequest(
+                    url: Uri.parse((uri!.queryParameters['url']
+                            .toString()
+                            .contains('resto-detail/'))
+                        ? uri.queryParameters['url'].toString()
+                        : uri.queryParameters['url']
+                            .toString()
+                            .replaceAll('resto-detail', 'resto-detail/'))));
+            SharedPreferences pref = await SharedPreferences.getInstance();
+            pref.setString("table", uri.queryParameters['url'].toString().split('qr=')[1]);
+          } else {
+            _webViewController!.loadUrl(
+                urlRequest: URLRequest(
+                    url: Uri.parse((uri!.queryParameters['url']
+                            .toString()
+                            .contains('resto-detail/'))
+                        ? uri.queryParameters['url'].toString()
+                        : uri.queryParameters['url']
+                            .toString()
+                            .replaceAll('resto-detail', 'resto-detail/'))));
+          }
+        }
+        print('Received URI: $uri');
+        // setState(() {
+        //   _currentURI = uri;
+        //   _err = null;
+        // });
+        // 3
+      }, onError: (Object err) {
+        if (!mounted) {
+          return;
+        }
+        _webViewController!.loadUrl(
+            urlRequest: URLRequest(url: Uri.parse('$mainUrl/resto')));
+        debugPrint('Error occurred: $err');
+        setState(() {
+          _currentURI = null;
+          if (err is FormatException) {
+            _err = err;
+          } else {
+            _err = null;
+          }
+        });
+      });
+    }
+  }
+
+
+
   Future handleTableLink(String urlLink) async {
     var parameters = DynamicLinkParameters(
       uriPrefix: 'https://irgresto.page.link',
@@ -247,6 +320,11 @@ class _WebViewActivityState extends State<WebViewActivity>
         _webViewController!
             .loadUrl(urlRequest: URLRequest(url: Uri.parse('$mainUrl/resto')));
         return Future.value(true);
+      } else if ((value.toString().contains('history') == true &&
+          value.toString().contains('resto') == true)) {
+        _webViewController!
+            .loadUrl(urlRequest: URLRequest(url: Uri.parse('$mainUrl/resto')));
+        return Future.value(true);
       } else if (value.toString().contains('/owner/home')) {
         DateTime now = DateTime.now();
         if (currentBackPressTime == null ||
@@ -260,8 +338,8 @@ class _WebViewActivityState extends State<WebViewActivity>
         return Future.value(true);
       } else if (value.toString().contains('/owner/transaction')) {
         if (value.toString().contains('/owner/transaction/') != true) {
-          _webViewController!
-              .loadUrl(urlRequest: URLRequest(url: Uri.parse('$mainUrl/owner/home')));
+          _webViewController!.loadUrl(
+              urlRequest: URLRequest(url: Uri.parse('$mainUrl/owner/home')));
           return Future.value(true);
         } else {
           _webViewController!.goBack();
@@ -340,6 +418,7 @@ class _WebViewActivityState extends State<WebViewActivity>
 
   String doneCodeNotif = 'null';
   bool done = false;
+
   Future checkToken() async {
     String? token = await _webViewController
         ?.evaluateJavascript(source: '''localStorage.getItem('token');''');
@@ -374,6 +453,8 @@ class _WebViewActivityState extends State<WebViewActivity>
     WidgetsBinding.instance!.addObserver(this);
     idPlayer();
     initDynamicLinks();
+    _incomingLinkHandler();
+    // _initURIHandler();
     checkToken();
     // if (widget.codeNotif != "") {
     //   setState(() {
@@ -387,41 +468,46 @@ class _WebViewActivityState extends State<WebViewActivity>
         url = widget.url ?? '$mainUrl';
       }
     });
-    OneSignal.shared.setNotificationOpenedHandler((OSNotificationOpenedResult result) {
-      print('"OneSignal: notification opened: '+result.notification.collapseId.toString());
+    OneSignal.shared
+        .setNotificationOpenedHandler((OSNotificationOpenedResult result) {
+      print('"OneSignal: notification opened: ' +
+          result.notification.collapseId.toString());
       var res = result.notification.collapseId.toString();
       // print(result.notification.payload.collapseId);
       print('res onesignal');
       print(res);
       if (res.contains('home_user')) {
-        if (res.split('home_')[1].split('_')[0] == 'user'){
+        if (res.split('home_')[1].split('_')[0] == 'user') {
           _webViewController!.loadUrl(
               urlRequest: URLRequest(
-                  url: Uri.parse('$mainUrl/resto-detail/'+res.split('home_user_')[1])));
+                  url: Uri.parse(
+                      '$mainUrl/resto-detail/' + res.split('home_user_')[1])));
         }
       } else if (res.contains('home_admin')) {
-        if (res.split('home_')[1].split('_')[0] == 'admin'){
+        if (res.split('home_')[1].split('_')[0] == 'admin') {
           _webViewController!.loadUrl(
               urlRequest: URLRequest(
-                  url: Uri.parse('$mainUrl/profile/user/?page=/redirectToTrasaction/'+res.split('home_admin_')[1])));
+                  url: Uri.parse(
+                      '$mainUrl/profile/user/?page=/redirectToTrasaction/' +
+                          res.split('home_admin_')[1])));
         }
       }
     });
 
-    // pullToRefreshController = kIsWeb
-    //     ? null
-    //     : PullToRefreshController(
-    //         options: PullToRefreshOptions(backgroundColor: CustomColor.primary),
-    //         onRefresh: () async {
-    //           if (defaultTargetPlatform == TargetPlatform.android) {
-    //             _webViewController?.reload();
-    //           } else if (defaultTargetPlatform == TargetPlatform.iOS) {
-    //             _webViewController?.loadUrl(
-    //                 urlRequest:
-    //                     URLRequest(url: await _webViewController?.getUrl()));
-    //           }
-    //         },
-    //       );
+    pullToRefreshController = kIsWeb
+        ? null
+        : PullToRefreshController(
+      options: PullToRefreshOptions(backgroundColor: CustomColor.primary),
+      onRefresh: () async {
+        if (defaultTargetPlatform == TargetPlatform.android) {
+          _webViewController?.reload();
+        } else if (defaultTargetPlatform == TargetPlatform.iOS) {
+          _webViewController?.loadUrl(
+              urlRequest:
+              URLRequest(url: await _webViewController?.getUrl()));
+        }
+      },
+    );
     super.initState();
   }
 
@@ -460,6 +546,7 @@ class _WebViewActivityState extends State<WebViewActivity>
             child: Stack(
               children: [
                 InAppWebView(
+                  pullToRefreshController: pullToRefreshController,
                   initialUrlRequest: URLRequest(url: Uri.parse(url)),
                   initialOptions: InAppWebViewGroupOptions(
                     crossPlatform: InAppWebViewOptions(
@@ -489,9 +576,26 @@ class _WebViewActivityState extends State<WebViewActivity>
                     return GeolocationPermissionShowPromptResponse(
                         origin: origin, allow: true, retain: true);
                   },
-                  onProgressChanged: (InAppWebViewController controller, url) async {
+                  onProgressChanged:
+                      (InAppWebViewController controller, progress) async {
+                        if (progress == 100) {
+                          pullToRefreshController?.endRefreshing();
+                        }
+
                     SharedPreferences pref =
-                    await SharedPreferences.getInstance();
+                        await SharedPreferences.getInstance();
+
+                    if (pref.getBool("is_first") != true) {
+                      print('first_install');
+                      String? token2 = await controller.evaluateJavascript(
+                          source: '''localStorage.getItem('token');''');
+                      print(token2);
+                      controller.clearCache();
+                      controller.evaluateJavascript(
+                          source: "window.localStorage.clear();");
+                      controller.webStorage.localStorage.clear();
+                      pref.setBool("is_first", true);
+                    }
 
                     String? token = await controller.evaluateJavascript(
                         source: '''localStorage.getItem('token');''');
@@ -500,33 +604,59 @@ class _WebViewActivityState extends State<WebViewActivity>
                     }
 
                     controller.getUrl().then((value) async {
+                      pref.setString("url", value.toString());
                       if (value.toString() == '$mainUrl/login') {
                         controller.evaluateJavascript(
                             source: "window.localStorage.removeItem('token');");
-                        var is_ios = await controller.evaluateJavascript(
-                            source: '''localStorage.getItem("is_ios");''');
-                        var device_id = await controller.evaluateJavascript(
-                            source: '''localStorage.getItem("device_id");''');
-                        var latitude = await controller.evaluateJavascript(
-                            source: '''localStorage.getItem("lat");''');
-                        var longitude = await controller.evaluateJavascript(
-                            source: '''localStorage.getItem("long");''');
-                        var getIfHasLocation = await controller.evaluateJavascript(
-                            source: '''localStorage.getItem("activedPermissionLocation");''');
                         controller.evaluateJavascript(
-                            source: "window.localStorage.clear();");
+                            source: "window.localStorage.removeItem('table');");
                         controller.evaluateJavascript(
-                            source: "window.localStorage.setItem('is_ios', '$is_ios');");
+                            source: "window.localStorage.removeItem('cart');");
                         controller.evaluateJavascript(
-                            source: "window.localStorage.setItem('device_id', '$device_id');");
+                            source: "window.localStorage.removeItem('cart-details');");
                         controller.evaluateJavascript(
-                            source: "window.localStorage.setItem('lat', '$latitude');");
-                        controller.evaluateJavascript(
-                            source: "window.localStorage.setItem('long', '$longitude');");
-                        controller.evaluateJavascript(
-                            source: "window.localStorage.setItem('activedPermissionLocation', '$getIfHasLocation');");
+                            source: "window.localStorage.removeItem('notes');");
+                        // var is_ios = await controller.evaluateJavascript(
+                        //     source: '''localStorage.getItem("is_ios");''');
+                        // var device_id = await controller.evaluateJavascript(
+                        //     source: '''localStorage.getItem("device_id");''');
+                        // var latitude = await controller.evaluateJavascript(
+                        //     source: '''localStorage.getItem("lat");''');
+                        // var longitude = await controller.evaluateJavascript(
+                        //     source: '''localStorage.getItem("long");''');
+                        // var getIfHasLocation = await controller.evaluateJavascript(
+                        //     source:
+                        //         '''localStorage.getItem("activedPermissionLocation");''');
+                        // controller.clearCache();
+                        // controller.evaluateJavascript(
+                        //     source: "window.localStorage.clear();");
+                        // controller.webStorage.localStorage.clear();
+                        // controller.evaluateJavascript(
+                        //     source:
+                        //         "window.localStorage.setItem('is_ios', '$is_ios');");
+                        // print(is_ios);
+                        // controller.evaluateJavascript(
+                        //     source:
+                        //         "window.localStorage.setItem('device_id', '$device_id');");
+                        // print('login device_id ' + device_id.toString());
+                        // controller.evaluateJavascript(
+                        //     source:
+                        //         "window.localStorage.setItem('lat', '$latitude');");
+                        // print(latitude);
+                        // controller.evaluateJavascript(
+                        //     source:
+                        //         "window.localStorage.setItem('long', '$longitude');");
+                        // print(longitude);
+                        // controller.evaluateJavascript(
+                        //     source:
+                        //         "window.localStorage.setItem('activedPermissionLocation', '$getIfHasLocation');");
+                        // print(getIfHasLocation);
                       }
                     });
+
+                    var new_device_id = await controller.evaluateJavascript(
+                        source: '''localStorage.getItem("device_id");''');
+                    print('always device_id ' + new_device_id.toString());
 
                     String tokenValue = await pref.getString("token") ?? "";
                     // print('uhuy');
@@ -537,8 +667,9 @@ class _WebViewActivityState extends State<WebViewActivity>
                     if (tokenValue == null || tokenValue == "") {
                       pref.remove("token");
                       Future.delayed(Duration(seconds: 3), () async {
-                        String? secondValue = await controller.evaluateJavascript(
-                            source: '''localStorage.getItem('token');''');
+                        String? secondValue = await controller
+                            .evaluateJavascript(
+                                source: '''localStorage.getItem('token');''');
                         if (secondValue != null && secondValue != "") {
                           setState(() {
                             if (done != true) {
@@ -651,8 +782,13 @@ class _WebViewActivityState extends State<WebViewActivity>
                     }
 
                     if (url == Uri.parse('$mainUrl/feedback')) {
+                      String? userLS = await controller.evaluateJavascript(
+                          source: '''localStorage.getItem('user');''');
+                      var user = json.decode(userLS!);
+                      var email = user['email'];
+
                       await controller.goBack().whenComplete(() {
-                        launch('mailto:info@indonesiarestoguide.id');
+                        launch('mailto:info@indonesiarestoguide.id'+'?subject='+'Masukan dari akun IRG: '+email+'&body='+'Terimakasih telah menggunakan Indonesia Resto Guide, ada yang bisa kami bantu?%0D%0A%0D%0A');
                       });
                     }
 
@@ -748,6 +884,7 @@ class _WebViewActivityState extends State<WebViewActivity>
                     }
                   },
                   onLoadStop: (InAppWebViewController controller, url) async {
+                    pullToRefreshController?.endRefreshing();
                     SharedPreferences pref =
                         await SharedPreferences.getInstance();
 
@@ -756,6 +893,7 @@ class _WebViewActivityState extends State<WebViewActivity>
                     }
                   },
                   onLoadError: (controller, url, code, message) {
+                    pullToRefreshController?.endRefreshing();
                     if (message.isNotEmpty) {
                       CustomNavigator.navigatorPushReplacement(
                           context, new Maintenance());
@@ -903,7 +1041,8 @@ class _WebViewActivityState extends State<WebViewActivity>
                                             onTap: () async {
                                               setState(() {
                                                 notifOrder = false;
-                                                doneCodeNotif = widget.codeNotif.toString();
+                                                doneCodeNotif =
+                                                    widget.codeNotif.toString();
                                               });
 
                                               String idHistory = widget

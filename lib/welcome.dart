@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:in_app_update/in_app_update.dart';
 import 'package:kam5ia/utils/utils.dart';
 import 'package:onesignal_flutter/onesignal_flutter.dart';
@@ -8,6 +9,7 @@ import 'package:kam5ia/webview_activity.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:firebase_dynamic_links/firebase_dynamic_links.dart';
 import 'package:http/http.dart' as http;
+import 'package:uni_links/uni_links.dart';
 
 class Welcome extends StatefulWidget {
   @override
@@ -139,6 +141,9 @@ class _WelcomeState extends State<Welcome> {
 
     print('dylink1 welcome');
     print(data?.link);
+    print(data?.link);
+    print(data?.link.data);
+    print(data?.link.queryParameters["url"]);
     checkToken().whenComplete(() {
       if (data != null) {
         if (data.link.hasQuery) {
@@ -150,12 +155,12 @@ class _WelcomeState extends State<Welcome> {
                     new WebViewActivity(
                       codeNotif: codeNotif,
                       url: (data.link.queryParameters["url"]
-                          .toString()
-                          .contains('resto-detail/'))
+                              .toString()
+                              .contains('resto-detail/'))
                           ? data.link.queryParameters["url"].toString()
                           : data.link.queryParameters["url"]
-                          .toString()
-                          .replaceAll('resto-detail', 'resto-detail/'),
+                              .toString()
+                              .replaceAll('resto-detail', 'resto-detail/'),
                     ));
               });
             } else {
@@ -164,12 +169,12 @@ class _WelcomeState extends State<Welcome> {
                   new WebViewActivity(
                     codeNotif: codeNotif,
                     url: (data.link.queryParameters["url"]
-                        .toString()
-                        .contains('resto-detail/'))
+                            .toString()
+                            .contains('resto-detail/'))
                         ? data.link.queryParameters["url"].toString()
                         : data.link.queryParameters["url"]
-                        .toString()
-                        .replaceAll('resto-detail', 'resto-detail/'),
+                            .toString()
+                            .replaceAll('resto-detail', 'resto-detail/'),
                   ));
             }
           } else {
@@ -189,12 +194,27 @@ class _WelcomeState extends State<Welcome> {
               ));
         }
       } else {
-        CustomNavigator.navigatorPushReplacement(
-            context,
-            new WebViewActivity(
-              codeNotif: codeNotif,
-              url: "",
-            ));
+        firstInstall().whenComplete(() {
+          print('iki null');
+          CustomNavigator.navigatorPush(
+              context,
+              new WebViewActivity(
+                codeNotif: codeNotif,
+                url: (urlFI
+                        .toString()
+                        .contains('resto-detail/'))
+                    ? urlFI.toString()
+                    : urlFI
+                        .toString()
+                        .replaceAll('resto-detail', 'resto-detail/'),
+              ));
+        });
+        // CustomNavigator.navigatorPushReplacement(
+        //     context,
+        //     new WebViewActivity(
+        //       codeNotif: codeNotif,
+        //       url: "",
+        //     ));
       }
     });
   }
@@ -225,24 +245,29 @@ class _WelcomeState extends State<Welcome> {
   }
 
   String codeNotif = '';
+
   // bool notifOrder = false;
   Future checkToken() async {
     SharedPreferences pref = await SharedPreferences.getInstance();
     String token = pref.getString("token") ?? "";
-    if(token != "" && token != "null"){
-      var apiResult = await http
-          .get(Uri.parse('https://jiitu.co.id/api/irg/v2/transaction/user-check'), headers: {
-        "Accept": "Application/json",
-        "Authorization": "Bearer $token"
-      });
+    if (token != "" && token != "null") {
+      var apiResult = await http.get(
+          Uri.parse('https://jiitu.co.id/api/irg/v2/transaction/user-check'),
+          headers: {
+            "Accept": "Application/json",
+            "Authorization": "Bearer $token"
+          });
+      print(apiResult.body);
       print(apiResult.body);
       if (apiResult.body.toString().contains('Unauthenticated') == false) {
-        if(json.decode(apiResult.body)['transaction'] != false){
+        if (json.decode(apiResult.body)['transaction'] != false) {
           var data = json.decode(apiResult.body)['transaction']['id'];
           print(data);
 
           setState(() {
-            codeNotif = "IRG-" + data.toString().padLeft(5, '0') + " sudah siap diambil";
+            codeNotif = "IRG-" +
+                data.toString().padLeft(5, '0') +
+                " sudah siap diambil";
             // notifOrder = true;
           });
         }
@@ -250,32 +275,134 @@ class _WelcomeState extends State<Welcome> {
     }
   }
 
+  bool isLoadingFI = false;
+  String urlFI = '';
+  String tableFI = '';
+  bool _initialURILinkHandled = false;
+
+  Future firstInstall() async {
+    SharedPreferences pref = await SharedPreferences.getInstance();
+    String is_first_install = pref.getString("is_first_install") ?? "true";
+    if (isLoadingFI != true) {
+      isLoadingFI = true;
+      setState(() {});
+      if (is_first_install != 'false') {
+        var apiResult = await http.get(
+            Uri.parse('http://jiitu.co.id/api/links?app_id=IRG'),
+            headers: {
+              "Accept": "Application/json",
+            });
+        if (apiResult.statusCode == 200) {
+          isLoadingFI = false;
+          print('first install in welcome');
+          print(apiResult.body);
+          if (json.decode(apiResult.body).toString().contains('url')) {
+            urlFI = json.decode(apiResult.body)['url'];
+            if (json.decode(apiResult.body).toString().contains('qr')) {
+              tableFI = json.decode(apiResult.body)['qr'];
+              pref.setString("table", json.decode(apiResult.body)['qr'].toString());
+            }
+          }
+          pref.setString("is_first_install", "false");
+          setState(() {});
+        } else {
+          isLoadingFI = false;
+          setState(() {});
+        }
+      } else {
+        if (!_initialURILinkHandled) {
+          _initialURILinkHandled = true;
+          // 2
+
+          print("Invoked _initURIHandler");
+
+          // Fluttertoast.showToast(
+          //     msg: "Invoked _initURIHandler",
+          //     toastLength: Toast.LENGTH_SHORT,
+          //     gravity: ToastGravity.BOTTOM,
+          //     timeInSecForIosWeb: 1,
+          //     backgroundColor: Colors.green,
+          //     textColor: Colors.white);
+          try {
+            // 3
+            final initialURI = await getInitialUri();
+            // 4
+            if (initialURI != null) {
+              debugPrint("Initial URI received $initialURI");
+              if (!mounted) {
+                return;
+              }
+              print(initialURI.toString().contains('url'));
+              print(initialURI.toString().contains('qr'));
+              print(initialURI.queryParameters['url'].toString());
+              if (initialURI.toString().contains('url')) {
+                if (initialURI.toString().contains('qr')) {
+                  urlFI = (initialURI.queryParameters['url']
+                      .toString()
+                      .contains('resto-detail/'))
+                      ? initialURI.queryParameters['url'].toString()
+                      : initialURI.queryParameters['url']
+                      .toString()
+                      .replaceAll('resto-detail', 'resto-detail/');
+                  SharedPreferences pref = await SharedPreferences.getInstance();
+                  pref.setString("table", initialURI.queryParameters['url'].toString().split('qr=')[1]);
+                } else {
+                  urlFI = (initialURI.queryParameters['url']
+                      .toString()
+                      .contains('resto-detail/'))
+                      ? initialURI.queryParameters['url'].toString()
+                      : initialURI.queryParameters['url']
+                      .toString()
+                      .replaceAll('resto-detail', 'resto-detail/');
+                }
+              }
+              setState(() {});
+            } else {
+              debugPrint("Null Initial URI received");
+            }
+          } on PlatformException {
+            // 5
+            debugPrint("Failed to receive initial uri");
+          }
+        }
+      }
+    }
+    setState(() {});
+  }
+
+
   @override
   void initState() {
     super.initState();
     idPlayer();
-    OneSignal.shared.setNotificationOpenedHandler((OSNotificationOpenedResult result) {
-      print('"OneSignal: notification opened: '+result.notification.collapseId.toString());
+    // firstInstall();
+    OneSignal.shared
+        .setNotificationOpenedHandler((OSNotificationOpenedResult result) {
+      print('"OneSignal: notification opened: ' +
+          result.notification.collapseId.toString());
       var res = result.notification.collapseId.toString();
       // print(result.notification.payload.collapseId);
       print('res onesignal');
       print(res);
       if (res.contains('home_user')) {
-        if (res.split('home_')[1].split('_')[0] == 'user'){
+        if (res.split('home_')[1].split('_')[0] == 'user') {
           CustomNavigator.navigatorPushReplacement(
               context,
               new WebViewActivity(
                 codeNotif: codeNotif,
-                url: ('https://m.indonesiarestoguide.id/resto-detail/'+res.split('home_user_')[1]),
+                url: ('https://m.indonesiarestoguide.id/resto-detail/' +
+                    res.split('home_user_')[1]),
               ));
         }
       } else if (res.contains('home_admin')) {
-        if (res.split('home_')[1].split('_')[0] == 'admin'){
+        if (res.split('home_')[1].split('_')[0] == 'admin') {
           CustomNavigator.navigatorPushReplacement(
               context,
               new WebViewActivity(
                 codeNotif: codeNotif,
-                url: ('https://m.indonesiarestoguide.id/profile/user/?page=/redirectToTrasaction/'+res.split('home_admin_')[1]),
+                url:
+                    ('https://m.indonesiarestoguide.id/profile/user/?page=/redirectToTrasaction/' +
+                        res.split('home_admin_')[1]),
               ));
         }
       }

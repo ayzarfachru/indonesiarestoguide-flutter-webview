@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/scheduler.dart';
 import 'package:flutter/services.dart';
 import 'package:in_app_update/in_app_update.dart';
 import 'package:kam5ia/utils/utils.dart';
@@ -56,19 +57,21 @@ class _WelcomeState extends State<Welcome> {
   // }
 
   Future idPlayer() async {
-    await OneSignal.shared.getDeviceState().then((status) {
-      print(playerId);
-      setState(() {
-        playerId = status?.userId;
-      });
+    // await OneSignal.shared.getDeviceState().then((status) {
+    Future.delayed(Duration(milliseconds: 1500), () async {
+      OneSignal.User.pushSubscription.optIn();
+      playerId = await OneSignal.User.pushSubscription.id;
+
+      setState(() {});
 
       print(playerId);
       if (playerId == null) {
-        CustomNavigator.navigatorPushReplacementWelcome(context, new Welcome());
+        SchedulerBinding.instance.addPostFrameCallback((_) {
+          CustomNavigator.navigatorPushReplacementWelcome(
+              context, new Welcome());
+        });
       } else {
         _checkForSession().then((status) {
-          print('_checkForSession 1');
-          print(status);
           if (status) {
             initDynamicLinks();
           }
@@ -80,9 +83,6 @@ class _WelcomeState extends State<Welcome> {
   AppUpdateInfo? _updateInfo;
 
   Future<void> checkForUpdate() async {
-    print('UpdateAvailability.updateAvailable');
-    print(UpdateAvailability.updateAvailable);
-    print(_updateInfo?.updateAvailability);
 
     InAppUpdate.checkForUpdate().then((info) {
       setState(() {
@@ -93,10 +93,7 @@ class _WelcomeState extends State<Welcome> {
               .catchError((e) => showSnack(e.toString()));
         } else {
           _checkForSession().then((status) {
-            print('_checkForSession');
-            print(status);
             if (status) {
-              print('check');
               initDynamicLinks();
             }
           });
@@ -139,12 +136,7 @@ class _WelcomeState extends State<Welcome> {
     final PendingDynamicLinkData? data =
         await FirebaseDynamicLinks.instance.getInitialLink();
 
-    print('dylink1 welcome');
-    print(data?.link);
-    print(data?.link);
-    print(data?.link.data);
-    print(data?.link.queryParameters["url"]);
-    checkToken().whenComplete(() {
+    checkToken().whenComplete(() async {
       if (data != null) {
         if (data.link.hasQuery) {
           if (data.link.toString().contains('resto-detail')) {
@@ -194,21 +186,174 @@ class _WelcomeState extends State<Welcome> {
               ));
         }
       } else {
-        firstInstall().whenComplete(() {
-          print('iki null');
-          CustomNavigator.navigatorPush(
-              context,
-              new WebViewActivity(
-                codeNotif: codeNotif,
-                url: (urlFI
+        if (!_initialURILinkHandled) {
+          _initialURILinkHandled = true;
+          // 2
+
+          print("Invoked _initURIHandler");
+
+          // Fluttertoast.showToast(
+          //     msg: "Invoked _initURIHandler",
+          //     toastLength: Toast.LENGTH_SHORT,
+          //     gravity: ToastGravity.BOTTOM,
+          //     timeInSecForIosWeb: 1,
+          //     backgroundColor: Colors.green,
+          //     textColor: Colors.white);
+          try {
+            // 3
+            final initialURI = await getInitialUri();
+            // 4
+            if (initialURI != null) {
+              debugPrint("Initial URI received $initialURI");
+              if (!mounted) {
+                return;
+              }
+              if (initialURI.toString().contains('url')) {
+                if (initialURI.toString().contains('qr')) {
+                  urlFI = (initialURI.queryParameters['url']
+                          .toString()
+                          .contains('resto-detail/'))
+                      ? initialURI.queryParameters['url'].toString()
+                      : initialURI.queryParameters['url'].toString();
+                  SharedPreferences pref =
+                      await SharedPreferences.getInstance();
+                  pref.setString(
+                      "table",
+                      initialURI.queryParameters['url']
+                          .toString()
+                          .split('qr=')[1]);
+                } else {
+                  urlFI = (initialURI.queryParameters['url']
+                          .toString()
+                          .contains('resto-detail/'))
+                      ? initialURI.queryParameters['url'].toString()
+                      : initialURI.queryParameters['url'].toString();
+                }
+              } else {
+                if (initialURI.toString().contains('qr')) {
+                  urlFI =
+                      initialURI.toString().replaceAll('mirg://', 'https://');
+                  SharedPreferences pref =
+                      await SharedPreferences.getInstance();
+                  pref.setString(
+                      "table", initialURI.toString().split('qr=')[1]);
+                } else {
+                  urlFI =
+                      initialURI.toString().replaceAll('mirg://', 'https://');
+                }
+              }
+              setState(() {});
+            } else {
+              // app link with api
+              SharedPreferences pref = await SharedPreferences.getInstance();
+              String is_first_install =
+                  (pref.getString("is_first_install") ?? "true");
+              if (is_first_install.toString() == 'null') {
+                is_first_install = 'true';
+              }
+              if (isLoadingFI != true) {
+                isLoadingFI = true;
+                setState(() {});
+                if (is_first_install != 'false') {
+                  var apiResult = await http.get(
+                      Uri.parse('http://jiitu.co.id/api/links?app_id=IRG'),
+                      headers: {
+                        "Accept": "Application/json",
+                      });
+                  if (apiResult.statusCode == 200) {
+                    isLoadingFI = false;
+                    print('first install in welcome');
+                    print(apiResult.body);
+                    if (json
+                        .decode(apiResult.body)
                         .toString()
-                        .contains('resto-detail/'))
-                    ? urlFI.toString()
-                    : urlFI
-                        .toString()
-                        .replaceAll('resto-detail', 'resto-detail/'),
-              ));
-        });
+                        .contains('url')) {
+                      urlFI = json.decode(apiResult.body)['url'];
+                      if (json
+                          .decode(apiResult.body)
+                          .toString()
+                          .contains('qr')) {
+                        tableFI = json.decode(apiResult.body)['url'].toString().split('qr=')[1];
+                        pref.setString("table",
+                            json.decode(apiResult.body)['url'].toString().split('qr=')[1]);
+                      }
+                    }
+                    pref.setString("is_first_install", "false");
+                    CustomNavigator.navigatorPush(
+                        context,
+                        new WebViewActivity(
+                          codeNotif: codeNotif,
+                          url: (urlFI.toString().contains('resto-detail/'))
+                              ? urlFI.toString()
+                              : urlFI
+                                  .toString()
+                                  .replaceAll('resto-detail', 'resto-detail/'),
+                        ));
+                    setState(() {});
+                  } else {
+                    pref.setString("is_first_install", "false");
+                    isLoadingFI = false;
+                    CustomNavigator.navigatorPush(
+                        context,
+                        new WebViewActivity(
+                          codeNotif: codeNotif,
+                          url: (urlFI.toString().contains('resto-detail/'))
+                              ? urlFI.toString()
+                              : urlFI
+                                  .toString()
+                                  .replaceAll('resto-detail', 'resto-detail/'),
+                        ));
+                    setState(() {});
+                  }
+                } else {
+                  isLoadingFI = false;
+                  CustomNavigator.navigatorPush(
+                      context,
+                      new WebViewActivity(
+                        codeNotif: codeNotif,
+                        url: (urlFI.toString().contains('resto-detail/'))
+                            ? urlFI.toString()
+                            : urlFI
+                                .toString()
+                                .replaceAll('resto-detail', 'resto-detail/'),
+                      ));
+                }
+              }
+              debugPrint("Null Initial URI received");
+            }
+          } on PlatformException {
+            // 5
+            debugPrint("Failed to receive initial uri");
+          }
+        }
+
+        CustomNavigator.navigatorPush(
+            context,
+            new WebViewActivity(
+              codeNotif: codeNotif,
+              url: (urlFI.toString().contains('resto-detail/'))
+                  ? urlFI.toString()
+                  : urlFI
+                      .toString()
+                      .replaceAll('resto-detail', 'resto-detail/'),
+            ));
+
+        // firstInstall().whenComplete(() {
+        //   print('iki null');
+        //   CustomNavigator.navigatorPush(
+        //       context,
+        //       new WebViewActivity(
+        //         codeNotif: codeNotif,
+        //         url: (urlFI
+        //                 .toString()
+        //                 .contains('resto-detail/'))
+        //             ? urlFI.toString()
+        //             : urlFI
+        //                 .toString()
+        //                 .replaceAll('resto-detail', 'resto-detail/'),
+        //       ));
+        // });
+
         // CustomNavigator.navigatorPushReplacement(
         //     context,
         //     new WebViewActivity(
@@ -237,9 +382,6 @@ class _WelcomeState extends State<Welcome> {
     var shortLink = await dynamicLinks.buildShortLink(parameters);
     var shortUrl = shortLink.shortUrl;
 
-    print('table');
-    print(urlLink);
-    print(shortUrl);
     SharedPreferences pref = await SharedPreferences.getInstance();
     pref.setString("table", shortUrl.toString());
   }
@@ -257,7 +399,6 @@ class _WelcomeState extends State<Welcome> {
             "Accept": "Application/json",
             "Authorization": "Bearer $token"
           });
-      print(apiResult.body);
       print(apiResult.body);
       if (apiResult.body.toString().contains('Unauthenticated') == false) {
         if (json.decode(apiResult.body)['transaction'] != false) {
@@ -281,109 +422,203 @@ class _WelcomeState extends State<Welcome> {
   bool _initialURILinkHandled = false;
 
   Future firstInstall() async {
-    SharedPreferences pref = await SharedPreferences.getInstance();
-    String is_first_install = pref.getString("is_first_install") ?? "true";
-    if (isLoadingFI != true) {
-      isLoadingFI = true;
-      setState(() {});
-      if (is_first_install != 'false') {
-        var apiResult = await http.get(
-            Uri.parse('http://jiitu.co.id/api/links?app_id=IRG'),
-            headers: {
-              "Accept": "Application/json",
-            });
-        if (apiResult.statusCode == 200) {
-          isLoadingFI = false;
-          print('first install in welcome');
-          print(apiResult.body);
-          if (json.decode(apiResult.body).toString().contains('url')) {
-            urlFI = json.decode(apiResult.body)['url'];
-            if (json.decode(apiResult.body).toString().contains('qr')) {
-              tableFI = json.decode(apiResult.body)['qr'];
-              pref.setString("table", json.decode(apiResult.body)['qr'].toString());
+    if (!_initialURILinkHandled) {
+      _initialURILinkHandled = true;
+      // 2
+
+      print("Invoked _initURIHandler");
+
+      // Fluttertoast.showToast(
+      //     msg: "Invoked _initURIHandler",
+      //     toastLength: Toast.LENGTH_SHORT,
+      //     gravity: ToastGravity.BOTTOM,
+      //     timeInSecForIosWeb: 1,
+      //     backgroundColor: Colors.green,
+      //     textColor: Colors.white);
+      try {
+        // 3
+        final initialURI = await getInitialUri();
+        // 4
+        if (initialURI != null) {
+          debugPrint("Initial URI received $initialURI");
+          if (!mounted) {
+            return;
+          }
+          if (initialURI.toString().contains('url')) {
+            if (initialURI.toString().contains('qr')) {
+              urlFI = (initialURI.queryParameters['url']
+                      .toString()
+                      .contains('resto-detail/'))
+                  ? initialURI.queryParameters['url'].toString()
+                  : initialURI.queryParameters['url'].toString();
+              SharedPreferences pref = await SharedPreferences.getInstance();
+              pref.setString("table",
+                  initialURI.queryParameters['url'].toString().split('qr=')[1]);
+            } else {
+              urlFI = (initialURI.queryParameters['url']
+                      .toString()
+                      .contains('resto-detail/'))
+                  ? initialURI.queryParameters['url'].toString()
+                  : initialURI.queryParameters['url'].toString();
+            }
+          } else {
+            if (initialURI.toString().contains('qr')) {
+              urlFI = initialURI.toString().replaceAll('mirg://', 'https://');
+              SharedPreferences pref = await SharedPreferences.getInstance();
+              pref.setString("table", initialURI.toString().split('qr=')[1]);
+            } else {
+              urlFI = initialURI.toString().replaceAll('mirg://', 'https://');
             }
           }
-          pref.setString("is_first_install", "false");
           setState(() {});
         } else {
-          isLoadingFI = false;
-          setState(() {});
-        }
-      } else {
-        if (!_initialURILinkHandled) {
-          _initialURILinkHandled = true;
-          // 2
-
-          print("Invoked _initURIHandler");
-
-          // Fluttertoast.showToast(
-          //     msg: "Invoked _initURIHandler",
-          //     toastLength: Toast.LENGTH_SHORT,
-          //     gravity: ToastGravity.BOTTOM,
-          //     timeInSecForIosWeb: 1,
-          //     backgroundColor: Colors.green,
-          //     textColor: Colors.white);
-          try {
-            // 3
-            final initialURI = await getInitialUri();
-            // 4
-            if (initialURI != null) {
-              debugPrint("Initial URI received $initialURI");
-              if (!mounted) {
-                return;
-              }
-              print(initialURI.toString().contains('url'));
-              print(initialURI.toString().contains('qr'));
-              print(initialURI.queryParameters['url'].toString());
-              if (initialURI.toString().contains('url')) {
-                if (initialURI.toString().contains('qr')) {
-                  urlFI = (initialURI.queryParameters['url']
-                      .toString()
-                      .contains('resto-detail/'))
-                      ? initialURI.queryParameters['url'].toString()
-                      : initialURI.queryParameters['url']
-                      .toString()
-                      .replaceAll('resto-detail', 'resto-detail/');
-                  SharedPreferences pref = await SharedPreferences.getInstance();
-                  pref.setString("table", initialURI.queryParameters['url'].toString().split('qr=')[1]);
-                } else {
-                  urlFI = (initialURI.queryParameters['url']
-                      .toString()
-                      .contains('resto-detail/'))
-                      ? initialURI.queryParameters['url'].toString()
-                      : initialURI.queryParameters['url']
-                      .toString()
-                      .replaceAll('resto-detail', 'resto-detail/');
+          // app link with api
+          SharedPreferences pref = await SharedPreferences.getInstance();
+          String is_first_install =
+              (pref.getString("is_first_install") ?? "true");
+          if (isLoadingFI != true) {
+            isLoadingFI = true;
+            setState(() {});
+            if (is_first_install != 'false') {
+              var apiResult = await http.get(
+                  Uri.parse('http://jiitu.co.id/api/links?app_id=IRG'),
+                  headers: {
+                    "Accept": "Application/json",
+                  });
+              if (apiResult.statusCode == 200) {
+                isLoadingFI = false;
+                print('first install in welcome');
+                print(apiResult.body);
+                if (json.decode(apiResult.body).toString().contains('url')) {
+                  urlFI = json.decode(apiResult.body)['url'];
+                  if (json.decode(apiResult.body).toString().contains('qr')) {
+                    tableFI = json.decode(apiResult.body)['url'].toString().split('qr=')[1];
+                    pref.setString(
+                        "table", json.decode(apiResult.body)['url'].toString().split('qr=')[1]);
+                  }
                 }
+                pref.setString("is_first_install", "false");
+                setState(() {});
+              } else {
+                pref.setString("is_first_install", "false");
+                isLoadingFI = false;
+                setState(() {});
               }
-              setState(() {});
             } else {
-              debugPrint("Null Initial URI received");
+              isLoadingFI = false;
             }
-          } on PlatformException {
-            // 5
-            debugPrint("Failed to receive initial uri");
           }
+          debugPrint("Null Initial URI received");
         }
+      } on PlatformException {
+        // 5
+        debugPrint("Failed to receive initial uri");
       }
     }
+    // SharedPreferences pref = await SharedPreferences.getInstance();
+    // String is_first_install = pref.getString("is_first_install") ?? "true";
+    // if (isLoadingFI != true) {
+    //   isLoadingFI = true;
+    //   setState(() {});
+    //   if (is_first_install != 'false') {
+    //     var apiResult = await http.get(
+    //         Uri.parse('http://jiitu.co.id/api/links?app_id=IRG'),
+    //         headers: {
+    //           "Accept": "Application/json",
+    //         });
+    //     if (apiResult.statusCode == 200) {
+    //       isLoadingFI = false;
+    //       print('first install in welcome');
+    //       print(apiResult.body);
+    //       if (json.decode(apiResult.body).toString().contains('url')) {
+    //         urlFI = json.decode(apiResult.body)['url'];
+    //         if (json.decode(apiResult.body).toString().contains('qr')) {
+    //           tableFI = json.decode(apiResult.body)['qr'];
+    //           pref.setString("table", json.decode(apiResult.body)['qr'].toString());
+    //         }
+    //       }
+    //       pref.setString("is_first_install", "false");
+    //       setState(() {});
+    //     } else {
+    //       pref.setString("is_first_install", "false");
+    //       isLoadingFI = false;
+    //       setState(() {});
+    //     }
+    //   } else {
+    //     if (!_initialURILinkHandled) {
+    //       _initialURILinkHandled = true;
+    //       // 2
+    //
+    //       print("Invoked _initURIHandler");
+    //
+    //       // Fluttertoast.showToast(
+    //       //     msg: "Invoked _initURIHandler",
+    //       //     toastLength: Toast.LENGTH_SHORT,
+    //       //     gravity: ToastGravity.BOTTOM,
+    //       //     timeInSecForIosWeb: 1,
+    //       //     backgroundColor: Colors.green,
+    //       //     textColor: Colors.white);
+    //       try {
+    //         // 3
+    //         final initialURI = await getInitialUri();
+    //         // 4
+    //         if (initialURI != null) {
+    //           debugPrint("Initial URI received $initialURI");
+    //           if (!mounted) {
+    //             return;
+    //           }
+    //           print(initialURI.toString().contains('url'));
+    //           print(initialURI.toString().contains('qr'));
+    //           print(initialURI.queryParameters['url'].toString());
+    //           if (initialURI.toString().contains('url')) {
+    //             if (initialURI.toString().contains('qr')) {
+    //               urlFI = (initialURI.queryParameters['url']
+    //                   .toString()
+    //                   .contains('resto-detail/'))
+    //                   ? initialURI.queryParameters['url'].toString()
+    //                   : initialURI.queryParameters['url']
+    //                   .toString();
+    //               SharedPreferences pref = await SharedPreferences.getInstance();
+    //               pref.setString("table", initialURI.queryParameters['url'].toString().split('qr=')[1]);
+    //             } else {
+    //               urlFI = (initialURI.queryParameters['url']
+    //                   .toString()
+    //                   .contains('resto-detail/'))
+    //                   ? initialURI.queryParameters['url'].toString()
+    //                   : initialURI.queryParameters['url']
+    //                   .toString();
+    //             }
+    //           } else {
+    //             if (initialURI.toString().contains('qr')) {
+    //               urlFI = initialURI.toString();
+    //               SharedPreferences pref = await SharedPreferences.getInstance();
+    //               pref.setString("table", initialURI.toString().split('qr=')[1]);
+    //             } else {
+    //               urlFI = initialURI.toString();
+    //             }
+    //           }
+    //           setState(() {});
+    //         } else {
+    //           debugPrint("Null Initial URI received");
+    //         }
+    //       } on PlatformException {
+    //         // 5
+    //         debugPrint("Failed to receive initial uri");
+    //       }
+    //     }
+    //   }
+    // }
     setState(() {});
   }
-
 
   @override
   void initState() {
     super.initState();
     idPlayer();
     // firstInstall();
-    OneSignal.shared
-        .setNotificationOpenedHandler((OSNotificationOpenedResult result) {
-      print('"OneSignal: notification opened: ' +
-          result.notification.collapseId.toString());
+    OneSignal.Notifications.addClickListener((result) {
       var res = result.notification.collapseId.toString();
       // print(result.notification.payload.collapseId);
-      print('res onesignal');
-      print(res);
       if (res.contains('home_user')) {
         if (res.split('home_')[1].split('_')[0] == 'user') {
           CustomNavigator.navigatorPushReplacement(

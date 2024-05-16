@@ -13,7 +13,6 @@ import 'package:permission_handler/permission_handler.dart';
 import 'package:kam5ia/welcome.dart';
 import 'package:kam5ia/webview_activity.dart';
 
-
 class MyHttpOverrides extends HttpOverrides {
   @override
   HttpClient createHttpClient(SecurityContext? context) {
@@ -42,14 +41,16 @@ void main() async {
 
   // GestureBinding.instance?.resamplingEnabled = true;
   // var resto = Api.getResto(4) as Resto;
-  OneSignal.shared.setAppId(
-    "4fe55f91-4eb4-4b48-a92c-d7a1c31b114b",
-    // iOSSettings: null
-  );
-  OneSignal.shared.addTrigger("prompt_ios", "true");
+  // OneSignal.shared.setAppId(
+  //   "4fe55f91-4eb4-4b48-a92c-d7a1c31b114b",
+  //   // iOSSettings: null
+  // );
+  OneSignal.initialize("4fe55f91-4eb4-4b48-a92c-d7a1c31b114b");
+  // OneSignal.shared.addTrigger("prompt_ios", "true");
   // OneSignal.shared.setInFocusDisplayType(OSNotificationDisplayType.notification);
-  await OneSignal.shared
-      .promptUserForPushNotificationPermission(fallbackToSettings: Platform.isIOS).then((value) => runApp(MyApp()));
+  OneSignal.Notifications.requestPermission(true);
+  // await OneSignal.shared
+  //     .promptUserForPushNotificationPermission(fallbackToSettings: Platform.isIOS).then((value) => runApp(MyApp()));
 
   // runApp(MaterialApp(
   //     debugShowCheckedModeBanner: false,
@@ -88,8 +89,6 @@ class _MyAppState extends State<MyApp> {
         });
       } else {
         setState(() {
-          // initDynamicLinks();
-          print('IKI LOH COK');
           isLogin = true;
         });
       }
@@ -123,15 +122,11 @@ class _MyAppState extends State<MyApp> {
     final PendingDynamicLinkData? data =
         await FirebaseDynamicLinks.instance.getInitialLink();
 
-    print('GATEL');
     if (data != null) {
-      print(data.link);
       pref.setString("url_dylink", data.link.queryParameters["url"].toString());
     }
     FirebaseDynamicLinks.instance.onLink
         .listen((PendingDynamicLinkData dynamicLink) async {
-      print('dylink2 nya GATEL');
-      print(dynamicLink.link.queryParameters["url"]);
       pref.setString(
           "url_dylink", dynamicLink.link.queryParameters["url"].toString());
     });
@@ -175,8 +170,6 @@ class _MyAppState extends State<MyApp> {
           "Accept": "Application/json",
           "Authorization": "Bearer $token"
         });
-    print('owner');
-    print(apiResult.body);
     var data = json.decode(apiResult.body);
 
     // for(var v in data['trans']){
@@ -254,8 +247,6 @@ class _MyAppState extends State<MyApp> {
           "Accept": "Application/json",
           "Authorization": "Bearer $token"
         });
-    print(apiResult.body);
-    print(idRes);
     var data = json.decode(apiResult.body);
 
     // for(var v in data['trans']){
@@ -310,13 +301,13 @@ class _MyAppState extends State<MyApp> {
   String restoName = "";
   String openAndClose = "0";
   String kosong = '';
+
   Future _getUserResto() async {
     // List<History> _history = [];
 
     setState(() {
       isLoading = true;
     });
-    print(res.split('_')[0]);
     SharedPreferences pref = await SharedPreferences.getInstance();
     String token = pref.getString("token") ?? "";
     var apiResult = await http.get(Uri.parse(Links.mainUrl + '/resto'),
@@ -324,7 +315,6 @@ class _MyAppState extends State<MyApp> {
           "Accept": "Application/json",
           "Authorization": "Bearer $token"
         });
-    print(apiResult.body);
     var data = json.decode(apiResult.body);
 
     // for(var v in data['trans']){
@@ -359,14 +349,12 @@ class _MyAppState extends State<MyApp> {
     //   pref.setString("openclose", '0');
     // }
 
-    print('itil');
     if (apiResult.statusCode == 200) {
       if (data['msg'].toString() == "User tidak punya resto") {
         kosong = '1';
       } else if (data['resto']['id'] == null || id == 'null' || id == '') {
         kosong = '1';
       } else {
-        print('itil');
         SharedPreferences pref = await SharedPreferences.getInstance();
         pref.setString("homepg", "1");
         // pref.setString("homerestoname", restoName);
@@ -393,7 +381,26 @@ class _MyAppState extends State<MyApp> {
     //     builder: (context) => new DetailResto(res.split('_')[1])));
   }
 
+  Future _toWebViewHistoryDetail(String id) async {
+    navigatorKey.currentState?.pushReplacement(new MaterialPageRoute(
+        builder: (context) => new WebViewActivity(
+              codeNotif: "",
+              url: "https://m.indonesiarestoguide.id/history/" + id + "/resto",
+            )));
+  }
+
+  Future _toWebViewAdmin(String id) async {
+    navigatorKey.currentState?.pushReplacement(new MaterialPageRoute(
+        builder: (context) => new WebViewActivity(
+              codeNotif: "",
+              url:
+                  "https://m.indonesiarestoguide.id/profile/user/?page=/redirectToTrasaction/" +
+                      id,
+            )));
+  }
+
   String codeNotif = "";
+
   Future _toWebView() async {
     SharedPreferences pref = await SharedPreferences.getInstance();
     navigatorKey.currentState?.pushReplacement(new MaterialPageRoute(
@@ -405,82 +412,77 @@ class _MyAppState extends State<MyApp> {
 
   bool isLogin = false;
   String res = '';
+
   @override
   void initState() {
     // initDynamicLinks();
-    OneSignal.shared.setNotificationWillShowInForegroundHandler(
-        (OSNotificationReceivedEvent result) {
+    OneSignal.Notifications.addForegroundWillDisplayListener((result) {
       // Display Notification, send null to not display, send notification to display
-      print(result.notification.body);
       if (result.notification.body.toString().contains("IRG-")) {
         setState(() {
           codeNotif = result.notification.body.toString();
         });
-        print(result.notification.body);
+        _toWebView();
+      } else if (result.notification.body
+          .toString()
+          .toLowerCase()
+          .contains("pembayaran transaksi")) {
+        setState(() {
+          codeNotif = result.notification.body.toString();
+        });
         _toWebView();
       }
-      result.complete(result.notification);
     });
 
-    OneSignal.shared
-        .setNotificationOpenedHandler((OSNotificationOpenedResult result) {
-      print(result.notification.body.toString().contains("IRG-"));
+    OneSignal.Notifications.addClickListener((result) {
       if (result.notification.body.toString().contains("IRG-")) {
         setState(() {
           codeNotif = result.notification.body.toString();
         });
         _toWebView();
-      }
-      print(result.notification.collapseId.toString().split("home_user_")[1]);
-      if (result.notification.collapseId.toString().contains("home_user")) {
-        _toWebViewDetailResto(
-            result.notification.collapseId.toString().split("home_user_")[1]);
-      }
-      print('"OneSignal: notification opened: ' +
-          result.notification.collapseId.toString());
-      res = result.notification.collapseId.toString();
-      // print(result.notification.payload.collapseId);
-      print(res.split('_')[0]);
-      if (result.notification.collapseId.toString().split('_')[0] ==
-          'forUser') {
-        _toDetailRes();
-        // navigatorKey.currentState?.pushReplacement(new MaterialPageRoute(
-        //     builder: (context) =>
-        //     new SplashScreen())).whenComplete(() {
-        //   navigatorKey.currentState?.pushReplacement(new MaterialPageRoute(
-        //       builder: (context) =>
-        //       new OrderPending()));
-        // });
-      } else if (result.notification.collapseId.toString().split('_')[0] ==
-          'forAdmin') {
-        if (owner != 'true') {
-          print(result.notification.collapseId);
-          // SharedPreferences pref = await SharedPreferences.getInstance();
-          // pref.setString("homepg", "1");
-          // _getUserResto();
-          _getOwnerResto();
-          // navigatorKey.currentState!.pushReplacement(new MaterialPageRoute(
-          //     builder: (context) =>
-          //     new SplashScreen())).whenComplete(() {
-          //   navigatorKey.currentState!.pushReplacement(new MaterialPageRoute(
-          //       builder: (context) =>
-          //       new HomeActivityResto()));
-          // });
+      } else if (result.notification.body
+          .toString()
+          .toLowerCase()
+          .contains("pembayaran transaksi")) {
+        var aStr = result.notification.body
+            .toString()
+            .replaceAll(new RegExp(r'[^0-9]'), '');
+        var aInt = int.parse(aStr);
+        final RegExp regexp = new RegExp(r'^0+(?=.)');
+        _toWebViewHistoryDetail(aInt.toString().replaceAll(regexp, ''));
+      } else if (result.notification.body
+          .toString()
+          .toLowerCase()
+          .contains("ada pesanan")) {
+        if (result.notification.collapseId
+                .toString()
+                .toLowerCase()
+                .split('home_')[1]
+                .split('_')[0] ==
+            'admin') {
+          _toWebViewAdmin(result.notification.collapseId
+              .toString()
+              .toLowerCase()
+              .split('home_admin_')[1]);
+        }
+      } else if (result.notification.body
+          .toString()
+          .toLowerCase()
+          .contains("ada promo")) {
+        if (result.notification.collapseId
+                .toString()
+                .toLowerCase()
+                .split('home_')[1]
+                .split('_')[0] ==
+            'user') {
+          _toWebViewDetailResto(
+              result.notification.collapseId.toString().split("home_user_")[1]);
         }
       }
     });
-    // initDynamicLinks().then((status) {
-    //   print('OI1 '+deepLink2);
-    // });
-    // WidgetsBinding.instance!.addObserver(this);
-    // _checkForSession().then((status) {
-    //   if (status) {
-    //     _navigateHome();
-    //   }
-    // });
-    print('OI2 ' + deepLink2);
     super.initState();
   }
+
   //
   // @override
   // void dispose() {
@@ -537,10 +539,7 @@ class _MyAppState extends State<MyApp> {
       // },
       theme: ThemeData(
         primaryColor: CustomColor.primary,
-        primaryColorBrightness: Brightness.light,
         scaffoldBackgroundColor: Colors.white,
-        accentColor: CustomColor.primary,
-        accentColorBrightness: Brightness.light,
         visualDensity: VisualDensity.adaptivePlatformDensity,
         appBarTheme: AppBarTheme(
             color: CustomColor.background, centerTitle: true, elevation: 0),

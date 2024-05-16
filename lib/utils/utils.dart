@@ -46,6 +46,28 @@ class CustomText {
     );
   }
 
+  static Widget textThermal(
+      {String? text,
+        double? size,
+        double? minSize,
+        int? maxLines,
+        FontWeight? weight,
+        Color? color,
+        TextAlign? textAlign}) {
+    return AutoSizeText(
+      text.toString(),
+      textScaleFactor: 1.0,
+      style: GoogleFonts.poppins(
+          textStyle: TextStyle(
+              fontSize: minSize,
+              fontWeight: weight,
+              color: color ??= Colors.black)),
+      minFontSize: (minSize == 0) ? 0 : 0,
+      maxLines: maxLines ?? 1,
+      textAlign: textAlign ?? TextAlign.center,
+    );
+  }
+
   static Widget permissionText({
     String? text,
     Color? color,
@@ -847,7 +869,7 @@ class CustomText {
 
 class CustomColor {
   static Color primary = Color(0xffaf1e22);
-  static Color primaryLight = Color(0xffAF1E22);
+  static Color primaryLight = Color(0xffd50000);
   static Color primaryLight2 = Color(0xffAF1E22).withOpacity(.2);
   static Color primaryLight3 = Color(0xffffe5dc);
   // static Color primaryLight = Color(0xffAF1E22).withOpacity(.2);

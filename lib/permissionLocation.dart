@@ -1,5 +1,7 @@
+import 'package:app_settings/app_settings.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:geolocator/geolocator.dart';
 import 'package:kam5ia/utils/utils.dart';
 import 'package:kam5ia/webview_activity.dart';
 import 'package:permission_handler/permission_handler.dart';
@@ -18,17 +20,35 @@ class _permissionLocationState extends State<permissionLocation> {
   // String mainUrl = 'https://m.kam5ia.com';
   // String url = "";
 
+  bool isLocationEnabled = false;
+
   Future reqHandlePermission() async{
     await Permission.location.request().whenComplete(() async {
       await Permission.location.status.isGranted.then((value) async {
         print(value);
         if (value) {
-          CustomNavigator.navigatorPushReplacement(
-              context,
-              new WebViewActivity(
-                codeNotif: "",
-                url: "",
-              ));
+          final locationPermissionStatus = await Geolocator.checkPermission();
+          final isLocationServiceEnabled =
+          await Geolocator.isLocationServiceEnabled();
+
+          setState(() {
+            isLocationEnabled =
+                locationPermissionStatus == LocationPermission.always &&
+                    isLocationServiceEnabled;
+          });
+
+
+          if (!isLocationEnabled) {
+            AppSettings.openAppSettings(type: AppSettingsType.location);
+            Fluttertoast.showToast(msg: 'Aktifkan lokasi anda untuk menggunakan aplikasi ini');
+          } else {
+            CustomNavigator.navigatorPushReplacement(
+                context,
+                new WebViewActivity(
+                  codeNotif: "",
+                  url: "",
+                ));
+          }
         } else {
           Fluttertoast.showToast(msg: 'Aktifkan izin berbagi lokasi anda');
           openAppSettings();
@@ -120,12 +140,28 @@ class _permissionLocationState extends State<permissionLocation> {
                     if (!value) {
                       reqHandlePermission();
                     } else {
-                      CustomNavigator.navigatorPushReplacement(
-                          context,
-                          new WebViewActivity(
-                            codeNotif: "",
-                            url: "",
-                          ));
+                      final locationPermissionStatus = await Geolocator.checkPermission();
+                      final isLocationServiceEnabled =
+                      await Geolocator.isLocationServiceEnabled();
+
+                      setState(() {
+                        isLocationEnabled = isLocationServiceEnabled;
+                      });
+
+                      print('isLocationEnabled');
+                      print(isLocationEnabled);
+
+                      if (!isLocationEnabled) {
+                        AppSettings.openAppSettings(type: AppSettingsType.location);
+                        Fluttertoast.showToast(msg: 'Aktifkan lokasi anda untuk menggunakan aplikasi ini');
+                      } else {
+                        CustomNavigator.navigatorPushReplacement(
+                            context,
+                            new WebViewActivity(
+                              codeNotif: "",
+                              url: "",
+                            ));
+                      }
                     }
                   });
                 },

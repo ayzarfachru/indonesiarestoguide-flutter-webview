@@ -1,4 +1,4 @@
-name: kam5ia
+name: indonesiarestoguide
 description: A new Indonesia Resto Guide application.
 
 # The following line prevents the package from being accidentally published to
@@ -15,7 +15,7 @@ publish_to: "none" # Remove this line if you wish to publish to pub.dev
 # In iOS, build-name is used as CFBundleShortVersionString while build-number used as CFBundleVersion.
 # Read more about iOS versioning at
 # https://developer.apple.com/library/archive/documentation/General/Reference/InfoPlistKeyReference/Articles/CoreFoundationKeys.html
-version: 1.0.0+124
+version: 1.0.0+127
 #version: 1.0.0+95 old
 
 environment:
@@ -38,7 +38,7 @@ dependencies:
 #  flutter_icons: ^1.1.0
 #  carousel_slider: ^4.0.0
   #  carousel_slider: ^3.0.0
-  intl: ^0.18.1
+  intl: ^0.19.0
   http: ^1.1.2
 #  http: ^0.13.4
   #  http: ^0.12.2
@@ -88,7 +88,7 @@ dependencies:
   #  qr_flutter: ^3.2.0
   uni_links: ^0.5.1
   #  uni_links: ^0.4.0
-  onesignal_flutter: ^5.0.4
+  onesignal_flutter: ^5.2.0
   #  onesignal_flutter: ^2.6.3
   #  firebase_core: ^0.5.0
 #  firebase_messaging: ^14.2.1

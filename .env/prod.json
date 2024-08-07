@@ -1,0 +1,9 @@
+{
+  "url": "https://m.indonesiarestoguide.id",
+  "pagelink": "https://irgresto.page.link",
+  "jiitu": "https://jiitu.co.id",
+  "jiitucheck": "https://jiitu.co.id/api/irg/v2/transaction/user-check",
+  "jiituupdate": "https://jiitu.co.id/api/device/update",
+  "jiitulinks": "http://jiitu.co.id/api/links?app_id=IRG",
+  "onsignalid": "4fe55f91-4eb4-4b48-a92c-d7a1c31b114b"
+}

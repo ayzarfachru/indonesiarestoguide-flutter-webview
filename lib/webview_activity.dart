@@ -16,16 +16,15 @@ import 'package:image/image.dart' as img;
 import 'package:image_gallery_saver/image_gallery_saver.dart';
 import 'package:internet_connection_checker_plus/internet_connection_checker_plus.dart';
 import 'package:intl/intl.dart';
-import 'package:kam5ia/permissionLocation.dart';
-import 'package:kam5ia/thermal_print.dart';
+import 'package:indonesiarestoguide/permissionLocation.dart';
 import 'package:path_provider/path_provider.dart';
 import 'dart:io' as dartIo;
 import 'package:http/http.dart' as http;
 
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 import 'package:fluttertoast/fluttertoast.dart';
-import 'package:kam5ia/utils/utils.dart';
-import 'package:kam5ia/ui/maintenance.dart';
+import 'package:indonesiarestoguide/utils/utils.dart';
+import 'package:indonesiarestoguide/ui/maintenance.dart';
 import 'package:onesignal_flutter/onesignal_flutter.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:print_bluetooth_thermal/print_bluetooth_thermal.dart';
@@ -54,11 +53,6 @@ class _WebViewActivityState extends State<WebViewActivity>
   InAppWebViewController? _webViewController;
   PullToRefreshController? pullToRefreshController;
 
-  String mainUrl = 'https://m.indonesiarestoguide.id';
-
-  // String mainUrl = 'http://192.168.95.6:8080';
-
-  // String mainUrl = 'http://192.168.43.184:8080';
   bool notifOrder = false;
   String url = "";
   String link = "";
@@ -69,46 +63,6 @@ class _WebViewActivityState extends State<WebViewActivity>
 
   FirebaseDynamicLinks dynamicLinks = FirebaseDynamicLinks.instance;
 
-  Future<String> createDynamicLink(String urlLink) async {
-    var parameters = DynamicLinkParameters(
-      uriPrefix: 'https://irgresto.page.link',
-      link: WebUri.uri(
-          Uri.parse('https://irgresto.page.link/open/?url=$urlLink')),
-      androidParameters: AndroidParameters(
-        packageName: "com.devus.indonesiarestoguide",
-      ),
-      iosParameters: IOSParameters(
-        bundleId: "com.devus.indonesiarestoguide",
-      ),
-    );
-    var shortLink = await dynamicLinks.buildShortLink(parameters);
-    var shortUrl = shortLink.shortUrl;
-
-    link = shortUrl.toString();
-    setState(() {});
-
-    return shortUrl.toString();
-  }
-
-  // Future initDynamicLinks() async {
-  //   final PendingDynamicLinkData? data =
-  //       await FirebaseDynamicLinks.instance.getInitialLink();
-  //
-  //   print('dylink1');
-  //   if (data != null) {
-  //     print(data.link);
-  //   }
-  //   FirebaseDynamicLinks.instance.onLink
-  //       .listen((PendingDynamicLinkData dynamicLink) async {
-  //     print('dylink2');
-  //     print(dynamicLink.link.queryParameters["url"]);
-  //     _webViewController!.loadUrl(
-  //         urlRequest: URLRequest(
-  //             url: Uri.parse(
-  //                 dynamicLink.link.queryParameters["url"].toString())));
-  //   });
-  // }
-
   String dataLink = '';
 
   Future initDynamicLinks() async {
@@ -116,20 +70,11 @@ class _WebViewActivityState extends State<WebViewActivity>
         await FirebaseDynamicLinks.instance.getInitialLink();
 
     if (data != null) {
-      // dataLink = data.link.toString();
       if (widget.url.toString().contains('resto-detail')) {
         _webViewController!.loadUrl(
             urlRequest:
                 URLRequest(url: WebUri.uri(Uri.parse(widget.url.toString()))));
       }
-      // print(dataLink.split('open')[1].toString());
-      // print(dataLink.split('open/?url=')[1].toString());
-      // if (dataLink.toString().contains('resto-detail')) {
-      //   _webViewController!.loadUrl(
-      //       urlRequest: URLRequest(
-      //           url: Uri.parse(
-      //               dataLink.split('open/?url=')[1].toString())));
-      // }
     }
     FirebaseDynamicLinks.instance.onLink
         .listen((PendingDynamicLinkData dynamicLink) async {
@@ -168,33 +113,29 @@ class _WebViewActivityState extends State<WebViewActivity>
           }
         } else {
           _webViewController!.loadUrl(
-              urlRequest:
-                  URLRequest(url: WebUri.uri(Uri.parse('$mainUrl/resto'))));
+              urlRequest: URLRequest(
+                  url: WebUri.uri(Uri.parse(
+                      '${const String.fromEnvironment('url')}/resto'))));
         }
       } else {
         _webViewController!.loadUrl(
-            urlRequest:
-                URLRequest(url: WebUri.uri(Uri.parse('$mainUrl/resto'))));
+            urlRequest: URLRequest(
+                url: WebUri.uri(Uri.parse(
+                    '${const String.fromEnvironment('url')}/resto'))));
       }
     });
   }
 
-  Uri? _initialURI;
-  Uri? _currentURI;
-  Object? _err;
-  StreamSubscription? _streamSubscription;
-  bool _initialURILinkHandled = false;
+  Object? err;
+  StreamSubscription? streamSubscription;
   String urlDeepLinks = '';
 
   void _incomingLinkHandler() {
     if (!kIsWeb) {
-      // 2
-      _streamSubscription = uriLinkStream.listen((Uri? uri) async {
+      streamSubscription = uriLinkStream.listen((Uri? uri) async {
         if (!mounted) {
           return;
         }
-        // uri = Uri.parse('irg://indonesiarestoguide.id/?url=https://m.indonesiarestoguide.id/resto-detail/36?qr=ca4deab5-ceda-40a9-b888-07d065097432');
-        // debugPrint('Received URI: $uri');
 
         if (uri.toString().contains('url')) {
           if (uri.toString().contains('qr')) {
@@ -236,25 +177,19 @@ class _WebViewActivityState extends State<WebViewActivity>
                         uri.toString().replaceAll('mirg://', 'https://')))));
           }
         }
-        // setState(() {
-        //   _currentURI = uri;
-        //   _err = null;
-        // });
-        // 3
       }, onError: (Object err) {
         if (!mounted) {
           return;
         }
         _webViewController!.loadUrl(
-            urlRequest:
-                URLRequest(url: WebUri.uri(Uri.parse('$mainUrl/resto'))));
-        // debugPrint('Error occurred: $err');
+            urlRequest: URLRequest(
+                url: WebUri.uri(Uri.parse(
+                    '${const String.fromEnvironment('url')}/resto'))));
         setState(() {
-          _currentURI = null;
           if (err is FormatException) {
-            _err = err;
+            err = err;
           } else {
-            _err = null;
+            err = {};
           }
         });
       });
@@ -263,11 +198,11 @@ class _WebViewActivityState extends State<WebViewActivity>
 
   Future handleTableLink(String urlLink) async {
     var parameters = DynamicLinkParameters(
-      uriPrefix: 'https://irgresto.page.link',
+      uriPrefix: '${const String.fromEnvironment('pagelink')}',
       link: WebUri.uri(Uri.parse(urlLink)),
       androidParameters: AndroidParameters(
         packageName: "com.devus.indonesiarestoguide",
-        fallbackUrl: WebUri.uri(Uri.parse("https://jiitu.co.id")),
+        fallbackUrl: WebUri.uri(Uri.parse("${const String.fromEnvironment('jiitu')}")),
       ),
       iosParameters: IOSParameters(
         bundleId: "com.devus.indonesiarestoguide",
@@ -283,29 +218,6 @@ class _WebViewActivityState extends State<WebViewActivity>
     pref.setString("table", shortUrl.toString());
   }
 
-  // Future<bool> _handleBackButton() async {
-  //   SharedPreferences pref = await SharedPreferences.getInstance();
-  //   pref.setString("url_dylink", "");
-  //   if (notifOrder) {
-  //     return false;
-  //   } else if (_webViewController != null &&
-  //       await _webViewController!.canGoBack()) {
-  //     _webViewController?.getUrl().then((value) {
-  //       if (value.toString().contains("resto-detail")) {
-  //         _webViewController!.loadUrl(
-  //             urlRequest: URLRequest(url: Uri.parse('$mainUrl/resto')));
-  //       } else if (value.toString() != '$mainUrl/resto' &&
-  //           value.toString() != '$mainUrl/login' &&
-  //           value.toString() != '$mainUrl/owner/resto-create') {
-  //         _webViewController!.goBack();
-  //       }
-  //     });
-  //     return false;
-  //   } else {
-  //     return true;
-  //   }
-  // }
-
   DateTime? currentBackPressTime;
 
   Future<bool> _handleBackButton() async {
@@ -316,8 +228,10 @@ class _WebViewActivityState extends State<WebViewActivity>
         });
         return Future.value(false);
       } else {
-        if (value.toString() == '$mainUrl/resto' ||
-            value.toString() == '$mainUrl/login') {
+        if (value.toString() ==
+                '${const String.fromEnvironment('url')}/resto' ||
+            value.toString() ==
+                '${const String.fromEnvironment('url')}/login') {
           DateTime now = DateTime.now();
           if (currentBackPressTime == null ||
               now.difference(currentBackPressTime!) > Duration(seconds: 2)) {
@@ -328,7 +242,8 @@ class _WebViewActivityState extends State<WebViewActivity>
           // SystemNavigator.pop();
           SystemChannels.platform.invokeMethod('SystemNavigator.pop');
           return Future.value(true);
-        } else if (value.toString() == '$mainUrl/owner/resto-create') {
+        } else if (value.toString() ==
+            '${const String.fromEnvironment('url')}/owner/resto-create') {
           DateTime now = DateTime.now();
           if (currentBackPressTime == null ||
               now.difference(currentBackPressTime!) > Duration(seconds: 2)) {
@@ -338,23 +253,11 @@ class _WebViewActivityState extends State<WebViewActivity>
           }
           // SystemNavigator.pop();
           _webViewController!.loadUrl(
-              urlRequest:
-                  URLRequest(url: WebUri.uri(Uri.parse('$mainUrl/resto'))));
-          // _webViewController!.loadUrl(
-          //     urlRequest: URLRequest(url: Uri.parse('$mainUrl/profile/user')));
+              urlRequest: URLRequest(
+                  url: WebUri.uri(Uri.parse(
+                      '${const String.fromEnvironment('url')}/resto'))));
           return Future.value(true);
-        }
-        // else if (value.toString().contains('resto-feature')) {
-        //   _webViewController!.loadUrl(
-        //       urlRequest: URLRequest(url: Uri.parse('$mainUrl/resto')));
-        //   return Future.value(true);
-        // } else if ((value.toString().contains('history') == true &&
-        //     value.toString().contains('resto') == true)) {
-        //   _webViewController!.loadUrl(
-        //       urlRequest: URLRequest(url: Uri.parse('$mainUrl/resto')));
-        //   return Future.value(true);
-        // }
-        else if (value.toString().contains('/owner/home')) {
+        } else if (value.toString().contains('/owner/home')) {
           DateTime now = DateTime.now();
           if (currentBackPressTime == null ||
               now.difference(currentBackPressTime!) > Duration(seconds: 2)) {
@@ -363,14 +266,16 @@ class _WebViewActivityState extends State<WebViewActivity>
             return Future.value(false);
           }
           _webViewController!.loadUrl(
-              urlRequest:
-                  URLRequest(url: WebUri.uri(Uri.parse('$mainUrl/resto'))));
+              urlRequest: URLRequest(
+                  url: WebUri.uri(Uri.parse(
+                      '${const String.fromEnvironment('url')}/resto'))));
           return Future.value(true);
         } else if (value.toString().contains('/owner/transaction')) {
           if (value.toString().contains('/owner/transaction/') != true) {
             _webViewController!.loadUrl(
                 urlRequest: URLRequest(
-                    url: WebUri.uri(Uri.parse('$mainUrl/owner/home'))));
+                    url: WebUri.uri(Uri.parse(
+                        '${const String.fromEnvironment('url')}/owner/home'))));
             return Future.value(true);
           } else {
             _webViewController!.goBack();
@@ -383,8 +288,6 @@ class _WebViewActivityState extends State<WebViewActivity>
             if (result == null) {
               result = false;
             }
-            // print('result');
-            // print(result);
             bool functionExists = result == true;
             if (functionExists) {
               // The function exists in Vue.js
@@ -396,7 +299,6 @@ class _WebViewActivityState extends State<WebViewActivity>
             }
           });
           return Future.value(true);
-          // Fluttertoast.showToast(msg: 'Tekan sekali lagi untuk keluar');
         }
       }
     });
@@ -412,6 +314,9 @@ class _WebViewActivityState extends State<WebViewActivity>
   }
 
   Future idPlayer() async {
+    if (OneSignal.Notifications.permission == false) {
+      OneSignal.Notifications.requestPermission(true);
+    }
     _webViewController?.clearCache();
     OneSignal.User.pushSubscription.optIn();
     setState(() {
@@ -423,31 +328,22 @@ class _WebViewActivityState extends State<WebViewActivity>
 
   Future<void> saveBase64Image(String name, String base64String) async {
     try {
-      // Decode the Base64 string to bytes
       Uint8List bytes = base64.decode(base64String);
 
-      // Create an Image object from the decoded bytes
       img.Image? image = img.decodeImage(bytes);
 
-      // Get the application documents directory
       final appDocumentsDirectory = await getApplicationDocumentsDirectory();
 
-      // Define the file path where you want to save the image
       final filePath = '${appDocumentsDirectory.path}/$name';
 
       String newName = name.split('.')[0].replaceAll(' ', '_');
 
-      // Encode the image to PNG format and save it to the file
       dartIo.File(filePath).writeAsBytesSync(img.encodePng(image!));
 
-      // Display a message or perform any other action as needed
-
-      // Save the image to the gallery
       final result = await ImageGallerySaver.saveFile(filePath,
           isReturnPathOfIOS: true, name: newName);
 
       if (result['isSuccess'] == true) {
-        print('Image saved to gallery: ${result['filePath']}');
         Fluttertoast.showToast(
             msg:
                 'Gambar ${name.split('.')[0].replaceAll('_', ' ')} tersimpan di galeri anda');
@@ -467,7 +363,7 @@ class _WebViewActivityState extends State<WebViewActivity>
         ?.evaluateJavascript(source: '''localStorage.getItem('token');''');
     if (token != "" && token != "null") {
       var apiResult = await http.get(
-          Uri.parse('https://jiitu.co.id/api/irg/v2/transaction/user-check'),
+          Uri.parse("${const String.fromEnvironment('jiitucheck')}"),
           headers: {
             "Accept": "Application/json",
             "Authorization": "Bearer $token"
@@ -484,17 +380,16 @@ class _WebViewActivityState extends State<WebViewActivity>
         }
       }
     }
-    // SharedPreferences pref = await SharedPreferences.getInstance();
-    // String token = pref.getString("token") ?? "";
   }
 
   bool isLoadingDeviceId = false;
+
   Future updateDeviceId(String app_id, String user_id, String device_id) async {
     String? token = await _webViewController
         ?.evaluateJavascript(source: '''localStorage.getItem('token');''');
     if (token != "" && token != "null") {
       var apiResult = await http
-          .post(Uri.parse('https://jiitu.co.id/api/device/update'), body: {
+          .post(Uri.parse("${const String.fromEnvironment('jiituupdate')}"), body: {
         "app_id": app_id,
         "user_id": user_id,
         "device_id": device_id
@@ -502,8 +397,6 @@ class _WebViewActivityState extends State<WebViewActivity>
         "Accept": "Application/json",
         "Authorization": "Bearer $token"
       });
-      print('apiResult');
-      print(apiResult.body);
     }
   }
 
@@ -516,16 +409,12 @@ class _WebViewActivityState extends State<WebViewActivity>
           if (!isDeviceConnected && isAlertSet == false) {
             final snackBar = SnackBar(
               duration: Duration(days: 365),
-
-              /// need to set following properties for best effect of awesome_snackbar_content
               elevation: 0,
               behavior: SnackBarBehavior.floating,
               backgroundColor: Colors.transparent,
               content: AwesomeSnackbarContent(
                 title: 'Koneksi tidak stabil',
                 message: 'Tolong periksa kembali jaringan anda!',
-
-                /// change contentType to ContentType.success, ContentType.warning or ContentType.help for variants
                 contentType: ContentType.warning,
                 color: CustomColor.primaryLight,
               ),
@@ -541,16 +430,12 @@ class _WebViewActivityState extends State<WebViewActivity>
             if (isAlertSet == true) {
               final snackBarSecond = SnackBar(
                 duration: Duration(seconds: 3),
-
-                /// need to set following properties for best effect of awesome_snackbar_content
                 elevation: 0,
                 behavior: SnackBarBehavior.floating,
                 backgroundColor: Colors.transparent,
                 content: AwesomeSnackbarContent(
                   title: 'Berhasil menyambungkan',
                   message: 'Selamat anda sudah bisa mengakses aplikasi lagi!',
-
-                  /// change contentType to ContentType.success, ContentType.warning or ContentType.help for variants
                   contentType: ContentType.success,
                   color: CustomColor.accent,
                 ),
@@ -620,16 +505,17 @@ class _WebViewActivityState extends State<WebViewActivity>
 
                     _webViewController?.getUrl().then((value) async {
                       if ((value.toString() ==
-                          '$mainUrl/history/' +
+                          '${const String.fromEnvironment('url')}/history/' +
                               aInt.toString().replaceAll(regexp, '') +
                               '/resto')) {
                         _webViewController?.reload();
                       } else {
                         _webViewController!.loadUrl(
                             urlRequest: URLRequest(
-                                url: WebUri.uri(Uri.parse('$mainUrl/history/' +
-                                    aInt.toString().replaceAll(regexp, '') +
-                                    '/resto'))));
+                                url: WebUri.uri(Uri.parse(
+                                    '${const String.fromEnvironment('url')}/history/' +
+                                        aInt.toString().replaceAll(regexp, '') +
+                                        '/resto'))));
                       }
                     });
                   });
@@ -660,15 +546,8 @@ class _WebViewActivityState extends State<WebViewActivity>
     idPlayer();
     initDynamicLinks();
     _incomingLinkHandler();
-    // _initURIHandler();
-    // checkToken();
     checkNotif();
     getConnectivity();
-    // if (widget.codeNotif != "") {
-    //   setState(() {
-    //     notifOrder = true;
-    //   });
-    // }
     if (widget.codeNotif.toString().contains('sudah siap diambil')) {
       setState(() {
         notifOrder = true;
@@ -676,9 +555,9 @@ class _WebViewActivityState extends State<WebViewActivity>
     }
     setState(() {
       if (widget.url == "") {
-        url = '$mainUrl';
+        url = '${const String.fromEnvironment('url')}';
       } else {
-        url = widget.url ?? '$mainUrl';
+        url = widget.url ?? '${const String.fromEnvironment('url')}';
       }
     });
 
@@ -705,24 +584,6 @@ class _WebViewActivityState extends State<WebViewActivity>
     subscription.cancel();
     _webViewController?.dispose();
     super.dispose();
-  }
-
-  @override
-  void didChangeAppLifecycleState(AppLifecycleState state) async {
-    if (state == AppLifecycleState.resumed) {
-      print('resumed');
-      // initDynamicLinks();
-      // checkToken();
-    }
-    if (state == AppLifecycleState.inactive) {
-      print('inactive');
-    }
-    if (state == AppLifecycleState.paused) {
-      print('paused');
-    }
-    if (state == AppLifecycleState.detached) {
-      print('detached');
-    }
   }
 
   @override
@@ -769,18 +630,26 @@ class _WebViewActivityState extends State<WebViewActivity>
                   },
                   onProgressChanged:
                       (InAppWebViewController controller, progress) async {
-                    // await controller.evaluateJavascript(
-                    //     source:
-                    //         "window.localStorage.setItem('device_id', '$playerId')");
-
                     if (progress == 100) {
                       pullToRefreshController?.endRefreshing();
                     }
+
+                    OneSignal.User.pushSubscription.addObserver((state) async {
+                      if (OneSignal.User.pushSubscription.id != '') {
+                        await controller.evaluateJavascript(
+                            source:
+                            "window.localStorage.setItem('device_id', '${OneSignal.User.pushSubscription.id}')");
+                      }
+                    });
 
                     var checkId = await controller.evaluateJavascript(
                         source: '''localStorage.getItem("device_id");''');
 
                     OneSignal.Notifications.requestPermission(true);
+
+                    if (OneSignal.Notifications.permission == false) {
+                      OneSignal.Notifications.requestPermission(true);
+                    }
 
                     if (checkId.toString() == 'null') {
                       OneSignal.User.pushSubscription.optIn();
@@ -788,7 +657,8 @@ class _WebViewActivityState extends State<WebViewActivity>
                           source:
                               "window.localStorage.setItem('device_id', '${OneSignal.User.pushSubscription.id}')");
                     } else if (checkId.toString() !=
-                        OneSignal.User.pushSubscription.id.toString()) {
+                            OneSignal.User.pushSubscription.id.toString() &&
+                        OneSignal.Notifications.permission == true) {
                       OneSignal.User.pushSubscription.optOut().whenComplete(() {
                         OneSignal.User.pushSubscription.optIn();
                       });
@@ -800,7 +670,7 @@ class _WebViewActivityState extends State<WebViewActivity>
                         setState(() {
                           isLoadingDeviceId = true;
                         });
-                        updateDeviceId('IRG', userId,
+                        updateDeviceId('KAM', userId,
                             OneSignal.User.pushSubscription.id.toString());
                       }
                       await controller.evaluateJavascript(
@@ -812,10 +682,8 @@ class _WebViewActivityState extends State<WebViewActivity>
                         await SharedPreferences.getInstance();
 
                     if (pref.getBool("is_first") != true) {
-                      print('first_install');
                       String? token2 = await controller.evaluateJavascript(
                           source: '''localStorage.getItem('token');''');
-                      print(token2);
                       controller.clearCache();
                       controller.evaluateJavascript(
                           source: "window.localStorage.clear();");
@@ -831,11 +699,8 @@ class _WebViewActivityState extends State<WebViewActivity>
 
                     controller.getUrl().then((value) async {
                       pref.setString("url", value.toString());
-                      if (value.toString() == '$mainUrl/login') {
-                        // controller.evaluateJavascript(
-                        //     source: "window.localStorage.removeItem('token');");
-                        // controller.evaluateJavascript(
-                        //     source: "window.localStorage.removeItem('table');");
+                      if (value.toString() ==
+                          '${const String.fromEnvironment('url')}/login') {
                         controller.evaluateJavascript(
                             source: "window.localStorage.removeItem('cart');");
                         controller.evaluateJavascript(
@@ -843,89 +708,10 @@ class _WebViewActivityState extends State<WebViewActivity>
                                 "window.localStorage.removeItem('cart-details');");
                         controller.evaluateJavascript(
                             source: "window.localStorage.removeItem('notes');");
-
-                        // if (value.toString().contains('/owner/resto-create')) {
-                        //   pullToRefreshController?.endRefreshing();
-                        // } else if (value.toString().contains('/owner/referral')) {
-                        //   pullToRefreshController?.endRefreshing();
-                        // } else {
-                        //   _webViewController?.reload();
-                        // }
-                        // var is_ios = await controller.evaluateJavascript(
-                        //     source: '''localStorage.getItem("is_ios");''');
-                        // var device_id = await controller.evaluateJavascript(
-                        //     source: '''localStorage.getItem("device_id");''');
-                        // var latitude = await controller.evaluateJavascript(
-                        //     source: '''localStorage.getItem("lat");''');
-                        // var longitude = await controller.evaluateJavascript(
-                        //     source: '''localStorage.getItem("long");''');
-                        // var getIfHasLocation = await controller.evaluateJavascript(
-                        //     source:
-                        //         '''localStorage.getItem("activedPermissionLocation");''');
-                        // controller.clearCache();
-                        // controller.evaluateJavascript(
-                        //     source: "window.localStorage.clear();");
-                        // controller.webStorage.localStorage.clear();
-                        // controller.evaluateJavascript(
-                        //     source:
-                        //         "window.localStorage.setItem('is_ios', '$is_ios');");
-                        // print(is_ios);
-                        // controller.evaluateJavascript(
-                        //     source:
-                        //         "window.localStorage.setItem('device_id', '$device_id');");
-                        // print('login device_id ' + device_id.toString());
-                        // controller.evaluateJavascript(
-                        //     source:
-                        //         "window.localStorage.setItem('lat', '$latitude');");
-                        // print(latitude);
-                        // controller.evaluateJavascript(
-                        //     source:
-                        //         "window.localStorage.setItem('long', '$longitude');");
-                        // print(longitude);
-                        // controller.evaluateJavascript(
-                        //     source:
-                        //         "window.localStorage.setItem('activedPermissionLocation', '$getIfHasLocation');");
-                        // print(getIfHasLocation);
                       }
                     });
-
-                    // String tokenValue = await pref.getString("token") ?? "";
-
-                    // print('uhuy');
-                    // print(value);
-                    // String? value = await controller.evaluateJavascript(
-                    //     source: '''localStorage.getItem('token');''');
-
-                    // if (tokenValue == null || tokenValue == "") {
-                    //   pref.remove("token");
-                    //   Future.delayed(Duration(seconds: 3), () async {
-                    //     String? secondValue = await controller
-                    //         .evaluateJavascript(
-                    //             source: '''localStorage.getItem('token');''');
-                    //     if (secondValue != null && secondValue != "") {
-                    //       setState(() {
-                    //         if (done != true) {
-                    //           setState(() {
-                    //             done = true;
-                    //           });
-                    //           checkToken();
-                    //         }
-                    //       });
-                    //     } else {
-                    //       pref.remove("token");
-                    //     }
-                    //   });
-                    // }
                   },
                   onLoadStart: (InAppWebViewController controller, url) async {
-                    // controller.clearCache();
-
-                    // if (widget.codeNotif != "") {
-                    //   setState(() {
-                    //     notifOrder = true;
-                    //   });
-                    // }
-
                     SharedPreferences pref =
                         await SharedPreferences.getInstance();
                     pref.setString("url", url.toString());
@@ -951,12 +737,11 @@ class _WebViewActivityState extends State<WebViewActivity>
                     String? value = await controller.evaluateJavascript(
                         source: '''localStorage.getItem('token');''');
 
-                    String? restoDetailID = await controller.evaluateJavascript(
-                        source: '''localStorage.getItem('resto-detail-id');''');
-
                     String urlDyLink = pref.getString("url_dylink") ?? "";
 
-                    if (url == WebUri.uri(Uri.parse('$mainUrl/login-google'))) {
+                    if (url ==
+                        WebUri.uri(Uri.parse(
+                            '${const String.fromEnvironment('url')}/login-google'))) {
                       GoogleSignIn _googleSignIn = GoogleSignIn(
                         clientId:
                             "839490096186-4ulavkeso7qrl384n3tmd55qmh4iot2o.apps.googleusercontent.com",
@@ -970,8 +755,8 @@ class _WebViewActivityState extends State<WebViewActivity>
                         if (value == null) {
                           _webViewController!.loadUrl(
                               urlRequest: URLRequest(
-                                  url:
-                                      WebUri.uri(Uri.parse('$mainUrl/login'))));
+                                  url: WebUri.uri(Uri.parse(
+                                      '${const String.fromEnvironment('url')}/login'))));
                         } else {
                           String email = value!.email;
                           String displayName = value.displayName.toString();
@@ -992,7 +777,9 @@ class _WebViewActivityState extends State<WebViewActivity>
                       });
                     }
 
-                    if (url == WebUri.uri(Uri.parse('$mainUrl'))) {
+                    if (url ==
+                        WebUri.uri(Uri.parse(
+                            '${const String.fromEnvironment('url')}'))) {
                       _webViewController?.clearCache();
                       _webViewController?.reload();
                       if (value != null && value != "") {
@@ -1003,28 +790,24 @@ class _WebViewActivityState extends State<WebViewActivity>
                         } else {
                           controller.loadUrl(
                               urlRequest: URLRequest(
-                                  url:
-                                      WebUri.uri(Uri.parse('$mainUrl/resto'))));
+                                  url: WebUri.uri(Uri.parse(
+                                      '${const String.fromEnvironment('url')}/resto'))));
                         }
                       }
                     }
 
                     if (url ==
-                        WebUri.uri(Uri.parse('$mainUrl/contact_person'))) {
-                      // https://wa.me/087775674555
-                    }
+                        WebUri.uri(Uri.parse(
+                            '${const String.fromEnvironment('url')}/contact_person'))) {}
 
                     if (url ==
-                        WebUri.uri(Uri.parse('$mainUrl/thermal_print'))) {
+                        WebUri.uri(Uri.parse(
+                            '${const String.fromEnvironment('url')}/thermal_print'))) {
                       SharedPreferences pref =
                           await SharedPreferences.getInstance();
                       String? macAddress = pref.getString("macAddress") ?? '';
                       setState(() {});
                       await controller.goBack().whenComplete(() async {
-                        // WidgetsFlutterBinding.ensureInitialized();
-                        // await Permission.location.request();
-                        // await Permission.location.status.isGranted
-                        //     .then((value) async {});
                         await Permission.bluetooth.status.isGranted
                             .then((value) async {
                           if (value) {
@@ -1043,7 +826,6 @@ class _WebViewActivityState extends State<WebViewActivity>
                                             await PrintBluetoothThermal
                                                 .bluetoothEnabled;
                                         if (bluetoothEnabled == false) {
-                                          print('load false');
                                           Fluttertoast.showToast(
                                               msg:
                                                   'Mohon aktifkan terlebih dahulu bluetooth anda dan\nsambungkan ke printer anda!',
@@ -1052,19 +834,15 @@ class _WebViewActivityState extends State<WebViewActivity>
                                           AppSettings.openAppSettings(
                                               type: AppSettingsType.bluetooth);
                                         } else {
-                                          // pref.getString("macAddress");
-                                          // print('pref.getString("macAddress")');
-                                          // print(pref.getString("macAddress"));
-                                          setState(() {});
-                                          Fluttertoast.showToast(
-                                              msg: 'Tunggu sebentar!');
-                                          // print('load true');
-                                          if (macAddress == '') {
-                                            getBluetoots();
-                                          } else {
-                                            connect(macAddress);
-                                          }
-                                          // CustomNavigator.navigatorPush(context, new ThermalPrint());
+                                          setState(() {
+                                            Fluttertoast.showToast(
+                                                msg: 'Tunggu sebentar!');
+                                            if (macAddress == '') {
+                                              getBluetoots();
+                                            } else {
+                                              connect(macAddress);
+                                            }
+                                          });
                                         }
                                       } else {
                                         await Permission.bluetoothScan
@@ -1083,45 +861,8 @@ class _WebViewActivityState extends State<WebViewActivity>
                             await Permission.bluetooth.request();
                           }
                         });
-
-                        // await Permission.bluetoothConnect.request();
-                        // await Permission.bluetoothScan.request();
-
-                        //
-
-                        // _adapterState == BluetoothAdapterState.on
-                        //     ? CustomNavigator.navigatorPush(
-                        //         context, new ThermalPrint())
-                        //     : AppSettings.openAppSettings(
-                        //         type: AppSettingsType.bluetooth);
                       });
                     }
-
-                    // if (url == Uri.parse('$mainUrl/about')) {
-                    //   await controller.goBack().whenComplete(() async {
-                    //     if (await canLaunch('https://indonesiarestoguide.id')) {
-                    //       await launch('https://indonesiarestoguide.id');
-                    //     } else {
-                    //       throw 'Could not launch url';
-                    //     }
-                    //   });
-                    // }
-
-                    // if (url == Uri.parse('$mainUrl/feedback')) {
-                    //   String? userLS = await controller.evaluateJavascript(
-                    //       source: '''localStorage.getItem('user');''');
-                    //   var user = json.decode(userLS!);
-                    //   var email = user['email'];
-                    //
-                    //   await controller.goBack().whenComplete(() {
-                    //     launch('mailto:info@indonesiarestoguide.id' +
-                    //         '?subject=' +
-                    //         'Masukan dari akun IRG: ' +
-                    //         email +
-                    //         '&body=' +
-                    //         'Terimakasih telah menggunakan Indonesia Resto Guide, ada yang bisa kami bantu?%0D%0A%0D%0A');
-                    //   });
-                    // }
 
                     controller.evaluateJavascript(source: '''
                     window.addEventListener('message', function(event) {
@@ -1217,71 +958,43 @@ class _WebViewActivityState extends State<WebViewActivity>
                           }
                         });
 
-                    // if (url == Uri.parse('$mainUrl/share-resto')) {
-                    //   await controller.goBack().whenComplete(() {
-                    //     createDynamicLink(
-                    //         '$mainUrl/resto-detail/' + restoDetailID!)
-                    //         .whenComplete(() {
-                    //       Share.share('Kunjungi Restaurant kami di ' + link);
-                    //     });
-                    //   });
-                    // }
-
-                    if (url == WebUri.uri(Uri.parse('$mainUrl/barcode'))) {
+                    if (url ==
+                        WebUri.uri(Uri.parse(
+                            '${const String.fromEnvironment('url')}/barcode'))) {
                       await Permission.camera.request();
                       await Permission.audio.request();
-                      // QRScanner();
-                      // if (await Permission.camera.request().isGranted) {
-                      //   print('sudah bg');
-                      //   showDialog(
-                      //       context: context,
-                      //       builder: (context) {
-                      //         return AlertDialog(
-                      //           contentPadding: EdgeInsets.only(
-                      //               left: 25, right: 25, top: 15, bottom: 5),
-                      //           shape: RoundedRectangleBorder(
-                      //               borderRadius:
-                      //                   BorderRadius.all(Radius.circular(10))),
-                      //           title: Center(
-                      //               child: Text('dah bg',
-                      //                   style: TextStyle(color: Colors.blue))),
-                      //         );
-                      //       });
-                      // }
                     }
 
-                    if (url == WebUri.uri(Uri.parse('$mainUrl/scan'))) {
+                    if (url ==
+                        WebUri.uri(Uri.parse(
+                            '${const String.fromEnvironment('url')}/scan'))) {
                       await Permission.camera.request();
                       await Permission.audio.request();
                     }
 
                     if (url.toString().contains("open-jiitu")) {
                       await controller.goBack().whenComplete(() async {
-                        if (await canLaunch('https://jiitu.co.id/')) {
-                          await launch('https://jiitu.co.id/');
+                        if (await canLaunch("${const String.fromEnvironment('jiitu')}/")) {
+                          await launch("${const String.fromEnvironment('jiitu')}/");
                         } else {
                           throw 'Could not launch url';
                         }
                       });
                     }
 
-                    // if (url.toString().contains("call-resto")) {
-                    //   await controller.goBack().whenComplete(() {
-                    //     String phone = url.toString().split('call-resto/')[1];
-                    //     launch("tel:$phone");
-                    //   });
-                    // }
-
-                    if (url.toString() != '$mainUrl' &&
-                        url.toString() != '$mainUrl/') {
-                      if (url.toString().contains(mainUrl)) {
+                    if (url.toString() !=
+                            '${const String.fromEnvironment('url')}' &&
+                        url.toString() !=
+                            '${const String.fromEnvironment('url')}/') {
+                      if (url
+                          .toString()
+                          .contains(const String.fromEnvironment('url'))) {
                         await Permission.location.status.isGranted
                             .then((value) async {
                           if (!value) {
                             CustomNavigator.navigatorPushReplacement(
                                 context, new permissionLocation());
                           } else {
-                            // final locationPermissionStatus = await Geolocator.checkPermission();
                             final isLocationServiceEnabled =
                                 await Geolocator.isLocationServiceEnabled();
 
@@ -1295,7 +1008,6 @@ class _WebViewActivityState extends State<WebViewActivity>
                             }
                           }
                         });
-                        // new permissionLocation();
                       }
                     }
 
@@ -1491,7 +1203,7 @@ class _WebViewActivityState extends State<WebViewActivity>
                                               _webViewController!.loadUrl(
                                                   urlRequest: URLRequest(
                                                       url: WebUri.uri(Uri.parse(
-                                                          '$mainUrl/history'))));
+                                                          '${const String.fromEnvironment('url')}/history'))));
                                             },
                                             child: Column(
                                               mainAxisAlignment:
@@ -1754,17 +1466,6 @@ class _WebViewActivityState extends State<WebViewActivity>
                                             ),
                                           ),
                                         ),
-                                        // const SizedBox(
-                                        //   height: 10,
-                                        // ),
-                                        // CustomText.text(
-                                        //     textAlign: TextAlign.left,
-                                        //     text: widget.codeNotif
-                                        //         .toString()
-                                        //         .split(" sudah")[0],
-                                        //     minSize: 24,
-                                        //     weight: FontWeight.bold,
-                                        //     color: CustomColor.primary),
                                       ],
                                     ),
                                   ),
@@ -1785,8 +1486,8 @@ class _WebViewActivityState extends State<WebViewActivity>
   bool isPrint = false;
   List<BluetoothInfo> items = [];
   bool connected = false;
-  bool _progress = false;
-  String _msjprogress = "";
+  bool progress = false;
+  String msjprogress = "";
   var thermalDataCashier = '';
   var thermalData = '';
   var thermalDataTrans = '';
@@ -1796,20 +1497,14 @@ class _WebViewActivityState extends State<WebViewActivity>
   Future<void> getBluetoots() async {
     await disconnect();
     setState(() {
-      _progress = true;
-      // _msjprogress = "Wait";
+      progress = true;
       items = [];
     });
     final List<BluetoothInfo> listResult =
         await PrintBluetoothThermal.pairedBluetooths;
 
-    /*await Future.forEach(listResult, (BluetoothInfo bluetooth) {
-      String name = bluetooth.name;
-      String mac = bluetooth.macAdress;
-    });*/
-
     setState(() {
-      _progress = false;
+      progress = false;
     });
 
     if (listResult.length == 0) {
@@ -1819,14 +1514,9 @@ class _WebViewActivityState extends State<WebViewActivity>
           toastLength: Toast.LENGTH_LONG,
           timeInSecForIosWeb: 5);
       AppSettings.openAppSettings(type: AppSettingsType.bluetooth);
-      // _msj =
-      // "There are no bluetoohs linked, go to settings and link the printer";
     } else {
       isPrint = true;
-      // print("thermalDataDecode[json.decode]");
-      // print(thermalDataDecode['item']['name']);
       Fluttertoast.showToast(msg: 'Pilih bluetooth dalam daftar untuk dicetak');
-      // _msj = "Touch an item in the list to connect";
     }
 
     setState(() {
@@ -1845,8 +1535,7 @@ class _WebViewActivityState extends State<WebViewActivity>
     await disconnect();
     setState(() {
       isLoadingConnect = true;
-      _progress = true;
-      // _msjprogress = "Connecting...";
+      progress = true;
       Fluttertoast.showToast(msg: 'Menghubungkan...');
       connected = false;
     });
@@ -1859,7 +1548,7 @@ class _WebViewActivityState extends State<WebViewActivity>
       setState(() {
         Fluttertoast.showToast(msg: 'Berhasil dicetak');
         pref.setString("macAddress", mac.toString());
-        _progress = false;
+        progress = false;
         isLoadingConnect = false;
         this.printTest();
       });
@@ -1909,10 +1598,8 @@ class _WebViewActivityState extends State<WebViewActivity>
     var thermalDataDecode = json.decode(thermalData);
     var thermalDataTransDecode = json.decode(thermalDataTrans);
     List<int> bytes = [];
-    // Using default profile
     final profile = await CapabilityProfile.load();
     final generator = Generator(PaperSize.mm58, profile);
-    //bytes += generator.setGlobalFont(PosFontType.fontA);
     bytes += generator.reset();
 
     final ByteData data = await rootBundle.load('assets/logo-jiitu.png');
@@ -1926,7 +1613,6 @@ class _WebViewActivityState extends State<WebViewActivity>
           height: image.height ~/ 1.3,
           interpolation: img.Interpolation.nearest);
       final bytesimg = Uint8List.fromList(img.encodeJpg(resizedImage));
-      //image = img.decodeImage(bytesimg);
     }
 
     List<String> menuName = [];
@@ -1980,17 +1666,7 @@ class _WebViewActivityState extends State<WebViewActivity>
             .format(int.parse(thermalDataDecode['total'].toString()))
             .toString();
 
-    //Using `ESC *`
-    // bytes += generator.image(image!);
-
-    // bytes += generator.text('JIITU',
-    //     styles: PosStyles(
-    //       bold: true,
-    //       fontType: PosFontType.fontA,
-    //       align: PosAlign.center,
-    //     ));
-
-    var maxWordLength = 26; // Define your maximum word length here
+    var maxWordLength = 26;
     String nameResto =
         thermalDataDecode['outlet']['name'].toString().toUpperCase();
     var _nameResto = nameResto.split(' ');
@@ -2024,15 +1700,6 @@ class _WebViewActivityState extends State<WebViewActivity>
             align: PosAlign.center,
           ));
     }
-    // OLD
-    // bytes += generator.text('Long Text That May Wrap to Next Line Automatically',
-    //     styles: PosStyles(
-    //       width: PosTextSize.size2,
-    //       height: PosTextSize.size2,
-    //       bold: true,
-    //       fontType: PosFontType.fontA,
-    //       align: PosAlign.center,
-    //     ), linesAfter: 1);
 
     var maxWordLengthSecond = 32;
     String addressResto = thermalDataDecode['outlet']['address'].toString();
@@ -2063,12 +1730,6 @@ class _WebViewActivityState extends State<WebViewActivity>
             align: PosAlign.center,
           ));
     }
-    // bytes += generator.text(
-    //     'Jalan Brigadir Jenderal Slamet Riyadi, RW 03 Kel. Oro Oro Dowo, Klojen Kota Malang, Kota Malang, Jawa Timur, Jawa, 65112, Indonesia',
-    //     styles: PosStyles(
-    //       align: PosAlign.center,
-    //     ));
-    //
     bytes += generator.text('--------------------------------',
         styles: PosStyles(bold: true, align: PosAlign.center));
 
@@ -2198,7 +1859,6 @@ class _WebViewActivityState extends State<WebViewActivity>
         styles: PosStyles(bold: true, align: PosAlign.center));
 
     for (var i = 0; i < menuName.length; i++) {
-      // String addressResto = 'Jalan Brigadir Jenderal Slamet Riyadi, RW 03 Kel. Oro Oro Dowo, Klojen Kota Malang, Kota Malang, Jawa Timur, Jawa, 65112, Indonesia';
       var _menuName = menuName[i].split(' ');
       currentLine = '';
 
@@ -2230,12 +1890,6 @@ class _WebViewActivityState extends State<WebViewActivity>
               align: PosAlign.left,
             ));
       }
-      // bytes += generator.text(nama[i],
-      //     styles: PosStyles(
-      //       bold: true,
-      //       fontType: PosFontType.fontA,
-      //       align: PosAlign.left,
-      //     ));
       bytes += generator.row([
         PosColumn(
           text: menuPrice[i] + ' X ' + qty[i],
@@ -2273,22 +1927,6 @@ class _WebViewActivityState extends State<WebViewActivity>
         ),
       ),
     ]);
-    // bytes += generator.row([
-    //   PosColumn(
-    //     text: 'Pajak',
-    //     width: 6,
-    //     styles: PosStyles(
-    //       align: PosAlign.left,
-    //     ),
-    //   ),
-    //   PosColumn(
-    //     text: '6.636',
-    //     width: 6,
-    //     styles: PosStyles(
-    //       align: PosAlign.right,
-    //     ),
-    //   ),
-    // ]);
     bytes += generator.row([
       PosColumn(
         text: 'Platform Fee',
@@ -2344,22 +1982,6 @@ class _WebViewActivityState extends State<WebViewActivity>
         ),
       ),
     ]);
-    // bytes += generator.row([
-    //   PosColumn(
-    //     text: 'Bayar',
-    //     width: 6,
-    //     styles: PosStyles(
-    //       align: PosAlign.left,
-    //     ),
-    //   ),
-    //   PosColumn(
-    //     text: '74.000',
-    //     width: 6,
-    //     styles: PosStyles(
-    //       align: PosAlign.right,
-    //     ),
-    //   ),
-    // ]);
 
     bytes += generator.text('--------------------------------',
         styles: PosStyles(bold: true, align: PosAlign.center));
@@ -2374,13 +1996,12 @@ class _WebViewActivityState extends State<WebViewActivity>
           align: PosAlign.center,
         ));
 
-    bytes += generator.text('https://jiitu.co.id',
+    bytes += generator.text("${const String.fromEnvironment('jiitu')}",
         styles: PosStyles(
           align: PosAlign.center,
         ));
 
     bytes += generator.feed(2);
-    // bytes += generator.cut();
     return bytes;
   }
 }

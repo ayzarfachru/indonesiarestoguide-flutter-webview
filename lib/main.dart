@@ -1,17 +1,15 @@
-import 'dart:convert';
 import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:http/http.dart' as http;
-import 'package:kam5ia/utils/utils.dart';
+import 'package:indonesiarestoguide/utils/utils.dart';
 import 'package:onesignal_flutter/onesignal_flutter.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_dynamic_links/firebase_dynamic_links.dart';
 import 'package:permission_handler/permission_handler.dart';
-import 'package:kam5ia/welcome.dart';
-import 'package:kam5ia/webview_activity.dart';
+import 'package:indonesiarestoguide/welcome.dart';
+import 'package:indonesiarestoguide/webview_activity.dart';
 
 class MyHttpOverrides extends HttpOverrides {
   @override
@@ -37,28 +35,8 @@ void main() async {
     systemNavigationBarIconBrightness: Brightness.dark,
   ));
   await Firebase.initializeApp();
-  // await FlutterDownloader.initialize(debug: true);
-
-  // GestureBinding.instance?.resamplingEnabled = true;
-  // var resto = Api.getResto(4) as Resto;
-  // OneSignal.shared.setAppId(
-  //   "4fe55f91-4eb4-4b48-a92c-d7a1c31b114b",
-  //   // iOSSettings: null
-  // );
-  OneSignal.initialize("4fe55f91-4eb4-4b48-a92c-d7a1c31b114b");
-  // OneSignal.shared.addTrigger("prompt_ios", "true");
-  // OneSignal.shared.setInFocusDisplayType(OSNotificationDisplayType.notification);
+  OneSignal.initialize("${const String.fromEnvironment('onsignalid')}");
   OneSignal.Notifications.requestPermission(true);
-  // await OneSignal.shared
-  //     .promptUserForPushNotificationPermission(fallbackToSettings: Platform.isIOS).then((value) => runApp(MyApp()));
-
-  // runApp(MaterialApp(
-  //     debugShowCheckedModeBanner: false,
-  //     routes: <String, WidgetBuilder>{
-  //       '/': (BuildContext context) => MyApp(),
-  //       '/open': (BuildContext context) => DetailResto(4.toString()),
-  //     }
-  // ));
   runApp(MyApp());
 }
 
@@ -70,52 +48,6 @@ class MyApp extends StatefulWidget {
 class _MyAppState extends State<MyApp> {
   final GlobalKey<NavigatorState> navigatorKey =
       new GlobalKey<NavigatorState>();
-
-  Future<bool> _checkForSession() async {
-    await Future.delayed(Duration.zero, () {});
-    return true;
-  }
-
-  Future<int> getSwitch() async {
-    SharedPreferences pref = await SharedPreferences.getInstance();
-    return pref.getInt("id") ?? 0;
-  }
-
-  void _navigateHome() {
-    getSwitch().then((onValue) {
-      if (onValue == 0) {
-        setState(() {
-          isLogin = false;
-        });
-      } else {
-        setState(() {
-          isLogin = true;
-        });
-      }
-    });
-  }
-
-  String deepLink2 = '';
-
-  // initDynamicLinks() async {
-  //   print('DynamicLinks onLink');
-  //   // await Future.delayed(Duration(seconds: 3));
-  //   var data = await FirebaseDynamicLinks.instance.getInitialLink();
-  //   var deepLink = data.link;
-  //   final queryParams = deepLink.queryParameters;
-  //   if (queryParams.length > 0) {
-  //     var userName = queryParams['userId'];
-  //   }
-  //   FirebaseDynamicLinks.instance.onLink(onSuccess: (dynamicLink)
-  //   async {
-  //     var deepLink = dynamicLink.link;
-  //     deepLink2 = dynamicLink.toString();
-  //     print(deepLink);
-  //     debugPrint('DynamicLinks onLink $deepLink');
-  //   }, onError: (e) async {
-  //     debugPrint('DynamicLinks onError $e');
-  //   });
-  // }
 
   Future initDynamicLinks() async {
     SharedPreferences pref = await SharedPreferences.getInstance();
@@ -132,260 +64,24 @@ class _MyAppState extends State<MyApp> {
     });
   }
 
-  // Future<Widget> getRoute(deepLink) async {
-  //   if (deepLink.toString().isEmpty) {
-  //     return HomeActivity();
-  //   } else {
-  //     // if (deepLink.path == "/open") {
-  //     //   final id = deepLink.queryParameters["id"];
-  //     //   if (id != null) {
-  //     //     if (id.toString().contains('-') == true) {
-  //     //       SharedPreferences pref = await SharedPreferences.getInstance();
-  //     //       // pref.getString('restoIdUsr')??'';
-  //     //       print('TOL');
-  //     //       return DetailResto(id.toString().split('-')[0]);
-  //     //     } else {
-  //     //       print('PUK');
-  //     //       return DetailResto(id);
-  //     //     }
-  //     //   }
-  //     // }
-  //   }
-  //   return HomeActivity();
-  // }
-
-  String owner = 'false';
-
-  Future _getOwnerResto() async {
-    // List<History> _history = [];
-
-    // setState(() {
-    //   isLoading = true;
-    // });
-    // List<User> _user = [];
-    SharedPreferences pref = await SharedPreferences.getInstance();
-    String token = pref.getString("token") ?? "";
-    var apiResult = await http.get(Uri.parse(Links.mainUrl + '/owner'),
-        headers: {
-          "Accept": "Application/json",
-          "Authorization": "Bearer $token"
-        });
-    var data = json.decode(apiResult.body);
-
-    // for(var v in data['trans']){
-    //   History h = History(
-    //       id: v['id'],
-    //       name: v['resto_name'],
-    //       time: v['time'],
-    //       price: v['price'],
-    //       img: v['resto_img'],
-    //       type: v['type']
-    //   );
-    //   _history.add(h);
-    // }
-
-    // setState(() {
-    //   // id = (data['msg'].toString() == "User tidak punya resto")?'':data['resto']['id'].toString();
-    //   // restoName = (data['msg'].toString() == "User tidak punya resto")?'':data['resto']['name'];
-    //   // // history = _history;
-    //   // openAndClose = (data['status'].toString() == "closed")?'1':'0';
-    //   // isLoading = false;
-    // });
-
-    // if(openAndClose == '0'){
-    //   SharedPreferences pref = await SharedPreferences.getInstance();
-    //   pref.setString("openclose", '1');
-    // }else if(openAndClose == '1'){
-    //   SharedPreferences pref = await SharedPreferences.getInstance();
-    //   pref.setString("openclose", '0');
-    // }
-
-    if (apiResult.statusCode == 200) {
-      if (data['resto'].toString() == "[]") {
-        _getUserResto();
-      } else {
-        owner = 'true';
-        SharedPreferences pref = await SharedPreferences.getInstance();
-        pref.setInt("ownerId", int.parse(res.split('_')[1]));
-        pref.setString("owner", 'true');
-        pref.setString("nameOwner", pref.getString('name') ?? '');
-        pref.setString("emailOwner", pref.getString('email') ?? '');
-        pref.setString("homepg", "1");
-        _getCheckResto();
-        // for(var v in data['resto']){
-        //   User p = User.resto(
-        //     id: int.parse(v['restaurant_id']),
-        //     name: v['restaurant']['name'],
-        //     email: v['restaurant']['address'],
-        //     notelp: '',
-        //     img: v['restaurant']['img'],
-        //   );
-        //   _user.add(p);
-        // }
-      }
-    } else {
-      _getUserResto();
-    }
-
-    setState(() {
-      // user = _user;
-    });
-  }
-
-  Future _getCheckResto() async {
-    // List<History> _history = [];
-
-    // setState(() {
-    //   isLoading = true;
-    // });
-    SharedPreferences pref = await SharedPreferences.getInstance();
-    String token = pref.getString("token") ?? "";
-    int idRes = pref.getInt("ownerId") ?? 0;
-    var apiResult = await http.get(
-        Uri.parse(Links.mainUrl + '/owner/activate/' + idRes.toString()),
-        headers: {
-          "Accept": "Application/json",
-          "Authorization": "Bearer $token"
-        });
-    var data = json.decode(apiResult.body);
-
-    // for(var v in data['trans']){
-    //   History h = History(
-    //       id: v['id'],
-    //       name: v['resto_name'],
-    //       time: v['time'],
-    //       price: v['price'],
-    //       img: v['resto_img'],
-    //       type: v['type']
-    //   );
-    //   _history.add(h);
-    // }
-
-    setState(() {
-      // id = (data['msg'].toString() == "User tidak punya resto")?'':data['resto']['id'].toString();
-      // restoName = (data['msg'].toString() == "User tidak punya resto")?'':data['resto']['name'];
-      // // history = _history;
-      // openAndClose = (data['status'].toString() == "closed")?'1':'0';
-      // isLoading = false;
-    });
-
-    // if(openAndClose == '0'){
-    //   SharedPreferences pref = await SharedPreferences.getInstance();
-    //   pref.setString("openclose", '1');
-    // }else if(openAndClose == '1'){
-    //   SharedPreferences pref = await SharedPreferences.getInstance();
-    //   pref.setString("openclose", '0');
-    // }
-
-    if (apiResult.statusCode == 200) {
-      if (data['msg'].toString() == "User tidak punya resto") {
-        kosong = '1';
-      }
-      // else if (data['resto']['id'] == null || id == 'null' || id == '') {
-      //   kosong = '1';
-      // }
-      else {
-        SharedPreferences pref = await SharedPreferences.getInstance();
-        pref.setString("homepg", "1");
-        // pref.setString("homerestoname", restoName);
-        setState(() {
-          // navigatorKey.currentState?.pushReplacement(new MaterialPageRoute(
-          //     builder: (context) => new HomeActivityResto()));
-        });
-      }
-    }
-  }
-
   String id = "";
   bool isLoading = false;
-  String restoName = "";
-  String openAndClose = "0";
-  String kosong = '';
-
-  Future _getUserResto() async {
-    // List<History> _history = [];
-
-    setState(() {
-      isLoading = true;
-    });
-    SharedPreferences pref = await SharedPreferences.getInstance();
-    String token = pref.getString("token") ?? "";
-    var apiResult = await http.get(Uri.parse(Links.mainUrl + '/resto'),
-        headers: {
-          "Accept": "Application/json",
-          "Authorization": "Bearer $token"
-        });
-    var data = json.decode(apiResult.body);
-
-    // for(var v in data['trans']){
-    //   History h = History(
-    //       id: v['id'],
-    //       name: v['resto_name'],
-    //       time: v['time'],
-    //       price: v['price'],
-    //       img: v['resto_img'],
-    //       type: v['type']
-    //   );
-    //   _history.add(h);
-    // }
-
-    setState(() {
-      id = (data['msg'].toString() == "User tidak punya resto")
-          ? ''
-          : data['resto']['id'].toString();
-      restoName = (data['msg'].toString() == "User tidak punya resto")
-          ? ''
-          : data['resto']['name'];
-      // history = _history;
-      openAndClose = (data['status'].toString() == "closed") ? '1' : '0';
-      isLoading = false;
-    });
-
-    // if(openAndClose == '0'){
-    //   SharedPreferences pref = await SharedPreferences.getInstance();
-    //   pref.setString("openclose", '1');
-    // }else if(openAndClose == '1'){
-    //   SharedPreferences pref = await SharedPreferences.getInstance();
-    //   pref.setString("openclose", '0');
-    // }
-
-    if (apiResult.statusCode == 200) {
-      if (data['msg'].toString() == "User tidak punya resto") {
-        kosong = '1';
-      } else if (data['resto']['id'] == null || id == 'null' || id == '') {
-        kosong = '1';
-      } else {
-        SharedPreferences pref = await SharedPreferences.getInstance();
-        pref.setString("homepg", "1");
-        // pref.setString("homerestoname", restoName);
-        setState(() {
-          // navigatorKey.currentState?.pushReplacement(new MaterialPageRoute(
-          //     builder: (context) => new HomeActivityResto()));
-        });
-      }
-    }
-  }
 
   Future _toWebViewDetailResto(String id) async {
     navigatorKey.currentState?.pushReplacement(new MaterialPageRoute(
         builder: (context) => new WebViewActivity(
               codeNotif: "",
-              url: "https://m.indonesiarestoguide.id/resto-detail/" + id,
+              url: "${const String.fromEnvironment('url')}/resto-detail/" + id,
             )));
-  }
-
-  Future _toDetailRes() async {
-    // SharedPreferences pref = await SharedPreferences.getInstance();
-    // pref.setString("homepg", "");
-    // navigatorKey.currentState?.pushReplacement(new MaterialPageRoute(
-    //     builder: (context) => new DetailResto(res.split('_')[1])));
   }
 
   Future _toWebViewHistoryDetail(String id) async {
     navigatorKey.currentState?.pushReplacement(new MaterialPageRoute(
         builder: (context) => new WebViewActivity(
               codeNotif: "",
-              url: "https://m.indonesiarestoguide.id/history/" + id + "/resto",
+              url: "${const String.fromEnvironment('url')}/history/" +
+                  id +
+                  "/resto",
             )));
   }
 
@@ -394,7 +90,7 @@ class _MyAppState extends State<MyApp> {
         builder: (context) => new WebViewActivity(
               codeNotif: "",
               url:
-                  "https://m.indonesiarestoguide.id/profile/user/?page=/redirectToTrasaction/" +
+                  "${const String.fromEnvironment('url')}/profile/user/?page=/redirectToTrasaction/" +
                       id,
             )));
   }
@@ -483,49 +179,6 @@ class _MyAppState extends State<MyApp> {
     super.initState();
   }
 
-  //
-  // @override
-  // void dispose() {
-  //   WidgetsBinding.instance!.removeObserver(this);
-  //   super.dispose();
-  // }
-
-  // @override
-  // void didChangeAppLifecycleState(AppLifecycleState state) {
-  //   if (state == AppLifecycleState.resumed) {
-  //     print('ASYU');
-  //     _checkForSession().then((status) {
-  //       if (status) {
-  //         _navigateHome();
-  //       }
-  //     });
-  //   }
-  //   if (state == AppLifecycleState.inactive) {
-  //     print('ASYU');
-  //     _checkForSession().then((status) {
-  //       if (status) {
-  //         _navigateHome();
-  //       }
-  //     });
-  //   }
-  //   if (state == AppLifecycleState.paused) {
-  //     print('ASYU');
-  //     _checkForSession().then((status) {
-  //       if (status) {
-  //         _navigateHome();
-  //       }
-  //     });
-  //   }
-  //   if (state == AppLifecycleState.detached) {
-  //     print('ASYU');
-  //     _checkForSession().then((status) {
-  //       if (status) {
-  //         _navigateHome();
-  //       }
-  //     });
-  //   }
-  // }
-
   @override
   Widget build(BuildContext context) {
     SystemChrome.setPreferredOrientations([
@@ -534,9 +187,6 @@ class _MyAppState extends State<MyApp> {
     return MaterialApp(
       navigatorKey: navigatorKey,
       debugShowCheckedModeBanner: false,
-      // routes: <String, WidgetBuilder>{
-      //   '/open': (BuildContext context) => DetailResto(4.toString()),
-      // },
       theme: ThemeData(
         primaryColor: CustomColor.primary,
         scaffoldBackgroundColor: Colors.white,
@@ -544,7 +194,6 @@ class _MyAppState extends State<MyApp> {
         appBarTheme: AppBarTheme(
             color: CustomColor.background, centerTitle: true, elevation: 0),
       ),
-      // home: (isLogin)?new SplashScreen():new WelcomeScreen(),
       home: new Welcome(),
     );
   }

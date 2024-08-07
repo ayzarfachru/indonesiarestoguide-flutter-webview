@@ -2,30 +2,23 @@ import 'package:app_settings/app_settings.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:geolocator/geolocator.dart';
-import 'package:kam5ia/utils/utils.dart';
-import 'package:kam5ia/webview_activity.dart';
+import 'package:indonesiarestoguide/utils/utils.dart';
+import 'package:indonesiarestoguide/webview_activity.dart';
 import 'package:permission_handler/permission_handler.dart';
 
 class permissionLocation extends StatefulWidget {
-  // String? url;
-
-  // permissionLocation({Key? key, @required this.url})
-  //     : super(key: key);
 
   @override
   State<permissionLocation> createState() => _permissionLocationState();
 }
 
 class _permissionLocationState extends State<permissionLocation> {
-  // String mainUrl = 'https://m.kam5ia.com';
-  // String url = "";
 
   bool isLocationEnabled = false;
 
   Future reqHandlePermission() async{
     await Permission.location.request().whenComplete(() async {
       await Permission.location.status.isGranted.then((value) async {
-        print(value);
         if (value) {
           final locationPermissionStatus = await Geolocator.checkPermission();
           final isLocationServiceEnabled =
@@ -136,7 +129,6 @@ class _permissionLocationState extends State<permissionLocation> {
               GestureDetector(
                 onTap: () async {
                   await Permission.location.status.isGranted.then((value) async {
-                    print(value);
                     if (!value) {
                       reqHandlePermission();
                     } else {
@@ -148,8 +140,6 @@ class _permissionLocationState extends State<permissionLocation> {
                         isLocationEnabled = isLocationServiceEnabled;
                       });
 
-                      print('isLocationEnabled');
-                      print(isLocationEnabled);
 
                       if (!isLocationEnabled) {
                         AppSettings.openAppSettings(type: AppSettingsType.location);
